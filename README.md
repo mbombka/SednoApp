@@ -1,6 +1,7 @@
 # SimplifierApp
 
 A minimal Flutter application for Android. It currently opens a single home screen.
+The planned purpose is to simplify long text.
 
 ## Project layout
 
