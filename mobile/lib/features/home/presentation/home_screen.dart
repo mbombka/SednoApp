@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:simplifier_app/features/home/presentation/home_view_model.dart';
 import 'package:simplifier_app/features/home/presentation/text_input_view_model.dart';
+import 'package:simplifier_app/features/history/domain/history_entry.dart';
+import 'package:simplifier_app/features/history/domain/history_repository.dart';
 import 'package:simplifier_app/features/photo/domain/photo_text_repository.dart';
 import 'package:simplifier_app/features/photo/presentation/photo_input_view_model.dart';
 import 'package:simplifier_app/features/simplification/domain/input_text.dart';
@@ -16,6 +18,8 @@ class HomeScreen extends StatefulWidget {
     this.onCameraPressed,
     this.photoRepository,
     this.simplificationRepository,
+    this.historyRepository,
+    this.onHistorySaved,
     super.key,
   });
 
@@ -25,6 +29,8 @@ class HomeScreen extends StatefulWidget {
   final VoidCallback? onCameraPressed;
   final PhotoTextRepository? photoRepository;
   final SimplificationRepository? simplificationRepository;
+  final HistoryRepository? historyRepository;
+  final VoidCallback? onHistorySaved;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -59,6 +65,14 @@ class _HomeScreenState extends State<HomeScreen> {
     if (widget.onSubmit case final callback?) return callback(input);
     if (_simplificationViewModel case final model?) {
       final result = await model.simplify(input);
+      if (widget.historyRepository case final history?) {
+        try {
+          await history.save(HistoryEntry(original: input, result: result));
+          widget.onHistorySaved?.call();
+        } catch (_) {
+          // A storage failure must not hide a successful simplification.
+        }
+      }
       if (!mounted) return;
       Navigator.of(context).push<void>(
         MaterialPageRoute(
