@@ -11,6 +11,8 @@ The planned purpose is to simplify long text.
 - `test/` mirrors the application structure for unit and widget tests.
 - `android/` contains the generated Android host project.
 - `lib/features/*/domain/` contains validated models and repository contracts.
+- `lib/features/photo/` contains local camera capture, cropping, Polish OCR, and
+  temporary photo cleanup. The recognized text is editable on **Start**.
 - `lib/features/shared/data/development_mocks.dart` contains in-memory development
   repositories. Their constructors reject production (`dart.vm.product`) builds.
 - `api/openapi.yaml` defines the future HTTPS backend contract. It has no
@@ -35,3 +37,6 @@ flutter run
 ```
 
 The Android application ID is the Flutter template default, `com.example.simplifier_app`. Set an ID you own before publishing.
+
+The camera and OCR flow needs a physical Android device check. Follow
+[`mobile/docs/android_camera_ocr_manual_check.md`](mobile/docs/android_camera_ocr_manual_check.md).

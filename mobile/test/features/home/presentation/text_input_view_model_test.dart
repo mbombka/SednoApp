@@ -107,6 +107,23 @@ void main() {
     expect(model.errorMessage, isNull);
   });
 
+  test('timeout keeps input and shows a retry message', () async {
+    final model = TextInputViewModel(
+      onSubmit: (_) async => throw TimeoutException('private detail'),
+    );
+    addTearDown(model.dispose);
+    model.setText('Zachowaj tekst');
+
+    await model.submit();
+    expect(model.status, TextInputStatus.error);
+    expect(
+      model.errorMessage,
+      'Przekroczono czas oczekiwania. Spróbuj ponownie.',
+    );
+    expect(model.characterCounter, '14/4000');
+    expect(model.canSubmit, isTrue);
+  });
+
   test('clears an error on edit and reports an unavailable handler', () async {
     final model = TextInputViewModel(
       onSubmit: (_) async => throw const SubmissionUnavailableException(),

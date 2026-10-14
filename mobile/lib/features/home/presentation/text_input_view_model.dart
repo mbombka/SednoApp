@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:characters/characters.dart';
 import 'package:flutter/foundation.dart';
+import 'package:simplifier_app/features/shared/data/development_mocks.dart';
 import 'package:simplifier_app/features/simplification/domain/input_text.dart';
 
 typedef SubmitText = Future<void> Function(InputText input);
@@ -56,6 +59,15 @@ class TextInputViewModel extends ChangeNotifier {
       if (_disposed) return;
       _status = TextInputStatus.error;
       _errorMessage = 'Upraszczanie tekstu nie jest jeszcze dostępne.';
+    } on TimeoutException {
+      if (_disposed) return;
+      _status = TextInputStatus.error;
+      _errorMessage = 'Przekroczono czas oczekiwania. Spróbuj ponownie.';
+    } on QuotaExceededException {
+      if (_disposed) return;
+      _status = TextInputStatus.error;
+      _errorMessage =
+          'Dzisiejszy limit został wykorzystany. Spróbuj po północy UTC.';
     } catch (_) {
       if (_disposed) return;
       _status = TextInputStatus.error;
