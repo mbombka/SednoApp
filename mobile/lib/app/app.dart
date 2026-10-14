@@ -79,17 +79,7 @@ class _AppNavigationState extends State<_AppNavigation>
               )
             : MockHistoryRepository(clock: DateTime.now));
     _purgeHistory();
-    if (widget.simplificationRepository case final repository?) {
-      _simplificationRepository = repository;
-    } else if (const bool.fromEnvironment('dart.vm.product')) {
-      _simplificationRepository = null;
-    } else {
-      final quota = MockQuotaRepository(clock: DateTime.now);
-      _simplificationRepository = MockSimplificationRepository(
-        quota: quota,
-        clock: DateTime.now,
-      );
-    }
+    _simplificationRepository = widget.simplificationRepository;
   }
 
   Future<void> _purgeHistory() async {

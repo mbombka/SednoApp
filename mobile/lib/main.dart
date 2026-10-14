@@ -9,6 +9,7 @@ import 'package:sedno_app/features/account/data/backend_session_gateway.dart';
 import 'package:sedno_app/features/account/data/firebase_account_repository.dart';
 import 'package:sedno_app/features/account/domain/account_repository.dart';
 import 'package:sedno_app/features/history/data/encrypted_history_repository.dart';
+import 'package:sedno_app/features/simplification/data/http_simplification_repository.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,11 +25,20 @@ Future<void> main() async {
     clock: DateTime.now,
   );
   AccountRepository? accounts;
-  if (apiKey.isNotEmpty &&
+  BackendSessionGateway? sessions;
+  if (backendUrl.isNotEmpty) {
+    sessions = BackendSessionGateway(
+      baseUrl: Uri.parse(backendUrl),
+      client: http.Client(),
+      storage: const SecureSessionStorage(FlutterSecureStorage()),
+      integrity: const AndroidIntegrityTokenSource(playProjectNumber),
+    );
+  }
+  if (sessions != null &&
+      apiKey.isNotEmpty &&
       appId.isNotEmpty &&
       projectId.isNotEmpty &&
       senderId.isNotEmpty &&
-      backendUrl.isNotEmpty &&
       webClientId.isNotEmpty) {
     await Firebase.initializeApp(
       options: const FirebaseOptions(
@@ -42,14 +52,21 @@ Future<void> main() async {
     accounts = FirebaseAccountRepository(
       auth: FirebaseAuth.instance,
       google: GoogleSignIn.instance,
-      sessions: BackendSessionGateway(
-        baseUrl: Uri.parse(backendUrl),
-        client: http.Client(),
-        storage: const SecureSessionStorage(FlutterSecureStorage()),
-        integrity: const AndroidIntegrityTokenSource(playProjectNumber),
-      ),
+      sessions: sessions,
       clearHistory: history.clear,
     );
   }
-  runApp(SednoApp(accountRepository: accounts, historyRepository: history));
+  runApp(
+    SednoApp(
+      accountRepository: accounts,
+      historyRepository: history,
+      simplificationRepository: sessions == null
+          ? null
+          : HttpSimplificationRepository(
+              baseUrl: Uri.parse(backendUrl),
+              client: http.Client(),
+              sessions: sessions,
+            ),
+    ),
+  );
 }

@@ -72,11 +72,20 @@ class BackendSessionGateway {
   final http.Client client;
   final SessionStorage storage;
   final IntegrityTokenSource integrity;
+  final ValueNotifier<int> sessionRevision = ValueNotifier(0);
 
   static const _installationKey = 'installation_id';
   static const _guestKey = 'guest_token';
   static const _accountKey = 'account_token';
   static const _accountJsonKey = 'account_json';
+
+  /// Returns the current revocable backend bearer, creating a guest session
+  /// only when no account or guest session has been stored.
+  Future<String> accessToken() async {
+    final account = await storage.read(_accountKey);
+    if (account != null) return account;
+    return _guestToken();
+  }
 
   Future<Account?> savedAccount() async {
     final token = await storage.read(_accountKey);
@@ -144,6 +153,7 @@ class BackendSessionGateway {
     await storage.write(_accountKey, data['accessToken'] as String);
     await storage.write(_accountJsonKey, jsonEncode(account.toJson()));
     await storage.delete(_guestKey);
+    sessionRevision.value++;
     return account;
   }
 
@@ -160,5 +170,6 @@ class BackendSessionGateway {
     }
     await storage.delete(_accountKey);
     await storage.delete(_accountJsonKey);
+    sessionRevision.value++;
   }
 }

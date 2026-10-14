@@ -14,7 +14,8 @@ class QuotaState {
     if (limit != (tier == QuotaTier.free ? 2 : 400) ||
         used < 0 ||
         used > limit ||
-        remaining != limit - used ||
+        remaining < 0 ||
+        remaining > limit - used ||
         !serverTime.isUtc ||
         !resetAt.isUtc ||
         !resetAt.isAfter(serverTime) ||

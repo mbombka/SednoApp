@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:characters/characters.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sedno_app/features/shared/data/development_mocks.dart';
+import 'package:sedno_app/features/simplification/data/http_simplification_repository.dart';
 import 'package:sedno_app/features/simplification/domain/input_text.dart';
 
 typedef SubmitText = Future<void> Function(InputText input);
@@ -68,6 +69,24 @@ class TextInputViewModel extends ChangeNotifier {
       _status = TextInputStatus.error;
       _errorMessage =
           'Dzisiejszy limit został wykorzystany. Spróbuj po północy UTC.';
+    } on SimplificationApiException catch (error) {
+      if (_disposed) return;
+      _status = TextInputStatus.error;
+      _errorMessage = switch (error.kind) {
+        SimplificationFailure.offline =>
+          'Brak połączenia z internetem. Spróbuj ponownie.',
+        SimplificationFailure.timeout =>
+          'Przekroczono czas oczekiwania. Spróbuj ponownie.',
+        SimplificationFailure.unauthorized =>
+          'Sesja wygasła. Sprawdź konto i spróbuj ponownie.',
+        SimplificationFailure.rateLimited =>
+          'Dzisiejszy limit został wykorzystany. Sprawdź czas odnowienia.',
+        SimplificationFailure.resultUnavailable => 'Wynik tej próby nie jest już dostępny. Zmień tekst, aby wysłać nowe żądanie.',
+        SimplificationFailure.unavailable =>
+          'Usługa jest chwilowo niedostępna. Spróbuj ponownie.',
+        SimplificationFailure.rejected =>
+          'Nie można uprościć tego tekstu. Sprawdź dane i spróbuj ponownie.',
+      };
     } catch (_) {
       if (_disposed) return;
       _status = TextInputStatus.error;

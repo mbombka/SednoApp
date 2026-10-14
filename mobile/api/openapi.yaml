@@ -1,258 +1,233 @@
 openapi: 3.0.3
 info:
-  title: Sedno API
-  version: 0.1.0
+  title: Sedno backend API
+  version: 1.0.0
   description: >-
-    Contract for the future ASP.NET Core service. Submitted text is processed
-    transiently and is never persisted by the backend. Photos and history stay
-    on the device. All timestamps are UTC; character limits use Unicode
-    grapheme clusters, not UTF-16 code units or Unicode scalar values.
+    Text is processed transiently. The backend stores no submitted or simplified
+    text. Photos and history remain on the device. Timestamps are UTC.
 servers:
   - url: https://api.example.invalid
-    description: Replace with the production HTTPS host during deployment.
-  - url: https://dev-api.example.invalid
-    description: Replace with the development HTTPS host during deployment.
+security:
+  - sessionBearer: []
 paths:
   /v1/guest-sessions:
     post:
       operationId: createGuestSession
-      summary: Create a pseudonymous guest session
       security: []
+      description: >-
+        Creates a new pseudonymous guest identity and opaque credential.
+        Installation ID is not authentication. Sessions with the same
+        installation ID share a quota bucket. Changing it, including on
+        reinstall, can bypass guest limits. Production requires a fresh
+        Google Play Integrity standard token bound to the installation ID.
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              additionalProperties: false
-              required: [installationId]
+              required: [installationId, integrityToken]
               properties:
-                installationId:
-                  type: string
-                  minLength: 1
-                  description: Pseudonymous installation identifier, never an anonymous identity.
-                integrityToken:
-                  type: string
-                  description: Play Integrity token when available.
+                installationId: { type: string, minLength: 1, maxLength: 200 }
+                integrityToken: { type: string, description: Required in production. }
       responses:
         '200':
-          description: Existing or new guest session; creating a session does not reset usage.
+          description: New guest session.
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/Session'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-  /v1/simplifications:
+              schema: { $ref: '#/components/schemas/Session' }
+        '400': { $ref: '#/components/responses/Problem' }
+        '403': { $ref: '#/components/responses/Problem' }
+        '429': { $ref: '#/components/responses/Problem' }
+  /v1/auth/sessions:
     post:
-      operationId: simplifyText
-      summary: Simplify text without storing its content
+      operationId: linkFirebaseIdentity
       description: >-
-        The requestId is an idempotency key scoped to the session. Replays of
-        the same request return the same result without a second quota charge.
-        Reusing a requestId with different text is rejected. Failed requests
-        do not consume quota. The server verifies identity and subscription.
+        Requires a guest bearer. Verifies a Firebase ID token for the configured
+        project, links existing guest usage to that Firebase UID, revokes the
+        guest bearer, and issues a new opaque account session. Repeated linking
+        to the same account does not copy or recount usage.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SimplificationRequest'
+              type: object
+              required: [idToken]
+              properties:
+                idToken: { type: string }
       responses:
         '200':
-          description: Simplification and authoritative server quota state.
+          description: New account session and current quota.
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/SimplificationResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '429':
-          $ref: '#/components/responses/QuotaExceeded'
-        '503':
-          $ref: '#/components/responses/Unavailable'
+              schema: { $ref: '#/components/schemas/Session' }
+        '400': { $ref: '#/components/responses/Problem' }
+        '401': { $ref: '#/components/responses/Problem' }
+        '409': { $ref: '#/components/responses/Problem' }
+  /v1/auth/sign-out:
+    post:
+      operationId: signOut
+      description: Revokes the current opaque session.
+      responses:
+        '204': { description: Session revoked. }
+        '401': { $ref: '#/components/responses/Problem' }
   /v1/quota:
     get:
       operationId: getQuota
-      summary: Get authoritative daily quota
       responses:
         '200':
-          description: Current quota, based on server time and UTC reset.
+          description: Current UTC-day quota.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Quota' }
+        '401': { $ref: '#/components/responses/Problem' }
+        '429': { $ref: '#/components/responses/Problem' }
+  /v1/simplifications:
+    post:
+      operationId: simplifyText
+      description: >-
+        requestId is unique per authenticated identity. Active duplicates return
+        202. Completed duplicates return 409 result_unavailable because result
+        text is never persisted; the client must keep its successful response.
+        A lost successful response cannot be replayed or regenerated under the
+        same key. A new key starts a new request and uses quota on success.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SimplificationRequest' }
+      responses:
+        '200':
+          description: Result and current quota.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SimplificationResponse' }
+        '202':
+          description: Existing request is processing.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/QuotaState'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-  /v1/account:
+                type: object
+                required: [status, quota]
+                properties:
+                  status: { type: string, enum: [processing] }
+                  quota: { $ref: '#/components/schemas/Quota' }
+        '400': { $ref: '#/components/responses/Problem' }
+        '401': { $ref: '#/components/responses/Problem' }
+        '409': { $ref: '#/components/responses/Problem' }
+        '413': { $ref: '#/components/responses/Problem' }
+        '429': { $ref: '#/components/responses/Problem' }
+        '503': { $ref: '#/components/responses/Problem' }
+  /v1/simplifications/requests/{requestId}:
     get:
-      operationId: getAccount
-      summary: Get current guest or signed-in account
+      operationId: getRequestStatus
+      description: Ownership is checked against the bearer credential. No result text is returned.
+      parameters:
+        - in: path
+          name: requestId
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 100 }
       responses:
         '200':
-          description: Current account.
+          description: Operational status.
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/Account'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-    delete:
-      operationId: deleteAccount
-      summary: Delete server account data
-      description: The app separately deletes its local encrypted history.
+              schema: { $ref: '#/components/schemas/RequestStatus' }
+        '400': { $ref: '#/components/responses/Problem' }
+        '401': { $ref: '#/components/responses/Problem' }
+        '404': { $ref: '#/components/responses/Problem' }
+        '429': { $ref: '#/components/responses/Problem' }
+  /health/live:
+    get:
+      operationId: liveness
+      security: []
       responses:
-        '204':
-          description: Account data deleted.
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+        '200': { description: Process is alive. }
+  /health/ready:
+    get:
+      operationId: readiness
+      security: []
+      responses:
+        '200': { description: PostgreSQL is reachable. }
+        '503': { description: PostgreSQL is unavailable. }
 components:
   securitySchemes:
-    bearerAuth:
+    sessionBearer:
       type: http
       scheme: bearer
-      bearerFormat: JWT
+      description: Revocable opaque guest or account credential, not a JWT.
+  responses:
+    Problem:
+      description: RFC 7807 Problem Details with a machine-readable code.
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
   schemas:
-    Session:
+    Problem:
       type: object
-      additionalProperties: false
-      required: [accessToken, account, quota]
+      required: [status, title, code]
       properties:
-        accessToken:
-          type: string
-          minLength: 1
-        account:
-          $ref: '#/components/schemas/Account'
-        quota:
-          $ref: '#/components/schemas/QuotaState'
-    SimplificationRequest:
-      type: object
-      additionalProperties: false
-      required: [requestId, text]
-      properties:
-        requestId:
-          type: string
-          minLength: 1
-          description: Unique idempotency key generated by the client.
-        text:
-          type: string
-          minLength: 1
-          description: 1 to 4000 non-whitespace Unicode grapheme clusters.
-          x-maxGraphemeClusters: 4000
-    SimplificationResponse:
-      type: object
-      additionalProperties: false
-      required: [result, quota]
-      properties:
-        result:
-          $ref: '#/components/schemas/SimplificationResult'
-        quota:
-          $ref: '#/components/schemas/QuotaState'
-    SimplificationResult:
-      type: object
-      additionalProperties: false
-      required: [id, text, createdAt]
-      properties:
-        id:
-          type: string
-          minLength: 1
-        text:
-          type: string
-          minLength: 1
-        createdAt:
-          type: string
-          format: date-time
-          description: UTC, with a Z suffix.
+        type: { type: string }
+        status: { type: integer }
+        title: { type: string, description: Polish user-facing message. }
+        code: { type: string }
+        quota: { $ref: '#/components/schemas/Quota' }
     Account:
       type: object
-      additionalProperties: false
       required: [id, provider]
       properties:
-        id:
-          type: string
-          minLength: 1
-        provider:
-          type: string
-          enum: [guest, google, email]
-        email:
-          type: string
-          format: email
-          nullable: true
-        displayName:
-          type: string
-          nullable: true
-    QuotaState:
+        id: { type: string, format: uuid }
+        provider: { type: string, enum: [guest, google, email] }
+    Session:
       type: object
-      additionalProperties: false
+      required: [accessToken, account, quota]
+      properties:
+        accessToken: { type: string }
+        account: { $ref: '#/components/schemas/Account' }
+        quota: { $ref: '#/components/schemas/Quota' }
+    Quota:
+      type: object
       required: [tier, limit, used, remaining, serverTime, resetAt]
       description: >-
-        Free limit is 2; subscription limit is 400 total per day. Remaining is
-        limit minus used. Reset is the next 00:00 UTC after serverTime.
+        used counts successful requests on the current UTC reservation day;
+        remaining excludes active reservations. Paid limit includes free usage.
       properties:
-        tier:
-          type: string
-          enum: [free, subscription]
-        limit:
-          type: integer
-          enum: [2, 400]
-        used:
-          type: integer
-          minimum: 0
-        remaining:
-          type: integer
-          minimum: 0
-        serverTime:
-          type: string
-          format: date-time
-        resetAt:
-          type: string
-          format: date-time
-    Error:
+        tier: { type: string, enum: [free, subscription] }
+        limit: { type: integer, enum: [2, 400] }
+        used: { type: integer, minimum: 0 }
+        remaining: { type: integer, minimum: 0 }
+        serverTime: { type: string, format: date-time }
+        resetAt: { type: string, format: date-time }
+    SimplificationRequest:
       type: object
-      additionalProperties: false
-      required: [code, message]
+      required: [requestId, text]
       properties:
-        code:
+        requestId: { type: string, minLength: 1, maxLength: 100, pattern: '^[A-Za-z0-9_-]+$' }
+        text:
           type: string
-        message:
-          type: string
-          description: User-facing message in Polish.
-        quota:
-          $ref: '#/components/schemas/QuotaState'
-  responses:
-    BadRequest:
-      description: Malformed or invalid input.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Unauthorized:
-      description: Missing or invalid session.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Conflict:
-      description: Request ID was reused with different text.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    QuotaExceeded:
-      description: No remaining uses before the next UTC reset.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Unavailable:
-      description: Model provider temporarily unavailable; quota is unchanged.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-security:
-  - bearerAuth: []
+          minLength: 1
+          x-maxGraphemeClusters: 4000
+          description: Non-whitespace text, at most 4000 Unicode grapheme clusters.
+    SimplificationResponse:
+      type: object
+      required: [result, quota]
+      properties:
+        result: { $ref: '#/components/schemas/Result' }
+        quota: { $ref: '#/components/schemas/Quota' }
+    Result:
+      type: object
+      required: [id, text, createdAt]
+      properties:
+        id: { type: string }
+        text: { type: string }
+        createdAt: { type: string, format: date-time }
+    RequestStatus:
+      type: object
+      required: [requestId, status, reservationDay, quota]
+      properties:
+        requestId: { type: string }
+        status: { type: string, enum: [processing, succeeded, failed, expired] }
+        reservationDay: { type: string, format: date-time }
+        finishedAt: { type: string, format: date-time, nullable: true }
+        quota: { $ref: '#/components/schemas/Quota' }

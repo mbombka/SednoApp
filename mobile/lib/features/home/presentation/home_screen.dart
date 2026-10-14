@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:sedno_app/features/home/presentation/home_view_model.dart';
 import 'package:sedno_app/features/home/presentation/text_input_view_model.dart';
@@ -5,6 +7,8 @@ import 'package:sedno_app/features/history/domain/history_entry.dart';
 import 'package:sedno_app/features/history/domain/history_repository.dart';
 import 'package:sedno_app/features/photo/domain/photo_text_repository.dart';
 import 'package:sedno_app/features/photo/presentation/photo_input_view_model.dart';
+import 'package:sedno_app/features/quota/domain/quota_repository.dart';
+import 'package:sedno_app/features/quota/domain/quota_state.dart';
 import 'package:sedno_app/features/simplification/domain/input_text.dart';
 import 'package:sedno_app/features/simplification/domain/simplification_repository.dart';
 import 'package:sedno_app/features/simplification/presentation/result_screen.dart';
@@ -36,14 +40,19 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   late final TextInputViewModel _inputViewModel;
   PhotoInputViewModel? _photoViewModel;
   SimplificationViewModel? _simplificationViewModel;
+  QuotaStateSource? _quotaSource;
+  Timer? _resetTimer;
+  Timer? _counterTimer;
+  final Stopwatch _quotaAge = Stopwatch();
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _inputViewModel = TextInputViewModel(onSubmit: _submit);
     _inputViewModel.setText(widget.textController.text);
     if (widget.photoRepository case final repository?) {
@@ -54,7 +63,73 @@ class _HomeScreenState extends State<HomeScreen> {
         repository: repository,
       );
     }
+    _attachQuota(widget.simplificationRepository);
     widget.textController.addListener(_onTextChanged);
+  }
+
+  void _attachQuota(SimplificationRepository? repository) {
+    if (repository case final QuotaStateSource source) {
+      _quotaSource = source;
+      source.quotaListenable.addListener(_onQuotaChanged);
+    } else {
+      return;
+    }
+    _onQuotaChanged();
+    _loadQuota();
+  }
+
+  Future<void> _loadQuota() async {
+    try {
+      await _quotaSource?.current();
+    } catch (_) {
+      final quota = _quotaSource?.quotaListenable.value;
+      if (quota != null &&
+          quota.remaining == 0 &&
+          _remainingUntilReset(quota) == Duration.zero) {
+        _resetTimer?.cancel();
+        _resetTimer = Timer(const Duration(seconds: 30), _loadQuota);
+      }
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _loadQuota();
+  }
+
+  void _onQuotaChanged() {
+    _resetTimer?.cancel();
+    _counterTimer?.cancel();
+    _quotaAge
+      ..reset()
+      ..start();
+    final quota = _quotaSource?.quotaListenable.value;
+    if (quota == null) return;
+    _resetTimer = Timer(
+      _remainingUntilReset(quota) + const Duration(seconds: 1),
+      _loadQuota,
+    );
+    if (quota.remaining < 2) {
+      _counterTimer = Timer.periodic(const Duration(minutes: 1), (_) {
+        if (mounted) setState(() {});
+      });
+    }
+  }
+
+  Duration _remainingUntilReset(QuotaState quota) {
+    final remaining =
+        quota.resetAt.difference(quota.serverTime) - _quotaAge.elapsed;
+    return remaining.isNegative ? Duration.zero : remaining;
+  }
+
+  String _timeUntilReset(QuotaState quota) {
+    final remaining = _remainingUntilReset(quota);
+    final totalMinutes =
+        (remaining.inMicroseconds + Duration.microsecondsPerMinute - 1) ~/
+        Duration.microsecondsPerMinute;
+    final hours = totalMinutes ~/ 60;
+    final minutes = totalMinutes.remainder(60);
+    return 'za $hours godz. $minutes min';
   }
 
   static Future<void> _unavailableSubmission(InputText _) async {
@@ -105,19 +180,29 @@ class _HomeScreenState extends State<HomeScreen> {
           : PhotoInputViewModel(widget.photoRepository!);
     }
     if (oldWidget.simplificationRepository != widget.simplificationRepository) {
+      _quotaSource?.quotaListenable.removeListener(_onQuotaChanged);
+      _resetTimer?.cancel();
+      _counterTimer?.cancel();
+      _quotaSource = null;
       _simplificationViewModel = widget.simplificationRepository == null
           ? null
           : SimplificationViewModel(
               repository: widget.simplificationRepository!,
             );
+      _attachQuota(widget.simplificationRepository);
     }
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     widget.textController.removeListener(_onTextChanged);
     _inputViewModel.dispose();
     _photoViewModel?.dispose();
+    _quotaSource?.quotaListenable.removeListener(_onQuotaChanged);
+    _resetTimer?.cancel();
+    _counterTimer?.cancel();
+    _quotaAge.stop();
     super.dispose();
   }
 
@@ -143,101 +228,126 @@ class _HomeScreenState extends State<HomeScreen> {
     final viewModel = HomeViewModel(appName: widget.appName);
 
     return AnimatedBuilder(
-      animation: Listenable.merge([_inputViewModel, ?_photoViewModel]),
-      builder: (context, _) => SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              viewModel.welcomeMessage,
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(height: 24),
-            TextField(
-              controller: widget.textController,
-              enabled:
-                  !_inputViewModel.isLoading &&
-                  !(_photoViewModel?.isLoading ?? false),
-              minLines: 6,
-              maxLines: null,
-              textCapitalization: TextCapitalization.sentences,
-              decoration: InputDecoration(
-                labelText: 'Tekst do uproszczenia',
-                hintText: 'Wpisz lub wklej tekst',
-                alignLabelWithHint: true,
-                errorText: _inputViewModel.errorMessage,
+      animation: Listenable.merge([
+        _inputViewModel,
+        ?_photoViewModel,
+        ?_quotaSource?.quotaListenable,
+      ]),
+      builder: (context, _) {
+        final quota = _quotaSource?.quotaListenable.value;
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                viewModel.welcomeMessage,
+                style: Theme.of(context).textTheme.headlineSmall,
               ),
-            ),
-            const SizedBox(height: 8),
-            Align(
-              alignment: Alignment.centerRight,
-              child: Text(
-                _inputViewModel.characterCounter,
-                key: const Key('characterCounter'),
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              children: [
-                OutlinedButton.icon(
-                  onPressed:
-                      _inputViewModel.isLoading ||
-                          (_photoViewModel?.isLoading ?? false)
-                      ? null
-                      : _openCamera,
-                  icon: const Icon(Icons.photo_camera_outlined),
-                  label: Text(
-                    (_photoViewModel?.isLoading ?? false)
-                        ? 'Odczytywanie…'
-                        : 'Aparat',
-                  ),
+              const SizedBox(height: 24),
+              TextField(
+                controller: widget.textController,
+                enabled:
+                    !_inputViewModel.isLoading &&
+                    !(_photoViewModel?.isLoading ?? false),
+                minLines: 6,
+                maxLines: null,
+                textCapitalization: TextCapitalization.sentences,
+                decoration: InputDecoration(
+                  labelText: 'Tekst do uproszczenia',
+                  hintText: 'Wpisz lub wklej tekst',
+                  alignLabelWithHint: true,
+                  errorText: _inputViewModel.errorMessage,
                 ),
-                FilledButton(
-                  onPressed:
-                      _inputViewModel.canSubmit &&
-                          !(_photoViewModel?.isLoading ?? false)
-                      ? _inputViewModel.submit
-                      : null,
-                  child: _inputViewModel.isLoading
-                      ? const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
+              ),
+              const SizedBox(height: 8),
+              Align(
+                alignment: Alignment.centerRight,
+                child: Text(
+                  _inputViewModel.characterCounter,
+                  key: const Key('characterCounter'),
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: [
+                  OutlinedButton.icon(
+                    onPressed:
+                        _inputViewModel.isLoading ||
+                            (_photoViewModel?.isLoading ?? false)
+                        ? null
+                        : _openCamera,
+                    icon: const Icon(Icons.photo_camera_outlined),
+                    label: Text(
+                      (_photoViewModel?.isLoading ?? false)
+                          ? 'Odczytywanie…'
+                          : 'Aparat',
+                    ),
+                  ),
+                  FilledButton(
+                    onPressed:
+                        _inputViewModel.canSubmit &&
+                            (quota == null || quota.remaining > 0) &&
+                            !(_photoViewModel?.isLoading ?? false)
+                        ? _inputViewModel.submit
+                        : null,
+                    child: _inputViewModel.isLoading
+                        ? const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
                               ),
-                            ),
-                            SizedBox(width: 12),
-                            Text('Upraszczanie…'),
-                          ],
-                        )
-                      : const Text('Uprość'),
+                              SizedBox(width: 12),
+                              Text('Upraszczanie…'),
+                            ],
+                          )
+                        : const Text('Uprość'),
+                  ),
+                ],
+              ),
+              if (_photoViewModel?.message case final message?) ...[
+                const SizedBox(height: 12),
+                Text(message, key: const Key('photoMessage')),
+              ],
+              if (quota != null &&
+                  quota.tier == QuotaTier.free &&
+                  quota.remaining < 2) ...[
+                const SizedBox(height: 12),
+                Text(
+                  quota.remaining == 1
+                      ? 'Pozostało 1 uproszczenie. Limit odnowi się o 00:00 UTC (${_timeUntilReset(quota)}).'
+                      : 'Wykorzystano dzienny limit. Odnowi się o 00:00 UTC (${_timeUntilReset(quota)}). Subskrypcja: 9,99 zł miesięcznie.',
+                  key: const Key('quotaMessage'),
                 ),
               ],
-            ),
-            if (_photoViewModel?.message case final message?) ...[
-              const SizedBox(height: 12),
-              Text(message, key: const Key('photoMessage')),
-            ],
-            const SizedBox(height: 16),
-            const Text(
-              'Tekst zostanie przekazany dostawcy AI do uproszczenia.',
-            ),
-            if (_inputViewModel.status == TextInputStatus.success &&
-                widget.simplificationRepository == null) ...[
+              if (_inputViewModel.errorMessage == null &&
+                  _quotaSource != null &&
+                  quota == null) ...[
+                const SizedBox(height: 12),
+                const Text('Nie można sprawdzić limitu. Sprawdź połączenie.'),
+              ],
               const SizedBox(height: 16),
-              const Text('Tekst został przekazany do uproszczenia.'),
+              const Text(
+                'Tekst zostanie przekazany dostawcy AI do uproszczenia.',
+              ),
+              if (_inputViewModel.status == TextInputStatus.success &&
+                  widget.simplificationRepository == null) ...[
+                const SizedBox(height: 16),
+                const Text('Tekst został przekazany do uproszczenia.'),
+              ],
             ],
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
