@@ -46,3 +46,9 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Backend local configuration and build output
+**/bin/
+**/obj/
+backend/.env
+backend/**/appsettings.Local.json

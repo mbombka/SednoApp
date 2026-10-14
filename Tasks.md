@@ -90,16 +90,140 @@ filtering expired entries, deletion, and corrupted data.
 
 **Agent prompt:**
 
-Read AGENTS.md and the existing code. Implement only the scope of this
-task, preserve existing tests, and add new tests.
+Read AGENTS.md, the existing code, and contracts/OpenAPI.
+Implement only the scope of this task, preserve existing tests,
+and add new tests. Do not modify the Flutter application.
 
-Create the ASP.NET Core API with PostgreSQL, migrations, and a mock model.
-Implement guest sessions, quotas, UTC resets, atomic quota reservations,
-and request idempotency.
-Failed simplifications must not consume quota.
-Retrying the same request must not consume quota twice.
+### 1. Create the backend project
 
-Tests: concurrent requests, midnight UTC, failures, and duplicate requests.
+Create the following structure alongside mobile/:
+
+backend/
+  Simplifier.Backend.sln
+  src/
+    Simplifier.Api/
+    Simplifier.Application/
+    Simplifier.Domain/
+    Simplifier.Infrastructure/
+  tests/
+    Simplifier.UnitTests/
+    Simplifier.IntegrationTests/
+  README.md
+
+Use a supported .NET LTS version, ASP.NET Core, EF Core,
+PostgreSQL, dependency injection, and asynchronous I/O.
+Keep responsibilities separated without unnecessary abstractions.
+
+### 2. Configure local development
+
+Provide:
+- PostgreSQL Docker Compose configuration.
+- EF Core migrations and database setup instructions.
+- Development and production configuration separation.
+- Environment-variable configuration and .NET user-secrets support.
+- Liveness and readiness endpoints.
+
+Never commit credentials or production secrets.
+Document startup, migration, and test commands.
+
+### 3. Implement guest sessions
+
+Create an endpoint issuing a guest identity and an unpredictable
+session credential. Store only a secure hash of that credential.
+
+An installation identifier must not act as authentication.
+Document that reinstalling may bypass guest limits.
+Provide extension points for authentication and Play Integrity
+implemented in task 8.
+
+Protect quota and simplification endpoints with guest authentication.
+Add basic request rate limiting independent of daily quotas.
+
+### 4. Implement the API contract
+
+Follow the existing OpenAPI contract; update it if necessary.
+
+Provide operations for:
+- Creating a guest session.
+- Reading remaining quota and the next reset timestamp.
+- Submitting text for simplification.
+- Reading request status by idempotency key.
+
+Validate input server-side:
+- Reject empty or whitespace-only text.
+- Reject text exceeding 4,000 grapheme clusters.
+- Apply an HTTP request-size limit.
+
+Use consistent Problem Details responses and machine-readable
+error codes. Never include submitted text in errors or logs.
+
+### 5. Implement the mock model adapter
+
+Define an AI-provider interface and a deterministic development mock.
+Mark mock output explicitly as demo content.
+Do not integrate a real provider or require an API key yet.
+
+Production configuration must refuse to enable the mock.
+
+### 6. Implement daily quotas
+
+- Free users: 2 successful simplifications per UTC day.
+- Paid users: 400 total successful simplifications per UTC day.
+- Reset boundary: 00:00 UTC, using server time.
+- Inject TimeProvider to make time-dependent logic testable.
+- Determine entitlement server-side, never from client declarations.
+- Until billing is implemented, production users are free-tier only.
+
+Use atomic database operations to reserve quota before processing.
+Commit usage on success and release reservations on definite failure.
+Do not hold a database transaction open during model processing.
+
+Define reservation expiration and crash recovery.
+Attribute requests crossing midnight to their reservation day.
+Prevent late completion from committing an expired reservation.
+
+### 7. Implement idempotency
+
+Scope idempotency keys to the authenticated identity.
+Concurrent or repeated requests with the same key must not trigger
+another model call or consume quota twice.
+
+Reject reuse of a key with different input; use a keyed fingerprint
+rather than storing the original text.
+
+Persist request status and quota metadata, not input or output text.
+Since results are not persisted, explicitly document how the API
+handles retries after a successful response is lost.
+Do not silently regenerate completed requests.
+
+Enforce ownership checks when reading request status.
+Document retention and cleanup of operational metadata.
+
+### 8. Add tests
+
+Use xUnit for unit tests and ASP.NET Core integration testing
+with an isolated real PostgreSQL instance, e.g. Testcontainers.
+
+Cover:
+- Guest authentication and cross-user access rejection.
+- Empty, oversized, Polish, and emoji-containing input.
+- Free and paid quota policies.
+- UTC midnight and requests crossing the reset boundary.
+- Parallel submissions at the quota boundary.
+- Duplicate keys and key reuse with different input.
+- Provider failure and reservation release.
+- Expired reservations and crash recovery.
+- Absence of user content and credentials in logs.
+
+Do not rely on EF Core InMemory for transaction/concurrency tests.
+
+### Acceptance criteria
+
+The backend starts locally using documented commands.
+Migrations apply to an empty database.
+OpenAPI matches implemented endpoints.
+Tests pass, or environment limitations are explicitly reported.
+Report changed files, design decisions, and outstanding limitations.
 
 ## 8. Authentication and Guest Protection
 
