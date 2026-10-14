@@ -93,9 +93,10 @@ public sealed class ApiTests(BackendFixture fixture)
         Assert.Equal(2, results.Count(x => x.StatusCode == HttpStatusCode.OK));
         Assert.Single(results, x => x.StatusCode == HttpStatusCode.TooManyRequests);
         Assert.Equal(2, fixture.Model.Calls);
-        var duplicate = await Submit(guest.Client, "parallel0", "Tekst0");
+        var completed = Array.FindIndex(results, x => x.StatusCode == HttpStatusCode.OK);
+        var duplicate = await Submit(guest.Client, $"parallel{completed}", "Tekst" + completed);
         Assert.Equal("result_unavailable", await Code(duplicate));
-        Assert.Equal("key_conflict", await Code(await Submit(guest.Client, "parallel0", "Inny tekst")));
+        Assert.Equal("key_conflict", await Code(await Submit(guest.Client, $"parallel{completed}", "Inny tekst")));
         Assert.Equal(2, fixture.Model.Calls);
     }
 

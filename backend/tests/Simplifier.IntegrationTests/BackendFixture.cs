@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
@@ -55,7 +54,7 @@ public sealed class CaptureLogs : ILoggerProvider
         public IDisposable BeginScope<TState>(TState state) where TState : notnull => NullScope.Instance;
         public bool IsEnabled(LogLevel logLevel) => true;
         public void Log<TState>(LogLevel level, EventId id, TState state, Exception? exception,
-            Func<TState, Exception?, string> formatter) => messages.Enqueue(formatter(state));
+            Func<TState, Exception?, string> formatter) => messages.Enqueue(formatter(state, exception));
     }
     private sealed class NullScope : IDisposable
     {
@@ -66,7 +65,8 @@ public sealed class CaptureLogs : ILoggerProvider
 
 public sealed class BackendFixture : IAsyncLifetime
 {
-    private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder().WithImage("postgres:17-alpine").Build();
+    private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder("postgres:17-alpine").Build();
+    private readonly Dictionary<string, string?> _originalEnvironment = new();
     public TestClock Clock { get; } = new();
     public TestModel Model { get; } = new();
     public TestEntitlements Entitlements { get; } = new();
@@ -76,15 +76,13 @@ public sealed class BackendFixture : IAsyncLifetime
     public async Task InitializeAsync()
     {
         await _postgres.StartAsync();
+        SetEnvironment("ASPNETCORE_ENVIRONMENT", "Development");
+        SetEnvironment("ConnectionStrings__Postgres", _postgres.GetConnectionString());
+        SetEnvironment("Security__CredentialKey", Convert.ToBase64String(Enumerable.Repeat((byte)1, 32).ToArray()));
+        SetEnvironment("Security__FingerprintKey", Convert.ToBase64String(Enumerable.Repeat((byte)2, 32).ToArray()));
         Factory = new WebApplicationFactory<Program>().WithWebHostBuilder(web =>
         {
             web.UseEnvironment("Development");
-            web.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?>
-            {
-                ["ConnectionStrings:Postgres"] = _postgres.GetConnectionString(),
-                ["Security:CredentialKey"] = Convert.ToBase64String(Enumerable.Repeat((byte)1, 32).ToArray()),
-                ["Security:FingerprintKey"] = Convert.ToBase64String(Enumerable.Repeat((byte)2, 32).ToArray())
-            }));
             web.ConfigureTestServices(services =>
             {
                 services.RemoveAll<TimeProvider>(); services.AddSingleton<TimeProvider>(Clock);
@@ -102,5 +100,13 @@ public sealed class BackendFixture : IAsyncLifetime
     {
         await Factory.DisposeAsync();
         await _postgres.DisposeAsync();
+        foreach (var (name, value) in _originalEnvironment)
+            Environment.SetEnvironmentVariable(name, value);
+    }
+
+    private void SetEnvironment(string name, string value)
+    {
+        _originalEnvironment[name] = Environment.GetEnvironmentVariable(name);
+        Environment.SetEnvironmentVariable(name, value);
     }
 }
