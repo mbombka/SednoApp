@@ -10,8 +10,18 @@ The planned purpose is to simplify long text.
 - `lib/features/home/presentation/` contains the home screen and its view model.
 - `test/` mirrors the application structure for unit and widget tests.
 - `android/` contains the generated Android host project.
+- `lib/features/*/domain/` contains validated models and repository contracts.
+- `lib/features/shared/data/development_mocks.dart` contains in-memory development
+  repositories. Their constructors reject production (`dart.vm.product`) builds.
+- `api/openapi.yaml` defines the future HTTPS backend contract. It has no
+  photo or history upload endpoint.
 
 Add new features under `lib/features/<feature>/`. Add data or domain layers when a feature needs them, and keep tests beside the matching path under `test/`.
+
+Input length is measured in Unicode grapheme clusters using `characters`.
+The maximum is 4,000 clusters; whitespace-only input is invalid. The mocks
+take an injected clock and share a quota repository, so development can run
+without an API. They are not connected to the current placeholder screen.
 
 ## Commands
 
