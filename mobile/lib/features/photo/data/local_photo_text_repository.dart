@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:simplifier_app/features/photo/domain/photo_text_repository.dart';
+import 'package:sedno_app/features/photo/domain/photo_text_repository.dart';
 
 abstract interface class PhotoCaptureService {
   Future<String?> capture();

@@ -1,6 +1,6 @@
-import 'package:simplifier_app/features/shared/domain/json_values.dart';
-import 'package:simplifier_app/features/simplification/domain/input_text.dart';
-import 'package:simplifier_app/features/simplification/domain/simplification_result.dart';
+import 'package:sedno_app/features/shared/domain/json_values.dart';
+import 'package:sedno_app/features/simplification/domain/input_text.dart';
+import 'package:sedno_app/features/simplification/domain/simplification_result.dart';
 
 /// This model is for local encrypted storage only; the API never accepts history.
 class HistoryEntry {

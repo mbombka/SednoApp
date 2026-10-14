@@ -1,5 +1,5 @@
-import 'package:simplifier_app/features/simplification/domain/input_text.dart';
-import 'package:simplifier_app/features/shared/domain/json_values.dart';
+import 'package:sedno_app/features/simplification/domain/input_text.dart';
+import 'package:sedno_app/features/shared/domain/json_values.dart';
 
 class SimplificationResult {
   SimplificationResult({

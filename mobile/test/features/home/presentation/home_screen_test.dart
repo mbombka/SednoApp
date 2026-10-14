@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:simplifier_app/features/home/presentation/home_screen.dart';
-import 'package:simplifier_app/features/home/presentation/text_input_view_model.dart';
+import 'package:sedno_app/features/home/presentation/home_screen.dart';
+import 'package:sedno_app/features/home/presentation/text_input_view_model.dart';
 
 void main() {
   Future<void> showScreen(
@@ -15,7 +15,7 @@ void main() {
     MaterialApp(
       home: Scaffold(
         body: HomeScreen(
-          appName: 'Simplyfi_it',
+          appName: 'Sedno',
           textController: controller,
           onSubmit: onSubmit,
           onCameraPressed: onCameraPressed,

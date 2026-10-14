@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:simplifier_app/features/account/domain/account.dart';
-import 'package:simplifier_app/features/account/presentation/account_screen.dart';
-import 'package:simplifier_app/features/shared/data/development_mocks.dart';
+import 'package:sedno_app/features/account/domain/account.dart';
+import 'package:sedno_app/features/account/presentation/account_screen.dart';
+import 'package:sedno_app/features/shared/data/development_mocks.dart';
 
 void main() {
   testWidgets('guest can sign in and sign out from the account tab', (

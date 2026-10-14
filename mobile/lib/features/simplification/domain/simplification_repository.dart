@@ -1,5 +1,5 @@
-import 'package:simplifier_app/features/quota/domain/quota_state.dart';
-import 'package:simplifier_app/features/simplification/domain/simplification_result.dart';
+import 'package:sedno_app/features/quota/domain/quota_state.dart';
+import 'package:sedno_app/features/simplification/domain/simplification_result.dart';
 
 class SimplificationResponse {
   SimplificationResponse({required this.result, required this.quota});

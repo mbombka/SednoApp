@@ -99,15 +99,15 @@ and add new tests. Do not modify the Flutter application.
 Create the following structure alongside mobile/:
 
 backend/
-  Simplifier.Backend.sln
+  Sedno.Backend.sln
   src/
-    Simplifier.Api/
-    Simplifier.Application/
-    Simplifier.Domain/
-    Simplifier.Infrastructure/
+    Sedno.Api/
+    Sedno.Application/
+    Sedno.Domain/
+    Sedno.Infrastructure/
   tests/
-    Simplifier.UnitTests/
-    Simplifier.IntegrationTests/
+    Sedno.UnitTests/
+    Sedno.IntegrationTests/
   README.md
 
 Use a supported .NET LTS version, ASP.NET Core, EF Core,

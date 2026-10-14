@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:characters/characters.dart';
 import 'package:flutter/foundation.dart';
-import 'package:simplifier_app/features/shared/data/development_mocks.dart';
-import 'package:simplifier_app/features/simplification/domain/input_text.dart';
+import 'package:sedno_app/features/shared/data/development_mocks.dart';
+import 'package:sedno_app/features/simplification/domain/input_text.dart';
 
 typedef SubmitText = Future<void> Function(InputText input);
 

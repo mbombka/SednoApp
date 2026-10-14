@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart' as firebase;
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:simplifier_app/features/account/data/backend_session_gateway.dart';
-import 'package:simplifier_app/features/account/domain/account.dart';
-import 'package:simplifier_app/features/account/domain/account_repository.dart';
+import 'package:sedno_app/features/account/data/backend_session_gateway.dart';
+import 'package:sedno_app/features/account/domain/account.dart';
+import 'package:sedno_app/features/account/domain/account_repository.dart';
 
 class FirebaseAccountRepository implements AccountRepository {
   FirebaseAccountRepository({

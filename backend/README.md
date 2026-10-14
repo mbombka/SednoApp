@@ -1,4 +1,4 @@
-# Simplyfi_it backend
+# Sedno backend
 
 ASP.NET Core on .NET 10 LTS with EF Core and PostgreSQL. The contract implemented here is [`../contracts/openapi.yaml`](../contracts/openapi.yaml). The earlier `mobile/api/openapi.yaml` is a scaffold draft and is superseded by this contract.
 
@@ -10,19 +10,22 @@ Install .NET 10 SDK and Docker with Compose. From `backend/`:
 export POSTGRES_PASSWORD="$(openssl rand -base64 32)"
 docker compose up -d --wait
 export ASPNETCORE_ENVIRONMENT=Development
-export ConnectionStrings__Postgres="Host=localhost;Port=5432;Database=simplifier;Username=simplifier;Password=${POSTGRES_PASSWORD}"
+export ConnectionStrings__Postgres="Host=localhost;Port=5432;Database=sedno;Username=sedno;Password=${POSTGRES_PASSWORD}"
 export Security__CredentialKey="$(openssl rand -base64 32)"
 export Security__FingerprintKey="$(openssl rand -base64 32)"
 dotnet tool install --global dotnet-ef --version 10.0.3
-dotnet ef database update --project src/Simplifier.Infrastructure --startup-project src/Simplifier.Api
-dotnet run --project src/Simplifier.Api
+dotnet ef database update --project src/Sedno.Infrastructure --startup-project src/Sedno.Api
+dotnet run --project src/Sedno.Api
 ```
 
 The API starts on the URL printed by `dotnet run`. `GET /health/live` checks process liveness; `GET /health/ready` checks PostgreSQL. Use HTTPS for every deployed client connection. HTTP is permitted only in Development on a local machine. The Compose port binds to loopback.
+The development Compose database, user, and volume now use `sedno`; an existing
+development volume under the previous name is not connected automatically.
+Re-enter any local .NET user secrets under the new `sedno-backend-dev` secret ID.
 
-Instead of exported secrets, use `dotnet user-secrets set "Security:CredentialKey" "<base64-32-byte-key>" --project src/Simplifier.Api` and similarly set `Security:FingerprintKey` and `ConnectionStrings:Postgres`. Environment variables use double underscores for nested keys. Never put keys or database passwords into tracked configuration. Production uses `appsettings.Production.json` and environment variables or a secret store. The API refuses to start with `Model:Provider=mock` outside Development.
+Instead of exported secrets, use `dotnet user-secrets set "Security:CredentialKey" "<base64-32-byte-key>" --project src/Sedno.Api` and similarly set `Security:FingerprintKey` and `ConnectionStrings:Postgres`. Environment variables use double underscores for nested keys. Never put keys or database passwords into tracked configuration. Production uses `appsettings.Production.json` and environment variables or a secret store. The API refuses to start with `Model:Provider=mock` outside Development.
 
-For future schema changes, run `dotnet ef migrations add Name --project src/Simplifier.Infrastructure --startup-project src/Simplifier.Api --output-dir Migrations`, review the migration, then run `database update`. Production migrations should run as an explicit deployment step. The included initial migration creates the schema in an empty database.
+For future schema changes, run `dotnet ef migrations add Name --project src/Sedno.Infrastructure --startup-project src/Sedno.Api --output-dir Migrations`, review the migration, then run `database update`. Production migrations should run as an explicit deployment step. The included initial migration creates the schema in an empty database.
 
 ## API and data behavior
 
@@ -45,7 +48,7 @@ Operational request metadata is retained for eight days, then deleted hourly. Ex
 ## Tests
 
 ```sh
-dotnet test Simplifier.Backend.sln
+dotnet test Sedno.Backend.sln
 ```
 
 Unit tests cover input and quota policy. Integration tests use an isolated Testcontainers PostgreSQL instance, apply the migration, and exercise authentication, request validation, quota and idempotency concurrency, UTC boundaries, reservation recovery, provider failure, and log exclusion. Docker must be running and `docker info` must work for the user running tests; see [Docker's Linux post-installation guide](https://docs.docker.com/engine/install/linux-postinstall) for socket access.

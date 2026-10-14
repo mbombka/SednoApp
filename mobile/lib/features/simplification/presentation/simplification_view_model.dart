@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:simplifier_app/features/simplification/domain/input_text.dart';
-import 'package:simplifier_app/features/simplification/domain/simplification_repository.dart';
-import 'package:simplifier_app/features/simplification/domain/simplification_result.dart';
+import 'package:sedno_app/features/simplification/domain/input_text.dart';
+import 'package:sedno_app/features/simplification/domain/simplification_repository.dart';
+import 'package:sedno_app/features/simplification/domain/simplification_result.dart';
 
 /// Keeps the request identifier across retries so a timed-out response cannot
 /// consume a second allowance if the backend already processed it.

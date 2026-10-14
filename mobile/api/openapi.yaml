@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Simplyfi_it API
+  title: Sedno API
   version: 0.1.0
   description: >-
     Contract for the future ASP.NET Core service. Submitted text is processed

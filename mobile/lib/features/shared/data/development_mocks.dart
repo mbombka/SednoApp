@@ -1,11 +1,11 @@
-import 'package:simplifier_app/features/account/domain/account.dart';
-import 'package:simplifier_app/features/account/domain/account_repository.dart';
-import 'package:simplifier_app/features/history/domain/history_entry.dart';
-import 'package:simplifier_app/features/history/domain/history_repository.dart';
-import 'package:simplifier_app/features/quota/domain/quota_repository.dart';
-import 'package:simplifier_app/features/quota/domain/quota_state.dart';
-import 'package:simplifier_app/features/simplification/domain/simplification_repository.dart';
-import 'package:simplifier_app/features/simplification/domain/simplification_result.dart';
+import 'package:sedno_app/features/account/domain/account.dart';
+import 'package:sedno_app/features/account/domain/account_repository.dart';
+import 'package:sedno_app/features/history/domain/history_entry.dart';
+import 'package:sedno_app/features/history/domain/history_repository.dart';
+import 'package:sedno_app/features/quota/domain/quota_repository.dart';
+import 'package:sedno_app/features/quota/domain/quota_state.dart';
+import 'package:sedno_app/features/simplification/domain/simplification_repository.dart';
+import 'package:sedno_app/features/simplification/domain/simplification_result.dart';
 
 typedef Clock = DateTime Function();
 

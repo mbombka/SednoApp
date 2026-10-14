@@ -2,10 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:simplifier_app/features/history/data/encrypted_history_repository.dart';
-import 'package:simplifier_app/features/history/domain/history_entry.dart';
-import 'package:simplifier_app/features/simplification/domain/input_text.dart';
-import 'package:simplifier_app/features/simplification/domain/simplification_result.dart';
+import 'package:sedno_app/features/history/data/encrypted_history_repository.dart';
+import 'package:sedno_app/features/history/domain/history_entry.dart';
+import 'package:sedno_app/features/simplification/domain/input_text.dart';
+import 'package:sedno_app/features/simplification/domain/simplification_result.dart';
 
 class MemoryDocumentStore implements HistoryDocumentStore {
   String? document;

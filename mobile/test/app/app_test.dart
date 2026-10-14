@@ -2,23 +2,23 @@ import 'dart:ui' show Tristate;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:simplifier_app/app/app.dart';
-import 'package:simplifier_app/app/app_theme.dart';
+import 'package:sedno_app/app/app.dart';
+import 'package:sedno_app/app/app_theme.dart';
 
 void main() {
   testWidgets('opens Start with the Polish application name', (tester) async {
-    await tester.pumpWidget(const SimplifierApp());
+    await tester.pumpWidget(const SednoApp());
 
     expect(find.byType(MaterialApp), findsOneWidget);
     expect(find.byType(Scaffold), findsOneWidget);
-    expect(find.text(SimplifierApp.displayName), findsOneWidget);
-    expect(find.text('Witaj w Simplyfi_it'), findsOneWidget);
+    expect(find.text(SednoApp.displayName), findsOneWidget);
+    expect(find.text('Witaj w Sedno'), findsOneWidget);
     expect(find.byType(TextField), findsOneWidget);
     expect(find.byType(Tab), findsNWidgets(3));
   });
 
   testWidgets('navigates between top tabs', (tester) async {
-    await tester.pumpWidget(const SimplifierApp());
+    await tester.pumpWidget(const SednoApp());
 
     await tester.tap(find.text('Historia').first);
     await tester.pumpAndSettle();
@@ -37,7 +37,7 @@ void main() {
   });
 
   testWidgets('preserves entered text after switching tabs', (tester) async {
-    await tester.pumpWidget(const SimplifierApp());
+    await tester.pumpWidget(const SednoApp());
     await tester.enterText(find.byType(TextField), 'Przykładowy tekst');
 
     await tester.tap(find.text('Historia').first);
@@ -58,7 +58,7 @@ void main() {
     tester,
   ) async {
     final semantics = tester.ensureSemantics();
-    await tester.pumpWidget(const SimplifierApp());
+    await tester.pumpWidget(const SednoApp());
 
     final tabs = find.byType(Tab);
     expect(tester.getSemantics(tabs.at(0)).label, contains('Start'));
@@ -76,7 +76,7 @@ void main() {
   });
 
   testWidgets('uses a light high contrast theme', (tester) async {
-    await tester.pumpWidget(const SimplifierApp());
+    await tester.pumpWidget(const SednoApp());
     final theme = Theme.of(tester.element(find.byType(TextField)));
 
     expect(theme.brightness, Brightness.light);
@@ -94,7 +94,7 @@ void main() {
     await tester.pumpWidget(
       const MediaQuery(
         data: MediaQueryData(textScaler: TextScaler.linear(2.5)),
-        child: SimplifierApp(),
+        child: SednoApp(),
       ),
     );
     expect(tester.takeException(), isNull);

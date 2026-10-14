@@ -4,11 +4,11 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
-import 'package:simplifier_app/app/app.dart';
-import 'package:simplifier_app/features/account/data/backend_session_gateway.dart';
-import 'package:simplifier_app/features/account/data/firebase_account_repository.dart';
-import 'package:simplifier_app/features/account/domain/account_repository.dart';
-import 'package:simplifier_app/features/history/data/encrypted_history_repository.dart';
+import 'package:sedno_app/app/app.dart';
+import 'package:sedno_app/features/account/data/backend_session_gateway.dart';
+import 'package:sedno_app/features/account/data/firebase_account_repository.dart';
+import 'package:sedno_app/features/account/domain/account_repository.dart';
+import 'package:sedno_app/features/history/data/encrypted_history_repository.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -51,7 +51,5 @@ Future<void> main() async {
       clearHistory: history.clear,
     );
   }
-  runApp(
-    SimplifierApp(accountRepository: accounts, historyRepository: history),
-  );
+  runApp(SednoApp(accountRepository: accounts, historyRepository: history));
 }

@@ -1,4 +1,4 @@
-import 'package:simplifier_app/features/history/domain/history_entry.dart';
+import 'package:sedno_app/features/history/domain/history_entry.dart';
 
 abstract interface class HistoryRepository {
   Future<void> save(HistoryEntry entry);

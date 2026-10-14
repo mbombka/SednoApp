@@ -2,10 +2,9 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
     <application
-        android:label="SimplifierApp"
+        android:label="Sedno"
         android:allowBackup="false"
         android:name="${applicationName}"
-        android:allowBackup="false"
         android:fullBackupContent="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:icon="@mipmap/ic_launcher">

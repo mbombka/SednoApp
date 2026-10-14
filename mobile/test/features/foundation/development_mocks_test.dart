@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:simplifier_app/features/account/domain/account.dart';
-import 'package:simplifier_app/features/history/domain/history_entry.dart';
-import 'package:simplifier_app/features/shared/data/development_mocks.dart';
-import 'package:simplifier_app/features/simplification/domain/input_text.dart';
-import 'package:simplifier_app/features/simplification/domain/simplification_result.dart';
+import 'package:sedno_app/features/account/domain/account.dart';
+import 'package:sedno_app/features/history/domain/history_entry.dart';
+import 'package:sedno_app/features/shared/data/development_mocks.dart';
+import 'package:sedno_app/features/simplification/domain/input_text.dart';
+import 'package:sedno_app/features/simplification/domain/simplification_result.dart';
 
 void main() {
   test(

@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:simplifier_app/features/home/presentation/text_input_view_model.dart';
-import 'package:simplifier_app/features/simplification/domain/input_text.dart';
+import 'package:sedno_app/features/home/presentation/text_input_view_model.dart';
+import 'package:sedno_app/features/simplification/domain/input_text.dart';
 
 void main() {
   test('starts idle and counts visible Unicode characters', () {

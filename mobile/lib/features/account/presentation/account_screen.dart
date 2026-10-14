@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:simplifier_app/features/account/domain/account.dart';
-import 'package:simplifier_app/features/account/domain/account_repository.dart';
+import 'package:sedno_app/features/account/domain/account.dart';
+import 'package:sedno_app/features/account/domain/account_repository.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({this.repository, super.key});

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:simplifier_app/features/home/presentation/home_view_model.dart';
-import 'package:simplifier_app/features/home/presentation/text_input_view_model.dart';
-import 'package:simplifier_app/features/history/domain/history_entry.dart';
-import 'package:simplifier_app/features/history/domain/history_repository.dart';
-import 'package:simplifier_app/features/photo/domain/photo_text_repository.dart';
-import 'package:simplifier_app/features/photo/presentation/photo_input_view_model.dart';
-import 'package:simplifier_app/features/simplification/domain/input_text.dart';
-import 'package:simplifier_app/features/simplification/domain/simplification_repository.dart';
-import 'package:simplifier_app/features/simplification/presentation/result_screen.dart';
-import 'package:simplifier_app/features/simplification/presentation/simplification_view_model.dart';
+import 'package:sedno_app/features/home/presentation/home_view_model.dart';
+import 'package:sedno_app/features/home/presentation/text_input_view_model.dart';
+import 'package:sedno_app/features/history/domain/history_entry.dart';
+import 'package:sedno_app/features/history/domain/history_repository.dart';
+import 'package:sedno_app/features/photo/domain/photo_text_repository.dart';
+import 'package:sedno_app/features/photo/presentation/photo_input_view_model.dart';
+import 'package:sedno_app/features/simplification/domain/input_text.dart';
+import 'package:sedno_app/features/simplification/domain/simplification_repository.dart';
+import 'package:sedno_app/features/simplification/presentation/result_screen.dart';
+import 'package:sedno_app/features/simplification/presentation/simplification_view_model.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({

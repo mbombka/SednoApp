@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Simplyfi_it backend API
+  title: Sedno backend API
   version: 1.0.0
   description: >-
     Text is processed transiently. The backend stores no submitted or simplified

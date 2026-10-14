@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:simplifier_app/features/history/domain/history_repository.dart';
-import 'package:simplifier_app/features/history/presentation/history_view_model.dart';
+import 'package:sedno_app/features/history/domain/history_repository.dart';
+import 'package:sedno_app/features/history/presentation/history_view_model.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({

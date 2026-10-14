@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:simplifier_app/features/history/domain/history_entry.dart';
-import 'package:simplifier_app/features/history/domain/history_repository.dart';
+import 'package:sedno_app/features/history/domain/history_entry.dart';
+import 'package:sedno_app/features/history/domain/history_repository.dart';
 
 class HistoryViewModel extends ChangeNotifier {
   HistoryViewModel(this.repository);

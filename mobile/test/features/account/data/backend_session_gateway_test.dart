@@ -4,8 +4,8 @@ import 'package:crypto/crypto.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:simplifier_app/features/account/data/backend_session_gateway.dart';
-import 'package:simplifier_app/features/account/domain/account.dart';
+import 'package:sedno_app/features/account/data/backend_session_gateway.dart';
+import 'package:sedno_app/features/account/domain/account.dart';
 
 class MemorySessionStorage implements SessionStorage {
   final values = <String, String>{};

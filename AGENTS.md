@@ -1,10 +1,10 @@
-# SimplifierApp / Simplyfi_it
+# SednoApp / Sedno
 
 ## Purpose
 An Android application built with Flutter/Dart that simplifies Polish
 texts, primarily for people who are hard of hearing or have cognitive
 difficulties.
-Project name: SimplifierApp. Display name: Simplyfi_it.
+Project name: SednoApp. Display name: Sedno.
 All user-facing content must be in Polish.
 
 ## Existing Code

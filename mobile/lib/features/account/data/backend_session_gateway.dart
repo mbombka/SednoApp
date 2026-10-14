@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
-import 'package:simplifier_app/features/account/domain/account.dart';
+import 'package:sedno_app/features/account/domain/account.dart';
 
 abstract interface class IntegrityTokenSource {
   Future<String?> tokenFor(String requestHash);
@@ -38,7 +38,7 @@ class AndroidIntegrityTokenSource implements IntegrityTokenSource {
   const AndroidIntegrityTokenSource(this.cloudProjectNumber);
 
   final int cloudProjectNumber;
-  static const _channel = MethodChannel('simplyfi_it/play_integrity');
+  static const _channel = MethodChannel('sedno/play_integrity');
 
   @override
   Future<String?> tokenFor(String requestHash) async {

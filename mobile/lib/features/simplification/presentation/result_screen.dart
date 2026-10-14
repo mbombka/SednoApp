@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:simplifier_app/features/simplification/domain/simplification_result.dart';
+import 'package:sedno_app/features/simplification/domain/simplification_result.dart';
 
 class ResultScreen extends StatefulWidget {
   const ResultScreen({

@@ -1,4 +1,4 @@
-import 'package:simplifier_app/features/shared/domain/json_values.dart';
+import 'package:sedno_app/features/shared/domain/json_values.dart';
 
 enum QuotaTier { free, subscription }
 

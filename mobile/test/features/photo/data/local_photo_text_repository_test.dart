@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:simplifier_app/features/photo/data/local_photo_text_repository.dart';
-import 'package:simplifier_app/features/photo/domain/photo_text_repository.dart';
+import 'package:sedno_app/features/photo/data/local_photo_text_repository.dart';
+import 'package:sedno_app/features/photo/domain/photo_text_repository.dart';
 
 class FakeCapture implements PhotoCaptureService {
   FakeCapture(this.result);
@@ -77,7 +77,7 @@ void main() {
 
   test('deletes a real temporary file', () async {
     final directory = await Directory.systemTemp.createTemp(
-      'simplyfi-photo-test-',
+      'sedno-photo-test-',
     );
     addTearDown(() => directory.delete(recursive: true));
     final file = File('${directory.path}/capture.jpg');

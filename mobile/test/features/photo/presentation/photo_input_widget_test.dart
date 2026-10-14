@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:simplifier_app/features/home/presentation/home_screen.dart';
-import 'package:simplifier_app/features/photo/domain/photo_text_repository.dart';
+import 'package:sedno_app/features/home/presentation/home_screen.dart';
+import 'package:sedno_app/features/photo/domain/photo_text_repository.dart';
 
 class FakePhotoRepository implements PhotoTextRepository {
   FakePhotoRepository(this.action);
@@ -21,7 +21,7 @@ void main() {
     MaterialApp(
       home: Scaffold(
         body: HomeScreen(
-          appName: 'Simplyfi_it',
+          appName: 'Sedno',
           textController: controller,
           photoRepository: repository,
         ),

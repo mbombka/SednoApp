@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:simplifier_app/features/photo/domain/photo_text_repository.dart';
+import 'package:sedno_app/features/photo/domain/photo_text_repository.dart';
 
 class PhotoInputViewModel extends ChangeNotifier {
   PhotoInputViewModel(this.repository);

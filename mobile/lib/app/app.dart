@@ -1,19 +1,19 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:simplifier_app/app/app_theme.dart';
-import 'package:simplifier_app/features/account/presentation/account_screen.dart';
-import 'package:simplifier_app/features/account/domain/account_repository.dart';
-import 'package:simplifier_app/features/history/data/encrypted_history_repository.dart';
-import 'package:simplifier_app/features/history/domain/history_repository.dart';
-import 'package:simplifier_app/features/history/presentation/history_screen.dart';
-import 'package:simplifier_app/features/home/presentation/home_screen.dart';
-import 'package:simplifier_app/features/photo/data/local_photo_text_repository.dart';
-import 'package:simplifier_app/features/shared/data/development_mocks.dart';
-import 'package:simplifier_app/features/simplification/domain/simplification_repository.dart';
+import 'package:sedno_app/app/app_theme.dart';
+import 'package:sedno_app/features/account/presentation/account_screen.dart';
+import 'package:sedno_app/features/account/domain/account_repository.dart';
+import 'package:sedno_app/features/history/data/encrypted_history_repository.dart';
+import 'package:sedno_app/features/history/domain/history_repository.dart';
+import 'package:sedno_app/features/history/presentation/history_screen.dart';
+import 'package:sedno_app/features/home/presentation/home_screen.dart';
+import 'package:sedno_app/features/photo/data/local_photo_text_repository.dart';
+import 'package:sedno_app/features/shared/data/development_mocks.dart';
+import 'package:sedno_app/features/simplification/domain/simplification_repository.dart';
 
-class SimplifierApp extends StatelessWidget {
-  const SimplifierApp({
+class SednoApp extends StatelessWidget {
+  const SednoApp({
     this.simplificationRepository,
     this.historyRepository,
     this.accountRepository,
@@ -24,8 +24,8 @@ class SimplifierApp extends StatelessWidget {
   final HistoryRepository? historyRepository;
   final AccountRepository? accountRepository;
 
-  static const name = 'SimplifierApp';
-  static const displayName = 'Simplyfi_it';
+  static const name = 'SednoApp';
+  static const displayName = 'Sedno';
 
   @override
   Widget build(BuildContext context) {
@@ -123,7 +123,7 @@ class _AppNavigationState extends State<_AppNavigation>
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text(SimplifierApp.displayName),
+          title: const Text(SednoApp.displayName),
           bottom: const TabBar(
             isScrollable: true,
             tabAlignment: TabAlignment.start,
@@ -137,7 +137,7 @@ class _AppNavigationState extends State<_AppNavigation>
         body: TabBarView(
           children: [
             HomeScreen(
-              appName: SimplifierApp.displayName,
+              appName: SednoApp.displayName,
               textController: _inputController,
               photoRepository: _photoRepository,
               simplificationRepository: _simplificationRepository,

@@ -1,4 +1,4 @@
-name: simplifier_app
+name: sedno_app
 description: "A minimal Android home screen built with Flutter."
 publish_to: 'none'
 version: 0.1.0+1

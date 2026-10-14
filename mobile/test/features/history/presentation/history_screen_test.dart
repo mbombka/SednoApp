@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:simplifier_app/app/app.dart';
-import 'package:simplifier_app/features/history/domain/history_entry.dart';
-import 'package:simplifier_app/features/history/presentation/history_screen.dart';
-import 'package:simplifier_app/features/shared/data/development_mocks.dart';
-import 'package:simplifier_app/features/simplification/domain/input_text.dart';
-import 'package:simplifier_app/features/simplification/domain/simplification_result.dart';
+import 'package:sedno_app/app/app.dart';
+import 'package:sedno_app/features/history/domain/history_entry.dart';
+import 'package:sedno_app/features/history/presentation/history_screen.dart';
+import 'package:sedno_app/features/shared/data/development_mocks.dart';
+import 'package:sedno_app/features/simplification/domain/input_text.dart';
+import 'package:sedno_app/features/simplification/domain/simplification_result.dart';
 
 void main() {
   testWidgets('shows retention notice and deletes a saved entry', (
@@ -55,7 +55,7 @@ void main() {
       clock: () => now,
     );
     await tester.pumpWidget(
-      SimplifierApp(
+      SednoApp(
         simplificationRepository: simplification,
         historyRepository: history,
       ),

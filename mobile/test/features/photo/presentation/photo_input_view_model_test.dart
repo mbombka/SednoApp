@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:simplifier_app/features/photo/domain/photo_text_repository.dart';
-import 'package:simplifier_app/features/photo/presentation/photo_input_view_model.dart';
+import 'package:sedno_app/features/photo/domain/photo_text_repository.dart';
+import 'package:sedno_app/features/photo/presentation/photo_input_view_model.dart';
 
 class FakePhotoRepository implements PhotoTextRepository {
   FakePhotoRepository(this.action);

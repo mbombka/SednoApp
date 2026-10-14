@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:simplifier_app/app/app.dart';
-import 'package:simplifier_app/features/quota/domain/quota_state.dart';
-import 'package:simplifier_app/features/simplification/domain/simplification_repository.dart';
-import 'package:simplifier_app/features/simplification/domain/simplification_result.dart';
+import 'package:sedno_app/app/app.dart';
+import 'package:sedno_app/features/quota/domain/quota_state.dart';
+import 'package:sedno_app/features/simplification/domain/simplification_repository.dart';
+import 'package:sedno_app/features/simplification/domain/simplification_result.dart';
 
 class StubRepository implements SimplificationRepository {
   StubRepository(this.action);
@@ -53,7 +53,7 @@ void main() {
         ),
       );
       await tester.pumpWidget(
-        SimplifierApp(
+        SednoApp(
           simplificationRepository: StubRepository((request) async {
             sentText = request.input.value;
             return response(request.requestId);
@@ -96,7 +96,7 @@ void main() {
   testWidgets('error keeps input and retry opens result', (tester) async {
     var calls = 0;
     await tester.pumpWidget(
-      SimplifierApp(
+      SednoApp(
         simplificationRepository: StubRepository((request) async {
           if (calls++ == 0) throw StateError('private detail');
           return response(request.requestId);
@@ -124,7 +124,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      SimplifierApp(
+      SednoApp(
         simplificationRepository: StubRepository(
           (request) async => response(request.requestId),
         ),

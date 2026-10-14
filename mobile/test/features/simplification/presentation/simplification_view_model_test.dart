@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:simplifier_app/features/quota/domain/quota_state.dart';
-import 'package:simplifier_app/features/simplification/domain/input_text.dart';
-import 'package:simplifier_app/features/simplification/domain/simplification_repository.dart';
-import 'package:simplifier_app/features/simplification/domain/simplification_result.dart';
-import 'package:simplifier_app/features/simplification/presentation/simplification_view_model.dart';
+import 'package:sedno_app/features/quota/domain/quota_state.dart';
+import 'package:sedno_app/features/simplification/domain/input_text.dart';
+import 'package:sedno_app/features/simplification/domain/simplification_repository.dart';
+import 'package:sedno_app/features/simplification/domain/simplification_result.dart';
+import 'package:sedno_app/features/simplification/presentation/simplification_view_model.dart';
 
 class FakeSimplificationRepository implements SimplificationRepository {
   FakeSimplificationRepository(this.respond);

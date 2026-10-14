@@ -1,4 +1,4 @@
-# SimplifierApp
+# SednoApp
 
 A minimal Flutter application for Android. It currently opens a single home screen.
 The planned purpose is to simplify long text.
@@ -36,7 +36,11 @@ flutter test
 flutter run
 ```
 
-The Android application ID is the Flutter template default, `com.example.simplifier_app`. Set an ID you own before publishing.
+The Android application ID is the development placeholder `com.example.sedno_app`. Set an ID you own before publishing.
+This ID replaces the previous development ID. Android treats it as a separate
+installation, so register the new package and signing certificate in Firebase
+and Google Play before testing sign-in or Play Integrity. Data stored under the
+previous package ID is not available to the new installation.
 
 The **Konto** tab supports Firebase Google and email/password sign-in when the
 Android app is configured. Supply `FIREBASE_API_KEY`, `FIREBASE_APP_ID`,

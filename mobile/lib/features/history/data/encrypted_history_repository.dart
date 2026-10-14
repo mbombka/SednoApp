@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
-import 'package:simplifier_app/features/history/domain/history_entry.dart';
-import 'package:simplifier_app/features/history/domain/history_repository.dart';
+import 'package:sedno_app/features/history/domain/history_entry.dart';
+import 'package:sedno_app/features/history/domain/history_repository.dart';
 
 /// Android encrypts this document with a Keystore key in the no-backup directory.
 abstract interface class HistoryDocumentStore {
@@ -15,7 +15,7 @@ abstract interface class HistoryDocumentStore {
 class AndroidHistoryDocumentStore implements HistoryDocumentStore {
   const AndroidHistoryDocumentStore();
 
-  static const _channel = MethodChannel('pl.simplyfi_it/history');
+  static const _channel = MethodChannel('pl.sedno/history');
 
   @override
   Future<String?> read() => _channel.invokeMethod<String>('read');
