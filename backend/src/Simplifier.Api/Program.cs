@@ -15,8 +15,31 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connect
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddScoped<IUsageStore, UsageStore>();
 builder.Services.AddScoped<IEntitlementResolver, FreeEntitlementResolver>();
-builder.Services.AddScoped<IIntegrityVerifier, PendingIntegrityVerifier>();
 builder.Services.AddHostedService<MetadataCleanup>();
+builder.Services.AddHttpClient();
+var firebaseProject = builder.Configuration["Firebase:ProjectId"];
+if (!builder.Environment.IsDevelopment() && string.IsNullOrWhiteSpace(firebaseProject))
+    throw new InvalidOperationException("Firebase:ProjectId is required.");
+builder.Services.AddSingleton<IIdentityTokenVerifier>(sp => new FirebaseTokenVerifier(
+    sp.GetRequiredService<IHttpClientFactory>().CreateClient(), firebaseProject ?? "development",
+    sp.GetRequiredService<TimeProvider>()));
+var integrityProvider = builder.Configuration["PlayIntegrity:Provider"] ?? "google";
+if (integrityProvider == "mock" && builder.Environment.IsDevelopment())
+    builder.Services.AddSingleton<IIntegrityVerifier, DevelopmentIntegrityVerifier>();
+else if (integrityProvider == "google")
+{
+    var packageName = builder.Configuration["PlayIntegrity:PackageName"];
+    var credentialsPath = builder.Configuration["PlayIntegrity:ServiceAccountJsonPath"];
+    if (string.IsNullOrWhiteSpace(packageName) || string.IsNullOrWhiteSpace(credentialsPath))
+        throw new InvalidOperationException("Play Integrity package and service account path are required.");
+    builder.Services.AddSingleton<IPlayAccessTokenSource>(sp => new ServiceAccountAccessTokenSource(
+        sp.GetRequiredService<IHttpClientFactory>().CreateClient(), credentialsPath,
+        sp.GetRequiredService<TimeProvider>()));
+    builder.Services.AddSingleton<IIntegrityVerifier>(sp => new PlayIntegrityVerifier(
+        sp.GetRequiredService<IHttpClientFactory>().CreateClient(),
+        sp.GetRequiredService<IPlayAccessTokenSource>(), packageName, sp.GetRequiredService<TimeProvider>()));
+}
+else throw new InvalidOperationException("Unsupported Play Integrity provider.");
 
 var credentialKey = ReadKey(builder.Configuration, "Security:CredentialKey");
 var fingerprintKey = ReadKey(builder.Configuration, "Security:FingerprintKey");
@@ -34,11 +57,13 @@ else throw new InvalidOperationException("Unsupported model provider.");
 
 builder.Services.AddRateLimiter(options =>
 {
+    var permitLimit = builder.Configuration.GetValue<int?>("RateLimiting:PermitLimit") ?? 60;
+    if (permitLimit < 1) throw new InvalidOperationException("RateLimiting:PermitLimit must be positive.");
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
     options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
         RateLimitPartition.GetFixedWindowLimiter(
             $"ip:{context.Connection.RemoteIpAddress}",
-            _ => new FixedWindowRateLimiterOptions { PermitLimit = 60, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
+            _ => new FixedWindowRateLimiterOptions { PermitLimit = permitLimit, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
     options.OnRejected = async (context, _) =>
     {
         var details = new ProblemDetails { Status = 429, Title = "Zbyt wiele żądań." };
@@ -81,12 +106,13 @@ app.Use(async (context, next) =>
         var authorization = context.Request.Headers.Authorization.ToString();
         if (!authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase) ||
             await context.RequestServices.GetRequiredService<IGuestStore>()
-                .AuthenticateAsync(authorization[7..], context.RequestAborted) is not Guid identityId)
+                .AuthenticateAsync(authorization[7..], context.RequestAborted) is not SessionIdentity session)
         {
             await Problem(context, 401, "unauthorized", "Brak ważnej sesji.").ExecuteAsync(context);
             return;
         }
-        context.Items["identity"] = identityId;
+        context.Items["identity"] = session.IdentityId;
+        context.Items["session"] = session;
     }
     await next(context);
 });
@@ -101,9 +127,27 @@ app.MapPost("/v1/guest-sessions", async (HttpContext context, IGuestStore guests
     catch (JsonException) { return Problem(context, 400, "invalid_json", "Nieprawidłowe dane."); }
     if (request is null || string.IsNullOrWhiteSpace(request.InstallationId) || request.InstallationId.Length > 200)
         return Problem(context, 400, "invalid_installation_id", "Nieprawidłowy identyfikator instalacji.");
-    if (!await integrity.VerifyAsync(request.IntegrityToken, context.RequestAborted))
+    if (!await integrity.VerifyAsync(request.IntegrityToken,
+        PlayIntegrityVerifier.RequestHash(request.InstallationId), context.RequestAborted))
         return Problem(context, 403, "integrity_failed", "Nie można potwierdzić instalacji.");
     return Results.Ok(await guests.CreateAsync(request.InstallationId, context.RequestAborted));
+});
+app.MapPost("/v1/auth/sessions", async (HttpContext context, IGuestStore guests, IIdentityTokenVerifier verifier) =>
+{
+    IdentityTokenInput? input;
+    try { input = await context.Request.ReadFromJsonAsync<IdentityTokenInput>(cancellationToken: context.RequestAborted); }
+    catch (JsonException) { return Problem(context, 400, "invalid_json", "Nieprawidłowe dane."); }
+    if (input is null || string.IsNullOrWhiteSpace(input.IdToken) || input.IdToken.Length > 8192)
+        return Problem(context, 400, "invalid_id_token", "Nieprawidłowy token tożsamości.");
+    var verified = await verifier.VerifyAsync(input.IdToken, context.RequestAborted);
+    if (verified is null) return Problem(context, 401, "invalid_id_token", "Nie można potwierdzić tożsamości.");
+    var linked = await guests.LinkAsync((SessionIdentity)context.Items["session"]!, verified, context.RequestAborted);
+    return linked is null ? Problem(context, 409, "account_conflict", "Nie można połączyć tego konta.") : Results.Ok(linked);
+});
+app.MapPost("/v1/auth/sign-out", async (HttpContext context, IGuestStore guests) =>
+{
+    await guests.SignOutAsync((SessionIdentity)context.Items["session"]!, context.RequestAborted);
+    return Results.NoContent();
 });
 app.MapGet("/v1/quota", async (HttpContext context, IUsageStore usage) =>
     Results.Ok(await usage.GetQuotaAsync((Guid)context.Items["identity"]!, context.RequestAborted)));
@@ -158,4 +202,5 @@ static IResult Problem(HttpContext context, int status, string code, string titl
     return Results.Problem(details);
 }
 public sealed record GuestInput(string InstallationId, string? IntegrityToken);
+public sealed record IdentityTokenInput(string IdToken);
 public partial class Program { }

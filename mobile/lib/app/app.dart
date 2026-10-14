@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:simplifier_app/app/app_theme.dart';
 import 'package:simplifier_app/features/account/presentation/account_screen.dart';
+import 'package:simplifier_app/features/account/domain/account_repository.dart';
 import 'package:simplifier_app/features/history/presentation/history_screen.dart';
 import 'package:simplifier_app/features/home/presentation/home_screen.dart';
 import 'package:simplifier_app/features/photo/data/local_photo_text_repository.dart';
@@ -8,9 +9,14 @@ import 'package:simplifier_app/features/shared/data/development_mocks.dart';
 import 'package:simplifier_app/features/simplification/domain/simplification_repository.dart';
 
 class SimplifierApp extends StatelessWidget {
-  const SimplifierApp({this.simplificationRepository, super.key});
+  const SimplifierApp({
+    this.simplificationRepository,
+    this.accountRepository,
+    super.key,
+  });
 
   final SimplificationRepository? simplificationRepository;
+  final AccountRepository? accountRepository;
 
   static const name = 'SimplifierApp';
   static const displayName = 'Simplyfi_it';
@@ -21,15 +27,19 @@ class SimplifierApp extends StatelessWidget {
       title: displayName,
       theme: AppTheme.light,
       themeMode: ThemeMode.light,
-      home: _AppNavigation(simplificationRepository: simplificationRepository),
+      home: _AppNavigation(
+        simplificationRepository: simplificationRepository,
+        accountRepository: accountRepository,
+      ),
     );
   }
 }
 
 class _AppNavigation extends StatefulWidget {
-  const _AppNavigation({this.simplificationRepository});
+  const _AppNavigation({this.simplificationRepository, this.accountRepository});
 
   final SimplificationRepository? simplificationRepository;
+  final AccountRepository? accountRepository;
 
   @override
   State<_AppNavigation> createState() => _AppNavigationState();
@@ -88,7 +98,7 @@ class _AppNavigationState extends State<_AppNavigation> {
               simplificationRepository: _simplificationRepository,
             ),
             const HistoryScreen(),
-            const AccountScreen(),
+            AccountScreen(repository: widget.accountRepository),
           ],
         ),
       ),

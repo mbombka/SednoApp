@@ -37,6 +37,79 @@ public sealed class ApiTests(BackendFixture fixture)
     }
 
     [Fact]
+    public async Task LinkingGuestCarriesUsageOnceAndSignOutRevokesSession()
+    {
+        fixture.Clock.Set(new(2026, 10, 14, 12, 0, 0, TimeSpan.Zero));
+        var first = await GuestAsync();
+        Assert.Equal(HttpStatusCode.OK, (await Submit(first.Client, "before-login", "Tekst")).StatusCode);
+        Assert.Equal("invalid_id_token", await Code(await first.Client.PostAsJsonAsync("/v1/auth/sessions",
+            new { idToken = "forged" })));
+        Assert.Equal(1, await Remaining(first.Client));
+        var linked = await first.Client.PostAsJsonAsync("/v1/auth/sessions", new { idToken = "google-user-1" });
+        linked.EnsureSuccessStatusCode();
+        using var doc = JsonDocument.Parse(await linked.Content.ReadAsStringAsync());
+        var accountToken = doc.RootElement.GetProperty("accessToken").GetString()!;
+        Assert.Equal(1, doc.RootElement.GetProperty("quota").GetProperty("used").GetInt32());
+        Assert.Equal(HttpStatusCode.Unauthorized, (await first.Client.GetAsync("/v1/quota")).StatusCode);
+        first.Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accountToken);
+        Assert.Equal(1, await Remaining(first.Client));
+        Assert.Equal(HttpStatusCode.OK, (await Submit(first.Client, "after-login", "Drugi tekst")).StatusCode);
+        Assert.Equal(0, await Remaining(first.Client));
+
+        var second = await GuestAsync();
+        Assert.Equal(2, await Remaining(second.Client));
+        var secondLink = await second.Client.PostAsJsonAsync("/v1/auth/sessions", new { idToken = "email-user-1" });
+        secondLink.EnsureSuccessStatusCode();
+        using var secondDoc = JsonDocument.Parse(await secondLink.Content.ReadAsStringAsync());
+        Assert.Equal(2, secondDoc.RootElement.GetProperty("quota").GetProperty("used").GetInt32());
+        Assert.Equal(0, secondDoc.RootElement.GetProperty("quota").GetProperty("remaining").GetInt32());
+        Assert.Equal(HttpStatusCode.NoContent, (await first.Client.PostAsync("/v1/auth/sign-out", null)).StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await first.Client.GetAsync("/v1/quota")).StatusCode);
+    }
+
+    [Fact]
+    public async Task IntegrityFailureDoesNotCreateGuest()
+    {
+        fixture.Integrity.Allow = false;
+        try
+        {
+            using var client = Client();
+            var response = await client.PostAsJsonAsync("/v1/guest-sessions",
+                new { installationId = Guid.NewGuid().ToString(), integrityToken = "bad" });
+            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+            Assert.Equal("integrity_failed", await Code(response));
+        }
+        finally { fixture.Integrity.Allow = true; }
+    }
+
+    [Fact]
+    public async Task LinkingSharedInstallationAndAnotherDeviceCountsEachRequestOnce()
+    {
+        fixture.Clock.Set(new(2026, 10, 14, 12, 0, 0, TimeSpan.Zero));
+        var installation = Guid.NewGuid().ToString();
+        var first = await GuestAsync(installation);
+        Assert.Equal(HttpStatusCode.OK, (await Submit(first.Client, "one", "Pierwszy")).StatusCode);
+        (await first.Client.PostAsJsonAsync("/v1/auth/sessions", new { idToken = "google-user-2" }))
+            .EnsureSuccessStatusCode();
+        var sameInstallation = await GuestAsync(installation);
+        Assert.Equal(1, await Remaining(sameInstallation.Client));
+        var sameLink = await sameInstallation.Client.PostAsJsonAsync("/v1/auth/sessions",
+            new { idToken = "google-user-2" });
+        sameLink.EnsureSuccessStatusCode();
+        using var sameDoc = JsonDocument.Parse(await sameLink.Content.ReadAsStringAsync());
+        Assert.Equal(1, sameDoc.RootElement.GetProperty("quota").GetProperty("used").GetInt32());
+
+        var anotherDevice = await GuestAsync();
+        Assert.Equal(HttpStatusCode.OK, (await Submit(anotherDevice.Client, "two", "Drugi")).StatusCode);
+        var anotherLink = await anotherDevice.Client.PostAsJsonAsync("/v1/auth/sessions",
+            new { idToken = "google-user-2" });
+        anotherLink.EnsureSuccessStatusCode();
+        using var anotherDoc = JsonDocument.Parse(await anotherLink.Content.ReadAsStringAsync());
+        Assert.Equal(2, anotherDoc.RootElement.GetProperty("quota").GetProperty("used").GetInt32());
+        Assert.Equal(0, anotherDoc.RootElement.GetProperty("quota").GetProperty("remaining").GetInt32());
+    }
+
+    [Fact]
     public async Task GuestAuthenticationAndOwnership()
     {
         fixture.Clock.Set(new(2026, 10, 14, 12, 0, 0, TimeSpan.Zero));

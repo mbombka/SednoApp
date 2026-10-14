@@ -5,6 +5,16 @@ public sealed class GuestIdentity
     public Guid Id { get; set; }
     public string InstallationHash { get; set; } = "";
     public DateTimeOffset CreatedAt { get; set; }
+    public Guid? AccountId { get; set; }
+}
+
+public sealed class VerifiedAccount
+{
+    public Guid Id { get; set; }
+    public string FirebaseUid { get; set; } = "";
+    public string Provider { get; set; } = "email";
+    public Guid PrimaryIdentityId { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
 }
 
 public sealed class GuestSession
@@ -15,6 +25,7 @@ public sealed class GuestSession
     public string CredentialHash { get; set; } = "";
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset ExpiresAt { get; set; }
+    public Guid? AccountId { get; set; }
 }
 
 public enum RequestState { Processing, Succeeded, Failed, Expired }

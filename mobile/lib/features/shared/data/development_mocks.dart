@@ -141,6 +141,22 @@ class MockAccountRepository implements AccountRepository {
   Future<Account> current() async => _account;
 
   @override
+  Future<Account> signInWithGoogle() async =>
+      _account = Account(id: 'dev-google', provider: IdentityProvider.google);
+
+  @override
+  Future<Account> signInWithEmail(String email, String password) async =>
+      _account = Account(
+        id: 'dev-email',
+        provider: IdentityProvider.email,
+        email: email,
+      );
+
+  @override
+  Future<Account> registerWithEmail(String email, String password) =>
+      signInWithEmail(email, password);
+
+  @override
   Future<void> signOut() async {
     await history.clear();
     _account = Account(id: 'dev-guest', provider: IdentityProvider.guest);

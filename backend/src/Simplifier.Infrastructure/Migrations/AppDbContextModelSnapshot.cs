@@ -31,6 +31,9 @@ namespace Simplifier.Infrastructure.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid?>("AccountId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("InstallationHash")
                         .IsRequired()
                         .HasMaxLength(64)
@@ -40,11 +43,16 @@ namespace Simplifier.Infrastructure.Migrations
 
                     b.HasIndex("InstallationHash");
 
+                    b.HasIndex("AccountId");
+
                     b.ToTable("guest_identities", (string)null);
                 });
 
             modelBuilder.Entity("Simplifier.Domain.GuestSession", b =>
                 {
+                    b.Property<Guid?>("AccountId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
@@ -67,9 +75,23 @@ namespace Simplifier.Infrastructure.Migrations
 
                     b.HasIndex("ExpiresAt");
 
+                    b.HasIndex("AccountId");
+
                     b.HasIndex("IdentityId");
 
                     b.ToTable("guest_sessions", (string)null);
+                });
+
+            modelBuilder.Entity("Simplifier.Domain.VerifiedAccount", b =>
+                {
+                    b.Property<Guid>("Id").HasColumnType("uuid");
+                    b.Property<DateTimeOffset>("CreatedAt").HasColumnType("timestamp with time zone");
+                    b.Property<string>("FirebaseUid").IsRequired().HasMaxLength(128).HasColumnType("character varying(128)");
+                    b.Property<Guid>("PrimaryIdentityId").HasColumnType("uuid");
+                    b.Property<string>("Provider").IsRequired().HasMaxLength(16).HasColumnType("character varying(16)");
+                    b.HasKey("Id");
+                    b.HasIndex("FirebaseUid").IsUnique();
+                    b.ToTable("verified_accounts", (string)null);
                 });
 
             modelBuilder.Entity("Simplifier.Domain.SimplificationRecord", b =>

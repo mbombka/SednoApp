@@ -38,5 +38,19 @@ flutter run
 
 The Android application ID is the Flutter template default, `com.example.simplifier_app`. Set an ID you own before publishing.
 
+The **Konto** tab supports Firebase Google and email/password sign-in when the
+Android app is configured. Supply `FIREBASE_API_KEY`, `FIREBASE_APP_ID`,
+`FIREBASE_PROJECT_ID`, `FIREBASE_SENDER_ID`, `GOOGLE_WEB_CLIENT_ID`,
+`BACKEND_BASE_URL` (HTTPS), and `PLAY_CLOUD_PROJECT_NUMBER` as Flutter
+`--dart-define` values. Enable Google and email/password in Firebase Auth,
+register the app's Android signing certificate, and use the same Firebase
+project ID on the backend. These IDs are app configuration, not model secrets.
+The backend issues a separate revocable bearer after verifying the Firebase
+ID token. The Kotlin host requests a standard Play Integrity token for guest
+session creation. The development backend explicitly mocks that check; a
+production release requires a registered Play app and server configuration.
+The current Start screen still uses development simplification mocks and is
+not yet connected to the backend session.
+
 The camera and OCR flow needs a physical Android device check. Follow
 [`mobile/docs/android_camera_ocr_manual_check.md`](mobile/docs/android_camera_ocr_manual_check.md).

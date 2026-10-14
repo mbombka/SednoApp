@@ -19,7 +19,9 @@ public sealed class MetadataCleanup(IServiceScopeFactory scopes, TimeProvider cl
                 await db.Sessions.Where(x => x.ExpiresAt < now).ExecuteDeleteAsync(stoppingToken);
                 await db.Identities.Where(x => x.CreatedAt < now.AddDays(-90) &&
                     !db.Sessions.Any(s => s.IdentityId == x.Id) &&
-                    !db.Requests.Any(r => r.IdentityId == x.Id)).ExecuteDeleteAsync(stoppingToken);
+                    !db.Requests.Any(r => r.IdentityId == x.Id) &&
+                    !db.Accounts.Any(a => a.PrimaryIdentityId == x.Id) && x.AccountId == null)
+                    .ExecuteDeleteAsync(stoppingToken);
             }
         }
     }
