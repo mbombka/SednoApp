@@ -44,6 +44,25 @@ public sealed class TestEntitlements : IEntitlementResolver
     public Task<bool> HasSubscriptionAsync(Guid id, CancellationToken ct) => Task.FromResult(Paid.Contains(id));
 }
 
+public sealed class TestIdentityVerifier : IIdentityTokenVerifier
+{
+    public Task<VerifiedIdentity?> VerifyAsync(string token, CancellationToken ct) =>
+        Task.FromResult<VerifiedIdentity?>(token switch
+        {
+            "google-user-1" => new("user-1", "google"),
+            "email-user-1" => new("user-1", "email"),
+            "google-user-2" => new("user-2", "google"),
+            _ => null
+        });
+}
+
+public sealed class TestIntegrityVerifier : IIntegrityVerifier
+{
+    public bool Allow { get; set; } = true;
+    public Task<bool> VerifyAsync(string? token, string requestHash, CancellationToken ct) =>
+        Task.FromResult(Allow);
+}
+
 public sealed class CaptureLogs : ILoggerProvider
 {
     public ConcurrentQueue<string> Messages { get; } = new();
@@ -70,6 +89,8 @@ public sealed class BackendFixture : IAsyncLifetime
     public TestClock Clock { get; } = new();
     public TestModel Model { get; } = new();
     public TestEntitlements Entitlements { get; } = new();
+    public TestIdentityVerifier Identities { get; } = new();
+    public TestIntegrityVerifier Integrity { get; } = new();
     public CaptureLogs Logs { get; } = new();
     public WebApplicationFactory<Program> Factory { get; private set; } = null!;
 
@@ -80,6 +101,7 @@ public sealed class BackendFixture : IAsyncLifetime
         SetEnvironment("ConnectionStrings__Postgres", _postgres.GetConnectionString());
         SetEnvironment("Security__CredentialKey", Convert.ToBase64String(Enumerable.Repeat((byte)1, 32).ToArray()));
         SetEnvironment("Security__FingerprintKey", Convert.ToBase64String(Enumerable.Repeat((byte)2, 32).ToArray()));
+        SetEnvironment("RateLimiting__PermitLimit", "1000");
         Factory = new WebApplicationFactory<Program>().WithWebHostBuilder(web =>
         {
             web.UseEnvironment("Development");
@@ -88,6 +110,8 @@ public sealed class BackendFixture : IAsyncLifetime
                 services.RemoveAll<TimeProvider>(); services.AddSingleton<TimeProvider>(Clock);
                 services.RemoveAll<IModelProvider>(); services.AddSingleton<IModelProvider>(Model);
                 services.RemoveAll<IEntitlementResolver>(); services.AddSingleton<IEntitlementResolver>(Entitlements);
+                services.RemoveAll<IIdentityTokenVerifier>(); services.AddSingleton<IIdentityTokenVerifier>(Identities);
+                services.RemoveAll<IIntegrityVerifier>(); services.AddSingleton<IIntegrityVerifier>(Integrity);
                 services.AddLogging(logging => logging.AddProvider(Logs));
             });
         });

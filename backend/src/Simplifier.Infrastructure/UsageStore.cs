@@ -97,11 +97,16 @@ public sealed class UsageStore(AppDbContext db, IEntitlementResolver entitlement
     private async Task<QuotaDto> SnapshotAsync(Guid identityId, DateTimeOffset now, CancellationToken ct)
     {
         var day = QuotaPolicy.Day(now);
-        var bucket = await BucketAsync(identityId, ct);
+        var identity = await db.Identities.AsNoTracking().Where(x => x.Id == identityId)
+            .Select(x => new { x.InstallationHash, x.AccountId }).SingleAsync(ct);
+        var hashes = identity.AccountId is null ? new[] { identity.InstallationHash } :
+            await db.Identities.AsNoTracking().Where(x => x.AccountId == identity.AccountId)
+                .Select(x => x.InstallationHash).Distinct().ToArrayAsync(ct);
         var counts = await db.Requests.AsNoTracking()
             .Join(db.Identities.AsNoTracking(), request => request.IdentityId, identity => identity.Id,
                 (request, identity) => new { request, identity })
-            .Where(x => x.identity.InstallationHash == bucket && x.request.ReservationDay == day &&
+            .Where(x => (hashes.Contains(x.identity.InstallationHash) ||
+                (identity.AccountId != null && x.identity.AccountId == identity.AccountId)) && x.request.ReservationDay == day &&
                 (x.request.State != RequestState.Processing || x.request.ReservationExpiresAt > now))
             .GroupBy(x => x.request.State).Select(g => new { State = g.Key, Count = g.Count() }).ToListAsync(ct);
         var used = counts.Where(x => x.State == RequestState.Succeeded).Sum(x => x.Count);
@@ -111,16 +116,13 @@ public sealed class UsageStore(AppDbContext db, IEntitlementResolver entitlement
         return new(paid ? "subscription" : "free", limit, used, Math.Max(0, limit - used - reserved), now, QuotaPolicy.ResetAt(now));
     }
 
-    private Task<string> BucketAsync(Guid identityId, CancellationToken ct) =>
-        db.Identities.AsNoTracking().Where(x => x.Id == identityId).Select(x => x.InstallationHash).SingleAsync(ct);
-
     private async Task LockAsync(Guid identityId, CancellationToken ct)
     {
         var connection = db.Database.GetDbConnection();
         await using var command = connection.CreateCommand();
         command.Transaction = db.Database.CurrentTransaction!.GetDbTransaction();
-        command.CommandText = "SELECT pg_advisory_xact_lock(hashtext(@identity))";
-        command.Parameters.Add(new NpgsqlParameter("identity", await BucketAsync(identityId, ct)));
+        // Linking can merge several installation buckets. Serialize quota writes with linking.
+        command.CommandText = "SELECT pg_advisory_xact_lock(1748392201)";
         await command.ExecuteNonQueryAsync(ct);
     }
 }

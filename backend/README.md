@@ -1,6 +1,6 @@
 # Simplyfi_it backend
 
-ASP.NET Core on .NET 10 LTS with EF Core and PostgreSQL. The contract implemented here is [`../contracts/openapi.yaml`](../contracts/openapi.yaml). The earlier `mobile/api/openapi.yaml` is a scaffold draft and is superseded by this contract; no Flutter files are changed by this task.
+ASP.NET Core on .NET 10 LTS with EF Core and PostgreSQL. The contract implemented here is [`../contracts/openapi.yaml`](../contracts/openapi.yaml). The earlier `mobile/api/openapi.yaml` is a scaffold draft and is superseded by this contract.
 
 ## Local setup
 
@@ -26,7 +26,11 @@ For future schema changes, run `dotnet ef migrations add Name --project src/Simp
 
 ## API and data behavior
 
-`POST /v1/guest-sessions` creates a new guest identity and a random opaque bearer credential. Only an HMAC hash of the credential is stored. The installation ID is stored as a keyed hash for operational correlation, but it never authenticates a caller or retrieves an existing credential. A new session creates a new identity, but sessions presenting the same installation ID share one quota bucket. Changing the installation ID, including on reinstall, may bypass guest quotas. IP rate limiting slows abuse but does not solve it. `IIntegrityVerifier` and `IEntitlementResolver` are extension points for Play Integrity, account binding, and verified billing in task 8. They currently accept guest creation and grant free tier only in production. Signing in must later carry existing usage into the verified account, not grant a fresh allowance.
+`POST /v1/guest-sessions` creates a new guest identity and a random opaque bearer credential. Only an HMAC hash of the credential is stored. The installation ID is stored as a keyed hash for operational correlation, but it never authenticates a caller or retrieves an existing credential. Sessions presenting the same installation ID share one quota bucket. Reinstallation can still bypass guest limits; Play Integrity makes scripted abuse harder but does not solve this. IP rate limiting is an additional brake.
+
+`POST /v1/auth/sessions` accepts a guest bearer and a Firebase ID token from either Google or email/password sign-in. The backend checks the token's RSA signature against Google's published certificates, project audience, issuer, issue/expiry times, and Firebase sign-in provider. It then links guest usage to the verified Firebase UID and issues a new random, revocable account bearer valid for seven days. The old guest bearer is revoked. Sign-out revokes the current bearer. The app stores bearers in Android encrypted storage. Two installations linked to the same Firebase UID share a quota without copying usage records; each successful request is counted once. The account session returns the free quota already used that UTC day. Billing remains a separate task; production still resolves free tier only.
+
+Production requires `Firebase:ProjectId`, `PlayIntegrity:PackageName`, and `PlayIntegrity:ServiceAccountJsonPath`. The path points to a service-account JSON file supplied by the deployment secret store, outside the repository. Enable Play Integrity for the app's Google Cloud project and link that project in Play Console. A guest request must carry a standard Play Integrity token whose request hash is Base64URL(SHA-256(UTF-8(`guest-session:` + installation ID))). The backend exchanges it at Google's decode endpoint and requires a matching package/hash, a verdict no older than five minutes, `PLAY_RECOGNIZED`, and `MEETS_DEVICE_INTEGRITY`. `PlayIntegrity:Provider=mock` is available only in Development and is rejected in production. Development uses it by default. A real package name and Play release setup are needed before production rollout.
 
 The development mock returns deterministic text prefixed `Wersja demonstracyjna:`. Production has no model adapter yet; `Model:Provider=disabled` makes simplification return 503. No model key is required or stored. The client should explain AI provider processing before the first submission and warn that generated text may contain errors. Photos and history have no upload endpoint.
 

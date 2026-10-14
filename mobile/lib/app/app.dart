@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:simplifier_app/app/app_theme.dart';
 import 'package:simplifier_app/features/account/presentation/account_screen.dart';
+import 'package:simplifier_app/features/account/domain/account_repository.dart';
 import 'package:simplifier_app/features/history/data/encrypted_history_repository.dart';
 import 'package:simplifier_app/features/history/domain/history_repository.dart';
 import 'package:simplifier_app/features/history/presentation/history_screen.dart';
@@ -15,11 +16,13 @@ class SimplifierApp extends StatelessWidget {
   const SimplifierApp({
     this.simplificationRepository,
     this.historyRepository,
+    this.accountRepository,
     super.key,
   });
 
   final SimplificationRepository? simplificationRepository;
   final HistoryRepository? historyRepository;
+  final AccountRepository? accountRepository;
 
   static const name = 'SimplifierApp';
   static const displayName = 'Simplyfi_it';
@@ -33,16 +36,22 @@ class SimplifierApp extends StatelessWidget {
       home: _AppNavigation(
         simplificationRepository: simplificationRepository,
         historyRepository: historyRepository,
+        accountRepository: accountRepository,
       ),
     );
   }
 }
 
 class _AppNavigation extends StatefulWidget {
-  const _AppNavigation({this.simplificationRepository, this.historyRepository});
+  const _AppNavigation({
+    this.simplificationRepository,
+    this.historyRepository,
+    this.accountRepository,
+  });
 
   final SimplificationRepository? simplificationRepository;
   final HistoryRepository? historyRepository;
+  final AccountRepository? accountRepository;
 
   @override
   State<_AppNavigation> createState() => _AppNavigationState();
@@ -139,7 +148,7 @@ class _AppNavigationState extends State<_AppNavigation>
               repository: _historyRepository,
               revision: _historyRevision,
             ),
-            const AccountScreen(),
+            AccountScreen(repository: widget.accountRepository),
           ],
         ),
       ),
