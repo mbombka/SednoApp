@@ -6,13 +6,13 @@ void main() {
     test('builds a welcome message for the configured app name', () {
       const viewModel = HomeViewModel(appName: 'SimplifierApp');
 
-      expect(viewModel.welcomeMessage, 'Welcome to SimplifierApp');
+      expect(viewModel.welcomeMessage, 'Witaj w SimplifierApp');
     });
 
     test('uses a different app name when one is supplied', () {
       const viewModel = HomeViewModel(appName: 'Another App');
 
-      expect(viewModel.welcomeMessage, 'Welcome to Another App');
+      expect(viewModel.welcomeMessage, 'Witaj w Another App');
     });
   });
 }

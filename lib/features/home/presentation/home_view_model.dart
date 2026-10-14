@@ -3,5 +3,5 @@ class HomeViewModel {
 
   final String appName;
 
-  String get welcomeMessage => 'Welcome to $appName';
+  String get welcomeMessage => 'Witaj w $appName';
 }
