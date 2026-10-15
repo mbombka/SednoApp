@@ -50,6 +50,8 @@ app.*.map.json
 
 # Backend local configuration and build output
 **/bin/
+# Some .NET build tasks create a literal backslash in the directory name on Linux.
+**/bin\\Debug/
 **/obj/
 backend/.env
 backend/**/appsettings.Local.json
