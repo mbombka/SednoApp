@@ -69,6 +69,7 @@ void main() {
     await tester.tap(find.text('Uprość'));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('aiProcessingNotice')), findsOneWidget);
+    expect(find.textContaining('OpenAI'), findsOneWidget);
     expect(calls, 0);
     await tester.tap(find.text('Anuluj'));
     await tester.pumpAndSettle();

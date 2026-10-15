@@ -4,7 +4,7 @@ class PrivacyScreen extends StatelessWidget {
   const PrivacyScreen({super.key});
 
   static const aiNotice =
-      'Twój tekst trafi przez serwer Sedno do dostawcy AI, aby go uprościć. '
+      'Twój tekst trafi przez serwer Sedno do dostawcy AI — OpenAI, aby go uprościć. '
       'Nie wpisuj danych, których nie chcesz przekazywać. '
       'Zdjęcia zostają na urządzeniu. AI może popełniać błędy. Sprawdź wynik.';
   static const deletionNotice =
@@ -39,7 +39,7 @@ class PrivacyScreen extends StatelessWidget {
           ),
           SizedBox(height: 16),
           Text(
-            'Projekt informacji o prywatności — DO UZUPEŁNIENIA przed publikacją: administrator i kontakt, dostawca AI, podmioty przetwarzające, podstawy prawne, transfery, okresy przechowywania kont i kopii serwera oraz adres publicznej polityki i strony usuwania konta. Produkcyjne AI jest obecnie wyłączone; model demonstracyjny działa tylko w środowisku deweloperskim.',
+            'Projekt informacji o prywatności — DO UZUPEŁNIENIA przed publikacją: administrator i kontakt, podmioty przetwarzające, podstawy prawne, transfery, okresy przechowywania kont i kopii serwera oraz adres publicznej polityki i strony usuwania konta. Uproszczenia korzystają z modelu OpenAI GPT-6 Luna po skonfigurowaniu serwera. Model demonstracyjny działa tylko w środowisku deweloperskim.',
           ),
         ],
       ),

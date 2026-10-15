@@ -11,7 +11,7 @@ obecnej konfiguracji. W tej zmianie nie ustawiono usług ani zadań usuwających
 | Administrator | Mariusz Bąbka, osoba fizyczna, Polska; bez wyznaczonego IOD |
 | Kontakt prywatność/usuwanie | mariuszbabka0@gmail.com, poczta Gmail |
 | Adres administratora | ul. Słowiańska 91, Modlniczka, Polska |
-| AI | Wybrane OpenAI GPT-6 Luna, ID API `gpt-6-luna`; adapter jeszcze nie istnieje |
+| AI | Wybrane OpenAI GPT-6 Luna, ID API `gpt-6-luna`; adapter istnieje; domyślnie wyłączony, wymaga klucza i odbioru jakości |
 | Platforma | Zadeklarowane Firebase; dokładne usługi, region i baza nieustalone |
 | Grupa docelowa | Potwierdzone 16+: starsi nastolatkowie i dorośli |
 | Rynek | Polski język aplikacji potwierdzony; kraje dystrybucji jeszcze nie wskazane |
@@ -39,6 +39,12 @@ przy implementacji sprawdzić retencję endpointu, cache i projektu. Wyłączeni
 zapisu odpowiedzi przez `store: false` samo nie oznacza zerowej retencji wszystkich
 systemów. Nie obiecywać ZDR ani rezydencji UE bez potwierdzenia ich dostępności
 na koncie i prawidłowej konfiguracji.
+Tryb `openai-agent` korzysta z Agents API i nie ma ustawienia `store=false`:
+treść i wynik trafiają do sesji. Backend zleca usunięcie w bloku `finally`, z
+limitem 3 sekund i maksymalnie dwiema próbami. Przy błędzie pozostawia ostrzeżenie
+bez danych treści i sesji. Po awarii procesu lub błędzie usunięcia operator musi
+sprawdzić i usunąć pozostałe sesje w dedykowanym projekcie; kod nie ma trwałej
+kolejki usuwania ani automatycznego uzgadniania pozostawionych sesji.
 [Zasady danych OpenAI API](https://developers.openai.com/api/docs/guides/your-data).
 
 ## Proponowane okresy

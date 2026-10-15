@@ -99,7 +99,13 @@ procesy Sklepu Play podlegają zasadom Google. Sedno korzysta z wyniku do ochron
 sesji gościa. Nie deklarować nieużywanych opcjonalnych kontroli innych aplikacji.
 [Opis danych Play Integrity](https://developer.android.com/google/play/integrity/terms#data-safety).
 
-**OpenAI — plan, nie aktywne wdrożenie:** GPT-6 Luna (`gpt-6-luna`). Dokumentacja
+**OpenAI — adapter zaimplementowany, wdrożenie niepotwierdzone:** GPT-6 Luna
+(`gpt-6-luna`) przez Responses API z `store=false` albo zapisany agent przez
+Agents API. Agents API przechowuje sesje z treścią i wynikiem. Adapter zleca ich
+usunięcie po zakończeniu, ale awaria procesu lub nieudane usunięcie może pozostawić
+sesję u dostawcy. Wymagana jest operacyjna kontrola pozostałych sesji; nie deklarować
+przetwarzania efemerycznego. Domyślna konfiguracja produkcyjna
+nadal wyłącza uproszczanie. Dokumentacja
 API opisuje domyślny brak trenowania na danych, lecz nie gwarantuje zerowej
 retencji. Weryfikacja projektu i endpointu przed uruchomieniem jest konieczna.
 [Model](https://developers.openai.com/api/docs/models/gpt-6-luna),

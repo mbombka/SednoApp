@@ -33,7 +33,7 @@ class HttpSimplificationRepository
     required this.baseUrl,
     required this.client,
     required this.sessions,
-    this.requestTimeout = const Duration(seconds: 8),
+    this.requestTimeout = const Duration(seconds: 30),
     this.retryDelay = const Duration(milliseconds: 250),
     this.maxAttempts = 3,
     Future<void> Function(Duration)? wait,

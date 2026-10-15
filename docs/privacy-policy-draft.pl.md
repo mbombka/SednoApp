@@ -26,8 +26,9 @@ zdjęcie i odczytać z niego tekst. Przed wysłaniem możesz go poprawić.
 Do rozpoczęcia korzystania nie potrzebujesz konta. Logowanie przez Google lub
 e-mail jest dobrowolne; konto jest potrzebne do korzystania z subskrypcji.
 
-**Obecny stan wdrożenia:** w repozytorium nie ma aktywnego produkcyjnego dostawcy
-AI. Produkcyjna usługa upraszczania jest wyłączona. Demonstracyjny model działa
+**Obecny stan wdrożenia:** adapter API OpenAI jest zaimplementowany, ale
+konfiguracja produkcyjna domyślnie pozostawia uproszczanie wyłączone.
+Nie potwierdzono uruchomienia usługi ani dostępu do modelu na koncie administratora. Demonstracyjny model działa
 wyłącznie w środowisku deweloperskim. Przed uruchomieniem zewnętrznego AI
 zaktualizujemy stan wdrożenia w tej polityce i aplikacji. Wybranym przez
 administratora modelem jest OpenAI GPT-6 Luna (`gpt-6-luna`), przez API OpenAI.
@@ -47,9 +48,15 @@ Po wybraniu „Uprość” aplikacja wysyła tekst do backendu Sedno. Backend ni
 oryginału ani wyniku w bazie. Kod nie rejestruje ich w logach. Do obsługi żądania
 używa treści w pamięci. Wynik trafia do aplikacji i lokalnej historii.
 
-**Planowane AI:** po wdrożeniu adaptera tekst i instrukcja uproszczenia trafią
+**AI po włączeniu konfiguracji:** tekst i instrukcja uproszczenia trafią
 przez backend do API OpenAI, modelu GPT-6 Luna. Nie wyślemy zdjęcia ani całej
-historii. Wybrany model nie oznacza, że integracja już działa.
+historii. Tryb bezpośrednich wywołań Responses API wysyła `store=false`, co nie
+oznacza zerowej retencji po stronie dostawcy. Tryb zapisanego agenta (Agents API)
+przechowuje treść i wynik w osobnej sesji OpenAI. Backend zleca usunięcie sesji
+po zakończeniu żądania, także przy błędzie lub przerwaniu. Nie gwarantuje to
+natychmiastowego fizycznego usunięcia. Awaria procesu lub nieudane usunięcie
+mogą pozostawić sesję u dostawcy; wymaga to kontroli i usunięcia przez operatora.
+Obecność adaptera nie potwierdza uruchomienia integracji na serwerze.
 
 OpenAI opisuje brak używania danych API do trenowania domyślnie. Standardowe
 logi bezpieczeństwa mogą zawierać treści i być zachowywane do 30 dni, z wyjątkami

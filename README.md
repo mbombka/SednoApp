@@ -77,3 +77,14 @@ buttons. The user icon opens a full-screen panel with rounded navigation section
 Start, Konto and Historia, plus access to privacy information. AI processing is explained
 in a confirmation dialog before the first submission in a screen session; quota
 and reset details appear on submission when the remaining allowance is low.
+
+## Real AI integration
+
+The backend includes opt-in adapters for a saved OpenAI Agent and direct GPT-6 Luna calls. They remain disabled by
+default in production and uses a mock in Development until explicitly configured.
+See [server setup](backend/README.md#openai-simplification) and the
+[Polish acceptance procedure](docs/model-acceptance.pl.md). The API key stays on
+the server. Account access, live quality and real request cost require verification.
+For the saved agent configured in OpenAI Platform, follow
+[Agents API setup](backend/README.md#saved-openai-agent) using `OpenAI:ApiKey` and
+`OpenAI:AgentId`. The prompt and model are managed in the saved agent.

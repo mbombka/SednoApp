@@ -35,7 +35,7 @@ For future schema changes, run `dotnet ef migrations add Name --project src/Sedn
 
 Production requires `Firebase:ProjectId`, `PlayIntegrity:PackageName`, and `PlayIntegrity:ServiceAccountJsonPath`. The path points to a service-account JSON file supplied by the deployment secret store, outside the repository. Enable Play Integrity for the app's Google Cloud project and link that project in Play Console. A guest request must carry a standard Play Integrity token whose request hash is Base64URL(SHA-256(UTF-8(`guest-session:` + installation ID))). The backend exchanges it at Google's decode endpoint and requires a matching package/hash, a verdict no older than five minutes, `PLAY_RECOGNIZED`, and `MEETS_DEVICE_INTEGRITY`. `PlayIntegrity:Provider=mock` is available only in Development and is rejected in production. Development uses it by default. A real package name and Play release setup are needed before production rollout.
 
-The development mock returns deterministic text prefixed `Wersja demonstracyjna:`. Production has no model adapter yet; `Model:Provider=disabled` makes simplification return 503. No model key is required or stored. The client should explain AI provider processing before the first submission and warn that generated text may contain errors. Photos and history have no upload endpoint.
+The development mock returns deterministic text prefixed `Wersja demonstracyjna:`. The OpenAI adapter uses GPT-6 Luna through the Responses API when explicitly enabled (see below). The default `Model:Provider=disabled` makes simplification return 503. The mock and disabled modes need no model key. The client should explain AI provider processing before the first submission and warn that generated text may contain errors. Photos and history have no upload endpoint.
 
 The server counts Unicode grapheme clusters and rejects whitespace-only input or more than 4,000 clusters. It also caps HTTP bodies at 128 KiB. Errors use Problem Details with a stable `code` and Polish `title`. The basic rate limiter allows 60 requests per minute per remote IP, independently of daily quota. Configure a trusted reverse proxy to pass the real client IP before deploying at scale; do not trust arbitrary forwarded headers.
 
@@ -148,3 +148,120 @@ launch. Never request passwords, tokens, texts or photos by email.
 See [draft privacy policy](../docs/privacy-policy-draft.pl.md) and
 [Data Safety checklist](../docs/google-play-data-safety.pl.md). Both require the
 marked missing facts before production publication.
+
+
+## OpenAI simplification
+
+There are two explicit modes: `openai-agent` uses a saved Platform Agent (setup
+below), and `openai` calls Responses API directly with code-managed instructions.
+The following Responses API settings apply only to `openai`.
+
+The adapter is implemented only on the backend; no model key belongs in Flutter,
+`--dart-define`, tracked JSON, screenshots or logs. Model availability is documented
+by [OpenAI](https://developers.openai.com/api/docs/models/gpt-6-luna); access and
+billing on your own project must still be checked. No live call was made as part
+of implementation.
+
+From `backend/`, configure the development API using local user secrets:
+
+```sh
+dotnet user-secrets set "Model:Provider" "openai" --project src/Sedno.Api
+# Enter the key without echoing it or including it literally in shell history.
+read -rsp 'OpenAI API key: ' SEDNO_OPENAI_KEY
+printf '\n'
+dotnet user-secrets set "Model:OpenAI:ApiKey" "$SEDNO_OPENAI_KEY" --project src/Sedno.Api
+unset SEDNO_OPENAI_KEY
+```
+
+Run the API with `ASPNETCORE_ENVIRONMENT=Development` and the database/security
+configuration from Local setup. User secrets override Development's mock setting.
+To return to the demo, set `Model:Provider` to `mock` in user secrets. Production
+requires a secret store/environment variables `Model__Provider=openai` and
+`Model__OpenAI__ApiKey`; it deliberately remains disabled in tracked configuration.
+Configure the mobile backend URL following the root README.
+
+Defaults: `Model:OpenAI:Model=gpt-6-luna`, `MaxOutputTokens=4096` (allowed 256–8192),
+`TimeoutSeconds=20` (allowed 1–25). The mobile HTTP timeout is 30 seconds. Only this
+model has been enabled; changing models requires evaluation and code review.
+Missing/invalid configuration fails startup. Requests have fixed HTTPS destination,
+no redirects, no tools, no automatic provider retries, `reasoning.effort=none`,
+`store=false`, and a 256 KiB upstream response cap. Input remains limited to 4,000
+grapheme clusters; empty, incomplete, refused, malformed or oversized output fails
+without returning partial results. Successful output is capped at 16,000 graphemes.
+Named-client HTTP loggers are disabled. Also exclude content and credentials in
+proxy/APM/outbound tracing at deployment.
+
+The developer instructions preserve meaning, numbers, amounts, dates, conditions
+and negations. User text is a separate user message and is explicitly treated as
+data, including embedded attempts to override instructions. This is a mitigation,
+not proof that a model always preserves meaning or resists prompt injection.
+A provider failure returns the existing sanitized 503 and releases the reservation;
+client cancellation retains the existing reservation-expiry policy. A retry of a
+failed request key is terminal; a new user attempt needs a new key. Provider costs
+may still occur after a timeout or disconnect.
+
+`store=false` disables response application-state storage, not all provider
+retention. Verify project data controls, contractual entity, regional eligibility
+and retention before deployment; see [OpenAI data controls](https://developers.openai.com/api/docs/guides/your-data).
+Run the [acceptance procedure](../docs/model-acceptance.pl.md) with synthetic texts
+before enabling real user traffic.
+
+## Saved OpenAI Agent
+
+Use this mode for the Agent created in OpenAI Platform → Agents → Setup agent.
+The backend reads the existing `OpenAI:ApiKey` and `OpenAI:AgentId` user secrets;
+it does not copy, replace or append to the saved agent's prompt or model.
+From the repository root, enable the mode:
+
+```sh
+dotnet user-secrets set "Model:Provider" "openai-agent" --project backend/src/Sedno.Api
+ASPNETCORE_ENVIRONMENT=Development dotnet run --project backend/src/Sedno.Api
+```
+
+This assumes PostgreSQL, migrations and the other Local setup secrets are ready.
+Keep the model and agreed Polish instructions in the saved agent. Change
+`OpenAI:AgentId` to switch agents, then restart the backend. Saved-agent prompt
+and model edits apply to new sessions without changing Flutter or backend code.
+Production remains disabled by default; enable via the deployment secret store:
+`Model__Provider=openai-agent`, `OpenAI__ApiKey`, `OpenAI__AgentId`.
+Missing/invalid key or agent ID fails startup. `OpenAI:TimeoutSeconds` defaults
+to 20 and accepts 1–25, plus up to 3 seconds for cleanup; the mobile timeout is 30.
+
+The restricted application key needs `api.agents.read`, `api.agents.write` and
+`api.responses.write`. The Agents scopes also permit configuration management;
+use a dedicated Sedno project. See the [official quickstart](https://developers.openai.com/api/docs/guides/agents-api/quickstart).
+No live account/model-access verification is implied by mocked tests.
+
+Each simplification creates a fresh, initially empty session with
+`OpenAI-Beta: agents=v1`. Only after its ID is received is a separate user message
+submitted. The adapter polls the turn outcome (idle alone is not success), then
+accepts one completed `final_answer` message for that turn. It never returns
+commentary, reasoning or partial output. Responses are capped at 256 KiB and
+final text at 16,000 graphemes. Unexpected pagination fails closed. The session
+overrides tools to an empty list, disables multi-agent delegation, selects plain
+text output and uses `environment.type=none`; model/instructions are inherited.
+HTTP redirects and named-client logging are disabled. There are no submission
+retries. Proxy/APM tracing must also exclude bodies, credentials and response text.
+Existing quota, idempotency and sanitized 503 behavior apply unchanged.
+
+Unlike the direct adapter, Agents API stores conversation state: there is no
+`store=false` guarantee here. A `finally` block requests session deletion after
+success, failure, timeout or cancellation, with an independent three-second
+budget and at most two deletion attempts. A failed cleanup emits a generic
+warning without session ID, text, key or upstream exception; it does not discard
+an already received result. If cleanup fails or the process crashes, sessions
+can remain at OpenAI. There is no durable cleanup queue in this implementation.
+Operators must reconcile retained sessions in the dedicated project, account
+for this in the privacy policy, and verify provider retention before production.
+A lost empty-session creation response can leave an empty session; user content
+is never sent until a cleanup handle is known. API deletion does not promise
+immediate physical erasure. See [session deletion](https://developers.openai.com/api/docs/guides/agents-api/sessions/manage).
+
+Content-free .NET metrics use Meter `Sedno.OpenAI.Agents`:
+`sedno.agent.duration` (seconds; `agent_id`, `outcome`) and `sedno.agent.tokens`
+(`agent_id`, `kind=input_tokens|output_tokens`). Token counts come from completed
+turns when available; missing/late usage and failed turns make these counters
+incomplete, not a final bill. Export this Meter through your monitoring system;
+no exporter or admin dashboard is deployed here. Use Platform Usage filtered to
+the Sedno project/key for provider billing. Session deletion removes the session
+from the API, so do not rely on retaining content-bearing traces for accounting.

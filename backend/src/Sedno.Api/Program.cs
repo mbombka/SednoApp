@@ -100,12 +100,7 @@ builder.Services.AddScoped<GuestStore>(sp => new(sp.GetRequiredService<AppDbCont
 builder.Services.AddScoped<IGuestStore>(sp => sp.GetRequiredService<GuestStore>());
 builder.Services.AddScoped<SimplificationService>(sp => new(sp.GetRequiredService<IUsageStore>(),
     sp.GetRequiredService<IModelProvider>(), sp.GetRequiredService<TimeProvider>(), fingerprintKey));
-var provider = builder.Configuration["Model:Provider"] ?? "disabled";
-if (provider == "mock" && !builder.Environment.IsDevelopment())
-    throw new InvalidOperationException("Development mock cannot run outside Development.");
-if (provider == "mock") builder.Services.AddScoped<IModelProvider, DevelopmentMockProvider>();
-else if (provider == "disabled") builder.Services.AddScoped<IModelProvider, DisabledModelProvider>();
-else throw new InvalidOperationException("Unsupported model provider.");
+builder.Services.AddSednoModel(builder.Configuration, builder.Environment.IsDevelopment());
 
 builder.Services.AddRateLimiter(options =>
 {
