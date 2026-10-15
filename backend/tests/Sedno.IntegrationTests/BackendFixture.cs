@@ -49,6 +49,7 @@ public sealed class TestIdentityVerifier : IIdentityTokenVerifier
     public Task<VerifiedIdentity?> VerifyAsync(string token, CancellationToken ct) =>
         Task.FromResult<VerifiedIdentity?>(token switch
         {
+            _ when token.StartsWith("billing-") => new(token, "google"),
             "google-user-1" => new("user-1", "google"),
             "email-user-1" => new("user-1", "email"),
             "google-user-2" => new("user-2", "google"),
@@ -86,6 +87,7 @@ public sealed class BackendFixture : IAsyncLifetime
 {
     private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder("postgres:17-alpine").Build();
     private readonly Dictionary<string, string?> _originalEnvironment = new();
+    public TestBilling Billing { get; } = new();
     public TestClock Clock { get; } = new();
     public TestModel Model { get; } = new();
     public TestEntitlements Entitlements { get; } = new();
@@ -102,12 +104,20 @@ public sealed class BackendFixture : IAsyncLifetime
         SetEnvironment("Security__CredentialKey", Convert.ToBase64String(Enumerable.Repeat((byte)1, 32).ToArray()));
         SetEnvironment("Security__FingerprintKey", Convert.ToBase64String(Enumerable.Repeat((byte)2, 32).ToArray()));
         SetEnvironment("RateLimiting__PermitLimit", "1000");
+        SetEnvironment("Billing__Enabled", "true");
+        SetEnvironment("Billing__PackageName", "pl.sedno.test");
+        SetEnvironment("Billing__ProductId", "monthly");
+        SetEnvironment("Billing__ServiceAccountJsonPath", "/not-used-in-tests");
+        SetEnvironment("Billing__NotificationAudience", "https://test/notifications/google-play");
+        SetEnvironment("Billing__PushServiceAccountEmail", "push@test.invalid");
         Factory = new WebApplicationFactory<Program>().WithWebHostBuilder(web =>
         {
             web.UseEnvironment("Development");
             web.ConfigureTestServices(services =>
             {
                 services.RemoveAll<TimeProvider>(); services.AddSingleton<TimeProvider>(Clock);
+                services.RemoveAll<IPlayBillingClient>(); services.AddSingleton<IPlayBillingClient>(Billing);
+                services.RemoveAll<INotificationVerifier>(); services.AddSingleton<INotificationVerifier>(new TestPushVerifier());
                 services.RemoveAll<IModelProvider>(); services.AddSingleton<IModelProvider>(Model);
                 services.RemoveAll<IEntitlementResolver>(); services.AddSingleton<IEntitlementResolver>(Entitlements);
                 services.RemoveAll<IIdentityTokenVerifier>(); services.AddSingleton<IIdentityTokenVerifier>(Identities);
@@ -133,4 +143,21 @@ public sealed class BackendFixture : IAsyncLifetime
         _originalEnvironment[name] = Environment.GetEnvironmentVariable(name);
         Environment.SetEnvironmentVariable(name, value);
     }
+}
+
+public sealed class TestBilling : IPlayBillingClient
+{
+    public ConcurrentDictionary<string, PlaySubscription> Purchases { get; } = new();
+    public ConcurrentDictionary<string, int> Acknowledgements { get; } = new();
+    public Task<PlaySubscription> GetAsync(string token, CancellationToken ct) => Task.FromResult(Purchases[token]);
+    public Task AcknowledgeAsync(string token, CancellationToken ct)
+    {
+        Acknowledgements.AddOrUpdate(token, 1, (_, count) => count + 1);
+        Purchases[token] = Purchases[token] with { Acknowledged = true };
+        return Task.CompletedTask;
+    }
+}
+public sealed class TestPushVerifier : INotificationVerifier
+{
+    public Task<bool> VerifyAsync(string token, CancellationToken ct) => Task.FromResult(token == "trusted-push");
 }

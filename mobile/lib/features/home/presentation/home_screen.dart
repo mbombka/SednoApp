@@ -325,7 +325,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 Text(
                   quota.remaining == 1
                       ? 'Pozostało 1 uproszczenie. Limit odnowi się o 00:00 UTC (${_timeUntilReset(quota)}).'
-                      : 'Wykorzystano dzienny limit. Odnowi się o 00:00 UTC (${_timeUntilReset(quota)}). Subskrypcja: 9,99 zł miesięcznie.',
+                      : 'Wykorzystano dzienny limit. Odnowi się o 00:00 UTC (${_timeUntilReset(quota)}). Subskrypcję i jej cenę znajdziesz w zakładce Konto.',
                   key: const Key('quotaMessage'),
                 ),
               ],

@@ -17,7 +17,8 @@ public interface IPlayAccessTokenSource
     Task<string> GetAsync(CancellationToken ct);
 }
 
-public sealed class ServiceAccountAccessTokenSource(HttpClient client, string credentialsPath, TimeProvider clock) : IPlayAccessTokenSource
+public sealed class ServiceAccountAccessTokenSource(HttpClient client, string credentialsPath, TimeProvider clock,
+    string scope = "https://www.googleapis.com/auth/playintegrity") : IPlayAccessTokenSource
 {
     private readonly SemaphoreSlim _refresh = new(1, 1);
     private string? _accessToken;
@@ -40,7 +41,7 @@ public sealed class ServiceAccountAccessTokenSource(HttpClient client, string cr
             var header = Encode(JsonSerializer.SerializeToUtf8Bytes(new { alg = "RS256", typ = "JWT" }));
             var claims = Encode(JsonSerializer.SerializeToUtf8Bytes(new
             {
-                iss = email, scope = "https://www.googleapis.com/auth/playintegrity",
+                iss = email, scope,
                 aud = "https://oauth2.googleapis.com/token", iat = now, exp = now + 3600
             }));
             using var rsa = RSA.Create();

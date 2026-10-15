@@ -42,6 +42,21 @@ public sealed class SimplificationRecord
     public DateTimeOffset? FinishedAt { get; set; }
 }
 
+public sealed class PlayPurchase
+{
+    public string TokenHash { get; set; } = "";
+    public string ProtectedToken { get; set; } = "";
+    public Guid AccountId { get; set; }
+    public string State { get; set; } = "";
+    public DateTimeOffset? ExpiresAt { get; set; }
+    public bool Revoked { get; set; }
+}
+public sealed class PlayNotification
+{
+    public string Id { get; set; } = "";
+    public DateTimeOffset ProcessedAt { get; set; }
+}
+
 public static class QuotaPolicy
 {
     public static int Limit(bool subscription) => subscription ? 400 : 2;

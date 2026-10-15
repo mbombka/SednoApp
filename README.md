@@ -57,3 +57,10 @@ server quota. Without backend configuration, submission is unavailable.
 
 The camera and OCR flow needs a physical Android device check. Follow
 [`mobile/docs/android_camera_ocr_manual_check.md`](mobile/docs/android_camera_ocr_manual_check.md).
+
+Monthly subscriptions use Google Play Billing and require a signed-in Sedno
+account for purchase/restore. Set `PLAY_SUBSCRIPTION_PRODUCT_ID` to the product
+configured on the backend. The app shows Play's localized price; the backend
+verifies and acknowledges purchases and receives authenticated RTDN pushes.
+See [backend configuration](backend/README.md#google-play-subscriptions) and the
+[Google Play sandbox procedure](mobile/docs/google_play_subscription_sandbox.md).

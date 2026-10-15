@@ -28,11 +28,11 @@ namespace Sedno.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<Guid?>("AccountId")
                         .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("InstallationHash")
                         .IsRequired()
@@ -41,20 +41,20 @@ namespace Sedno.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("InstallationHash");
-
                     b.HasIndex("AccountId");
+
+                    b.HasIndex("InstallationHash");
 
                     b.ToTable("guest_identities", (string)null);
                 });
 
             modelBuilder.Entity("Sedno.Domain.GuestSession", b =>
                 {
-                    b.Property<Guid?>("AccountId")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("AccountId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("CreatedAt")
@@ -73,25 +73,58 @@ namespace Sedno.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ExpiresAt");
-
                     b.HasIndex("AccountId");
+
+                    b.HasIndex("ExpiresAt");
 
                     b.HasIndex("IdentityId");
 
                     b.ToTable("guest_sessions", (string)null);
                 });
 
-            modelBuilder.Entity("Sedno.Domain.VerifiedAccount", b =>
+            modelBuilder.Entity("Sedno.Domain.PlayNotification", b =>
                 {
-                    b.Property<Guid>("Id").HasColumnType("uuid");
-                    b.Property<DateTimeOffset>("CreatedAt").HasColumnType("timestamp with time zone");
-                    b.Property<string>("FirebaseUid").IsRequired().HasMaxLength(128).HasColumnType("character varying(128)");
-                    b.Property<Guid>("PrimaryIdentityId").HasColumnType("uuid");
-                    b.Property<string>("Provider").IsRequired().HasMaxLength(16).HasColumnType("character varying(16)");
+                    b.Property<string>("Id")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTimeOffset>("ProcessedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.HasKey("Id");
-                    b.HasIndex("FirebaseUid").IsUnique();
-                    b.ToTable("verified_accounts", (string)null);
+
+                    b.ToTable("play_notifications", (string)null);
+                });
+
+            modelBuilder.Entity("Sedno.Domain.PlayPurchase", b =>
+                {
+                    b.Property<string>("TokenHash")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ProtectedToken")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("Revoked")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.HasKey("TokenHash");
+
+                    b.HasIndex("AccountId");
+
+                    b.ToTable("play_purchases", (string)null);
                 });
 
             modelBuilder.Entity("Sedno.Domain.SimplificationRecord", b =>
@@ -134,6 +167,36 @@ namespace Sedno.Infrastructure.Migrations
                     b.ToTable("simplification_requests", (string)null);
                 });
 
+            modelBuilder.Entity("Sedno.Domain.VerifiedAccount", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("FirebaseUid")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<Guid>("PrimaryIdentityId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Provider")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FirebaseUid")
+                        .IsUnique();
+
+                    b.ToTable("verified_accounts", (string)null);
+                });
+
             modelBuilder.Entity("Sedno.Domain.GuestSession", b =>
                 {
                     b.HasOne("Sedno.Domain.GuestIdentity", "Identity")
@@ -143,6 +206,15 @@ namespace Sedno.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Identity");
+                });
+
+            modelBuilder.Entity("Sedno.Domain.PlayPurchase", b =>
+                {
+                    b.HasOne("Sedno.Domain.VerifiedAccount", null)
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Sedno.Domain.SimplificationRecord", b =>

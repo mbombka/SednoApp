@@ -1,4 +1,7 @@
 import 'dart:io';
+import 'dart:async';
+
+import 'package:sedno_app/features/subscription/presentation/subscription_view_model.dart';
 
 import 'package:flutter/material.dart';
 import 'package:sedno_app/app/app_theme.dart';
@@ -17,12 +20,14 @@ class SednoApp extends StatelessWidget {
     this.simplificationRepository,
     this.historyRepository,
     this.accountRepository,
+    this.subscriptionModel,
     super.key,
   });
 
   final SimplificationRepository? simplificationRepository;
   final HistoryRepository? historyRepository;
   final AccountRepository? accountRepository;
+  final SubscriptionViewModel? subscriptionModel;
 
   static const name = 'SednoApp';
   static const displayName = 'Sedno';
@@ -37,6 +42,7 @@ class SednoApp extends StatelessWidget {
         simplificationRepository: simplificationRepository,
         historyRepository: historyRepository,
         accountRepository: accountRepository,
+        subscriptionModel: subscriptionModel,
       ),
     );
   }
@@ -47,11 +53,13 @@ class _AppNavigation extends StatefulWidget {
     this.simplificationRepository,
     this.historyRepository,
     this.accountRepository,
+    this.subscriptionModel,
   });
 
   final SimplificationRepository? simplificationRepository;
   final HistoryRepository? historyRepository;
   final AccountRepository? accountRepository;
+  final SubscriptionViewModel? subscriptionModel;
 
   @override
   State<_AppNavigation> createState() => _AppNavigationState();
@@ -95,7 +103,10 @@ class _AppNavigationState extends State<_AppNavigation>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) _purgeHistory();
+    if (state == AppLifecycleState.resumed) {
+      _purgeHistory();
+      unawaited(widget.subscriptionModel?.refresh());
+    }
   }
 
   @override
@@ -138,7 +149,10 @@ class _AppNavigationState extends State<_AppNavigation>
               repository: _historyRepository,
               revision: _historyRevision,
             ),
-            AccountScreen(repository: widget.accountRepository),
+            AccountScreen(
+              repository: widget.accountRepository,
+              subscriptionModel: widget.subscriptionModel,
+            ),
           ],
         ),
       ),

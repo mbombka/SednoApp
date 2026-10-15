@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/widgets.dart';
@@ -10,6 +12,9 @@ import 'package:sedno_app/features/account/data/firebase_account_repository.dart
 import 'package:sedno_app/features/account/domain/account_repository.dart';
 import 'package:sedno_app/features/history/data/encrypted_history_repository.dart';
 import 'package:sedno_app/features/simplification/data/http_simplification_repository.dart';
+import 'package:sedno_app/features/subscription/data/backend_subscription_repository.dart';
+import 'package:sedno_app/features/subscription/data/google_play_store.dart';
+import 'package:sedno_app/features/subscription/presentation/subscription_view_model.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -56,9 +61,22 @@ Future<void> main() async {
       clearHistory: history.clear,
     );
   }
+  const productId = String.fromEnvironment('PLAY_SUBSCRIPTION_PRODUCT_ID');
+  final subscription = sessions == null || productId.isEmpty
+      ? null
+      : SubscriptionViewModel(
+          store: GooglePlayStore(productId: productId),
+          repository: BackendSubscriptionRepository(sessions),
+          productId: productId,
+        );
+  if (subscription != null) {
+    sessions!.sessionRevision.addListener(subscription.refresh);
+    unawaited(subscription.start());
+  }
   runApp(
     SednoApp(
       accountRepository: accounts,
+      subscriptionModel: subscription,
       historyRepository: history,
       simplificationRepository: sessions == null
           ? null

@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using Sedno.Application;
 using Sedno.Infrastructure;
@@ -14,9 +15,42 @@ if (string.IsNullOrWhiteSpace(connectionString)) throw new InvalidOperationExcep
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddScoped<IUsageStore, UsageStore>();
-builder.Services.AddScoped<IEntitlementResolver, FreeEntitlementResolver>();
+var dataProtection = builder.Services.AddDataProtection().SetApplicationName("Sedno");
+builder.Services.AddScoped<SubscriptionService>();
+builder.Services.AddScoped<IEntitlementResolver>(sp => sp.GetRequiredService<SubscriptionService>());
 builder.Services.AddHostedService<MetadataCleanup>();
 builder.Services.AddHttpClient();
+// Purchase tokens appear in Google API URLs. Disable all HTTP client loggers for this client.
+builder.Services.AddHttpClient("play-billing", client => client.Timeout = TimeSpan.FromSeconds(15)).RemoveAllLoggers();
+var billingEnabled = builder.Configuration.GetValue<bool>("Billing:Enabled");
+var billingPackage = builder.Configuration["Billing:PackageName"] ?? "";
+var billingProduct = builder.Configuration["Billing:ProductId"] ?? "";
+if (billingEnabled)
+{
+    var keyPath = builder.Configuration["Billing:DataProtectionKeyPath"];
+    if (!builder.Environment.IsDevelopment() && string.IsNullOrWhiteSpace(keyPath))
+        throw new InvalidOperationException("Billing:DataProtectionKeyPath is required in production.");
+    if (!string.IsNullOrWhiteSpace(keyPath)) dataProtection.PersistKeysToFileSystem(new DirectoryInfo(keyPath));
+    var path = builder.Configuration["Billing:ServiceAccountJsonPath"];
+    var audience = builder.Configuration["Billing:NotificationAudience"];
+    var email = builder.Configuration["Billing:PushServiceAccountEmail"];
+    if (new[] { billingPackage, billingProduct, path, audience, email }.Any(string.IsNullOrWhiteSpace))
+        throw new InvalidOperationException("Complete Google Play Billing configuration is required.");
+    builder.Services.AddSingleton<IPlayBillingClient>(sp =>
+    {
+        var client = sp.GetRequiredService<IHttpClientFactory>().CreateClient("play-billing");
+        return new PlayBillingClient(client, new ServiceAccountAccessTokenSource(client, path!,
+            sp.GetRequiredService<TimeProvider>(), "https://www.googleapis.com/auth/androidpublisher"),
+            new(billingPackage, billingProduct));
+    });
+    builder.Services.AddSingleton<INotificationVerifier>(sp => new PubSubTokenVerifier(
+        sp.GetRequiredService<IHttpClientFactory>().CreateClient("play-billing"), audience!, email!, sp.GetRequiredService<TimeProvider>()));
+}
+else
+{
+    builder.Services.AddSingleton<IPlayBillingClient, DisabledPlayBillingClient>();
+    builder.Services.AddScoped<IEntitlementResolver, FreeEntitlementResolver>();
+}
 var firebaseProject = builder.Configuration["Firebase:ProjectId"];
 if (!builder.Environment.IsDevelopment() && string.IsNullOrWhiteSpace(firebaseProject))
     throw new InvalidOperationException("Firebase:ProjectId is required.");
@@ -116,6 +150,49 @@ app.Use(async (context, next) =>
     }
     await next(context);
 });
+app.MapGet("/v1/subscription", async (HttpContext context, SubscriptionService subscriptions, CancellationToken ct) =>
+{
+    var session = (SessionIdentity)context.Items["session"]!;
+    if (session.AccountId is null) return Problem(context, 403, "account_required", "Zaloguj się, aby korzystać z subskrypcji.");
+    if (!billingEnabled) return Problem(context, 503, "billing_unavailable", "Płatności są niedostępne.");
+    return Results.Ok(await subscriptions.CurrentAsync(session.AccountId.Value, ct));
+});
+app.MapPost("/v1/subscription", async (PurchaseInput input, HttpContext context, SubscriptionService subscriptions, CancellationToken ct) =>
+{
+    var session = (SessionIdentity)context.Items["session"]!;
+    if (session.AccountId is null) return Problem(context, 403, "account_required", "Zaloguj się, aby kupić subskrypcję.");
+    if (!billingEnabled) return Problem(context, 503, "billing_unavailable", "Płatności są niedostępne.");
+    if (string.IsNullOrWhiteSpace(input.PurchaseToken) || input.PurchaseToken.Length > 8192)
+        return Problem(context, 400, "invalid_purchase", "Nieprawidłowy zakup.");
+    return Results.Ok(await subscriptions.VerifyAsync(session.AccountId.Value, input.PurchaseToken, ct));
+});
+app.MapPost("/notifications/google-play", async (PubSubEnvelope envelope, HttpContext context,
+    SubscriptionService subscriptions, CancellationToken ct) =>
+{
+    if (!billingEnabled) return Results.StatusCode(503);
+    var header = context.Request.Headers.Authorization.ToString();
+    if (!header.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase) ||
+        !await context.RequestServices.GetRequiredService<INotificationVerifier>().VerifyAsync(header[7..], ct))
+        return Results.Unauthorized();
+    if (envelope.Message is not { Data: { Length: > 0 }, MessageId: { Length: > 0 and <= 200 } } message)
+        return Results.BadRequest();
+    try
+    {
+        using var doc = JsonDocument.Parse(Convert.FromBase64String(message.Data));
+        var p = doc.RootElement;
+        if (p.GetProperty("packageName").GetString() != billingPackage) return Results.BadRequest();
+        if (p.TryGetProperty("testNotification", out _)) return Results.NoContent();
+        var revoked = p.TryGetProperty("voidedPurchaseNotification", out var notification);
+        if (!revoked && !p.TryGetProperty("subscriptionNotification", out notification)) return Results.NoContent();
+        var token = notification.GetProperty("purchaseToken").GetString();
+        if (string.IsNullOrWhiteSpace(token) || token.Length > 8192) return Results.BadRequest();
+        await subscriptions.NotifyAsync(message.MessageId, token, ct);
+        return Results.NoContent();
+    }
+    catch (Exception ex) when (ex is JsonException or FormatException or KeyNotFoundException)
+    { return Results.BadRequest(); }
+});
+
 app.MapHealthChecks("/health/live", new() { Predicate = _ => false });
 app.MapGet("/health/ready", async (AppDbContext db, CancellationToken ct) =>
     await db.Database.CanConnectAsync(ct) ? Results.Ok(new { status = "ready" }) : Results.StatusCode(503));
@@ -204,3 +281,7 @@ static IResult Problem(HttpContext context, int status, string code, string titl
 public sealed record GuestInput(string InstallationId, string? IntegrityToken);
 public sealed record IdentityTokenInput(string IdToken);
 public partial class Program { }
+
+public sealed record PurchaseInput(string PurchaseToken);
+public sealed record PubSubMessage(string Data, string MessageId);
+public sealed record PubSubEnvelope(PubSubMessage? Message);

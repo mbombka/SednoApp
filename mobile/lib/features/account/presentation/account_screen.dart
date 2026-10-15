@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:sedno_app/features/subscription/presentation/subscription_view_model.dart';
+import 'package:sedno_app/features/subscription/presentation/subscription_panel.dart';
 import 'package:sedno_app/features/account/domain/account.dart';
 import 'package:sedno_app/features/account/domain/account_repository.dart';
 
 class AccountScreen extends StatefulWidget {
-  const AccountScreen({this.repository, super.key});
+  const AccountScreen({this.repository, this.subscriptionModel, super.key});
 
   final AccountRepository? repository;
+  final SubscriptionViewModel? subscriptionModel;
 
   @override
   State<AccountScreen> createState() => _AccountScreenState();
@@ -88,6 +91,8 @@ class _AccountScreenState extends State<AccountScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          if (widget.subscriptionModel case final model?)
+            SubscriptionPanel(model: model),
           Text('Konto', style: Theme.of(context).textTheme.headlineSmall),
           const SizedBox(height: 16),
           if (repository == null) const Text('Tutaj pojawią się opcje konta.'),

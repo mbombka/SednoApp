@@ -10,8 +10,24 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
     public DbSet<VerifiedAccount> Accounts => Set<VerifiedAccount>();
     public DbSet<SimplificationRecord> Requests => Set<SimplificationRecord>();
 
+    public DbSet<PlayPurchase> Purchases => Set<PlayPurchase>();
+    public DbSet<PlayNotification> PlayNotifications => Set<PlayNotification>();
+
     protected override void OnModelCreating(ModelBuilder model)
     {
+        model.Entity<PlayPurchase>(e =>
+        {
+            e.ToTable("play_purchases"); e.HasKey(x => x.TokenHash);
+            e.Property(x => x.TokenHash).HasMaxLength(64);
+            e.Property(x => x.State).HasMaxLength(80);
+            e.HasIndex(x => x.AccountId);
+            e.HasOne<VerifiedAccount>().WithMany().HasForeignKey(x => x.AccountId).OnDelete(DeleteBehavior.Cascade);
+        });
+        model.Entity<PlayNotification>(e =>
+        {
+            e.ToTable("play_notifications"); e.HasKey(x => x.Id);
+            e.Property(x => x.Id).HasMaxLength(200);
+        });
         model.Entity<GuestIdentity>(e =>
         {
             e.ToTable("guest_identities"); e.HasKey(x => x.Id);

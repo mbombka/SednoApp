@@ -72,6 +72,77 @@ paths:
       responses:
         '204': { description: Session revoked. }
         '401': { $ref: '#/components/responses/Problem' }
+  /v1/subscription:
+    get:
+      operationId: getSubscription
+      description: Requires an account bearer. Refreshes stored purchases against Google Play. No client-side entitlement is trusted.
+      responses:
+        '200':
+          description: Current subscription and the obfuscated account ID to pass to Play Billing.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Subscription' }
+        '401': { $ref: '#/components/responses/Problem' }
+        '403': { $ref: '#/components/responses/Problem' }
+        '503': { $ref: '#/components/responses/Problem' }
+    post:
+      operationId: verifyOrRestoreSubscription
+      description: >-
+        Requires an account bearer. Verifies the configured package/product and
+        obfuscated account binding with subscriptionsv2.get, acknowledges eligible
+        purchases on the backend, and stores an encrypted purchase token.
+        Repeating a purchase token restores the same entitlement; it never adds quota.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [purchaseToken]
+              properties:
+                purchaseToken: { type: string, minLength: 1, maxLength: 8192 }
+      responses:
+        '200':
+          description: Verified subscription.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Subscription' }
+        '400': { $ref: '#/components/responses/Problem' }
+        '401': { $ref: '#/components/responses/Problem' }
+        '403': { $ref: '#/components/responses/Problem' }
+        '503': { $ref: '#/components/responses/Problem' }
+  /notifications/google-play:
+    post:
+      operationId: googlePlayNotification
+      security:
+        - googlePushBearer: []
+      description: >-
+        Authenticated Pub/Sub push only. Verifies Google's RS256 OIDC signature,
+        issuer, expiry, exact audience and verified service-account email. Data is
+        a base64 Google Play RTDN payload for the configured package. Subscription
+        and voided-purchase events trigger a fresh Google lookup; event ordering is
+        not trusted. Message IDs are deduplicated transactionally after processing.
+        Unknown owners and transient failures return non-2xx so Pub/Sub can retry.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message]
+              properties:
+                message:
+                  type: object
+                  required: [messageId, data]
+                  properties:
+                    messageId: { type: string, minLength: 1, maxLength: 200 }
+                    data: { type: string, format: byte }
+      responses:
+        '204': { description: Processed, duplicate or test notification. }
+        '400': { description: Malformed payload or wrong package. }
+        '401': { description: Invalid push identity. }
+        '500': { description: Processing failed; retry delivery. }
+        '503': { description: Billing disabled. }
   /v1/quota:
     get:
       operationId: getQuota
@@ -153,6 +224,11 @@ paths:
         '503': { description: PostgreSQL is unavailable. }
 components:
   securitySchemes:
+    googlePushBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Google-signed OIDC JWT for the configured Pub/Sub push service account and audience.
     sessionBearer:
       type: http
       scheme: bearer
@@ -164,6 +240,14 @@ components:
         application/problem+json:
           schema: { $ref: '#/components/schemas/Problem' }
   schemas:
+    Subscription:
+      type: object
+      required: [state, active, accountBinding]
+      properties:
+        state: { type: string, description: Google subscriptionState, none, or revoked. }
+        active: { type: boolean }
+        expiresAt: { type: string, format: date-time, nullable: true }
+        accountBinding: { type: string, minLength: 64, maxLength: 64 }
     Problem:
       type: object
       required: [status, title, code]

@@ -31,7 +31,7 @@ For future schema changes, run `dotnet ef migrations add Name --project src/Sedn
 
 `POST /v1/guest-sessions` creates a new guest identity and a random opaque bearer credential. Only an HMAC hash of the credential is stored. The installation ID is stored as a keyed hash for operational correlation, but it never authenticates a caller or retrieves an existing credential. Sessions presenting the same installation ID share one quota bucket. Reinstallation can still bypass guest limits; Play Integrity makes scripted abuse harder but does not solve this. IP rate limiting is an additional brake.
 
-`POST /v1/auth/sessions` accepts a guest bearer and a Firebase ID token from either Google or email/password sign-in. The backend checks the token's RSA signature against Google's published certificates, project audience, issuer, issue/expiry times, and Firebase sign-in provider. It then links guest usage to the verified Firebase UID and issues a new random, revocable account bearer valid for seven days. The old guest bearer is revoked. Sign-out revokes the current bearer. The app stores bearers in Android encrypted storage. Two installations linked to the same Firebase UID share a quota without copying usage records; each successful request is counted once. The account session returns the free quota already used that UTC day. Billing remains a separate task; production still resolves free tier only.
+`POST /v1/auth/sessions` accepts a guest bearer and a Firebase ID token from either Google or email/password sign-in. The backend checks the token's RSA signature against Google's published certificates, project audience, issuer, issue/expiry times, and Firebase sign-in provider. It then links guest usage to the verified Firebase UID and issues a new random, revocable account bearer valid for seven days. The old guest bearer is revoked. Sign-out revokes the current bearer. The app stores bearers in Android encrypted storage. Two installations linked to the same Firebase UID share a quota without copying usage records; each successful request is counted once. The account session returns the free quota already used that UTC day. Subscriptions are verified separately through Google Play; purchase and restore require an account session.
 
 Production requires `Firebase:ProjectId`, `PlayIntegrity:PackageName`, and `PlayIntegrity:ServiceAccountJsonPath`. The path points to a service-account JSON file supplied by the deployment secret store, outside the repository. Enable Play Integrity for the app's Google Cloud project and link that project in Play Console. A guest request must carry a standard Play Integrity token whose request hash is Base64URL(SHA-256(UTF-8(`guest-session:` + installation ID))). The backend exchanges it at Google's decode endpoint and requires a matching package/hash, a verdict no older than five minutes, `PLAY_RECOGNIZED`, and `MEETS_DEVICE_INTEGRITY`. `PlayIntegrity:Provider=mock` is available only in Development and is rejected in production. Development uses it by default. A real package name and Play release setup are needed before production rollout.
 
@@ -39,7 +39,7 @@ The development mock returns deterministic text prefixed `Wersja demonstracyjna:
 
 The server counts Unicode grapheme clusters and rejects whitespace-only input or more than 4,000 clusters. It also caps HTTP bodies at 128 KiB. Errors use Problem Details with a stable `code` and Polish `title`. The basic rate limiter allows 60 requests per minute per remote IP, independently of daily quota. Configure a trusted reverse proxy to pass the real client IP before deploying at scale; do not trust arbitrary forwarded headers.
 
-Quota reservation is serialized per hashed installation bucket with a PostgreSQL transaction advisory lock. Request status and idempotency remain scoped to the authenticated identity. The transaction commits before calling the model. Active reservations reduce `remaining`, while `used` counts only successful requests. Reservations expire after five minutes; reads mark expired reservations and release their capacity. A late model response cannot commit an expired reservation. A request crossing 00:00 UTC stays on its reservation day. Quota queries use server time. The paid policy is 400 total uses per UTC day, including any free uses; production currently resolves every identity as free.
+Quota reservation is serialized per hashed installation bucket with a PostgreSQL transaction advisory lock. Request status and idempotency remain scoped to the authenticated identity. The transaction commits before calling the model. Active reservations reduce `remaining`, while `used` counts only successful requests. Reservations expire after five minutes; reads mark expired reservations and release their capacity. A late model response cannot commit an expired reservation. A request crossing 00:00 UTC stays on its reservation day. Quota queries use server time. The paid policy is 400 total uses per UTC day, including any free uses; Google Play entitlements resolve the paid tier without resetting existing daily usage.
 
 The database stores guest identity/session metadata, keyed input fingerprints, request status, and reservation day/timestamps. It stores neither submitted text nor result text. The idempotency key is scoped to the bearer identity. An active duplicate returns 202 and a status URL. A completed duplicate returns 409 `result_unavailable`; the result cannot be replayed if the original response was lost. The client must keep a received result locally. A new key can start a new simplification and may consume quota. Failed or expired keys remain terminal, so use a new key to retry. `GET /v1/simplifications/requests/{requestId}` reports status only to the owner.
 
@@ -52,3 +52,62 @@ dotnet test Sedno.Backend.sln
 ```
 
 Unit tests cover input and quota policy. Integration tests use an isolated Testcontainers PostgreSQL instance, apply the migration, and exercise authentication, request validation, quota and idempotency concurrency, UTC boundaries, reservation recovery, provider failure, and log exclusion. Docker must be running and `docker info` must work for the user running tests; see [Docker's Linux post-installation guide](https://docs.docker.com/engine/install/linux-postinstall) for socket access.
+
+
+## Google Play subscriptions
+
+See [sandbox procedure](../mobile/docs/google_play_subscription_sandbox.md).
+Billing is disabled by default in both environments. There is no runtime billing
+mock. Configure these values via environment variables or a secret store:
+
+- `Billing__Enabled=true`
+- `Billing__PackageName`: the exact registered Android application ID
+- `Billing__ProductId`: one subscription product with one monthly auto-renewing
+  base plan, no trial/introductory offers; configure PLN 9.99 in Play Console
+- `Billing__ServiceAccountJsonPath`: deployment-mounted Google service account
+  JSON, with Android Publisher API enabled and Play Console access to view
+  purchases/subscriptions and manage orders/subscriptions for this app
+- `Billing__NotificationAudience`: exact HTTPS Pub/Sub push audience
+- `Billing__PushServiceAccountEmail`: exact dedicated push authentication account
+- `Billing__DataProtectionKeyPath`: persistent, restricted directory for ASP.NET
+  Data Protection keys (required when billing is enabled outside Development)
+
+Use a shared persistent key ring across API replicas, permissions limited to the
+service identity, encryption of its volume/backups and a deployment secret store.
+Do not lose these keys: purchase tokens in PostgreSQL cannot then be decrypted.
+Data Protection uses application name `Sedno`; development uses its default local
+key ring. Raw tokens are never logged; the named Google HTTP client has all HTTP
+loggers disabled because Publisher URLs contain purchase tokens. Reverse proxies,
+APM and outbound tracing must also exclude bodies, authorization and Google URLs.
+
+`GET /v1/subscription` returns the account binding used as Play's obfuscated
+account ID. `POST /v1/subscription` verifies/restores a token, rejects mismatched
+ownership/product, acknowledges eligible purchases and stores the encrypted token
+plus SHA-256 lookup hash and minimal state metadata. Pending purchases receive no
+entitlement or acknowledgement. Active/grace-period and canceled-but-unexpired
+purchases grant access. Paused, held, pending and expired purchases do not.
+Replacement tokens retire the linked old entitlement. Every quota decision
+rechecks Google (including expiry), so a missed RTDN cannot extend stale access.
+Google unavailability fails the request closed; this trades API latency and
+availability for immediate verification. Monitor Publisher API quota before scale.
+
+Publish RTDN to a dedicated Pub/Sub topic. Grant
+`google-play-developer-notifications@system.gserviceaccount.com` publisher access.
+Create an authenticated push subscription targeting
+`https://<backend>/notifications/google-play`, using the configured audience and
+push account. Grant Pub/Sub's service agent permission to mint that account's
+OIDC token. Restrict who can publish to the topic and impersonate the push account.
+Configure retry/backoff, dead-letter monitoring and alerting. Google sends a
+base64 payload inside a Pub/Sub envelope. Signed pushes are checked for issuer,
+audience and verified email. Test events return 204; subscription and voided
+purchase events fetch current Google state instead of trusting event type or time.
+Concurrent duplicate message IDs are serialized and committed with the state
+update. Failures return non-2xx and are retried, including when ownership is not
+yet available. Keep dead-letter messages until resolved; never paste tokens into
+logs/tickets. Deduplication IDs are retained until an operational purge policy is
+chosen; purchase metadata is retained for subscription management and must be
+covered by the privacy policy. No simplification content is stored.
+
+A refund with revocation removes entitlement once Google reports expiry. A
+refund without revocation follows the entitlement still returned by Google;
+it must not revoke a renewed period just because an older order was refunded.
