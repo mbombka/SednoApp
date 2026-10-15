@@ -15,7 +15,7 @@ int requiredInt(Map<String, dynamic> json, String key) {
 DateTime requiredUtcDate(Map<String, dynamic> json, String key) {
   final value = json[key];
   if (value is! String ||
-      !RegExp(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$')
+      !RegExp(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|\+00:00)$')
           .hasMatch(value)) {
     throw FormatException('Nieprawidłowa data UTC: $key.');
   }

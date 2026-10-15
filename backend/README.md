@@ -232,9 +232,10 @@ The restricted application key needs `api.agents.read`, `api.agents.write` and
 use a dedicated Sedno project. See the [official quickstart](https://developers.openai.com/api/docs/guides/agents-api/quickstart).
 No live account/model-access verification is implied by mocked tests.
 
-Each simplification creates a fresh, initially empty session with
-`OpenAI-Beta: agents=v1`. Only after its ID is received is a separate user message
-submitted. The adapter polls the turn outcome (idle alone is not success), then
+Each simplification creates a fresh session with `OpenAI-Beta: agents=v1` and
+the text in a separate user message in `input`. Conversation-only sessions
+require initial input; empty session creation is rejected by the live API.
+The adapter polls the turn outcome (idle alone is not success), then
 accepts one completed `final_answer` message for that turn. It never returns
 commentary, reasoning or partial output. Responses are capped at 256 KiB and
 final text at 16,000 graphemes. Unexpected pagination fails closed. The session
@@ -253,9 +254,12 @@ an already received result. If cleanup fails or the process crashes, sessions
 can remain at OpenAI. There is no durable cleanup queue in this implementation.
 Operators must reconcile retained sessions in the dedicated project, account
 for this in the privacy policy, and verify provider retention before production.
-A lost empty-session creation response can leave an empty session; user content
-is never sent until a cleanup handle is known. API deletion does not promise
+A lost session-creation response may leave submitted content at OpenAI without
+a session ID known to this backend. Do not retry creation automatically; include
+these sessions in operational reconciliation. API deletion does not promise
 immediate physical erasure. See [session deletion](https://developers.openai.com/api/docs/guides/agents-api/sessions/manage).
+Upstream HTTP failures log only the numeric status, without response bodies,
+URLs, submitted text, credentials or underlying exceptions.
 
 Content-free .NET metrics use Meter `Sedno.OpenAI.Agents`:
 `sedno.agent.duration` (seconds; `agent_id`, `outcome`) and `sedno.agent.tokens`

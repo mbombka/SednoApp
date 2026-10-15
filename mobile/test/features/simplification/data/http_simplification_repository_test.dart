@@ -78,6 +78,43 @@ SimplificationRequest _request(String id) =>
     SimplificationRequest(input: InputText('Trudny tekst'), requestId: id);
 
 void main() {
+  test(
+    'reads ASP.NET UTC offsets in quota and simplification result',
+    () async {
+      final quota = {
+        ..._quota(0),
+        'serverTime': '2026-10-14T12:00:00.4732661+00:00',
+        'resetAt': '2026-10-15T00:00:00+00:00',
+      };
+      final repo = _repository(
+        MockClient((request) async {
+          if (request.method == 'GET') {
+            return http.Response(jsonEncode(quota), 200);
+          }
+          return http.Response(
+            jsonEncode({
+              'result': {
+                'id': 'offset-test',
+                'text': 'Prosty tekst',
+                'createdAt': '2026-10-14T12:00:01.1234567+00:00',
+              },
+              'quota': {...quota, 'used': 1, 'remaining': 1},
+            }),
+            200,
+          );
+        }),
+      );
+      final current = await repo.current();
+      expect(current.remaining, 2);
+      expect(current.serverTime.isUtc, isTrue);
+      expect(current.resetAt, DateTime.utc(2026, 10, 15));
+      final result = await repo.simplify(_request('offset-test'));
+      expect(result.result.text, 'Prosty tekst');
+      expect(result.result.createdAt.isUtc, isTrue);
+      expect(repo.quotaListenable.value!.remaining, 1);
+    },
+  );
+
   test('session deletion stops retries from resending the old text', () async {
     var posts = 0;
     final client = MockClient((request) async {

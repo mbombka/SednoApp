@@ -47,6 +47,14 @@ a separate installation; local history and credentials from older packages are
 not automatically transferred. External console configuration is a separate
 setup step and is not changed by editing this repository.
 
+For local Android Studio emulator testing, run the Development backend on port
+5000 and set **Run → Edit Configurations → Flutter → Additional run args** to
+`--dart-define=BACKEND_BASE_URL=http://10.0.2.2:5000`. Stop and run the app again;
+hot reload does not change compile-time configuration. The Android debug variant
+allows HTTP only to `10.0.2.2`, `127.0.0.1` and `localhost`. This exception is not
+included in release builds. Without `BACKEND_BASE_URL`, submission is unavailable.
+Google/Firebase sign-in configuration is not required for local guest testing.
+
 Guest simplification needs `BACKEND_BASE_URL` (HTTPS) and, in production,
 `PLAY_CLOUD_PROJECT_NUMBER`. The **Konto** screen (in the user menu) supports Firebase Google and
 email/password sign-in when the Android app is configured. For that, also

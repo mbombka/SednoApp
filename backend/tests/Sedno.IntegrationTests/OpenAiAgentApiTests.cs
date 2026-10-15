@@ -28,12 +28,12 @@ public sealed class OpenAiAgentApiTests(BackendFixture fixture)
                 Deletions++;
                 return Task.FromResult(Json(new { deleted = true }));
             }
-            if (path.EndsWith("/events"))
+            if (request.Method == HttpMethod.Post && path.EndsWith("/sessions"))
             {
                 Submissions++;
                 if (Failure == "timeout") throw new TaskCanceledException("sensitive-agent-error");
                 if (Failure == "http") return Task.FromResult(Json(new { error = "sensitive-agent-error" }, HttpStatusCode.TooManyRequests));
-                return Task.FromResult(Json(new { }, HttpStatusCode.Accepted));
+                return Task.FromResult(Json(new { id = "sess_test" }, HttpStatusCode.Created));
             }
             if (path.EndsWith("/turns")) return Task.FromResult(Json(new
             {
@@ -95,7 +95,7 @@ public sealed class OpenAiAgentApiTests(BackendFixture fixture)
         using var retry = await Submit("agent-failed");
         Assert.Equal(HttpStatusCode.Conflict, retry.StatusCode);
         Assert.Equal(2, upstream.Submissions);
-        Assert.Equal(2, upstream.Deletions);
+        Assert.Equal(failure == "failed" ? 2 : 1, upstream.Deletions);
         var logs = string.Join('\n', fixture.Logs.Messages);
         foreach (var sensitive in new[] { text, "Dostarcz dokumenty do 20 listopada.", "test-agent-secret",
             "sensitive-agent-error", token!, "https://api.openai.com/v1/agents" })

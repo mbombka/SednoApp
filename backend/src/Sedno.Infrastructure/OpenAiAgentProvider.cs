@@ -61,12 +61,13 @@ public sealed class OpenAiAgentProvider : IModelProvider
         using var linked = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeout.Token);
         try
         {
-            // Acquire a cleanup handle BEFORE sending user content. A lost create response
-            // can leave an empty session, but cannot leave a submitted text without a known ID.
+            // Conversation-only sessions require initial input. Do not retry a lost
+            // create response: the provider may already be processing this text.
             using (var created = await SendJsonAsync(HttpMethod.Post, Sessions, new
             {
                 agent_id = _options.AgentId,
                 environment = new { type = "none" },
+                input = new[] { new { role = "user", content = new[] { new { type = "input_text", text } } } },
                 agent = new
                 {
                     // Model and instructions are inherited from the saved agent.
@@ -81,14 +82,6 @@ public sealed class OpenAiAgentProvider : IModelProvider
             }
 
             var sessionUrl = $"{Sessions}/{sessionId}";
-            using (var accepted = await SendAsync(HttpMethod.Post, $"{sessionUrl}/events", new
-            {
-                events = new[] { new { type = "agent.session.input.message", input = new[]
-                {
-                    new { role = "user", content = new[] { new { type = "input_text", text } } }
-                } } }
-            }, linked.Token)) { }
-
             string? turnId = null;
             while (turnId is null)
             {
@@ -184,6 +177,8 @@ public sealed class OpenAiAgentProvider : IModelProvider
         // Never retry submissions: uncertain delivery can still incur provider costs.
         var response = await _client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
         if (response.IsSuccessStatusCode) return response;
+        // Status only: upstream error bodies can echo user text or credentials.
+        _logger.LogWarning("OpenAI Agents API zwróciło HTTP {StatusCode}.", (int)response.StatusCode);
         response.Dispose();
         throw new ModelProviderException();
     }

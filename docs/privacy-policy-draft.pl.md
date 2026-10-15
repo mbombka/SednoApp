@@ -56,6 +56,8 @@ przechowuje treść i wynik w osobnej sesji OpenAI. Backend zleca usunięcie ses
 po zakończeniu żądania, także przy błędzie lub przerwaniu. Nie gwarantuje to
 natychmiastowego fizycznego usunięcia. Awaria procesu lub nieudane usunięcie
 mogą pozostawić sesję u dostawcy; wymaga to kontroli i usunięcia przez operatora.
+Także utrata odpowiedzi na utworzenie sesji może pozostawić przesłany tekst
+u dostawcy bez identyfikatora sesji znanego backendowi.
 Obecność adaptera nie potwierdza uruchomienia integracji na serwerze.
 
 OpenAI opisuje brak używania danych API do trenowania domyślnie. Standardowe

@@ -37,13 +37,19 @@ public sealed class OpenAiAgentTests
             Assert.Equal("api.openai.com", request.RequestUri!.Host);
             Requests.Add((request.Method.Method, request.RequestUri.AbsoluteUri,
                 request.Content is null ? null : await request.Content.ReadAsStringAsync(ct)));
+            if (request.Method == HttpMethod.Post && request.RequestUri.AbsolutePath.EndsWith("/sessions"))
+            {
+                using var body = JsonDocument.Parse(Requests.Last().Body!);
+                // Live Agents API rejects conversation-only sessions without initial input.
+                Assert.NotEmpty(body.RootElement.GetProperty("input").EnumerateArray());
+            }
             if (Respond is not null) return Respond(request, ct);
             return Default(request);
         }
         public static HttpResponseMessage Default(HttpRequestMessage request)
         {
             if (request.Method == HttpMethod.Delete) return Json(new { deleted = true });
-            if (request.RequestUri!.AbsolutePath.EndsWith("/events")) return Json(new { }, HttpStatusCode.Accepted);
+            Assert.False(request.RequestUri!.AbsolutePath.EndsWith("/events"));
             if (request.RequestUri.AbsolutePath.EndsWith("/turns")) return Json(Turns());
             if (request.RequestUri.AbsolutePath.EndsWith("/items")) return Json(Items());
             return Json(new { id = "sess_test" }, HttpStatusCode.Created);
@@ -63,23 +69,19 @@ public sealed class OpenAiAgentTests
         var provider = Provider(client);
         Assert.Equal("Prosty tekst", await provider.SimplifyAsync(input, default));
         Assert.Equal("Prosty tekst", await provider.SimplifyAsync(input, default));
-        Assert.Equal(10, handler.Requests.Count);
+        Assert.Equal(8, handler.Requests.Count);
         using var create = JsonDocument.Parse(handler.Requests[0].Body!);
         Assert.Equal("agent_test", create.RootElement.GetProperty("agent_id").GetString());
-        Assert.False(create.RootElement.TryGetProperty("input", out _));
+        Assert.Equal("user", create.RootElement.GetProperty("input")[0].GetProperty("role").GetString());
+        Assert.Equal(input, create.RootElement.GetProperty("input")[0].GetProperty("content")[0].GetProperty("text").GetString());
         Assert.Equal("none", create.RootElement.GetProperty("environment").GetProperty("type").GetString());
         var agent = create.RootElement.GetProperty("agent");
         Assert.Empty(agent.GetProperty("tools").EnumerateArray());
         Assert.False(agent.GetProperty("multi_agent").GetProperty("enabled").GetBoolean());
         Assert.False(agent.TryGetProperty("instructions", out _));
         Assert.False(agent.TryGetProperty("model", out _));
-        using var submit = JsonDocument.Parse(handler.Requests[1].Body!);
-        var message = submit.RootElement.GetProperty("events")[0];
-        Assert.Equal("agent.session.input.message", message.GetProperty("type").GetString());
-        Assert.Equal("user", message.GetProperty("input")[0].GetProperty("role").GetString());
-        Assert.Equal(input, message.GetProperty("input")[0].GetProperty("content")[0].GetProperty("text").GetString());
-        Assert.Equal("DELETE", handler.Requests[4].Method);
-        Assert.Equal("POST", handler.Requests[5].Method); // New create, not a continuation.
+        Assert.Equal("DELETE", handler.Requests[3].Method);
+        Assert.Equal("POST", handler.Requests[4].Method); // New create, not a continuation.
     }
 
     [Theory]
@@ -146,24 +148,24 @@ public sealed class OpenAiAgentTests
     [InlineData(302)]
     public async Task FailedSubmissionIsNotRetriedAndCleanupDoesNotExposeDetails(int status)
     {
-        var handler = new Handler { Respond = (r, _) => r.RequestUri!.AbsolutePath.EndsWith("/events")
+        var handler = new Handler { Respond = (r, _) => r.RequestUri!.AbsolutePath.EndsWith("/turns")
             ? Json(new { error = "sensitive body and test-secret" }, (HttpStatusCode)status) : Handler.Default(r) };
         using var client = new HttpClient(handler);
         var error = await Assert.ThrowsAsync<ModelProviderException>(() => Provider(client).SimplifyAsync("Tekst", default));
         Assert.Null(error.InnerException);
         Assert.DoesNotContain("sensitive", error.ToString());
-        Assert.Single(handler.Requests, r => r.Url.EndsWith("/events"));
+        Assert.Single(handler.Requests, r => r.Method == "POST");
         Assert.Equal("DELETE", handler.Requests.Last().Method);
     }
 
     [Fact]
-    public async Task LostCreateResponseDoesNotSendUserContent()
+    public async Task LostCreateResponseIsNotRetriedAndDoesNotLeakContent()
     {
         var handler = new Handler { Respond = (_, _) => throw new HttpRequestException("secret transport failure") };
         using var client = new HttpClient(handler);
         var error = await Assert.ThrowsAsync<ModelProviderException>(() => Provider(client).SimplifyAsync("Poufny tekst", default));
         Assert.Single(handler.Requests);
-        Assert.DoesNotContain("Poufny", handler.Requests[0].Body!);
+        Assert.DoesNotContain("Poufny", error.ToString());
         Assert.Null(error.InnerException);
     }
 
@@ -173,7 +175,7 @@ public sealed class OpenAiAgentTests
         using var cancellation = new CancellationTokenSource();
         var handler = new Handler { Respond = (r, ct) =>
         {
-            if (r.RequestUri!.AbsolutePath.EndsWith("/events"))
+            if (r.RequestUri!.AbsolutePath.EndsWith("/turns"))
             {
                 cancellation.Cancel();
                 ct.ThrowIfCancellationRequested();
