@@ -4,7 +4,9 @@ Stan: 15 października 2026 r. Administrator: Mariusz Bąbka, Polska.
 Adres administratora: **ul. Słowiańska 91, Modlniczka, Polska**.
 Kontakt do danych i usuwania konta: **mariuszbabka0@gmail.com**.
 Grupa docelowa potwierdzona przez administratora: **16+**.
-Identyfikator pakietu zgłoszony jako skonfigurowany w Firebase: **`com.sedno.app`**.
+Docelowy identyfikator aplikacji Android (`applicationId` i `namespace`):
+**`io.github.mbombka.sedno`**. Dostępność w Google Play potwierdził administrator;
+rejestracja tego pakietu w Firebase i konfiguracja certyfikatów wymagają sprawdzenia.
 
 Dokument roboczy do wypełnienia formularza. „Kod” oznacza potwierdzenie w
 repozytorium, „plan” — zadeklarowaną przyszłą konfigurację. Nie wysłano formularza.
@@ -118,9 +120,11 @@ Firestore, Realtime Database ani przechowywania wyłącznie w UE bez wdrożenia.
 - [x] Uzupełniono adres administratora i potwierdzono grupę docelową 16+.
 - [ ] Wskazać kraje dystrybucji i skonfigurować grupy docelowe w Play Console;
   kod nie ma mechanizmu kontroli wieku.
-- [ ] Ujednolicić identyfikator Androida z Firebase: zadeklarowane `com.sedno.app`,
-  podczas gdy `mobile/android/app/build.gradle.kts` nadal ma `com.example.sedno_app`
-  w `applicationId` i `namespace`. Ta aktualizacja dokumentów nie zmienia pakietu.
+- [x] Ustawiono `io.github.mbombka.sedno` jako `applicationId`, `namespace`
+  i pakiet klasy startowej Androida.
+- [ ] Dodać w Firebase aplikację Android `io.github.mbombka.sedno`, zarejestrować
+  odciski certyfikatów i zaktualizować konfigurację Firebase/OAuth w wydaniu.
+  Ustawić ten sam pakiet dla Play Integrity i Billing na backendzie.
 - [ ] Przyjąć i wdrożyć plan retencji; obecnie część danych nie ma automatycznej
   daty usuwania. Nie wpisywać propozycji jako działającej funkcji.
 - [ ] Sprawdzić zależności Androida i ruch wersji release: dokumentacja SDK

@@ -34,11 +34,18 @@ flutter test
 flutter run
 ```
 
-The Android application ID is the development placeholder `com.example.sedno_app`. Set an ID you own before publishing.
-This ID replaces the previous development ID. Android treats it as a separate
-installation, so register the new package and signing certificate in Firebase
-and Google Play before testing sign-in or Play Integrity. Data stored under the
-previous package ID is not available to the new installation.
+The Android application ID and namespace are `io.github.mbombka.sedno`.
+Register this exact Android package in Firebase and Google Play, together with
+its signing certificate fingerprints. A Firebase Android registration for the
+previous package cannot be reused: add a new Android app in the same Firebase
+project, update `FIREBASE_APP_ID` and any other changed Firebase/OAuth configuration,
+and register debug and Play App Signing certificate fingerprints as appropriate.
+Set backend `PlayIntegrity__PackageName` and `Billing__PackageName` to
+`io.github.mbombka.sedno` for their corresponding production integrations.
+The display name remains **Sedno**. Android treats a different application ID as
+a separate installation; local history and credentials from older packages are
+not automatically transferred. External console configuration is a separate
+setup step and is not changed by editing this repository.
 
 Guest simplification needs `BACKEND_BASE_URL` (HTTPS) and, in production,
 `PLAY_CLOUD_PROJECT_NUMBER`. The **Konto** tab supports Firebase Google and

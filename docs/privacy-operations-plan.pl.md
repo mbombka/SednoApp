@@ -16,7 +16,7 @@ obecnej konfiguracji. W tej zmianie nie ustawiono usług ani zadań usuwających
 | Grupa docelowa | Potwierdzone 16+: starsi nastolatkowie i dorośli |
 | Rynek | Polski język aplikacji potwierdzony; kraje dystrybucji jeszcze nie wskazane |
 | Publiczne strony | Administrator nie ma domeny; adres opublikowanej strony nadal nieznany |
-| Pakiet Android w Firebase | Według administratora: `com.sedno.app`; kod nadal ma `com.example.sedno_app`, wymaga ujednolicenia przed wydaniem |
+| Pakiet Android | `io.github.mbombka.sedno` w projekcie; dostępność w Google Play potwierdzona przez administratora; rejestracja nowej aplikacji Android w Firebase i certyfikaty do sprawdzenia |
 
 Osoba fizyczna może być wskazana w informacji jako administrator; sam brak
 firmy nie rozstrzyga obowiązków związanych z publiczną aplikacją i subskrypcjami.
@@ -106,7 +106,8 @@ Nie zbierać daty urodzenia bez potrzeby tylko po to, by uzupełnić dokumentacj
 ## Kolejność przed publikacją
 
 1. Ustalić publiczne adresy stron i kraje dystrybucji. Adres administratora
-   oraz wiek 16+ są już potwierdzone. Ujednolicić pakiet Androida z Firebase.
+   oraz wiek 16+ są już potwierdzone. Zarejestrować docelowy pakiet `io.github.mbombka.sedno` w Firebase i sprawdzić
+   certyfikaty, konfigurację OAuth oraz wartości pakietu w backendzie.
 2. Wybrać dokładne usługi/regiony i sprawdzić umowy oraz mechanizmy transferów.
 3. Potwierdzić podstawy prawne i ocenę diagnostyki SDK, w tym potrzebę zgody;
    przyjąć właściwe zasady wraz z regulaminem.

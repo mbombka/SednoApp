@@ -6,9 +6,10 @@ z atrapami. Nie przeprowadzono ich przez samo uruchomienie testów repozytorium.
 
 ## Przygotowanie
 
-1. Zarejestruj własny identyfikator aplikacji. Zastąp identyfikator deweloperski
-   `com.example.sedno_app`, skonfiguruj podpisywanie i ten sam pakiet w Firebase,
-   Play Integrity oraz backendzie. Wgraj podpisany AAB na ścieżkę testów wewnętrznych.
+1. Zarejestruj pakiet `io.github.mbombka.sedno` w Google Play i dodaj aplikację
+   Android z tym pakietem w projekcie Firebase. Skonfiguruj podpisywanie, odciski
+   certyfikatów i ten sam pakiet w Play Integrity oraz backendzie
+   (`PlayIntegrity__PackageName` i `Billing__PackageName`). Wgraj podpisany AAB na ścieżkę testów wewnętrznych.
 2. Utwórz produkt subskrypcji, np. `sedno_monthly`: jeden aktywny, miesięczny plan
    odnawiany automatycznie, bez okresu próbnego i cen wprowadzających. Ustaw cenę
    w Polsce na 9,99 PLN. Inne kraje mogą zwracać inną walutę i cenę.
