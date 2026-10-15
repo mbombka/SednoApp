@@ -50,6 +50,8 @@ public sealed class TestIdentityVerifier : IIdentityTokenVerifier
         Task.FromResult<VerifiedIdentity?>(token switch
         {
             _ when token.StartsWith("billing-") => new(token, "google"),
+            "deletion-user" => new("user-delete", "google"),
+            "deletion-other" => new("user-delete-other", "google"),
             "google-user-1" => new("user-1", "google"),
             "email-user-1" => new("user-1", "email"),
             "google-user-2" => new("user-2", "google"),
@@ -91,6 +93,7 @@ public sealed class BackendFixture : IAsyncLifetime
     public TestClock Clock { get; } = new();
     public TestModel Model { get; } = new();
     public TestEntitlements Entitlements { get; } = new();
+    public TestIdentityAccounts IdentityAccounts { get; } = new();
     public TestIdentityVerifier Identities { get; } = new();
     public TestIntegrityVerifier Integrity { get; } = new();
     public CaptureLogs Logs { get; } = new();
@@ -104,6 +107,7 @@ public sealed class BackendFixture : IAsyncLifetime
         SetEnvironment("Security__CredentialKey", Convert.ToBase64String(Enumerable.Repeat((byte)1, 32).ToArray()));
         SetEnvironment("Security__FingerprintKey", Convert.ToBase64String(Enumerable.Repeat((byte)2, 32).ToArray()));
         SetEnvironment("RateLimiting__PermitLimit", "1000");
+        SetEnvironment("Privacy__DeletionEmail", "privacy@test.invalid");
         SetEnvironment("Billing__Enabled", "true");
         SetEnvironment("Billing__PackageName", "pl.sedno.test");
         SetEnvironment("Billing__ProductId", "monthly");
@@ -120,6 +124,7 @@ public sealed class BackendFixture : IAsyncLifetime
                 services.RemoveAll<INotificationVerifier>(); services.AddSingleton<INotificationVerifier>(new TestPushVerifier());
                 services.RemoveAll<IModelProvider>(); services.AddSingleton<IModelProvider>(Model);
                 services.RemoveAll<IEntitlementResolver>(); services.AddSingleton<IEntitlementResolver>(Entitlements);
+                services.RemoveAll<IIdentityAccountDeletion>(); services.AddSingleton<IIdentityAccountDeletion>(IdentityAccounts);
                 services.RemoveAll<IIdentityTokenVerifier>(); services.AddSingleton<IIdentityTokenVerifier>(Identities);
                 services.RemoveAll<IIntegrityVerifier>(); services.AddSingleton<IIntegrityVerifier>(Integrity);
                 services.AddLogging(logging => logging.AddProvider(Logs));
@@ -160,4 +165,17 @@ public sealed class TestBilling : IPlayBillingClient
 public sealed class TestPushVerifier : INotificationVerifier
 {
     public Task<bool> VerifyAsync(string token, CancellationToken ct) => Task.FromResult(token == "trusted-push");
+}
+
+public sealed class TestIdentityAccounts : IIdentityAccountDeletion
+{
+    public ConcurrentDictionary<string, bool> Deleted { get; } = new();
+    public bool Fail { get; set; }
+    public Task<bool> ExistsAsync(string uid, CancellationToken ct) => Task.FromResult(!Deleted.ContainsKey(uid));
+    public Task DeleteAsync(string uid, CancellationToken ct)
+    {
+        if (Fail) throw new InvalidOperationException("provider failure");
+        Deleted[uid] = true;
+        return Task.CompletedTask;
+    }
 }

@@ -57,6 +57,23 @@ if (!builder.Environment.IsDevelopment() && string.IsNullOrWhiteSpace(firebasePr
 builder.Services.AddSingleton<IIdentityTokenVerifier>(sp => new FirebaseTokenVerifier(
     sp.GetRequiredService<IHttpClientFactory>().CreateClient(), firebaseProject ?? "development",
     sp.GetRequiredService<TimeProvider>()));
+builder.Services.AddScoped<AccountDeletionService>();
+builder.Services.AddHttpClient("identity-deletion", client => client.Timeout = TimeSpan.FromSeconds(15)).RemoveAllLoggers();
+var deletionCredentials = builder.Configuration["Firebase:DeletionServiceAccountJsonPath"];
+if (!builder.Environment.IsDevelopment() && string.IsNullOrWhiteSpace(deletionCredentials))
+    throw new InvalidOperationException("Firebase:DeletionServiceAccountJsonPath is required.");
+if (!string.IsNullOrWhiteSpace(deletionCredentials))
+    builder.Services.AddSingleton<IIdentityAccountDeletion>(sp =>
+    {
+        var client = sp.GetRequiredService<IHttpClientFactory>().CreateClient("identity-deletion");
+        return new FirebaseAccountDeletion(client, new ServiceAccountAccessTokenSource(client, deletionCredentials,
+            sp.GetRequiredService<TimeProvider>(), "https://www.googleapis.com/auth/identitytoolkit"), firebaseProject!);
+    });
+else builder.Services.AddSingleton<IIdentityAccountDeletion, UnavailableAccountDeletion>();
+var deletionEmail = builder.Configuration["Privacy:DeletionEmail"];
+if (!builder.Environment.IsDevelopment() &&
+    (string.IsNullOrWhiteSpace(deletionEmail) || !System.Net.Mail.MailAddress.TryCreate(deletionEmail, out _)))
+    throw new InvalidOperationException("Privacy:DeletionEmail is required.");
 var integrityProvider = builder.Configuration["PlayIntegrity:Provider"] ?? "google";
 if (integrityProvider == "mock" && builder.Environment.IsDevelopment())
     builder.Services.AddSingleton<IIntegrityVerifier, DevelopmentIntegrityVerifier>();
@@ -78,7 +95,8 @@ else throw new InvalidOperationException("Unsupported Play Integrity provider.")
 var credentialKey = ReadKey(builder.Configuration, "Security:CredentialKey");
 var fingerprintKey = ReadKey(builder.Configuration, "Security:FingerprintKey");
 builder.Services.AddScoped<GuestStore>(sp => new(sp.GetRequiredService<AppDbContext>(),
-    sp.GetRequiredService<IUsageStore>(), sp.GetRequiredService<TimeProvider>(), credentialKey));
+    sp.GetRequiredService<IUsageStore>(), sp.GetRequiredService<TimeProvider>(), credentialKey,
+    sp.GetRequiredService<IIdentityAccountDeletion>()));
 builder.Services.AddScoped<IGuestStore>(sp => sp.GetRequiredService<GuestStore>());
 builder.Services.AddScoped<SimplificationService>(sp => new(sp.GetRequiredService<IUsageStore>(),
     sp.GetRequiredService<IModelProvider>(), sp.GetRequiredService<TimeProvider>(), fingerprintKey));
@@ -149,6 +167,19 @@ app.Use(async (context, next) =>
         context.Items["session"] = session;
     }
     await next(context);
+});
+app.MapGet("/usun-konto", (HttpContext context) =>
+{
+    context.Response.Headers.CacheControl = "no-store";
+    context.Response.Headers.ContentSecurityPolicy = "default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'";
+    return Results.Content(DeletionPage.Render(deletionEmail), "text/html; charset=utf-8");
+});
+app.MapDelete("/v1/account", async (HttpContext context, AccountDeletionService deletion, CancellationToken ct) =>
+{
+    var session = (SessionIdentity)context.Items["session"]!;
+    if (session.AccountId is null) return Problem(context, 403, "account_required", "Zaloguj się, aby usunąć konto.");
+    await deletion.DeleteAsync(session, ct);
+    return Results.NoContent();
 });
 app.MapGet("/v1/subscription", async (HttpContext context, SubscriptionService subscriptions, CancellationToken ct) =>
 {

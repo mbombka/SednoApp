@@ -76,13 +76,17 @@ class HttpSimplificationRepository
 
   @override
   Future<SimplificationResponse> simplify(SimplificationRequest request) async {
+    final revision = sessions.sessionRevision.value;
     for (var attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
+        _requireSession(revision);
         final response = await _send(
           'POST',
           '/v1/simplifications',
           body: jsonEncode(request.toJson()),
+          sessionRevision: revision,
         );
+        _requireSession(revision);
         if (response.statusCode == 200) {
           final value = SimplificationResponse.fromJson(_object(response.body));
           _quota.value = value.quota;
@@ -122,12 +126,22 @@ class HttpSimplificationRepository
     throw const SimplificationApiException(SimplificationFailure.unavailable);
   }
 
+  void _requireSession(int revision) {
+    if (sessions.sessionRevision.value != revision) {
+      throw const SimplificationApiException(
+        SimplificationFailure.unauthorized,
+      );
+    }
+  }
+
   Future<http.Response> _send(
     String method,
     String path, {
     String? body,
+    int? sessionRevision,
   }) async {
     final token = await sessions.accessToken().timeout(requestTimeout);
+    if (sessionRevision != null) _requireSession(sessionRevision);
     final url = baseUrl.resolve(path);
     final headers = <String, String>{'Authorization': 'Bearer $token'};
     if (body != null) headers['Content-Type'] = 'application/json';

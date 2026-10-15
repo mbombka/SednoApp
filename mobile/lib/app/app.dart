@@ -73,6 +73,7 @@ class _AppNavigationState extends State<_AppNavigation>
   late final HistoryRepository _historyRepository;
   final ValueNotifier<int> _historyRevision = ValueNotifier<int>(0);
   bool _disposed = false;
+  int _dataRevision = 0;
 
   @override
   void initState() {
@@ -138,6 +139,7 @@ class _AppNavigationState extends State<_AppNavigation>
         body: TabBarView(
           children: [
             HomeScreen(
+              key: ValueKey('home-$_dataRevision'),
               appName: SednoApp.displayName,
               textController: _inputController,
               photoRepository: _photoRepository,
@@ -146,10 +148,16 @@ class _AppNavigationState extends State<_AppNavigation>
               onHistorySaved: () => _historyRevision.value++,
             ),
             HistoryScreen(
+              key: ValueKey('history-$_dataRevision'),
               repository: _historyRepository,
               revision: _historyRevision,
             ),
             AccountScreen(
+              onDataCleared: () {
+                _inputController.clear();
+                _historyRevision.value++;
+                setState(() => _dataRevision++);
+              },
               repository: widget.accountRepository,
               subscriptionModel: widget.subscriptionModel,
             ),

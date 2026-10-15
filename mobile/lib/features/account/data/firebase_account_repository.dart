@@ -18,10 +18,13 @@ class FirebaseAccountRepository implements AccountRepository {
   final Future<void> Function() clearHistory;
 
   @override
-  Future<Account> current() async => auth.currentUser == null
-      ? Account(id: 'guest', provider: IdentityProvider.guest)
-      : (await sessions.savedAccount() ??
-            Account(id: 'guest', provider: IdentityProvider.guest));
+  Future<Account> current() async {
+    if (await sessions.deletionPending) await deleteAccount();
+    return auth.currentUser == null
+        ? Account(id: 'guest', provider: IdentityProvider.guest)
+        : (await sessions.savedAccount() ??
+              Account(id: 'guest', provider: IdentityProvider.guest));
+  }
 
   @override
   Future<Account> signInWithGoogle() async {
@@ -71,6 +74,13 @@ class FirebaseAccountRepository implements AccountRepository {
   }
 
   @override
-  Future<void> deleteAccount() =>
-      throw UnimplementedError('Usuwanie konta zostanie dodane osobno.');
+  Future<void> deleteAccount() async {
+    // The backend deletes Firebase identity and all server records first.
+    // Keep local credentials on failure so the user can retry.
+    await sessions.deleteAccount();
+    await clearHistory();
+    await auth.signOut();
+    await google.signOut();
+    await sessions.clearDeletedSession();
+  }
 }

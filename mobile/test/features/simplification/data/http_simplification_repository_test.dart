@@ -78,6 +78,42 @@ SimplificationRequest _request(String id) =>
     SimplificationRequest(input: InputText('Trudny tekst'), requestId: id);
 
 void main() {
+  test('session deletion stops retries from resending the old text', () async {
+    var posts = 0;
+    final client = MockClient((request) async {
+      if (request.method == 'GET') {
+        return http.Response(jsonEncode(_quota(0)), 200);
+      }
+      posts++;
+      return http.Response('', 503);
+    });
+    final sessions = BackendSessionGateway(
+      baseUrl: _url,
+      client: client,
+      storage: _MemoryStorage(),
+      integrity: _NoIntegrity(),
+    );
+    final repo = HttpSimplificationRepository(
+      baseUrl: _url,
+      client: client,
+      sessions: sessions,
+      wait: (_) async {
+        sessions.sessionRevision.value++;
+      },
+    );
+    await expectLater(
+      repo.simplify(_request('delete-in-flight')),
+      throwsA(
+        isA<SimplificationApiException>().having(
+          (error) => error.kind,
+          'kind',
+          SimplificationFailure.unauthorized,
+        ),
+      ),
+    );
+    expect(posts, 1);
+  });
+
   test('uses server quota for 2 to 1 to 0 and next UTC day reset', () async {
     var used = 0;
     var nextDay = false;

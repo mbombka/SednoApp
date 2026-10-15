@@ -1,3 +1,4 @@
+import 'package:sedno_app/features/privacy/presentation/privacy_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:sedno_app/features/subscription/presentation/subscription_view_model.dart';
 import 'package:sedno_app/features/subscription/presentation/subscription_panel.dart';
@@ -5,9 +6,15 @@ import 'package:sedno_app/features/account/domain/account.dart';
 import 'package:sedno_app/features/account/domain/account_repository.dart';
 
 class AccountScreen extends StatefulWidget {
-  const AccountScreen({this.repository, this.subscriptionModel, super.key});
+  const AccountScreen({
+    this.repository,
+    this.subscriptionModel,
+    this.onDataCleared,
+    super.key,
+  });
 
   final AccountRepository? repository;
+  final VoidCallback? onDataCleared;
   final SubscriptionViewModel? subscriptionModel;
 
   @override
@@ -28,8 +35,21 @@ class _AccountScreenState extends State<AccountScreen> {
   }
 
   Future<void> _load() async {
-    final account = await widget.repository?.current();
-    if (mounted) setState(() => _account = account);
+    try {
+      final account = await widget.repository?.current();
+      if (mounted) {
+        setState(() {
+          _account = account;
+          _message = null;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(
+          () => _message = 'Nie udało się odczytać konta lub dokończyć usuwania danych. Spróbuj ponownie.',
+        );
+      }
+    }
   }
 
   Future<void> _run(Future<Account> Function() action) async {
@@ -58,7 +78,10 @@ class _AccountScreenState extends State<AccountScreen> {
       _message = null;
     });
     try {
+      widget.onDataCleared?.call();
       await widget.repository!.signOut();
+      _email.clear();
+      _password.clear();
       if (mounted) {
         setState(
           () =>
@@ -68,6 +91,54 @@ class _AccountScreenState extends State<AccountScreen> {
     } catch (_) {
       if (mounted) {
         setState(() => _message = 'Nie udało się wylogować. Spróbuj ponownie.');
+      }
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _deleteAccount() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Usunąć konto?'),
+        content: const SingleChildScrollView(
+          child: Text(PrivacyScreen.deletionNotice),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Zachowaj konto'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Usuń konto i dane'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    setState(() {
+      _busy = true;
+      _message = null;
+    });
+    try {
+      widget.onDataCleared?.call();
+      await widget.repository!.deleteAccount();
+      _email.clear();
+      _password.clear();
+      if (mounted) {
+        setState(() {
+          _account = Account(id: 'guest', provider: IdentityProvider.guest);
+          _message = 'Konto i dane zostały usunięte. Subskrypcję anuluj osobno w Google Play.';
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(
+          () =>
+              _message = 'Nie udało się zakończyć usuwania. Spróbuj ponownie.',
+        );
       }
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -93,6 +164,12 @@ class _AccountScreenState extends State<AccountScreen> {
         children: [
           if (widget.subscriptionModel case final model?)
             SubscriptionPanel(model: model),
+          TextButton(
+            onPressed: () => Navigator.of(context).push<void>(
+              MaterialPageRoute(builder: (_) => const PrivacyScreen()),
+            ),
+            child: const Text('Prywatność i dane'),
+          ),
           Text('Konto', style: Theme.of(context).textTheme.headlineSmall),
           const SizedBox(height: 16),
           if (repository == null) const Text('Tutaj pojawią się opcje konta.'),
@@ -102,6 +179,10 @@ class _AccountScreenState extends State<AccountScreen> {
             OutlinedButton(
               onPressed: _busy ? null : _signOut,
               child: const Text('Wyloguj się'),
+            ),
+            OutlinedButton(
+              onPressed: _busy ? null : _deleteAccount,
+              child: const Text('Usuń konto'),
             ),
           ],
           if (repository != null && !signedIn) ...[
@@ -152,6 +233,10 @@ class _AccountScreenState extends State<AccountScreen> {
           ],
           if (_busy) const Center(child: CircularProgressIndicator()),
           if (_message != null) ...[
+            TextButton(
+              onPressed: _busy ? null : _load,
+              child: const Text('Odśwież konto i dokończ czyszczenie'),
+            ),
             const SizedBox(height: 12),
             Text(
               _message!,

@@ -72,6 +72,30 @@ paths:
       responses:
         '204': { description: Session revoked. }
         '401': { $ref: '#/components/responses/Problem' }
+  /v1/account:
+    delete:
+      operationId: deleteOwnAccount
+      description: >-
+        Requires an account bearer. Deletes only that account: Firebase identity,
+        linked installations, all sessions, request metadata and stored purchases.
+        Does not cancel Google Play subscriptions. Client clears local history
+        and credentials after 204. Provider/database failure can be retried;
+        a 401 is not proof of completed deletion.
+      responses:
+        '204': { description: Account and server data deleted. }
+        '401': { $ref: '#/components/responses/Problem' }
+        '403': { $ref: '#/components/responses/Problem' }
+        '500': { $ref: '#/components/responses/Problem' }
+  /usun-konto:
+    get:
+      operationId: accountDeletionPage
+      security: []
+      responses:
+        '200':
+          description: Public Polish deletion request instructions and email contact.
+          content:
+            text/html:
+              schema: { type: string }
   /v1/subscription:
     get:
       operationId: getSubscription

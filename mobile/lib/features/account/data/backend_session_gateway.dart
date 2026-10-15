@@ -82,6 +82,9 @@ class BackendSessionGateway {
   /// Returns the current revocable backend bearer, creating a guest session
   /// only when no account or guest session has been stored.
   Future<String> accessToken() async {
+    if (await storage.read('deletion_confirmed') == 'true') {
+      throw StateError('Dokończ usuwanie danych na urządzeniu.');
+    }
     final account = await storage.read(_accountKey);
     if (account != null) return account;
     return _guestToken();
@@ -155,6 +158,33 @@ class BackendSessionGateway {
     await storage.delete(_guestKey);
     sessionRevision.value++;
     return account;
+  }
+
+  Future<bool> get deletionPending async =>
+      await storage.read('deletion_confirmed') == 'true';
+
+  Future<void> deleteAccount() async {
+    if (await storage.read('deletion_confirmed') == 'true') return;
+    final token = await storage.read(_accountKey);
+    if (token == null) throw StateError('Zaloguj się ponownie.');
+    final response = await client.delete(
+      baseUrl.resolve('/v1/account'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+    if (response.statusCode != 204) {
+      throw StateError('Nie można usunąć konta. Spróbuj ponownie.');
+    }
+    await storage.write('deletion_confirmed', 'true');
+    sessionRevision.value++;
+  }
+
+  Future<void> clearDeletedSession() async {
+    await storage.delete(_accountKey);
+    await storage.delete(_accountJsonKey);
+    await storage.delete(_guestKey);
+    await storage.delete('deletion_confirmed');
+    // The installation identifier is device configuration, separate from the account.
+    sessionRevision.value++;
   }
 
   Future<void> signOut() async {

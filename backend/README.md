@@ -111,3 +111,40 @@ covered by the privacy policy. No simplification content is stored.
 A refund with revocation removes entitlement once Google reports expiry. A
 refund without revocation follows the entitlement still returned by Google;
 it must not revoke a renewed period just because an older order was refunded.
+
+## Privacy and account deletion
+
+`DELETE /v1/account` requires an account bearer; no target ID is accepted.
+It deletes the Firebase identity, all linked installation identities, request
+metadata, sessions on every device, and encrypted purchase records. Google Play
+subscriptions are **not canceled**. Firebase deletion is idempotent for
+`USER_NOT_FOUND`; if Firebase succeeds but the PostgreSQL transaction fails,
+retry with the same backend bearer. The two systems have no distributed
+transaction. A response lost after commit requires checking account status /
+support; a 401 alone is not reported as successful deletion by the app.
+No submitted/result text is retained. Pub/Sub dedup IDs contain no account/token
+link and retain their existing policy. Google retains its own purchase records.
+
+Supply `Firebase__DeletionServiceAccountJsonPath` from the deployment secret
+store. Use the same Firebase project, grant `firebaseauth.users.delete` and
+`firebaseauth.users.get`, enable Identity Toolkit API, and restrict the credential.
+Production refuses startup without this path. Missing configuration in Development
+fails deletion closed, with no fake success. Account linking also checks Firebase
+account existence so a still-signed token cannot recreate a deleted account.
+HTTP logging is disabled for the dedicated identity client; exclude bodies,
+credentials, emails and query strings in proxy/APM logs as well.
+
+`GET /usun-konto` is a public, Polish HTML page served by this backend, with a
+mailto deletion request, identity verification instructions and the subscription
+warning. Set `Privacy__DeletionEmail` to a monitored mailbox (required outside
+Development). Deploy the backend at its real HTTPS domain and enter
+`https://<backend>/usun-konto` in Play Console. No external site was deployed by
+this implementation. Mail is sent by the user's email client; the page does not
+store requests or automatically delete an account based on an email address.
+Operators must verify ownership, perform deletion through an authorized account
+session/support process, and define response and backup-erasure periods before
+launch. Never request passwords, tokens, texts or photos by email.
+
+See [draft privacy policy](../docs/privacy-policy-draft.pl.md) and
+[Data Safety checklist](../docs/google-play-data-safety.pl.md). Both require the
+marked missing facts before production publication.

@@ -1,3 +1,5 @@
+import 'package:sedno_app/features/privacy/presentation/privacy_screen.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -140,6 +142,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     if (widget.onSubmit case final callback?) return callback(input);
     if (_simplificationViewModel case final model?) {
       final result = await model.simplify(input);
+      if (!mounted) return;
       if (widget.historyRepository case final history?) {
         try {
           await history.save(HistoryEntry(original: input, result: result));
@@ -270,6 +273,17 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 ),
               ),
               const SizedBox(height: 16),
+              const Text(
+                PrivacyScreen.aiNotice,
+                key: Key('aiProcessingNotice'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).push<void>(
+                  MaterialPageRoute(builder: (_) => const PrivacyScreen()),
+                ),
+                child: const Text('Prywatność i dane'),
+              ),
+              const SizedBox(height: 16),
               Wrap(
                 spacing: 12,
                 runSpacing: 12,
@@ -336,9 +350,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 const Text('Nie można sprawdzić limitu. Sprawdź połączenie.'),
               ],
               const SizedBox(height: 16),
-              const Text(
-                'Tekst zostanie przekazany dostawcy AI do uproszczenia.',
-              ),
               if (_inputViewModel.status == TextInputStatus.success &&
                   widget.simplificationRepository == null) ...[
                 const SizedBox(height: 16),

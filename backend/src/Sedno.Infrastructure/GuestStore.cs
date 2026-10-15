@@ -7,7 +7,7 @@ using Sedno.Domain;
 
 namespace Sedno.Infrastructure;
 
-public sealed class GuestStore(AppDbContext db, IUsageStore usage, TimeProvider clock, byte[] credentialKey) : IGuestStore
+public sealed class GuestStore(AppDbContext db, IUsageStore usage, TimeProvider clock, byte[] credentialKey, IIdentityAccountDeletion identityAccounts) : IGuestStore
 {
     public async Task<GuestSessionDto> CreateAsync(string installationId, CancellationToken ct)
     {
@@ -56,7 +56,11 @@ public sealed class GuestStore(AppDbContext db, IUsageStore usage, TimeProvider 
             command.CommandText = "SELECT pg_advisory_xact_lock(1748392201)";
             await command.ExecuteNonQueryAsync(ct);
         }
-        var identity = await db.Identities.SingleAsync(x => x.Id == guest.IdentityId, ct);
+        // Check after acquiring the deletion/link lock: a token verified before
+        // deletion must not recreate its Firebase account after deletion commits.
+        if (!await identityAccounts.ExistsAsync(verified.Uid, ct)) return null;
+        var identity = await db.Identities.SingleOrDefaultAsync(x => x.Id == guest.IdentityId, ct);
+        if (identity is null) return null;
         var account = await db.Accounts.SingleOrDefaultAsync(x => x.FirebaseUid == verified.Uid, ct);
         if (identity.AccountId is not null && identity.AccountId != account?.Id) return null;
         if (account is null)
