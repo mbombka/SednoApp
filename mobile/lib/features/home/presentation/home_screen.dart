@@ -3,7 +3,6 @@ import 'package:sedno_app/features/privacy/presentation/privacy_screen.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:sedno_app/features/home/presentation/home_view_model.dart';
 import 'package:sedno_app/features/home/presentation/text_input_view_model.dart';
 import 'package:sedno_app/features/history/domain/history_entry.dart';
 import 'package:sedno_app/features/history/domain/history_repository.dart';
@@ -48,8 +47,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   SimplificationViewModel? _simplificationViewModel;
   QuotaStateSource? _quotaSource;
   Timer? _resetTimer;
-  Timer? _counterTimer;
   final Stopwatch _quotaAge = Stopwatch();
+  bool _aiNoticeAccepted = false;
+  bool _confirmingSubmission = false;
 
   @override
   void initState() {
@@ -101,7 +101,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   void _onQuotaChanged() {
     _resetTimer?.cancel();
-    _counterTimer?.cancel();
     _quotaAge
       ..reset()
       ..start();
@@ -111,11 +110,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       _remainingUntilReset(quota) + const Duration(seconds: 1),
       _loadQuota,
     );
-    if (quota.remaining < 2) {
-      _counterTimer = Timer.periodic(const Duration(minutes: 1), (_) {
-        if (mounted) setState(() {});
-      });
-    }
   }
 
   Duration _remainingUntilReset(QuotaState quota) {
@@ -136,6 +130,110 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   static Future<void> _unavailableSubmission(InputText _) async {
     throw const SubmissionUnavailableException();
+  }
+
+  Future<void> _requestSubmission() async {
+    if (_confirmingSubmission) return;
+    _confirmingSubmission = true;
+    try {
+      // Let the existing validator report empty or overlong input before asking.
+      try {
+        InputText(widget.textController.text);
+      } on FormatException {
+        await _inputViewModel.submit();
+        return;
+      }
+      if (!mounted) return;
+      if (_quotaSource != null && _quotaSource!.quotaListenable.value == null) {
+        await _loadQuota();
+        if (!mounted) return;
+      }
+      final quota = _quotaSource?.quotaListenable.value;
+      if (_quotaSource != null && quota == null) {
+        await showDialog<void>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Sprawdź połączenie'),
+            content: const Text(
+              'Nie można sprawdzić limitu. Sprawdź połączenie.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Zamknij'),
+              ),
+            ],
+          ),
+        );
+        return;
+      }
+      if (quota != null &&
+          quota.tier == QuotaTier.free &&
+          quota.remaining < 2) {
+        final proceed = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Dzienny limit'),
+            content: Text(
+              quota.remaining == 1
+                  ? 'Pozostało 1 uproszczenie. Limit odnowi się o 00:00 UTC (${_timeUntilReset(quota)}).'
+                  : 'Wykorzystano dzienny limit. Odnowi się o 00:00 UTC (${_timeUntilReset(quota)}). Subskrypcję i jej cenę znajdziesz w menu Konto.',
+              key: const Key('quotaMessage'),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Zamknij'),
+              ),
+              if (quota.remaining > 0)
+                FilledButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: const Text('Dalej'),
+                ),
+            ],
+          ),
+        );
+        if (!mounted || proceed != true || quota.remaining == 0) return;
+      }
+      if (!mounted) return;
+      if (!_aiNoticeAccepted) {
+        final accepted = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Zanim uprościsz tekst'),
+            content: const SingleChildScrollView(
+              child: Text(
+                PrivacyScreen.aiNotice,
+                key: Key('aiProcessingNotice'),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Anuluj'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).push<void>(
+                  MaterialPageRoute(builder: (_) => const PrivacyScreen()),
+                ),
+                child: const Text('Prywatność i dane'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('Rozumiem, wyślij'),
+              ),
+            ],
+          ),
+        );
+        if (!mounted || accepted != true) return;
+        _aiNoticeAccepted = true;
+      }
+      if (!mounted) return;
+      if (_quotaSource?.quotaListenable.value?.remaining == 0) return;
+      await _inputViewModel.submit();
+    } finally {
+      _confirmingSubmission = false;
+    }
   }
 
   Future<void> _submit(InputText input) async {
@@ -185,7 +283,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     if (oldWidget.simplificationRepository != widget.simplificationRepository) {
       _quotaSource?.quotaListenable.removeListener(_onQuotaChanged);
       _resetTimer?.cancel();
-      _counterTimer?.cancel();
       _quotaSource = null;
       _simplificationViewModel = widget.simplificationRepository == null
           ? null
@@ -204,7 +301,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     _photoViewModel?.dispose();
     _quotaSource?.quotaListenable.removeListener(_onQuotaChanged);
     _resetTimer?.cancel();
-    _counterTimer?.cancel();
     _quotaAge.stop();
     super.dispose();
   }
@@ -228,8 +324,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = HomeViewModel(appName: widget.appName);
-
     return AnimatedBuilder(
       animation: Listenable.merge([
         _inputViewModel,
@@ -237,126 +331,140 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         ?_quotaSource?.quotaListenable,
       ]),
       builder: (context, _) {
-        final quota = _quotaSource?.quotaListenable.value;
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                viewModel.welcomeMessage,
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-              const SizedBox(height: 24),
-              TextField(
-                controller: widget.textController,
-                enabled:
-                    !_inputViewModel.isLoading &&
-                    !(_photoViewModel?.isLoading ?? false),
-                minLines: 6,
-                maxLines: null,
-                textCapitalization: TextCapitalization.sentences,
-                decoration: InputDecoration(
-                  labelText: 'Tekst do uproszczenia',
-                  hintText: 'Wpisz lub wklej tekst',
-                  alignLabelWithHint: true,
-                  errorText: _inputViewModel.errorMessage,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Align(
-                alignment: Alignment.centerRight,
-                child: Text(
-                  _inputViewModel.characterCounter,
-                  key: const Key('characterCounter'),
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                PrivacyScreen.aiNotice,
-                key: Key('aiProcessingNotice'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(context).push<void>(
-                  MaterialPageRoute(builder: (_) => const PrivacyScreen()),
-                ),
-                child: const Text('Prywatność i dane'),
-              ),
-              const SizedBox(height: 16),
-              Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: [
-                  OutlinedButton.icon(
-                    onPressed:
-                        _inputViewModel.isLoading ||
-                            (_photoViewModel?.isLoading ?? false)
-                        ? null
-                        : _openCamera,
-                    icon: const Icon(Icons.photo_camera_outlined),
-                    label: Text(
-                      (_photoViewModel?.isLoading ?? false)
-                          ? 'Odczytywanie…'
-                          : 'Aparat',
-                    ),
-                  ),
-                  FilledButton(
-                    onPressed:
-                        _inputViewModel.canSubmit &&
-                            (quota == null || quota.remaining > 0) &&
-                            !(_photoViewModel?.isLoading ?? false)
-                        ? _inputViewModel.submit
-                        : null,
-                    child: _inputViewModel.isLoading
-                        ? const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
+        final busy =
+            _inputViewModel.isLoading || (_photoViewModel?.isLoading ?? false);
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            // Match the compact bottom spacing in the reference, while
+            // leaving the Android navigation area outside the touch targets.
+            final bottomSpacing = 32.0 + MediaQuery.paddingOf(context).bottom;
+            final editorHeight =
+                (constraints.maxHeight - 112 - 28 - bottomSpacing).clamp(
+                  160.0,
+                  double.infinity,
+                );
+            return SizedBox(
+              height: constraints.maxHeight,
+              child: ColoredBox(
+                color: const Color(0xFFF5F7FB),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Container(
+                        height: editorHeight,
+                        padding: const EdgeInsets.fromLTRB(24, 20, 24, 28),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.vertical(
+                            bottom: Radius.circular(36),
+                          ),
+                        ),
+                        child: Semantics(
+                          label: 'Tekst do uproszczenia',
+                          child: TextField(
+                            controller: widget.textController,
+                            enabled: !busy,
+                            expands: true,
+                            minLines: null,
+                            maxLines: null,
+                            textAlignVertical: TextAlignVertical.top,
+                            style: Theme.of(context).textTheme.headlineSmall,
+                            textCapitalization: TextCapitalization.sentences,
+                            decoration: const InputDecoration(
+                              hintText: 'Wpisz lub wklej tekst',
+                              border: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              contentPadding: EdgeInsets.zero,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 28),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Expanded(child: SizedBox()),
+                            Expanded(
+                              flex: 2,
+                              child: Center(
+                                child: FilledButton(
+                                  key: const Key('simplifyButton'),
+                                  style: FilledButton.styleFrom(
+                                    shape: const CircleBorder(),
+                                    padding: const EdgeInsets.all(20),
+                                    minimumSize: const Size(112, 112),
+                                  ),
+                                  onPressed: _inputViewModel.canSubmit && !busy
+                                      ? _requestSubmission
+                                      : null,
+                                  child: _inputViewModel.isLoading
+                                      ? const SizedBox(
+                                          width: 28,
+                                          height: 28,
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                            semanticsLabel: 'Upraszczanie…',
+                                          ),
+                                        )
+                                      : const Text('Uprość'),
                                 ),
                               ),
-                              SizedBox(width: 12),
-                              Text('Upraszczanie…'),
-                            ],
-                          )
-                        : const Text('Uprość'),
+                            ),
+                            Expanded(
+                              child: Center(
+                                child: OutlinedButton(
+                                  key: const Key('cameraButton'),
+                                  style: OutlinedButton.styleFrom(
+                                    shape: const CircleBorder(),
+                                    side: BorderSide.none,
+                                    backgroundColor: const Color(0xFFC2E7FF),
+                                    foregroundColor: const Color(0xFF14243A),
+                                    minimumSize: const Size(56, 56),
+                                    padding: const EdgeInsets.all(12),
+                                  ),
+                                  onPressed: busy ? null : _openCamera,
+                                  child: Semantics(
+                                    label: (_photoViewModel?.isLoading ?? false)
+                                        ? 'Odczytywanie…'
+                                        : 'Aparat',
+                                    child: const ExcludeSemantics(
+                                      child: Icon(
+                                        Icons.photo_camera_outlined,
+                                        size: 28,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (_inputViewModel.errorMessage case final error?)
+                        Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Text(error, semanticsLabel: error),
+                        ),
+                      if (_photoViewModel?.message case final message?) ...[
+                        const SizedBox(height: 12),
+                        Text(message, key: const Key('photoMessage')),
+                      ],
+                      SizedBox(height: bottomSpacing),
+                      if (_inputViewModel.status == TextInputStatus.success &&
+                          widget.simplificationRepository == null) ...[
+                        const SizedBox(height: 16),
+                        const Text('Tekst został przekazany do uproszczenia.'),
+                      ],
+                    ],
                   ),
-                ],
-              ),
-              if (_photoViewModel?.message case final message?) ...[
-                const SizedBox(height: 12),
-                Text(message, key: const Key('photoMessage')),
-              ],
-              if (quota != null &&
-                  quota.tier == QuotaTier.free &&
-                  quota.remaining < 2) ...[
-                const SizedBox(height: 12),
-                Text(
-                  quota.remaining == 1
-                      ? 'Pozostało 1 uproszczenie. Limit odnowi się o 00:00 UTC (${_timeUntilReset(quota)}).'
-                      : 'Wykorzystano dzienny limit. Odnowi się o 00:00 UTC (${_timeUntilReset(quota)}). Subskrypcję i jej cenę znajdziesz w zakładce Konto.',
-                  key: const Key('quotaMessage'),
                 ),
-              ],
-              if (_inputViewModel.errorMessage == null &&
-                  _quotaSource != null &&
-                  quota == null) ...[
-                const SizedBox(height: 12),
-                const Text('Nie można sprawdzić limitu. Sprawdź połączenie.'),
-              ],
-              const SizedBox(height: 16),
-              if (_inputViewModel.status == TextInputStatus.success &&
-                  widget.simplificationRepository == null) ...[
-                const SizedBox(height: 16),
-                const Text('Tekst został przekazany do uproszczenia.'),
-              ],
-            ],
-          ),
+              ),
+            );
+          },
         );
       },
     );

@@ -1,3 +1,5 @@
+import '../../../helpers.dart';
+
 import 'package:sedno_app/app/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -29,7 +31,7 @@ void main() {
       SednoApp(historyRepository: history, accountRepository: accounts),
     );
     await tester.enterText(find.byType(TextField), 'Tekst roboczy');
-    await tester.tap(find.widgetWithText(Tab, 'Konto'));
+    await navigateTo(tester, 'Konto');
     await tester.pumpAndSettle();
     await tester.ensureVisible(find.text('Usuń konto'));
     await tester.tap(find.text('Usuń konto'));
@@ -37,7 +39,7 @@ void main() {
     await tester.tap(find.text('Usuń konto i dane'));
     await tester.pumpAndSettle();
     expect(await history.readAll(), isEmpty);
-    await tester.tap(find.widgetWithText(Tab, 'Start'));
+    await navigateTo(tester, 'Start');
     await tester.pumpAndSettle();
     expect(
       tester.widget<TextField>(find.byType(TextField)).controller!.text,

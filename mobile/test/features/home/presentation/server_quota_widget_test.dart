@@ -19,7 +19,7 @@ class _ServerQuotaRepository
 
   @override
   Future<SimplificationResponse> simplify(SimplificationRequest request) =>
-      throw UnimplementedError();
+      Future.error(StateError('unavailable'));
 }
 
 QuotaState _quota(int used, {int day = 14}) => QuotaState(
@@ -59,18 +59,23 @@ void main() {
 
       repository.state.value = _quota(1);
       await tester.pump();
+      expect(find.byKey(const Key('quotaMessage')), findsNothing);
+      await tester.tap(find.text('Uprość'));
+      await tester.pumpAndSettle();
       expect(find.textContaining('Pozostało 1 uproszczenie'), findsOneWidget);
       expect(find.textContaining('za 12 godz.'), findsOneWidget);
+      await tester.tap(find.text('Zamknij'));
+      await tester.pumpAndSettle();
 
       repository.state.value = _quota(2);
       await tester.pump();
+      await tester.tap(find.text('Uprość'));
+      await tester.pumpAndSettle();
       expect(find.textContaining('Wykorzystano dzienny limit'), findsOneWidget);
-      expect(
-        tester
-            .widget<FilledButton>(find.widgetWithText(FilledButton, 'Uprość'))
-            .onPressed,
-        isNull,
-      );
+      expect(find.text('Dalej'), findsNothing);
+      expect(find.text('Rozumiem, wyślij'), findsNothing);
+      await tester.tap(find.text('Zamknij'));
+      await tester.pumpAndSettle();
 
       repository.state.value = _quota(0, day: 15);
       await tester.pump();

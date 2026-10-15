@@ -1,3 +1,5 @@
+import '../../../helpers.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sedno_app/app/app.dart';
@@ -61,12 +63,12 @@ void main() {
       ),
     );
     await tester.enterText(find.byType(TextField), 'Trudny tekst');
-    await tester.tap(find.text('Uprość'));
+    await submitText(tester);
     await tester.pumpAndSettle();
     expect((await history.readAll()).single.original.value, 'Trudny tekst');
     await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Historia').first);
+    await navigateTo(tester, 'Historia');
     await tester.pumpAndSettle();
     expect(find.text('Przykładowe uproszczenie: Trudny tekst'), findsOneWidget);
   });

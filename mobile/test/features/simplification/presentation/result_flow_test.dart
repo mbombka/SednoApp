@@ -1,3 +1,5 @@
+import '../../../helpers.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -61,7 +63,7 @@ void main() {
         ),
       );
       await tester.enterText(find.byType(TextField), 'Trudny tekst');
-      await tester.tap(find.text('Uprość'));
+      await submitText(tester);
       await tester.pumpAndSettle();
 
       expect(sentText, 'Trudny tekst');
@@ -104,7 +106,7 @@ void main() {
       ),
     );
     await tester.enterText(find.byType(TextField), 'Zachowaj tekst');
-    await tester.tap(find.text('Uprość'));
+    await submitText(tester);
     await tester.pump();
     expect(
       find.text('Nie udało się uprościć tekstu. Spróbuj ponownie.'),
@@ -114,7 +116,7 @@ void main() {
       tester.widget<TextField>(find.byType(TextField)).controller!.text,
       'Zachowaj tekst',
     );
-    await tester.tap(find.text('Uprość'));
+    await submitText(tester);
     await tester.pumpAndSettle();
     expect(calls, 2);
     expect(find.text('To jest prosty tekst.'), findsOneWidget);
@@ -131,7 +133,7 @@ void main() {
       ),
     );
     await tester.enterText(find.byType(TextField), 'Tekst do poprawy');
-    await tester.tap(find.text('Uprość'));
+    await submitText(tester);
     await tester.pumpAndSettle();
     await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();

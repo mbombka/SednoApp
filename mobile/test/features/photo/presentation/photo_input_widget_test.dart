@@ -38,10 +38,10 @@ void main() {
       FakePhotoRepository(() async => 'Zażółć gęślą jaźń'),
     );
 
-    await tester.tap(find.text('Aparat'));
+    await tester.tap(find.byKey(const Key('cameraButton')));
     await tester.pump();
     expect(controller.text, 'Zażółć gęślą jaźń');
-    expect(find.text('17/4000'), findsOneWidget);
+    expect(find.byKey(const Key('characterCounter')), findsNothing);
 
     await tester.enterText(find.byType(TextField), 'Poprawiony tekst');
     await tester.pump();
@@ -59,10 +59,10 @@ void main() {
       FakePhotoRepository(() async => 'x' * 4001),
     );
 
-    await tester.tap(find.text('Aparat'));
+    await tester.tap(find.byKey(const Key('cameraButton')));
     await tester.pump();
     expect(controller.text.length, 4001);
-    expect(find.text('4001/4000'), findsOneWidget);
+    expect(controller.text.length, 4001);
     expect(
       find.text('Tekst może mieć maksymalnie 4000 znaków.'),
       findsOneWidget,
@@ -97,7 +97,7 @@ void main() {
       ),
     ]) {
       await showScreen(tester, controller, scenario.$1);
-      await tester.tap(find.text('Aparat'));
+      await tester.tap(find.byKey(const Key('cameraButton')));
       await tester.pump();
       expect(controller.text, 'Zachowaj');
       expect(find.textContaining(scenario.$2), findsOneWidget);
@@ -116,9 +116,9 @@ void main() {
       FakePhotoRepository(() => pending.future),
     );
 
-    await tester.tap(find.text('Aparat'));
+    await tester.tap(find.byKey(const Key('cameraButton')));
     await tester.pump();
-    expect(find.text('Odczytywanie…'), findsOneWidget);
+    expect(find.bySemanticsLabel('Odczytywanie…'), findsOneWidget);
     expect(tester.widget<TextField>(find.byType(TextField)).enabled, isFalse);
     expect(
       tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
@@ -128,7 +128,7 @@ void main() {
     pending.complete(null);
     await tester.pump();
     expect(controller.text, 'Zachowaj');
-    expect(find.text('Aparat'), findsOneWidget);
+    expect(find.bySemanticsLabel('Aparat'), findsOneWidget);
     expect(find.byKey(const Key('photoMessage')), findsNothing);
   });
 }

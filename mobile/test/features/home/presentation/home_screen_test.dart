@@ -1,3 +1,5 @@
+import '../../../helpers.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -32,10 +34,10 @@ void main() {
     await showScreen(tester, controller: controller);
 
     expect(find.byType(TextField), findsOneWidget);
-    expect(find.text('0/4000'), findsOneWidget);
-    expect(find.text('Aparat'), findsOneWidget);
+    expect(find.byKey(const Key('characterCounter')), findsNothing);
+    expect(find.bySemanticsLabel('Aparat'), findsOneWidget);
     expect(find.text('Uprość'), findsOneWidget);
-    expect(find.textContaining('dostawcy AI'), findsOneWidget);
+    expect(find.textContaining('dostawcy AI'), findsNothing);
     expect(
       tester.getSize(find.byType(OutlinedButton)).height,
       greaterThanOrEqualTo(48),
@@ -47,8 +49,65 @@ void main() {
 
     await tester.enterText(find.byType(TextField), 'A👨‍👩‍👧‍👦');
     await tester.pump();
-    expect(find.text('2/4000'), findsOneWidget);
+    expect(controller.text, 'A👨‍👩‍👧‍👦');
   });
+
+  testWidgets('notice gates first submission and cancellation preserves text', (
+    tester,
+  ) async {
+    final controller = TextEditingController(text: 'Tekst do uproszczenia');
+    addTearDown(controller.dispose);
+    var calls = 0;
+    await showScreen(
+      tester,
+      controller: controller,
+      onSubmit: (_) async {
+        calls++;
+      },
+    );
+    expect(find.byKey(const Key('aiProcessingNotice')), findsNothing);
+    await tester.tap(find.text('Uprość'));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('aiProcessingNotice')), findsOneWidget);
+    expect(calls, 0);
+    await tester.tap(find.text('Anuluj'));
+    await tester.pumpAndSettle();
+    expect(calls, 0);
+    expect(controller.text, 'Tekst do uproszczenia');
+    await submitText(tester);
+    await tester.pumpAndSettle();
+    expect(calls, 1);
+    await tester.tap(find.text('Uprość'));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('aiProcessingNotice')), findsNothing);
+    expect(calls, 2);
+  });
+
+  testWidgets(
+    'editor is rounded and action buttons are circles with centered submit',
+    (tester) async {
+      final controller = TextEditingController();
+      addTearDown(controller.dispose);
+      await showScreen(tester, controller: controller);
+      final submit = find.byKey(const Key('simplifyButton'));
+      final camera = find.byKey(const Key('cameraButton'));
+      expect(tester.getCenter(submit).dx, closeTo(400, 1));
+      expect(
+        tester.getCenter(camera).dx,
+        greaterThan(tester.getCenter(submit).dx),
+      );
+      final submitSize = tester.getSize(submit);
+      final cameraSize = tester.getSize(camera);
+      expect(
+        tester.widget<FilledButton>(submit).style!.shape!.resolve({}),
+        isA<CircleBorder>(),
+      );
+      expect(cameraSize.width, cameraSize.height);
+      expect(submitSize.width, greaterThan(cameraSize.width));
+      expect(find.text('Witaj w Sedno'), findsNothing);
+      expect(find.text('Prywatność i dane'), findsNothing);
+    },
+  );
 
   testWidgets('empty input shows an error and does not submit', (tester) async {
     final controller = TextEditingController();
@@ -62,11 +121,11 @@ void main() {
       },
     );
 
-    await tester.tap(find.text('Uprość'));
+    await submitText(tester);
     await tester.pump();
     expect(find.text('Tekst nie może być pusty.'), findsOneWidget);
     await tester.enterText(find.byType(TextField), ' \n ');
-    await tester.tap(find.text('Uprość'));
+    await submitText(tester);
     await tester.pump();
     expect(find.text('Tekst nie może być pusty.'), findsOneWidget);
     expect(calls, 0);
@@ -88,7 +147,7 @@ void main() {
 
     await tester.enterText(find.byType(TextField), 'x' * 4001);
     await tester.pump();
-    expect(find.text('4001/4000'), findsOneWidget);
+    expect(controller.text.length, 4001);
     expect(
       find.text('Tekst może mieć maksymalnie 4000 znaków.'),
       findsOneWidget,
@@ -126,10 +185,10 @@ void main() {
       onCameraPressed: () => cameraCalls++,
     );
     await tester.enterText(find.byType(TextField), 'Tekst');
-    await tester.tap(find.text('Uprość'));
+    await submitText(tester);
     await tester.pump();
 
-    expect(find.text('Upraszczanie…'), findsOneWidget);
+    expect(find.bySemanticsLabel('Upraszczanie…'), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
     expect(tester.widget<TextField>(find.byType(TextField)).enabled, isFalse);
     expect(
@@ -165,14 +224,14 @@ void main() {
     );
     await tester.enterText(find.byType(TextField), 'Trudny tekst');
 
-    await tester.tap(find.text('Uprość'));
+    await submitText(tester);
     await tester.pump();
     expect(
       find.text('Nie udało się uprościć tekstu. Spróbuj ponownie.'),
       findsOneWidget,
     );
     expect(controller.text, 'Trudny tekst');
-    await tester.tap(find.text('Uprość'));
+    await submitText(tester);
     await tester.pump();
     expect(calls, 2);
     expect(
@@ -192,11 +251,11 @@ void main() {
       controller: controller,
       onCameraPressed: () => cameraCalls++,
     );
-    await tester.tap(find.text('Aparat'));
+    await tester.tap(find.byKey(const Key('cameraButton')));
     expect(cameraCalls, 1);
 
     await showScreen(tester, controller: controller);
-    await tester.tap(find.text('Aparat'));
+    await tester.tap(find.byKey(const Key('cameraButton')));
     await tester.pump();
     expect(find.text('Aparat będzie dostępny wkrótce.'), findsOneWidget);
   });
@@ -206,7 +265,7 @@ void main() {
     addTearDown(controller.dispose);
     await showScreen(tester, controller: controller);
     await tester.enterText(find.byType(TextField), 'Tekst');
-    await tester.tap(find.text('Uprość'));
+    await submitText(tester);
     await tester.pump();
     expect(
       find.text('Upraszczanie tekstu nie jest jeszcze dostępne.'),

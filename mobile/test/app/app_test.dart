@@ -1,4 +1,4 @@
-import 'dart:ui' show Tristate;
+import '../helpers.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -12,26 +12,27 @@ void main() {
     expect(find.byType(MaterialApp), findsOneWidget);
     expect(find.byType(Scaffold), findsOneWidget);
     expect(find.text(SednoApp.displayName), findsOneWidget);
-    expect(find.text('Witaj w Sedno'), findsOneWidget);
+    expect(find.text('Witaj w Sedno'), findsNothing);
+    expect(find.byTooltip('Menu użytkownika'), findsOneWidget);
     expect(find.byType(TextField), findsOneWidget);
-    expect(find.byType(Tab), findsNWidgets(3));
+    expect(find.byType(Tab), findsNothing);
   });
 
   testWidgets('navigates between top tabs', (tester) async {
     await tester.pumpWidget(const SednoApp());
 
-    await tester.tap(find.text('Historia').first);
+    await navigateTo(tester, 'Historia');
     await tester.pumpAndSettle();
     expect(
       find.text('Tutaj pojawi się historia uproszczonych tekstów.'),
       findsOneWidget,
     );
 
-    await tester.tap(find.text('Konto').first);
+    await navigateTo(tester, 'Konto');
     await tester.pumpAndSettle();
     expect(find.text('Tutaj pojawią się opcje konta.'), findsOneWidget);
 
-    await tester.tap(find.text('Start'));
+    await navigateTo(tester, 'Start');
     await tester.pumpAndSettle();
     expect(find.byType(TextField), findsOneWidget);
   });
@@ -40,11 +41,11 @@ void main() {
     await tester.pumpWidget(const SednoApp());
     await tester.enterText(find.byType(TextField), 'Przykładowy tekst');
 
-    await tester.tap(find.text('Historia').first);
+    await navigateTo(tester, 'Historia');
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Konto').first);
+    await navigateTo(tester, 'Konto');
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Start'));
+    await navigateTo(tester, 'Start');
     await tester.pumpAndSettle();
 
     expect(find.byType(TextField), findsOneWidget);
@@ -60,18 +61,19 @@ void main() {
     final semantics = tester.ensureSemantics();
     await tester.pumpWidget(const SednoApp());
 
-    final tabs = find.byType(Tab);
-    expect(tester.getSemantics(tabs.at(0)).label, contains('Start'));
     expect(
-      tester.getSemantics(tabs.at(0)).flagsCollection.isSelected,
-      Tristate.isTrue,
+      tester.getSize(find.byTooltip('Menu użytkownika')).height,
+      greaterThanOrEqualTo(48),
     );
-    expect(tester.getSemantics(tabs.at(1)).label, contains('Historia'));
-    expect(tester.getSemantics(tabs.at(2)).label, contains('Konto'));
-    for (var index = 0; index < 3; index++) {
-      expect(tester.getSize(tabs.at(index)).height, greaterThanOrEqualTo(48));
-    }
-    expect(find.bySemanticsLabel('Tekst do uproszczenia'), findsOneWidget);
+    expect(find.bySemanticsLabel('Aparat'), findsOneWidget);
+    expect(
+      tester.getSize(find.byKey(const Key('cameraButton'))).height,
+      greaterThanOrEqualTo(48),
+    );
+    expect(
+      tester.getSize(find.byKey(const Key('simplifyButton'))).height,
+      greaterThanOrEqualTo(48),
+    );
     semantics.dispose();
   });
 
@@ -84,6 +86,27 @@ void main() {
     expect(theme.colorScheme.onSurface, AppTheme.navy);
     expect(theme.scaffoldBackgroundColor, Colors.white);
   });
+
+  for (final screenHeight in [640.0, 892.0, 1280.0]) {
+    testWidgets(
+      'home actions keep compact bottom spacing at height $screenHeight',
+      (tester) async {
+        tester.view.physicalSize = Size(412, screenHeight);
+        tester.view.devicePixelRatio = 1;
+        tester.view.padding = const FakeViewPadding(bottom: 24);
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        addTearDown(tester.view.resetPadding);
+        await tester.pumpWidget(const SednoApp());
+        final submit = tester.getRect(find.byKey(const Key('simplifyButton')));
+        final camera = tester.getRect(find.byKey(const Key('cameraButton')));
+        expect(screenHeight - submit.bottom, closeTo(32 + 24, .1));
+        expect(camera.bottom, lessThanOrEqualTo(submit.bottom));
+        expect(submit.center.dx, closeTo(206, .1));
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
 
   testWidgets('large text remains usable on a small screen', (tester) async {
     tester.view.physicalSize = const Size(320, 480);
@@ -100,9 +123,7 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.byType(TextField), findsOneWidget);
 
-    await tester.ensureVisible(find.text('Konto').first);
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Konto').first);
+    await navigateTo(tester, 'Konto');
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
     expect(find.text('Tutaj pojawią się opcje konta.'), findsOneWidget);

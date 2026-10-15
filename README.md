@@ -48,7 +48,7 @@ not automatically transferred. External console configuration is a separate
 setup step and is not changed by editing this repository.
 
 Guest simplification needs `BACKEND_BASE_URL` (HTTPS) and, in production,
-`PLAY_CLOUD_PROJECT_NUMBER`. The **Konto** tab supports Firebase Google and
+`PLAY_CLOUD_PROJECT_NUMBER`. The **Konto** screen (in the user menu) supports Firebase Google and
 email/password sign-in when the Android app is configured. For that, also
 supply `FIREBASE_API_KEY`, `FIREBASE_APP_ID`, `FIREBASE_PROJECT_ID`,
 `FIREBASE_SENDER_ID`, and `GOOGLE_WEB_CLIENT_ID` as Flutter `--dart-define`
@@ -71,3 +71,9 @@ configured on the backend. The app shows Play's localized price; the backend
 verifies and acknowledges purchases and receives authenticated RTDN pushes.
 See [backend configuration](backend/README.md#google-play-subscriptions) and the
 [Google Play sandbox procedure](mobile/docs/google_play_subscription_sandbox.md).
+
+The Start screen has a rounded text editor and circular simplification/camera
+buttons. The user icon opens a full-screen panel with rounded navigation sections for
+Start, Konto and Historia, plus access to privacy information. AI processing is explained
+in a confirmation dialog before the first submission in a screen session; quota
+and reset details appear on submission when the remaining allowance is low.

@@ -1,3 +1,5 @@
+import 'package:sedno_app/features/account/presentation/user_menu_screen.dart';
+
 import 'dart:io';
 import 'dart:async';
 
@@ -36,6 +38,7 @@ class SednoApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: displayName,
+      debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       themeMode: ThemeMode.light,
       home: _AppNavigation(
@@ -74,6 +77,7 @@ class _AppNavigationState extends State<_AppNavigation>
   final ValueNotifier<int> _historyRevision = ValueNotifier<int>(0);
   bool _disposed = false;
   int _dataRevision = 0;
+  int _selectedPage = 0;
 
   @override
   void initState() {
@@ -119,50 +123,70 @@ class _AppNavigationState extends State<_AppNavigation>
     super.dispose();
   }
 
+  Future<void> _openUserMenu() async {
+    FocusManager.instance.primaryFocus?.unfocus();
+    final destination = await Navigator.of(context).push<UserMenuDestination>(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (_) => const UserMenuScreen(),
+      ),
+    );
+    if (!mounted || destination == null) return;
+    setState(() {
+      _selectedPage = switch (destination) {
+        UserMenuDestination.start => 0,
+        UserMenuDestination.history => 1,
+        UserMenuDestination.account => 2,
+      };
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text(SednoApp.displayName),
-          bottom: const TabBar(
-            isScrollable: true,
-            tabAlignment: TabAlignment.start,
-            tabs: [
-              Tab(height: 56, text: 'Start'),
-              Tab(height: 56, text: 'Historia'),
-              Tab(height: 56, text: 'Konto'),
-            ],
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(SednoApp.displayName),
+        centerTitle: false,
+        actions: [
+          IconButton(
+            tooltip: 'Menu użytkownika',
+            icon: const Icon(Icons.account_circle_outlined, size: 32),
+            color: AppTheme.blue,
+            onPressed: _openUserMenu,
           ),
-        ),
-        body: TabBarView(
-          children: [
-            HomeScreen(
-              key: ValueKey('home-$_dataRevision'),
-              appName: SednoApp.displayName,
-              textController: _inputController,
-              photoRepository: _photoRepository,
-              simplificationRepository: _simplificationRepository,
-              historyRepository: _historyRepository,
-              onHistorySaved: () => _historyRevision.value++,
-            ),
+          const SizedBox(width: 12),
+        ],
+      ),
+      body: IndexedStack(
+        index: _selectedPage,
+        children: [
+          HomeScreen(
+            key: ValueKey('home-$_dataRevision'),
+            appName: SednoApp.displayName,
+            textController: _inputController,
+            photoRepository: _photoRepository,
+            simplificationRepository: _simplificationRepository,
+            historyRepository: _historyRepository,
+            onHistorySaved: () => _historyRevision.value++,
+          ),
+          if (_selectedPage == 1)
             HistoryScreen(
               key: ValueKey('history-$_dataRevision'),
               repository: _historyRepository,
               revision: _historyRevision,
-            ),
-            AccountScreen(
-              onDataCleared: () {
-                _inputController.clear();
-                _historyRevision.value++;
-                setState(() => _dataRevision++);
-              },
-              repository: widget.accountRepository,
-              subscriptionModel: widget.subscriptionModel,
-            ),
-          ],
-        ),
+            )
+          else
+            const SizedBox.shrink(),
+          AccountScreen(
+            onDataCleared: () {
+              _inputController.clear();
+              _historyRevision.value++;
+              setState(() => _dataRevision++);
+            },
+            repository: widget.accountRepository,
+            subscriptionModel: widget.subscriptionModel,
+          ),
+        ],
       ),
     );
   }
