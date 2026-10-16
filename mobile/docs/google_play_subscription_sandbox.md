@@ -42,7 +42,7 @@ z atrapami. Nie przeprowadzono ich przez samo uruchomienie testów repozytorium.
 | Przywrócenie | Zamknij aplikację, usuń jej dane lub zainstaluj ponownie; zaloguj się na **to samo konto Sedno** i konto Play; wybierz Przywróć zakupy. | Ten sam token zostaje ponownie zweryfikowany. Brak drugiej opłaty i nowej puli użyć. |
 | Inne konto | Spróbuj przywrócić zakup na drugim koncie Sedno. | Backend odrzuca powiązanie z innym właścicielem. |
 | Anulowana subskrypcja | Anuluj odnawianie w Google Play przed końcem okresu, odśwież Konto. | Dostęp utrzymuje się do `expiryTime`; samo anulowanie odnawiania go nie odbiera. |
-| Wygasła | Poczekaj na koniec przyspieszonego okresu testowego po anulowaniu. | Backend i Start wracają do limitu 2, bez zerowania użycia. |
+| Wygasła | Poczekaj na koniec przyspieszonego okresu testowego po anulowaniu. | Backend i Start wracają do limitu 5, bez zerowania użycia. |
 | Zwrot z odebraniem dostępu | W testowym zamówieniu wybierz zwrot i odebranie dostępu. | RTDN wywołuje ponowną weryfikację; gdy Play zwraca stan wygasły, znika limit 400. Odświeżenie działa także bez dostarczonego RTDN. |
 | Zwrot bez odebrania dostępu | Wykonaj zwrot bez odwołania subskrypcji, jeśli opcja jest dostępna. | Dostęp odpowiada bieżącemu stanowi Play. Zwrot starego zamówienia nie odbiera nowego opłaconego okresu. |
 | Powtórzone RTDN | W kontrolowanym narzędziu testowym z prawem do konta push wyślij dwa razy tę samą kopertę z tym samym messageId, także równolegle. | HTTP 204; jeden zapis przetworzenia, bez ponownego przyznania puli lub drugiej operacji zakupu. Nie kopiuj tokenów do logów. |

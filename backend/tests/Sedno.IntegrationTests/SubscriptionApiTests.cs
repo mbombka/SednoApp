@@ -60,7 +60,7 @@ public sealed class SubscriptionApiTests(BackendFixture fixture)
         // Resolver is real here; existing quota tests retain their injected entitlement mock.
         Assert.Equal(active, await resolver.HasSubscriptionAsync(identity, default));
         var quota = await new UsageStore(db, resolver, fixture.Clock).GetQuotaAsync(identity, default);
-        Assert.Equal(active ? 400 : 2, quota.Limit);
+        Assert.Equal(active ? 400 : 5, quota.Limit);
     }
     [Fact]
     public async Task PendingToActiveAcknowledgesAndConcurrentDuplicateIsIdempotent()

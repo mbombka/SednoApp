@@ -9,7 +9,7 @@ public sealed class PolicyTests
     [Fact]
     public void LimitsAndUtcReset()
     {
-        Assert.Equal(2, QuotaPolicy.Limit(false));
+        Assert.Equal(5, QuotaPolicy.Limit(false));
         Assert.Equal(400, QuotaPolicy.Limit(true));
         var now = new DateTimeOffset(2026, 10, 14, 23, 59, 59, TimeSpan.Zero);
         Assert.Equal(new DateOnly(2026, 10, 14), QuotaPolicy.Day(now));

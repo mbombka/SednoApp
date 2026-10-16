@@ -67,7 +67,7 @@ public sealed class OpenAiApiTests(BackendFixture fixture)
         Assert.Equal(HttpStatusCode.OK, success.StatusCode);
         using var result = JsonDocument.Parse(await success.Content.ReadAsStringAsync());
         Assert.Equal("Nie płać 20 zł po 31.12.2026.", result.RootElement.GetProperty("result").GetProperty("text").GetString());
-        Assert.Equal(1, result.RootElement.GetProperty("quota").GetProperty("remaining").GetInt32());
+        Assert.Equal(4, result.RootElement.GetProperty("quota").GetProperty("remaining").GetInt32());
         using var duplicate = await Submit("ai-success");
         Assert.Equal(HttpStatusCode.Conflict, duplicate.StatusCode);
         Assert.Equal(1, upstream.Calls);
@@ -76,7 +76,7 @@ public sealed class OpenAiApiTests(BackendFixture fixture)
         Assert.Equal(HttpStatusCode.ServiceUnavailable, failed.StatusCode);
         Assert.DoesNotContain("sensitive-upstream-error", await failed.Content.ReadAsStringAsync());
         using var quota = JsonDocument.Parse(await client.GetStringAsync("/v1/quota"));
-        Assert.Equal(1, quota.RootElement.GetProperty("remaining").GetInt32());
+        Assert.Equal(4, quota.RootElement.GetProperty("remaining").GetInt32());
         using var failedDuplicate = await Submit("ai-failed");
         Assert.Equal(HttpStatusCode.Conflict, failedDuplicate.StatusCode);
         Assert.Equal(2, upstream.Calls);

@@ -68,7 +68,10 @@ ID token. The Kotlin host requests a standard Play Integrity token for guest
 session creation. The development backend explicitly mocks that check; a
 production release requires a registered Play app and server configuration.
 The Start screen uses the backend session for simplification and displays the
-server quota. Without backend configuration, submission is unavailable.
+server quota. The free tier includes 5 simplifications per UTC day, including
+guests. The remaining allowance warning appears only at 1 remaining; at 0,
+submission is blocked. Limits reset at 00:00 UTC according to server time.
+Without backend configuration, submission is unavailable.
 
 The camera and OCR flow needs a physical Android device check. Follow
 [`mobile/docs/android_camera_ocr_manual_check.md`](mobile/docs/android_camera_ocr_manual_check.md).

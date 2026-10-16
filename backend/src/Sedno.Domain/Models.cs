@@ -59,7 +59,7 @@ public sealed class PlayNotification
 
 public static class QuotaPolicy
 {
-    public static int Limit(bool subscription) => subscription ? 400 : 2;
+    public static int Limit(bool subscription) => subscription ? 400 : 5;
     public static DateOnly Day(DateTimeOffset now) => DateOnly.FromDateTime(now.UtcDateTime);
     public static DateTimeOffset ResetAt(DateTimeOffset now) => new(now.UtcDateTime.Date.AddDays(1), TimeSpan.Zero);
 }

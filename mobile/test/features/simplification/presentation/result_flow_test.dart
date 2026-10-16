@@ -24,9 +24,9 @@ SimplificationResponse response(String id) => SimplificationResponse(
   ),
   quota: QuotaState(
     tier: QuotaTier.free,
-    limit: 2,
+    limit: 5,
     used: 1,
-    remaining: 1,
+    remaining: 4,
     serverTime: DateTime.utc(2026, 10, 14),
     resetAt: DateTime.utc(2026, 10, 15),
   ),

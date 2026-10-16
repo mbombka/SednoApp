@@ -82,7 +82,7 @@ public sealed class OpenAiAgentApiTests(BackendFixture fixture)
         Assert.Equal(HttpStatusCode.OK, success.StatusCode);
         using var result = JsonDocument.Parse(await success.Content.ReadAsStringAsync());
         Assert.Equal("Dostarcz dokumenty do 20 listopada.", result.RootElement.GetProperty("result").GetProperty("text").GetString());
-        Assert.Equal(1, result.RootElement.GetProperty("quota").GetProperty("remaining").GetInt32());
+        Assert.Equal(4, result.RootElement.GetProperty("quota").GetProperty("remaining").GetInt32());
         using var duplicate = await Submit("agent-success");
         Assert.Equal(HttpStatusCode.Conflict, duplicate.StatusCode);
         Assert.Equal(1, upstream.Submissions);
@@ -91,7 +91,7 @@ public sealed class OpenAiAgentApiTests(BackendFixture fixture)
         Assert.Equal(HttpStatusCode.ServiceUnavailable, failed.StatusCode);
         Assert.DoesNotContain("sensitive-agent-error", await failed.Content.ReadAsStringAsync());
         using var quota = JsonDocument.Parse(await client.GetStringAsync("/v1/quota"));
-        Assert.Equal(1, quota.RootElement.GetProperty("remaining").GetInt32());
+        Assert.Equal(4, quota.RootElement.GetProperty("remaining").GetInt32());
         using var retry = await Submit("agent-failed");
         Assert.Equal(HttpStatusCode.Conflict, retry.StatusCode);
         Assert.Equal(2, upstream.Submissions);

@@ -22,10 +22,10 @@ Read README, existing code, and current dependencies before making changes.
 - Encrypted, local-only history with manual deletion and 7-day expiration.
   Never display expired entries; delete them on reads, startup, and resume.
   Display the retention notice in Historia. Exclude history from backups.
-- Free tier: 2 simplifications per day, including guest users.
+- Free tier: 5 simplifications per day, including guest users.
 - Subscription: PLN 9.99/month, 400 total simplifications per day.
 - Limits reset at 00:00 UTC according to server time.
-- Free-tier counter: hidden at 2 remaining; at 1, show the remaining
+- Free-tier counter: hidden at 2–5 remaining; at 1, show the remaining
   allowance and time until reset; at 0, block submission and show
   reset information and the subscription offer.
 - Google/email authentication; billing through Google Play.

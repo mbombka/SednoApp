@@ -167,7 +167,7 @@ Production configuration must refuse to enable the mock.
 
 ### 6. Implement daily quotas
 
-- Free users: 2 successful simplifications per UTC day.
+- Free users: 5 successful simplifications per UTC day.
 - Paid users: 400 total successful simplifications per UTC day.
 - Reset boundary: 00:00 UTC, using server time.
 - Inject TimeProvider to make time-dependent logic testable.
@@ -253,7 +253,7 @@ Implement safe retries using the same idempotency key and use the
 server-provided quota state.
 
 Tests: offline behavior, timeouts, 401/429/5xx responses,
-the free counter transition from 2 to 1 to 0, quota resets,
+the free counter transition from 5 through 2 to 1 to 0, quota resets,
 and prevention of duplicate quota consumption.
 
 ## 10. Google Play Subscription

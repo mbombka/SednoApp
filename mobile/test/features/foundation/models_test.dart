@@ -12,8 +12,8 @@ void main() {
   final now = DateTime.utc(2026, 10, 14, 12);
   final quota = QuotaState(
     tier: QuotaTier.free,
-    limit: 2,
-    used: 1,
+    limit: 5,
+    used: 4,
     remaining: 1,
     serverTime: now,
     resetAt: DateTime.utc(2026, 10, 15),

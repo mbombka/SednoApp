@@ -194,7 +194,7 @@ components:
         remaining excludes active reservations. Paid limit includes free usage.
       properties:
         tier: { type: string, enum: [free, subscription] }
-        limit: { type: integer, enum: [2, 400] }
+        limit: { type: integer, enum: [5, 400] }
         used: { type: integer, minimum: 0 }
         remaining: { type: integer, minimum: 0 }
         serverTime: { type: string, format: date-time }

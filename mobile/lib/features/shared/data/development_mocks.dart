@@ -35,7 +35,7 @@ class MockQuotaRepository implements QuotaRepository {
       _day = day;
       _used = 0;
     }
-    final limit = tier == QuotaTier.free ? 2 : 400;
+    final limit = tier == QuotaTier.free ? 5 : 400;
     return QuotaState(
       tier: tier,
       limit: limit,

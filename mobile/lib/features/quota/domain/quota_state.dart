@@ -11,7 +11,7 @@ class QuotaState {
     required this.serverTime,
     required this.resetAt,
   }) {
-    if (limit != (tier == QuotaTier.free ? 2 : 400) ||
+    if (limit != (tier == QuotaTier.free ? 5 : 400) ||
         used < 0 ||
         used > limit ||
         remaining < 0 ||

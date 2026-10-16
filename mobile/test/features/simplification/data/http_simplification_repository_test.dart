@@ -53,9 +53,9 @@ Map<String, Object?> _quota(
   String day = '2026-10-14',
 }) => {
   'tier': 'free',
-  'limit': 2,
+  'limit': 5,
   'used': used,
-  'remaining': remaining ?? 2 - used,
+  'remaining': remaining ?? 5 - used,
   'serverTime': '${day}T12:00:00Z',
   'resetAt': day == '2026-10-14'
       ? '2026-10-15T00:00:00Z'
@@ -98,20 +98,20 @@ void main() {
                 'text': 'Prosty tekst',
                 'createdAt': '2026-10-14T12:00:01.1234567+00:00',
               },
-              'quota': {...quota, 'used': 1, 'remaining': 1},
+              'quota': {...quota, 'used': 1, 'remaining': 4},
             }),
             200,
           );
         }),
       );
       final current = await repo.current();
-      expect(current.remaining, 2);
+      expect(current.remaining, 5);
       expect(current.serverTime.isUtc, isTrue);
       expect(current.resetAt, DateTime.utc(2026, 10, 15));
       final result = await repo.simplify(_request('offset-test'));
       expect(result.result.text, 'Prosty tekst');
       expect(result.result.createdAt.isUtc, isTrue);
-      expect(repo.quotaListenable.value!.remaining, 1);
+      expect(repo.quotaListenable.value!.remaining, 4);
     },
   );
 
@@ -151,7 +151,7 @@ void main() {
     expect(posts, 1);
   });
 
-  test('uses server quota for 2 to 1 to 0 and next UTC day reset', () async {
+  test('uses server quota for 5 to 0 and next UTC day reset', () async {
     var used = 0;
     var nextDay = false;
     final repo = _repository(
@@ -171,14 +171,14 @@ void main() {
         );
       }),
     );
-    expect((await repo.current()).remaining, 2);
-    expect(repo.quotaListenable.value!.remaining, 2);
-    await repo.simplify(_request('first'));
-    expect(repo.quotaListenable.value!.remaining, 1);
-    await repo.simplify(_request('second'));
-    expect(repo.quotaListenable.value!.remaining, 0);
+    expect((await repo.current()).remaining, 5);
+    expect(repo.quotaListenable.value!.remaining, 5);
+    for (var i = 1; i <= 5; i++) {
+      await repo.simplify(_request('request-$i'));
+      expect(repo.quotaListenable.value!.remaining, 5 - i);
+    }
     nextDay = true;
-    expect((await repo.current()).remaining, 2);
+    expect((await repo.current()).remaining, 5);
     expect(repo.quotaListenable.value!.resetAt, DateTime.utc(2026, 10, 16));
   });
 
@@ -198,7 +198,7 @@ void main() {
           return http.Response(
             jsonEncode({
               'status': 'processing',
-              'quota': _quota(0, remaining: 1),
+              'quota': _quota(0, remaining: 4),
             }),
             202,
           );
@@ -211,7 +211,7 @@ void main() {
     expect(result.result.text, 'Prosty tekst');
     expect(ids, ['same-key', 'same-key', 'same-key']);
     expect(charges, 1);
-    expect(repo.quotaListenable.value!.remaining, 1);
+    expect(repo.quotaListenable.value!.remaining, 4);
   });
 
   test('offline and repeated timeout surface typed failures', () async {
@@ -266,7 +266,7 @@ void main() {
     final limited = _repository(
       MockClient(
         (_) async => http.Response(
-          jsonEncode({'code': 'quota_exceeded', 'quota': _quota(2)}),
+          jsonEncode({'code': 'quota_exceeded', 'quota': _quota(5)}),
           429,
         ),
       ),

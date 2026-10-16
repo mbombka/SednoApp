@@ -16,7 +16,7 @@ dostępu do zapisanego agenta ani obsługi wybranego modelu na koncie.
 1. Skonfiguruj klucz przez lokalne user-secrets według `backend/README.md`.
 2. Uruchom PostgreSQL, migracje i backend. Skieruj aplikację do backendu.
 3. Korzystaj wyłącznie z poniższych sztucznych tekstów. Testy wywołują płatne API.
-4. Darmowy limit wynosi 2 dziennie. Do większej próby użyj osobnego środowiska
+4. Darmowy limit wynosi 5 dziennie. Do większej próby użyj osobnego środowiska
    testowego i kont testowych; nie wyłączaj limitów produkcyjnych.
 
 ## Przypadki jakości i odporności

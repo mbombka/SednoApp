@@ -17,9 +17,9 @@ void main() {
         requestId: 'one',
       );
       final response = await mock.simplify(first);
-      expect(response.quota.remaining, 1);
+      expect(response.quota.remaining, 4);
       expect((await mock.simplify(first)).result.id, 'one');
-      expect((await quota.current()).remaining, 1);
+      expect((await quota.current()).remaining, 4);
       expect(
         () => mock.simplify(
           SimplificationRequest(
@@ -29,17 +29,23 @@ void main() {
         ),
         throwsFormatException,
       );
-      await mock.simplify(
-        SimplificationRequest(input: InputText('Drugi'), requestId: 'two'),
-      );
+      for (var i = 2; i <= 5; i++) {
+        final response = await mock.simplify(
+          SimplificationRequest(
+            input: InputText('Tekst $i'),
+            requestId: 'request-$i',
+          ),
+        );
+        expect(response.quota.remaining, 5 - i);
+      }
       expect(
         () => mock.simplify(
-          SimplificationRequest(input: InputText('Trzeci'), requestId: 'three'),
+          SimplificationRequest(input: InputText('Szósty'), requestId: 'six'),
         ),
         throwsA(isA<QuotaExceededException>()),
       );
       now = DateTime.utc(2026, 10, 15);
-      expect((await quota.current()).remaining, 2);
+      expect((await quota.current()).remaining, 5);
     },
   );
 

@@ -44,7 +44,7 @@ public sealed class ApiTests(BackendFixture fixture)
         Assert.Equal(HttpStatusCode.OK, (await Submit(first.Client, "before-login", "Tekst")).StatusCode);
         Assert.Equal("invalid_id_token", await Code(await first.Client.PostAsJsonAsync("/v1/auth/sessions",
             new { idToken = "forged" })));
-        Assert.Equal(1, await Remaining(first.Client));
+        Assert.Equal(4, await Remaining(first.Client));
         var linked = await first.Client.PostAsJsonAsync("/v1/auth/sessions", new { idToken = "google-user-1" });
         linked.EnsureSuccessStatusCode();
         using var doc = JsonDocument.Parse(await linked.Content.ReadAsStringAsync());
@@ -52,17 +52,17 @@ public sealed class ApiTests(BackendFixture fixture)
         Assert.Equal(1, doc.RootElement.GetProperty("quota").GetProperty("used").GetInt32());
         Assert.Equal(HttpStatusCode.Unauthorized, (await first.Client.GetAsync("/v1/quota")).StatusCode);
         first.Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accountToken);
-        Assert.Equal(1, await Remaining(first.Client));
+        Assert.Equal(4, await Remaining(first.Client));
         Assert.Equal(HttpStatusCode.OK, (await Submit(first.Client, "after-login", "Drugi tekst")).StatusCode);
-        Assert.Equal(0, await Remaining(first.Client));
+        Assert.Equal(3, await Remaining(first.Client));
 
         var second = await GuestAsync();
-        Assert.Equal(2, await Remaining(second.Client));
+        Assert.Equal(5, await Remaining(second.Client));
         var secondLink = await second.Client.PostAsJsonAsync("/v1/auth/sessions", new { idToken = "email-user-1" });
         secondLink.EnsureSuccessStatusCode();
         using var secondDoc = JsonDocument.Parse(await secondLink.Content.ReadAsStringAsync());
         Assert.Equal(2, secondDoc.RootElement.GetProperty("quota").GetProperty("used").GetInt32());
-        Assert.Equal(0, secondDoc.RootElement.GetProperty("quota").GetProperty("remaining").GetInt32());
+        Assert.Equal(3, secondDoc.RootElement.GetProperty("quota").GetProperty("remaining").GetInt32());
         Assert.Equal(HttpStatusCode.NoContent, (await first.Client.PostAsync("/v1/auth/sign-out", null)).StatusCode);
         Assert.Equal(HttpStatusCode.Unauthorized, (await first.Client.GetAsync("/v1/quota")).StatusCode);
     }
@@ -92,7 +92,7 @@ public sealed class ApiTests(BackendFixture fixture)
         (await first.Client.PostAsJsonAsync("/v1/auth/sessions", new { idToken = "google-user-2" }))
             .EnsureSuccessStatusCode();
         var sameInstallation = await GuestAsync(installation);
-        Assert.Equal(1, await Remaining(sameInstallation.Client));
+        Assert.Equal(4, await Remaining(sameInstallation.Client));
         var sameLink = await sameInstallation.Client.PostAsJsonAsync("/v1/auth/sessions",
             new { idToken = "google-user-2" });
         sameLink.EnsureSuccessStatusCode();
@@ -106,7 +106,7 @@ public sealed class ApiTests(BackendFixture fixture)
         anotherLink.EnsureSuccessStatusCode();
         using var anotherDoc = JsonDocument.Parse(await anotherLink.Content.ReadAsStringAsync());
         Assert.Equal(2, anotherDoc.RootElement.GetProperty("quota").GetProperty("used").GetInt32());
-        Assert.Equal(0, anotherDoc.RootElement.GetProperty("quota").GetProperty("remaining").GetInt32());
+        Assert.Equal(3, anotherDoc.RootElement.GetProperty("quota").GetProperty("remaining").GetInt32());
     }
 
     [Fact]
@@ -136,7 +136,7 @@ public sealed class ApiTests(BackendFixture fixture)
         Assert.NotEqual(a.Id, b.Id);
         Assert.NotEqual(a.Token, b.Token);
         Assert.Equal(HttpStatusCode.OK, (await Submit(a.Client, "shared", "Tekst")).StatusCode);
-        Assert.Equal(1, await Remaining(b.Client));
+        Assert.Equal(4, await Remaining(b.Client));
         Assert.Equal(HttpStatusCode.NotFound,
             (await b.Client.GetAsync("/v1/simplifications/requests/shared")).StatusCode);
     }
@@ -150,7 +150,7 @@ public sealed class ApiTests(BackendFixture fixture)
         Assert.Equal("text_too_long", await Code(await Submit(guest.Client, "long", new string('ą', 4001))));
         Assert.Equal(HttpStatusCode.OK, (await Submit(guest.Client, "polish", "Zażółć gęślą jaźń")).StatusCode);
         Assert.Equal(HttpStatusCode.OK, (await Submit(guest.Client, "emoji", string.Concat(Enumerable.Repeat("👩‍💻", 4000)))).StatusCode);
-        Assert.Equal(0, await Remaining(guest.Client));
+        Assert.Equal(3, await Remaining(guest.Client));
         var oversized = await Submit(guest.Client, "body", new string('a', 140_000));
         Assert.Equal(HttpStatusCode.RequestEntityTooLarge, oversized.StatusCode);
     }
@@ -161,16 +161,16 @@ public sealed class ApiTests(BackendFixture fixture)
         fixture.Clock.Set(new(2026, 10, 14, 12, 0, 0, TimeSpan.Zero));
         fixture.Model.Reset();
         var guest = await GuestAsync();
-        var calls = Enumerable.Range(0, 3).Select(i => Submit(guest.Client, $"parallel{i}", "Tekst" + i));
+        var calls = Enumerable.Range(0, 6).Select(i => Submit(guest.Client, $"parallel{i}", "Tekst" + i));
         var results = await Task.WhenAll(calls);
-        Assert.Equal(2, results.Count(x => x.StatusCode == HttpStatusCode.OK));
+        Assert.Equal(5, results.Count(x => x.StatusCode == HttpStatusCode.OK));
         Assert.Single(results, x => x.StatusCode == HttpStatusCode.TooManyRequests);
-        Assert.Equal(2, fixture.Model.Calls);
+        Assert.Equal(5, fixture.Model.Calls);
         var completed = Array.FindIndex(results, x => x.StatusCode == HttpStatusCode.OK);
         var duplicate = await Submit(guest.Client, $"parallel{completed}", "Tekst" + completed);
         Assert.Equal("result_unavailable", await Code(duplicate));
         Assert.Equal("key_conflict", await Code(await Submit(guest.Client, $"parallel{completed}", "Inny tekst")));
-        Assert.Equal(2, fixture.Model.Calls);
+        Assert.Equal(5, fixture.Model.Calls);
     }
 
     [Fact]
@@ -196,7 +196,7 @@ public sealed class ApiTests(BackendFixture fixture)
         fixture.Model.Reset(); fixture.Model.Fail = true;
         var guest = await GuestAsync();
         Assert.Equal(HttpStatusCode.ServiceUnavailable, (await Submit(guest.Client, "fail", "Tekst")).StatusCode);
-        Assert.Equal(2, await Remaining(guest.Client));
+        Assert.Equal(5, await Remaining(guest.Client));
         fixture.Model.Fail = false;
         Assert.Equal(HttpStatusCode.OK, (await Submit(guest.Client, "new", "Tekst")).StatusCode);
         fixture.Model.Reset();
@@ -231,10 +231,10 @@ public sealed class ApiTests(BackendFixture fixture)
         Assert.Equal("reserved", (await usage.ReserveAsync(guest.Id, "cross", "fingerprint", default)).Kind);
         fixture.Clock.Set(new(2026, 10, 15, 0, 0, 10, TimeSpan.Zero));
         Assert.True(await usage.CompleteAsync(guest.Id, "cross", default));
-        Assert.Equal(2, (await usage.GetQuotaAsync(guest.Id, default)).Remaining);
+        Assert.Equal(5, (await usage.GetQuotaAsync(guest.Id, default)).Remaining);
         Assert.Equal("reserved", (await usage.ReserveAsync(guest.Id, "crashed", "fingerprint", default)).Kind);
         fixture.Clock.Set(new(2026, 10, 15, 0, 6, 0, TimeSpan.Zero));
-        Assert.Equal(2, (await usage.GetQuotaAsync(guest.Id, default)).Remaining);
+        Assert.Equal(5, (await usage.GetQuotaAsync(guest.Id, default)).Remaining);
         Assert.False(await usage.CompleteAsync(guest.Id, "crashed", default));
         Assert.Equal("expired", (await usage.GetStatusAsync(guest.Id, "crashed", default))!.Status);
     }

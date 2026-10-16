@@ -24,16 +24,16 @@ class _ServerQuotaRepository
 
 QuotaState _quota(int used, {int day = 14}) => QuotaState(
   tier: QuotaTier.free,
-  limit: 2,
+  limit: 5,
   used: used,
-  remaining: 2 - used,
+  remaining: 5 - used,
   serverTime: DateTime.utc(2026, 10, day, 12),
   resetAt: DateTime.utc(2026, 10, day + 1),
 );
 
 void main() {
   testWidgets(
-    'server quota hides full counter, blocks at zero, and reopens after reset',
+    'server quota warns only at one, blocks at zero, and reopens after reset',
     (tester) async {
       final repository = _ServerQuotaRepository();
       repository.state.value = _quota(0);
@@ -57,7 +57,18 @@ void main() {
         isNotNull,
       );
 
-      repository.state.value = _quota(1);
+      for (var used = 0; used < 4; used++) {
+        repository.state.value = _quota(used);
+        await tester.pump();
+        await tester.tap(find.text('Uprość'));
+        await tester.pumpAndSettle();
+        expect(find.byKey(const Key('quotaMessage')), findsNothing);
+        expect(find.byKey(const Key('aiProcessingNotice')), findsOneWidget);
+        await tester.tap(find.text('Anuluj'));
+        await tester.pumpAndSettle();
+      }
+
+      repository.state.value = _quota(4);
       await tester.pump();
       expect(find.byKey(const Key('quotaMessage')), findsNothing);
       await tester.tap(find.text('Uprość'));
@@ -67,7 +78,7 @@ void main() {
       await tester.tap(find.text('Zamknij'));
       await tester.pumpAndSettle();
 
-      repository.state.value = _quota(2);
+      repository.state.value = _quota(5);
       await tester.pump();
       await tester.tap(find.text('Uprość'));
       await tester.pumpAndSettle();
