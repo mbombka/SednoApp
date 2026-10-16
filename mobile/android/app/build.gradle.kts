@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "io.github.mbombka.sedno"
+    namespace = "xyz.sedno.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -15,7 +15,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "io.github.mbombka.sedno"
+        applicationId = "xyz.sedno.app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

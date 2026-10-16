@@ -6,7 +6,7 @@ z atrapami. Nie przeprowadzono ich przez samo uruchomienie testów repozytorium.
 
 ## Przygotowanie
 
-1. Zarejestruj pakiet `io.github.mbombka.sedno` w Google Play i dodaj aplikację
+1. Zarejestruj pakiet `xyz.sedno.app` w Google Play i dodaj aplikację
    Android z tym pakietem w projekcie Firebase. Skonfiguruj podpisywanie, odciski
    certyfikatów i ten sam pakiet w Play Integrity oraz backendzie
    (`PlayIntegrity__PackageName` i `Billing__PackageName`). Wgraj podpisany AAB na ścieżkę testów wewnętrznych.

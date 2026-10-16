@@ -36,14 +36,15 @@ flutter test
 flutter run
 ```
 
-The Android application ID and namespace are `io.github.mbombka.sedno`.
+The Android application ID and namespace are `xyz.sedno.app`, based on the
+reverse domain `sedno.xyz` with an `app` suffix.
 Register this exact Android package in Firebase and Google Play, together with
 its signing certificate fingerprints. A Firebase Android registration for the
 previous package cannot be reused: add a new Android app in the same Firebase
 project, update `FIREBASE_APP_ID` and any other changed Firebase/OAuth configuration,
 and register debug and Play App Signing certificate fingerprints as appropriate.
 Set backend `PlayIntegrity__PackageName` and `Billing__PackageName` to
-`io.github.mbombka.sedno` for their corresponding production integrations.
+`xyz.sedno.app` for their corresponding production integrations.
 The display name remains **Sedno**. Android treats a different application ID as
 a separate installation; local history and credentials from older packages are
 not automatically transferred. External console configuration is a separate

@@ -7,8 +7,10 @@ Adres administratora: **ul. Słowiańska 91, Modlniczka, Polska**.
 Kontakt do danych i usuwania konta: **mariuszbabka0@gmail.com**.
 Grupa docelowa potwierdzona przez administratora: **16+**.
 Docelowy identyfikator aplikacji Android (`applicationId` i `namespace`):
-**`io.github.mbombka.sedno`**. Dostępność w Google Play potwierdził administrator;
-rejestracja tego pakietu w Firebase i konfiguracja certyfikatów wymagają sprawdzenia.
+**`xyz.sedno.app`**, na podstawie domeny `sedno.xyz`. Dostępność nowego
+pakietu w Google Play wymaga sprawdzenia; wcześniejsze potwierdzenie
+administratora dotyczyło poprzedniego identyfikatora. Rejestracja nowego pakietu
+w Firebase i konfiguracja certyfikatów również wymagają wykonania.
 
 Dokument roboczy do wypełnienia formularza. „Kod” oznacza potwierdzenie w
 repozytorium, „plan” — zadeklarowaną przyszłą konfigurację. Nie wysłano formularza.
@@ -126,9 +128,10 @@ Firestore, Realtime Database ani przechowywania wyłącznie w UE bez wdrożenia.
 - [x] Wybrano Polskę jako pierwszy rynek.
 - [ ] Zastosować wybór kraju i grup docelowych w Play Console;
   kod nie ma mechanizmu kontroli wieku.
-- [x] Ustawiono `io.github.mbombka.sedno` jako `applicationId`, `namespace`
+- [x] Ustawiono `xyz.sedno.app` jako `applicationId`, `namespace`
   i pakiet klasy startowej Androida.
-- [ ] Dodać w Firebase aplikację Android `io.github.mbombka.sedno`, zarejestrować
+- [ ] Sprawdzić i zarejestrować nowy pakiet `xyz.sedno.app` w Google Play.
+- [ ] Dodać w Firebase aplikację Android `xyz.sedno.app`, zarejestrować
   odciski certyfikatów i zaktualizować konfigurację Firebase/OAuth w wydaniu.
   Ustawić ten sam pakiet dla Play Integrity i Billing na backendzie.
 - [x] Przyjęto zasady retencji w `privacy-operations-plan.pl.md`.

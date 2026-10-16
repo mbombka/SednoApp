@@ -1,4 +1,4 @@
-package io.github.mbombka.sedno
+package xyz.sedno.app
 
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
