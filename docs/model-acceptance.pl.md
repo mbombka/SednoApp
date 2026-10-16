@@ -37,6 +37,10 @@ błędu OpenAI. Po wyczerpaniu limitu aplikacja ma blokować kolejne wysłanie.
 
 ## Koszt i czas
 
+[Analiza kosztów na podstawie rzeczywistego zużycia z 16.10.2026](../backend/tools/Sedno.ModelBenchmark/results/2026-10-16-costs.md):
+15 pomiarów Responses default, 21 845 tokenów wejścia i 872 wyjścia; bazowo
+0,00262050 USD łącznie. Raport wyjaśnia brak rozbicia cache i ograniczenia próbek.
+
 Cennik modelu sprawdzony 15 października 2026: standardowe tokeny tekstowe
 0,10 USD za milion wejściowych i 0,50 USD za milion wyjściowych.
 [Dokumentacja i cena](https://developers.openai.com/api/docs/models/gpt-6-luna).

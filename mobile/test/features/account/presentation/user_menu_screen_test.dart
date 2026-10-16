@@ -2,9 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sedno_app/app/app.dart';
 import 'package:sedno_app/app/app_theme.dart';
+import 'package:sedno_app/features/about/presentation/about_screen.dart';
 import 'package:sedno_app/features/account/presentation/user_menu_screen.dart';
 
 void main() {
+  testWidgets('about opens from the menu and returns to it', (tester) async {
+    await tester.pumpWidget(const SednoApp());
+    await tester.tap(find.byTooltip('Menu użytkownika'));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('O aplikacji'),
+      200,
+      scrollable: find.byType(Scrollable).last,
+    );
+    await tester.tap(find.text('O aplikacji'));
+    await tester.pumpAndSettle();
+    expect(find.byType(AboutScreen), findsOneWidget);
+    expect(find.byTooltip('Wróć'), findsOneWidget);
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.byType(UserMenuScreen), findsOneWidget);
+  });
+
   testWidgets('menu opens full screen and closing preserves the editor', (
     tester,
   ) async {

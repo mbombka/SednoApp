@@ -1,122 +1,123 @@
-# Sedno — proponowane zasady retencji i obsługi prywatności
+# Sedno — wybrane zasady i wdrożenie prywatności
 
-Stan: 15 października 2026 r. Przygotowane dla Mariusza Bąbki na jego prośbę.
-Kontakt: mariuszbabka0@gmail.com. **To plan do przyjęcia i wdrożenia, nie opis
-obecnej konfiguracji. W tej zmianie nie ustawiono usług ani zadań usuwających.**
+16 października 2026 r. Administrator potwierdził dane i zlecił samodzielny wybór
+brakujących zasad. Nie wymaga to ponownego zbierania danych właściciela.
+Obywatelstwo nie jest potrzebne w publicznej informacji; wskazujemy Mariusza Bąbkę
+jako osobę fizyczną. Brak firmy nie oznacza automatycznego zwolnienia z obowiązków
+związanych z publiczną usługą, płatnościami czy danymi.
 
-## Ustalone dane i pozostałe decyzje
+## Wybrane decyzje i stan
 
-| Obszar | Ustalenie |
-| --- | --- |
-| Administrator | Mariusz Bąbka, osoba fizyczna, Polska; bez wyznaczonego IOD |
-| Kontakt prywatność/usuwanie | mariuszbabka0@gmail.com, poczta Gmail |
-| Adres administratora | ul. Słowiańska 91, Modlniczka, Polska |
-| AI | Wybrane OpenAI GPT-6 Luna, ID API `gpt-6-luna`; adapter istnieje; domyślnie wyłączony, wymaga klucza i odbioru jakości |
-| Platforma | Zadeklarowane Firebase; dokładne usługi, region i baza nieustalone |
-| Grupa docelowa | Potwierdzone 16+: starsi nastolatkowie i dorośli |
-| Rynek | Polski język aplikacji potwierdzony; kraje dystrybucji jeszcze nie wskazane |
-| Publiczne strony | Administrator nie ma domeny; adres opublikowanej strony nadal nieznany |
-| Pakiet Android | `io.github.mbombka.sedno` w projekcie; dostępność w Google Play potwierdzona przez administratora; rejestracja nowej aplikacji Android w Firebase i certyfikaty do sprawdzenia |
-
-Osoba fizyczna może być wskazana w informacji jako administrator; sam brak
-firmy nie rozstrzyga obowiązków związanych z publiczną aplikacją i subskrypcjami.
-Nie zakładamy zwolnienia z obowiązków tylko z powodu prywatnego statusu właściciela.
-
-## Proponowana infrastruktura, bez uruchamiania usług
-
-Firebase Hosting może obsłużyć publiczne dokumenty i przekazywać żądania do
-Cloud Run. Backend ASP.NET można przygotować jako kontener dla Cloud Run.
-PostgreSQL wymaga osobnej usługi; nie zmieniamy go na Firestore. Wybór dostawcy
-bazy, regionów i kosztów pozostaje decyzją wdrożeniową. Nie utworzono zasobów.
-[Firebase Hosting i Cloud Run](https://firebase.google.com/docs/hosting/cloud-run).
-
-Cel lokalizacji: backend, baza i jej kopie w wybranym regionie UE, z ustawieniami
-sprawdzonymi w panelach. To nie gwarantuje pozostawania wszystkich danych w EOG:
-Firebase Auth ma własne lokalizacje, a Google i OpenAI własne warunki.
-
-Dla OpenAI: nie włączać dobrowolnego udostępniania danych do trenowania;
-przy implementacji sprawdzić retencję endpointu, cache i projektu. Wyłączenie
-zapisu odpowiedzi przez `store: false` samo nie oznacza zerowej retencji wszystkich
-systemów. Nie obiecywać ZDR ani rezydencji UE bez potwierdzenia ich dostępności
-na koncie i prawidłowej konfiguracji.
-Aplikacja używa bezstanowego Responses API. Przy migracji ze starego agenta
-zatrzymać jego ruch i uruchomić narzędzie benchmarkowe z `--live --cleanup-agent`.
-Potwierdzić zakończenie sprzątania oznaczonych sesji; stare sesje bez oznaczeń
-sprawdzić osobno. Backend aplikacji nie uruchamia już mechanizmu sprzątania agenta.
-[Zasady danych OpenAI API](https://developers.openai.com/api/docs/guides/your-data).
-
-## Proponowane okresy
-
-Okresy są decyzjami minimalizacji danych dla tej aplikacji, a nie twierdzeniem,
-że konkretny przepis narzuca podaną liczbę dni. Wyjątki trzeba udokumentować.
-
-| Dane | Propozycja | Co trzeba wdrożyć |
+| Obszar | Decyzja | Stan |
 | --- | --- | --- |
-| Lokalna historia | Pozostawić 7 dni | Mechanizm już jest; sprawdzać na Androidzie |
-| Metadane żądań | Pozostawić 8 dni i czyszczenie godzinowe | Mechanizm jest; zapewnić działanie także przy skalowaniu/wyłączaniu backendu |
-| Sesje | Pozostawić 7 dni dla kont i 90 dla gości | Mechanizm jest; monitorować proces czyszczenia |
-| Nieaktywne konta | Usuwać po 24 miesiącach nieaktywności; powiadomienie 30 dni wcześniej, jeżeli jest dostępny bezpieczny kontakt | Brak automatyki i daty ostatniej aktywności; wymaga osobnego zadania i poinformowania użytkownika |
-| Wygasłe rekordy zakupów | Usuwać 90 dni po potwierdzonym końcu uprawnienia; wcześniej przy usunięciu konta | Nowy proces, ponowna weryfikacja stanu Google przed usunięciem; nie usuwać aktywnego zakupu z powodu samej starej daty w bazie |
-| ID powiadomień Pub/Sub | 30 dni od przetworzenia | Dodać czyszczenie i sprawdzić maksymalny okres ponowień transportu; nie usuwać identyfikatorów potrzebnych do obsługi faktycznych ponowień |
-| Logi techniczne Sedno/proxy | 30 dni; bez treści, poświadczeń i pełnych URL dostawcy zawierających tokeny | Ustawić retencję każdego magazynu, także eksportów; zminimalizować IP i identyfikatory |
-| Kopie PostgreSQL | Rotacja do 30 dni; usunięcie po wygaśnięciu kopii, bez zwykłego przywracania skasowanych kont do usługi | Ustawić backupy i ewidencję usunięć do ponownego zastosowania po odtworzeniu; zabezpieczyć ją i usuwać po wygaśnięciu właściwych kopii |
-| Zgłoszenia Gmail | 90 dni od zamknięcia sprawy | Ręczna kontrola raz w miesiącu lub automat; usuwać także załączniki i kopie robocze, opróżniać kosz |
-| Minimalne potwierdzenie obsługi praw | 12 miesięcy od zamknięcia: data, rodzaj żądania i wynik, bez hasła, tokenu czy pełnej korespondencji | Osobna ograniczona ewidencja, dostęp tylko administratora; potwierdzić potrzebę i podstawę przed przyjęciem |
+| Administrator | Mariusz Bąbka, ul. Słowiańska 91, Modlniczka, Polska; bez IOD | Potwierdzone przez właściciela |
+| Kontakt | mariuszbabka0@gmail.com | Potwierdzony; Gmail wymaga obsługi i MFA |
+| Rynek i wiek | Pierwszy rynek: Polska; 16+; 16–17 za zgodą opiekuna | Wybrano; ustawienia Play Console i warunki usługi do zastosowania |
+| Informacje o prywatności | https://sedno.xyz/#prywatnosc | Podsumowanie odczytane przez HTTPS 16.10.2026; pełna polityka gotowa lokalnie i w aplikacji |
+| Usuwanie | https://sedno.xyz/usun-konto | Treść i HTML gotowe lokalnie; backend ma publiczną trasę; publikacja niepotwierdzona |
+| Strona dokumentów | Firebase Hosting, własna domena i HTTPS | Wybór; nie utworzono zasobów ani certyfikatu |
+| Serwer | Google Cloud Run, europe-central2 (Warszawa) | Wybór; brak wdrożenia w tej zmianie |
+| Baza | Cloud SQL for PostgreSQL, europe-central2; kopie w tym regionie | Wybór; brak instancji i konfiguracji kopii |
+| AI | OpenAI Responses, gpt-6-luna, store=false, bez rozmów; standardowa retencja dostawcy | Kod gotowy; nie deklarujemy ZDR ani rezydencji UE bez kwalifikacji projektu |
+| Diagnostyka SDK | Bez reklam i własnej analityki; ocena konkretnego APK oraz potrzeby zgody przed udostępnieniem OCR | Nie rozstrzygamy spełnienia wymagań prawnych samą treścią polityki |
+| Zmiany polityki | Data wersji, strona prywatności i informacje do aktualizacji przed zmianą przetwarzania | Wybrany sposób komunikacji; publikacja jest czynnością administratora |
 
-Jeśli sprawa wymaga zachowania dowodów dla konkretnego roszczenia lub obowiązku
-prawnego, określić osobno zakres, podstawę i termin; nie przedłużać całej retencji
-„na wszelki wypadek”. Własne terminy nie zmieniają okresów u Google/OpenAI.
-Nie wprowadzać do polityki publicznej powyższych terminów jako obowiązujących,
-dopóki nie zostaną faktycznie skonfigurowane.
+Cloud Run i Cloud SQL obsługują wybrany region:
+[Cloud Run](https://docs.cloud.google.com/run/docs/locations),
+[Cloud SQL](https://docs.cloud.google.com/sql/docs/postgres/locations).
+Jest to wybór miejsca własnego backendu, a nie obietnica pozostawania wszystkich
+danych w EOG. Firebase Authentication i globalni dostawcy mają osobne zasady.
+Nie utworzono płatnych usług ani nie zmieniono kont Google/OpenAI.
 
-## Obsługa żądań przez Gmail — proponowana procedura
+## Retencja
 
-1. Sprawdzać skrzynkę w dni robocze. Przyjąć cel potwierdzenia otrzymania w ciągu
-   3 dni roboczych; nie jest to termin zaprogramowany w aplikacji.
-2. Wyjaśnić, jakie konto i dane obejmuje żądanie. Nie żądać zdjęć dokumentów,
-   hasła, kodu logowania, tokenu ani tekstów do uproszczenia jako standardowej weryfikacji.
-3. Zweryfikować właściciela konta. Preferować usunięcie po zalogowaniu w aplikacji;
-   osoba bez aplikacji musi mieć rzeczywistą alternatywę. Sam podany e-mail nie
-   wystarcza. Potrzebny jest oddzielny, bezpieczny proces potwierdzenia kontroli
-   nad metodą logowania; kod nie ma jeszcze portalu ani narzędzia operatorskiego.
-4. Po weryfikacji wykonać tę samą operację usuwania Firebase i danych PostgreSQL,
-   z autoryzowanym dostępem operatora. Nie tworzyć publicznego endpointu usuwającego
-   konto z samego e-maila. Przygotować i przetestować procedurę operatorską przed startem.
-5. Potwierdzić wykonanie lub wyjaśnić błąd/uzasadniony wyjątek. Poinformować o
-   lokalnej historii na pozostałych urządzeniach oraz osobnym anulowaniu subskrypcji.
-6. Pilnować odpowiedzi w terminach z polityki. Cel operacyjny: zakończyć prostą,
-   zweryfikowaną sprawę w 7 dni; nie jest to obietnica natychmiastowego wymazania
-   kopii u dostawców. Gdy brakuje weryfikacji, komunikować to bez zbędnej zwłoki.
-7. Po zamknięciu stosować powyższą retencję poczty i minimalnej ewidencji.
+| Dane | Przyjęta zasada | Realizacja |
+| --- | --- | --- |
+| Historia lokalna | 7 dni; ręczne usunięcie, wylogowanie | Istniejący kod; czyszczenie przy odczycie, starcie i wznowieniu |
+| Metadane żądań | 8 dni; proces co godzinę | Istniejący kod; zapewnić jego pracę w produkcji |
+| Sesje | Konto 7 dni, gość 90 dni | Istniejący kod; wygasłe rekordy usuwa proces godzinowy |
+| Niepowiązani goście | Ponad 90 dni i brak sesji/żądań | Istniejący kod; nie obiecujemy usunięcia dokładnie w 90. dniu |
+| Konta i rekordy zakupów | Do usunięcia konta | Pozostawiono rzeczywiste działanie; nie obiecujemy automatyki po nieaktywności |
+| ID powiadomień zakupowych | Obecnie bez automatycznego terminu | Jawnie opisane w polityce; automatyczna retencja wymaga osobnego zadania |
+| Logi własnego hostingu/proxy | Maksymalnie 30 dni, bez treści i poświadczeń | Wymaga konfiguracji każdego magazynu i eksportu przed startem |
+| Kopie bazy | Maksymalnie 30 dni, rotacja i ponowne zastosowanie usunięć po odtworzeniu | Wymaga konfiguracji backupów i zabezpieczonego rejestru usunięć |
+| Poczta zgłoszeń | 90 dni od zamknięcia sprawy | Ręczna kontrola miesięczna; usuwanie kopii, załączników i opróżnianie kosza |
+| Minimalna ewidencja obsługi praw | 12 miesięcy; data, rodzaj żądania, wynik | Ograniczony dostęp; bez pełnej korespondencji, haseł i tokenów |
 
-Zabezpieczyć Gmail silnym uwierzytelnieniem wieloskładnikowym, nie udostępniać
-skrzynki innym osobom, wyłączyć niepotrzebne przekazywanie wiadomości i nie
-wklejać zgłoszeń do narzędzi AI. Dla większej skali rozważyć osobny adres domenowy;
-nie zmienia to wskazanego obecnie adresu kontaktowego.
+Terminy operacyjne wybrano jako zasady minimalizacji; nie są twierdzeniem,
+że konkretny przepis zawsze wymaga tych okresów. Rzeczywisty wyjątek prawny
+lub roszczenie wymaga określenia celu, zakresu i terminu. Nie zachowywać całej
+korespondencji lub bazy „na wszelki wypadek”. Terminy Sedno nie zmieniają retencji
+Google/OpenAI. Przed udostępnieniem usługi trzeba zastosować wybrane ustawienia,
+a nie tylko opublikować dokument. Nie należy oznaczać poniższych prac jako
+wykonanych bez dowodu w konfiguracji usług.
 
-## Wiek i opis sklepu
+## Procedura zgłoszenia bez aplikacji
 
-Administrator wybrał **16+**. Docelowe grupy w Play Console: „16–17” i „18 i więcej”, o ile
-odpowiadają faktycznym rynkom i zasadom sklepu. Wybór 16+ nie gwarantuje wyłączenia
-obowiązków dotyczących małoletnich w każdym kraju. Gdy celem są wyłącznie dorośli,
-należy wybrać 18+. Nie utożsamiać wieku zgody na dane z pełnoletnością, uprawnieniem
-do zawarcia umowy/subskrypcji ani klasyfikacją treści PEGI/IARC.
-[Grupa docelowa Google Play](https://support.google.com/googleplay/android-developer/answer/9867159?hl=en).
+1. Skrzynkę sprawdzać w dni robocze. Cel organizacyjny: potwierdzenie odbioru
+   w 3 dni robocze, prosta zweryfikowana sprawa w 7 dni. Wiążące terminy odpowiedzi
+   wynikają z RODO, co do zasady miesiąc; ewentualne przedłużenie wyjaśnić w pierwszym miesiącu.
+2. Ustalić cel żądania, e-mail konta i UID w Firebase przez uprawniony dostęp.
+   Nie usuwać danych na podstawie samej wiadomości z podanym e-mailem ani nagłówka From.
+3. Dla konta z potwierdzonym adresem e-mail wysłać nowe, odrębne potwierdzenie
+   na adres zapisany i zweryfikowany w Firebase, nie na adres wskazany tylko w zgłoszeniu.
+   Potwierdzenie powinno zawierać losowy jednorazowy identyfikator sprawy (co najmniej
+   32 losowe bajty), wygasać po 24 godzinach i wymagać odesłania potwierdzenia zamiaru
+   usunięcia. Nie jest to hasło ani kod logowania Google/Firebase. Przechowywać
+   tylko zabezpieczony skrót do chwili weryfikacji lub wygaśnięcia, nie wpisywać do logów.
+4. Gdy adres nie jest zweryfikowany, konto ma sporne powiązania lub istnieje podejrzenie
+   przejęcia, nie polegać na samym dostępie do skrzynki. Potwierdzić kontrolę istniejącej
+   metody logowania; można zaproponować ponowne logowanie w aplikacji, ale zgłoszenie
+   bez aplikacji pozostaje otwarte. Dobrać minimalny inny dowód do konkretnej sprawy;
+   nie żądać rutynowo dokumentu tożsamości, haseł, kodów 2FA lub tekstów użytkownika.
+5. Uprawniony administrator wykonuje usunięcie tożsamości Firebase i powiązanych
+   danych PostgreSQL z użyciem istniejącej logiki `AccountDeletionService`, która
+   obsługuje blokady, kaskady i ponowienie po błędzie Firebase. Obsługę operatorską
+   należy przygotować i przećwiczyć w środowisku testowym przed startem: obecna
+   strona jest instrukcją kontaktu, nie automatycznym portalem ani narzędziem operatora.
+   Nie udostępniać publicznego endpointu usuwającego konto na podstawie e-maila.
+6. Sprawdzić, że usunięto sesje, powiązane instalacje, żądania i rekordy zakupów;
+   zachować minimalny zapis wykonania oraz wpis potrzebny do ponowienia usunięcia
+   po odtworzeniu kopii. Przy błędzie ponowić operację i poinformować użytkownika.
+7. Potwierdzić wynik; przypomnieć, że historia na innych urządzeniach wymaga
+   lokalnego usunięcia, a subskrypcję trzeba anulować osobno w Google Play.
+8. Zamknąć sprawę, usunąć jednorazowy identyfikator weryfikacji i rozpocząć retencję
+   90 dni korespondencji oraz 12 miesięcy minimalnej ewidencji. Nigdy nie kopiować
+   zgłoszeń do narzędzi AI.
 
-Opis i grafiki powinny odpowiadać zadeklarowanej grupie. Aplikacja nie ma kontroli
-wieku. Nie publikować zdania, że młodsi technicznie nie mogą z niej korzystać.
-Nie zbierać daty urodzenia bez potrzeby tylko po to, by uzupełnić dokumentację.
+Ta procedura określa sposób pracy administratora. Nie uruchomiono wysyłki
+potwierdzeń, panelu operatora ani automatyki pocztowej w tej zmianie.
 
-## Kolejność przed publikacją
+## Uzasadnienie podstaw i warunki uruchomienia
 
-1. Ustalić publiczne adresy stron i kraje dystrybucji. Adres administratora
-   oraz wiek 16+ są już potwierdzone. Zarejestrować docelowy pakiet `io.github.mbombka.sedno` w Firebase i sprawdzić
-   certyfikaty, konfigurację OAuth oraz wartości pakietu w backendzie.
-2. Wybrać dokładne usługi/regiony i sprawdzić umowy oraz mechanizmy transferów.
-3. Potwierdzić podstawy prawne i ocenę diagnostyki SDK, w tym potrzebę zgody;
-   przyjąć właściwe zasady wraz z regulaminem.
-4. Wdrożyć retencję i obsługę żądań bez aplikacji, w tym narzędzie/procedurę operatora.
-5. Uruchomić AI dopiero z właściwą informacją o dostawcy i retencji; przetestować
-   brak tekstów i sekretów w logach wszystkich warstw.
-6. Zaktualizować ekran prywatności i stronę usuwania, które nadal mają robocze
-   informacje z zadania 11; opublikować dokumenty i wtedy wysłać Data Safety.
+Usługa, konto i subskrypcja: art. 6 ust. 1 lit. b RODO. Ochrona usługi i limity:
+art. 6 ust. 1 lit. f. Obsługa praw: art. 6 ust. 1 lit. c i art. 12–22; minimalna
+ewidencja ich wykonania służy rozliczalności. Nie dopisujemy nieustalonych
+obowiązków podatkowych jako uniwersalnego powodu zatrzymywania danych. Sam brak
+firmy nie rozstrzyga sposobu rozliczania subskrypcji.
+
+Ocena interesu dla bezpieczeństwa: ograniczenie oszustw i współdzielenie limitu
+między instalacjami są potrzebne do działania usługi. Mniej ingerującym rozwiązaniem
+od treści w logach są keyed hashe, krótkie metadane, ograniczona retencja i brak
+reklamowego łączenia danych. Ryzyko błędnego blokowania ogranicza kontakt
+z administratorem i brak decyzji o skutkach prawnych. Właściciel powinien zachować
+tę ocenę i ponawiać ją po zmianie celu, zakresu lub grupy odbiorców.
+[Podstawy — Komisja Europejska](https://commission.europa.eu/law/law-topic/data-protection/information-business-and-organisations/legal-grounds-processing-data_en).
+
+Diagnostyka ML Kit wymaga osobnej analizy konkretnej wersji SDK i reguł dostępu
+do urządzenia, w tym polskiego Prawa komunikacji elektronicznej. Nie uznajemy jej
+za dowolnie dozwoloną tylko na podstawie art. 6 ust. 1 lit. f. Jeśli jest wymagana
+odrębna zgoda, produkcyjny OCR może zostać udostępniony dopiero po jej wdrożeniu
+albo po zmianie narzędzia; wpisywanie tekstu pozostaje alternatywą. Nie dodano
+pozornego przełącznika, który nie wyłącza rzeczywistej telemetrii SDK.
+[Zakres danych ML Kit](https://developers.google.com/ml-kit/android-data-disclosure),
+[art. 399 PKE](https://eli.gov.pl/api/acts/DU/2024/1221/text.html).
+
+Przed produkcyjnym startem: zastosować właściwe umowy powierzenia, odnotować
+rzeczywiste podmioty umowne i mechanizmy transferu, potwierdzić ustawienia OpenAI
+(bez dobrowolnego udostępniania danych do treningu), opublikować HTTPS i ustawić
+linki w Play Console, skonfigurować retencję i sprawdzić usuwanie oraz odtwarzanie
+kopii. Standardowe warunki wskazują OpenAI Ireland Ltd. dla klienta z EOG oraz
+Google Cloud Poland Sp. z o.o. dla standardowej umowy Cloud z polskim adresem
+rozliczeniowym; należy sprawdzić własny formularz zamówienia i warunki każdej usługi.
+Nie deklarujemy zawarcia umów, które nie zostały sprawdzone.

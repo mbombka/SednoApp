@@ -1,6 +1,9 @@
+> ARCHIWUM — zastąpione przez [aktualną politykę](privacy-policy.pl.md).
+> Poniższe dawne pytania nie są aktualną listą decyzji do podjęcia.
+
 # Polityka prywatności Sedno
 
-Wersja: 15 października 2026 r.
+Wersja robocza: 16 października 2026 r.
 
 > Dokument uzupełniony na podstawie kodu. Pola **[DO PODANIA]** wymagają danych
 > właściciela. Pola **[DO POTWIERDZENIA]** dotyczą decyzji organizacyjnych lub
@@ -16,7 +19,8 @@ Adres korespondencyjny: **ul. Słowiańska 91, Modlniczka, Polska**.
 W sprawach danych osobowych, realizacji praw i usunięcia konta napisz na
 **mariuszbabka0@gmail.com**. Administrator nie wyznaczył inspektora ochrony danych.
 
-Polityka jest dostępna pod adresem **[DO PODANIA: adres HTTPS polityki]**.
+Strona aplikacji: [www.sedno.xyz](https://www.sedno.xyz).
+Dokładny adres opublikowanej polityki: **[DO PODANIA: adres HTTPS polityki]**.
 Strona zgłoszeń usunięcia konta: **[DO PODANIA: publiczny adres HTTPS `/usun-konto`]**.
 
 ## 2. Do czego służy Sedno
@@ -26,13 +30,12 @@ zdjęcie i odczytać z niego tekst. Przed wysłaniem możesz go poprawić.
 Do rozpoczęcia korzystania nie potrzebujesz konta. Logowanie przez Google lub
 e-mail jest dobrowolne; konto jest potrzebne do korzystania z subskrypcji.
 
-**Obecny stan wdrożenia:** adapter API OpenAI jest zaimplementowany, ale
-konfiguracja produkcyjna domyślnie pozostawia uproszczanie wyłączone.
-Nie potwierdzono uruchomienia usługi ani dostępu do modelu na koncie administratora. Demonstracyjny model działa
-wyłącznie w środowisku deweloperskim. Przed uruchomieniem zewnętrznego AI
-zaktualizujemy stan wdrożenia w tej polityce i aplikacji. Wybranym przez
-administratora modelem jest OpenAI GPT-6 Luna (`gpt-6-luna`), przez API OpenAI.
-[Oficjalna dokumentacja modelu](https://developers.openai.com/api/docs/models/gpt-6-luna).
+**Stan integracji:** domyślnym dostawcą backendu jest OpenAI Responses API,
+model GPT-6 Luna (`gpt-6-luna`). Wymaga klucza na serwerze. W repozytorium są
+wyniki rzeczywistych prób syntetycznych z 16.10.2026, lecz nie potwierdzają one
+wdrożenia usług produkcyjnych ani ustawień retencji projektu.
+Model demonstracyjny jest dostępny wyłącznie po jawnym wyborze w środowisku
+deweloperskim. Konfigurację produkcyjną trzeba potwierdzić przed publikacją.
 
 AI może popełniać błędy. Sprawdź wynik, zanim go wykorzystasz. Sedno nie wymaga
 podawania informacji o zdrowiu, niepełnosprawności ani innych danych wrażliwych.

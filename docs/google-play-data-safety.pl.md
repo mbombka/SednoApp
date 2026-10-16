@@ -1,6 +1,8 @@
 # Sedno — przygotowane odpowiedzi Google Play Data Safety
 
-Stan: 15 października 2026 r. Administrator: Mariusz Bąbka, Polska.
+Strona aplikacji: [sedno.xyz](https://sedno.xyz). Działająca sekcja `/#prywatnosc` zawiera podsumowanie. Pełna polityka i strona `/usun-konto` nadal wymagają publikacji.
+
+Stan: 16 października 2026 r. Administrator: Mariusz Bąbka, Polska.
 Adres administratora: **ul. Słowiańska 91, Modlniczka, Polska**.
 Kontakt do danych i usuwania konta: **mariuszbabka0@gmail.com**.
 Grupa docelowa potwierdzona przez administratora: **16+**.
@@ -10,7 +12,8 @@ rejestracja tego pakietu w Firebase i konfiguracja certyfikatów wymagają spraw
 
 Dokument roboczy do wypełnienia formularza. „Kod” oznacza potwierdzenie w
 repozytorium, „plan” — zadeklarowaną przyszłą konfigurację. Nie wysłano formularza.
-Wersja produkcyjna ma obecnie wyłączony model i domyślnie wyłączone płatności;
+Domyślny dostawca modelu to OpenAI Responses API, wymagający klucza na serwerze.
+Płatności są domyślnie wyłączone;
 poniżej uwzględniono też przygotowane funkcje konta i subskrypcji. Ostateczne
 odpowiedzi muszą obejmować wszystkie faktycznie dystrybuowane konfiguracje.
 
@@ -21,8 +24,8 @@ odpowiedzi muszą obejmować wszystkie faktycznie dystrybuowane konfiguracje.
 | Czy aplikacja zbiera dane użytkownika? | **Tak** — identyfikator instalacji, dane sesji i żądań; przy logowaniu dane konta, przy zakupie dane subskrypcji; SDK też przesyłają dane |
 | Czy wszystkie dane przesyłane są szyfrowane? | **Tak dla zamierzonej konfiguracji produkcyjnej**, po sprawdzeniu wydania i całej infrastruktury: klient wymaga HTTPS w release, usługi Google/OpenAI używają HTTPS; nie jest to szyfrowanie end-to-end |
 | Czy użytkownik może poprosić o usunięcie konta? | **Tak** — Konto → Usuń konto; dodatkowo strona `/usun-konto` z kontaktem mailowym, po wdrożeniu |
-| Adres usuwania konta | **[BRAK: rzeczywisty publiczny URL HTTPS]**. Adres musi działać bez aplikacji; repozytorium samo nie zapewnia opublikowanego linku |
-| Polityka prywatności | **[BRAK: rzeczywisty publiczny URL HTTPS]**; przygotowany dokument: `privacy-policy-draft.pl.md` |
+| Adres usuwania konta | **https://sedno.xyz/usun-konto** — wybrany adres; opublikować i sprawdzić bez aplikacji |
+| Polityka prywatności | **https://sedno.xyz/#prywatnosc** — obecnie podsumowanie; przed zgłoszeniem opublikować tam pełną politykę z `privacy-policy.pl.md` lub odnośnik do niej |
 | Sposoby tworzenia konta | E-mail i hasło oraz OAuth przez Google; korzystanie jako gość bez tworzenia konta użytkownika |
 | Niezależny audyt bezpieczeństwa / certyfikacja | Nie zaznaczać jako wykonane — brak dowodu takiego audytu; testy nie są certyfikacją |
 | Reklamy / marketing | Brak integracji reklamowej i marketingowego profilowania w kodzie |
@@ -107,8 +110,8 @@ oraz retencję konta trzeba potwierdzić przed deklaracją w Google Play;
 `store=false` nie gwarantuje zerowej retencji dostawcy.
 [Zasady danych](https://developers.openai.com/api/docs/guides/your-data).
 
-**Hosting — plan:** Firebase; backend wymaga osobnego środowiska dla ASP.NET
-i bazy PostgreSQL. Usługi i regiony pozostają do wskazania; nie deklarować
+**Hosting — plan:** Firebase Hosting, Cloud Run i Cloud SQL for PostgreSQL
+w europe-central2 (Warszawa), bez utworzenia zasobów w tej zmianie; nie deklarować
 Firestore, Realtime Database ani przechowywania wyłącznie w UE bez wdrożenia.
 
 ## Usuwanie i ostatnie kontrole wydania
@@ -117,17 +120,19 @@ Firestore, Realtime Database ani przechowywania wyłącznie w UE bez wdrożenia.
 - [x] W aplikacji wyjaśniono, że usunięcie konta nie anuluje subskrypcji.
 - [x] Historia lokalna może być usuwana; wygasa po 7 dniach, bez kopii Androida.
 - [x] Backend ma publiczną trasę `/usun-konto`, z kontaktem mailowym z konfiguracji.
-- [ ] Ustawić `Privacy__DeletionEmail=mariuszbabka0@gmail.com`, wdrożyć stronę
-  i politykę HTTPS; wpisać rzeczywiste adresy w Play Console.
+- [x] Ustawiono produkcyjny kontakt `Privacy:DeletionEmail=mariuszbabka0@gmail.com`.
+- [ ] Opublikować stronę i politykę HTTPS; wpisać działające adresy w Play Console.
 - [x] Uzupełniono adres administratora i potwierdzono grupę docelową 16+.
-- [ ] Wskazać kraje dystrybucji i skonfigurować grupy docelowe w Play Console;
+- [x] Wybrano Polskę jako pierwszy rynek.
+- [ ] Zastosować wybór kraju i grup docelowych w Play Console;
   kod nie ma mechanizmu kontroli wieku.
 - [x] Ustawiono `io.github.mbombka.sedno` jako `applicationId`, `namespace`
   i pakiet klasy startowej Androida.
 - [ ] Dodać w Firebase aplikację Android `io.github.mbombka.sedno`, zarejestrować
   odciski certyfikatów i zaktualizować konfigurację Firebase/OAuth w wydaniu.
   Ustawić ten sam pakiet dla Play Integrity i Billing na backendzie.
-- [ ] Przyjąć i wdrożyć plan retencji; obecnie część danych nie ma automatycznej
+- [x] Przyjęto zasady retencji w `privacy-operations-plan.pl.md`.
+- [ ] Wdrożyć ustawienia hostingu, kopii i poczty; obecnie część danych nie ma automatycznej
   daty usuwania. Nie wpisywać propozycji jako działającej funkcji.
 - [ ] Sprawdzić zależności Androida i ruch wersji release: dokumentacja SDK
   opisuje wersje dostawców, a nie pomiar tego konkretnego pliku APK/AAB.

@@ -1,5 +1,7 @@
 # SednoApp
 
+Strona aplikacji: [sedno.xyz](https://sedno.xyz).
+
 A Flutter application for Android that simplifies Polish text through the backend.
 
 ## Project layout
@@ -104,3 +106,33 @@ agent code is not part of the application backend.
 See [server setup](backend/README.md#openai-simplification), including the migration
 cleanup procedure, and [acceptance checks](docs/model-acceptance.pl.md).
 The Flutter API contract is unchanged; photos stay on the device.
+
+## Informacje o aplikacji i prywatności
+
+Menu użytkownika → **O aplikacji** opisuje Sedno, limity, ostrzeżenie AI i kontakt.
+Ekran **Prywatność i dane** zawiera pełne zasady, dane administratora, prawa,
+retencję i sposób usunięcia konta. Adresy informacji:
+
+- https://sedno.xyz/#prywatnosc — działające podsumowanie; pełna polityka jest w aplikacji.
+- https://sedno.xyz/usun-konto — planowany adres zgłoszeń, wymaga publikacji.
+
+Dokumenty i adresy mają jedno źródło: `docs/privacy-policy.pl.json`. Po edycji:
+
+```sh
+python3 tools/generate_privacy_policy.py
+python3 tools/generate_privacy_policy.py --check
+```
+
+Generator wymaga Pythona 3 i `dart` w PATH. Tworzy
+[politykę Markdown](docs/privacy-policy.pl.md), treść Flutter, wspólne adresy i pliki
+HTML `docs/public/prywatnosc/index.html` oraz `docs/public/usun-konto/index.html`.
+Backend osadza politykę w assembly i udostępnia `/prywatnosc` bez logowania.
+Adres strony głównej nie jest adresem API. Przygotowanie plików nie publikuje ich
+na domenie. Sekcja `#prywatnosc` jest częścią istniejącej strony głównej.
+Pełny dokument HTML można włączyć do tej sekcji lub udostępnić z niej odnośnik.
+Przed zgłoszeniem w Play Console trzeba opublikować pełną politykę i stronę usuwania.
+
+[Przyjęte zasady i procedura wdrożenia](docs/privacy-operations-plan.pl.md)
+odróżniają działający kod od wybranego hostingu, retencji logów/kopii/poczty
+oraz prac wymaganych przed produkcją. Nie utworzono zasobów Google ani nie zmieniono
+umów lub kont dostawców. Dawna polityka robocza pozostaje archiwum.

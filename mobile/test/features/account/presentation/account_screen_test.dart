@@ -99,7 +99,7 @@ void main() {
     );
     await tester.tap(find.text('Prywatność i dane'));
     await tester.pumpAndSettle();
-    expect(find.textContaining('DO UZUPEŁNIENIA'), findsOneWidget);
+    expect(find.text('Twoje prawa i kontakt'), findsOneWidget);
     expect(
       find.textContaining('Zdjęcia zostają na urządzeniu'),
       findsOneWidget,

@@ -1,5 +1,11 @@
 # Sedno backend
 
+Strona aplikacji: [sedno.xyz](https://sedno.xyz). To adres strony
+informacyjnej; adres API nadal podaje konfiguracja wdrożenia. Wybrane publiczne adresy to
+`https://sedno.xyz/#prywatnosc` i `https://sedno.xyz/usun-konto`;
+pliki do publikacji są w `docs/public` w katalogu głównym repozytorium.
+Trasy backendu nie potwierdzają publikacji na domenie.
+
 ASP.NET Core on .NET 10 LTS with EF Core and PostgreSQL. The contract implemented here is [`../contracts/openapi.yaml`](../contracts/openapi.yaml). The earlier `mobile/api/openapi.yaml` is a scaffold draft and is superseded by this contract.
 
 ## Local setup
@@ -260,3 +266,17 @@ tagged with outcome and actual service tier, and `sedno.responses.tokens`, tagge
 with input/output kind. Usage is best-effort and absent usage is not zero usage.
 The benchmark additionally prints per-call HTTP status, tier and token counts;
 see [benchmark instructions](tools/Sedno.ModelBenchmark/README.md).
+
+## Dokumenty prywatności
+
+`GET /prywatnosc` zwraca publiczną politykę HTML osadzoną podczas kompilacji.
+`GET /usun-konto` zwraca instrukcję zgłoszenia usunięcia konta. Obie trasy są
+publiczne, bez sesji, z CSP i `Cache-Control: no-store`. Produkcyjna konfiguracja
+zawiera potwierdzony adres `Privacy:DeletionEmail=mariuszbabka0@gmail.com`;
+zmienna środowiskowa nadal może go nadpisać. Strona kontaktu nie jest automatycznym
+portalem usuwania konta ani narzędziem operatora.
+
+Źródło treści: `docs/privacy-policy.pl.json`; generowanie z katalogu repozytorium:
+`python3 tools/generate_privacy_policy.py`, weryfikacja: ten sam program z `--check`.
+Po zmianie dokumentów trzeba przebudować backend, aby zaktualizować zasób osadzony.
+Zasady i rzeczywisty stan wdrożenia: `docs/privacy-operations-plan.pl.md`.

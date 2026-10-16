@@ -86,6 +86,27 @@ public sealed class DeletionApiTests(BackendFixture fixture)
     }
 
     [Fact]
+    public async Task PublicPrivacyPageIsEmbeddedAndNeedsNoSession()
+    {
+        using var client = fixture.Factory.CreateClient();
+        using var response = await client.GetAsync("/prywatnosc");
+        response.EnsureSuccessStatusCode();
+        Assert.Equal("text/html", response.Content.Headers.ContentType!.MediaType);
+        Assert.Equal("no-store", response.Headers.CacheControl!.ToString());
+        Assert.Contains("frame-ancestors 'none'", response.Headers.GetValues("Content-Security-Policy").Single());
+        var html = WebUtility.HtmlDecode(await response.Content.ReadAsStringAsync());
+        Assert.Contains("lang=\"pl\"", html);
+        Assert.Contains("Administrator: Mariusz Bąbka", html);
+        Assert.Contains("Cele i podstawy przetwarzania", html);
+        Assert.Contains("Twoje prawa i kontakt", html);
+        Assert.Contains("Planowana infrastruktura produkcyjna", html);
+        Assert.Contains("https://sedno.xyz/#prywatnosc", html);
+        Assert.Contains("https://sedno.xyz/usun-konto", html);
+        Assert.DoesNotContain("DO UZUPEŁNIENIA", html);
+        Assert.DoesNotContain("<script", html);
+    }
+
+    [Fact]
     public async Task PublicPageNeedsNoSessionAndExplainsExternalRequestAndSubscription()
     {
         using var client = fixture.Factory.CreateClient();
@@ -93,9 +114,12 @@ public sealed class DeletionApiTests(BackendFixture fixture)
         response.EnsureSuccessStatusCode();
         var html = await response.Content.ReadAsStringAsync();
         Assert.Contains("Sedno", html);
+        Assert.Contains("href=\"https://sedno.xyz\"", html);
         Assert.Contains("mailto:privacy%40test.invalid", html);
         Assert.Contains("nie anuluje subskrypcji", html);
         Assert.Contains("Zweryfikujemy", html);
+        Assert.Contains("href=\"/prywatnosc\"", html);
+        Assert.DoesNotContain("DO UZUPEŁNIENIA", html);
         Assert.Equal("no-store", response.Headers.CacheControl!.ToString());
     }
 }

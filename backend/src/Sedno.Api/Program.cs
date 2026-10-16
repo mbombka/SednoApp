@@ -205,6 +205,12 @@ app.Use(async (context, next) =>
     }
     await next(context);
 });
+app.MapGet("/prywatnosc", (HttpContext context) =>
+{
+    context.Response.Headers.CacheControl = "no-store";
+    context.Response.Headers.ContentSecurityPolicy = "default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'";
+    return Results.Content(PrivacyPage.Html, "text/html; charset=utf-8");
+});
 app.MapGet("/usun-konto", (HttpContext context) =>
 {
     context.Response.Headers.CacheControl = "no-store";

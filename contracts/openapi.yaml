@@ -2,6 +2,10 @@ openapi: 3.0.3
 info:
   title: Sedno backend API
   version: 1.0.0
+  contact:
+    name: Sedno
+    url: https://sedno.xyz
+    email: mariuszbabka0@gmail.com
   description: >-
     Text is processed transiently. The backend stores no submitted or simplified
     text. Photos and history remain on the device. Timestamps are UTC.
@@ -86,6 +90,16 @@ paths:
         '401': { $ref: '#/components/responses/Problem' }
         '403': { $ref: '#/components/responses/Problem' }
         '500': { $ref: '#/components/responses/Problem' }
+  /prywatnosc:
+    get:
+      operationId: privacyPolicyPage
+      security: []
+      responses:
+        '200':
+          description: Public Polish privacy policy, including planned deployment settings.
+          content:
+            text/html:
+              schema: { type: string }
   /usun-konto:
     get:
       operationId: accountDeletionPage

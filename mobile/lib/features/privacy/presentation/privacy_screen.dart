@@ -1,48 +1,73 @@
 import 'package:flutter/material.dart';
+import 'package:sedno_app/app/app_information.dart';
+import 'package:sedno_app/features/shared/presentation/website_information.dart';
+import 'package:sedno_app/features/privacy/domain/privacy_policy.dart';
 
 class PrivacyScreen extends StatelessWidget {
   const PrivacyScreen({super.key});
 
-  static const aiNotice =
-      'Twój tekst trafi przez serwer Sedno do dostawcy AI — OpenAI, aby go uprościć. '
-      'Nie wpisuj danych, których nie chcesz przekazywać. '
-      'Zdjęcia zostają na urządzeniu. AI może popełniać błędy. Sprawdź wynik.';
-  static const deletionNotice =
-      'Usuniemy konto Sedno, jego dane na serwerze i lokalną historię na tym urządzeniu. '
-      'Tej czynności nie można cofnąć. '
-      'Usunięcie konta nie anuluje subskrypcji. '
-      'Aby zatrzymać opłaty, otwórz Google Play → Płatności i subskrypcje → '
-      'Subskrypcje → Sedno → Anuluj subskrypcję.';
+  static const aiNotice = PrivacyPolicy.aiNotice;
+  static const deletionNotice = PrivacyPolicy.deletionNotice;
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Prywatność i dane')),
-    body: const SingleChildScrollView(
-      padding: EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(aiNotice),
-          SizedBox(height: 16),
-          Text(
-            'Serwer nie zapisuje tekstu ani wyniku. Zdjęcia i rozpoznawanie tekstu pozostają na urządzeniu. Historia jest szyfrowana, przechowywana lokalnie przez 7 dni i wyłączona z kopii zapasowych. Możesz usuwać wpisy w zakładce Historia. Wylogowanie czyści historię.',
-          ),
-          SizedBox(height: 16),
-          Text(
-            'Identyfikator instalacji jest pseudonimowy. Serwer zapisuje dane sesji, konta, limitów i zakupów. Logowanie nie odnawia darmowego limitu. Metadane żądań są usuwane po 8 dniach, wygasłe sesje podczas okresowego czyszczenia.',
-          ),
-          SizedBox(height: 16),
-          Text(deletionNotice),
-          SizedBox(height: 16),
-          Text(
-            'Usunięcie przez stronę internetową nie czyści historii na urządzeniach. Usuń ją w aplikacji lub usuń dane aplikacji w ustawieniach Androida. Dane Google Play podlegają zasadom Google.',
-          ),
-          SizedBox(height: 16),
-          Text(
-            'Projekt informacji o prywatności — DO UZUPEŁNIENIA przed publikacją: administrator i kontakt, podmioty przetwarzające, podstawy prawne, transfery, okresy przechowywania kont i kopii serwera oraz adres publicznej polityki i strony usuwania konta. Uproszczenia korzystają z modelu OpenAI GPT-6 Luna po skonfigurowaniu serwera. Model demonstracyjny działa tylko w środowisku deweloperskim.',
-          ),
-        ],
+    appBar: AppBar(
+      title: const Text('Prywatność i dane'),
+      leading: Navigator.of(context).canPop()
+          ? IconButton(
+              tooltip: 'Wróć',
+              style: IconButton.styleFrom(minimumSize: const Size(48, 48)),
+              onPressed: () => Navigator.of(context).maybePop(),
+              icon: const Icon(Icons.arrow_back),
+            )
+          : null,
+    ),
+    body: SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text('Wersja: ${PrivacyPolicy.versionLabel}'),
+            const SizedBox(height: 16),
+            const WebsiteInformation(),
+            for (final section in PrivacyPolicy.sections) ...[
+              const SizedBox(height: 24),
+              _Heading(section.title),
+              for (final paragraph in section.paragraphs) ...[
+                Text(paragraph),
+                const SizedBox(height: 16),
+              ],
+            ],
+            const WebsiteInformation(
+              address: AppInformation.privacyUrl,
+              label: 'Informacje o prywatności na stronie',
+              copyLabel: 'Kopiuj link do prywatności',
+            ),
+            const SizedBox(height: 16),
+            const WebsiteInformation(
+              address: AppInformation.deletionUrl,
+              label: 'Adres strony usuwania konta',
+              copyLabel: 'Kopiuj link do usuwania konta',
+            ),
+          ],
+        ),
       ),
+    ),
+  );
+}
+
+class _Heading extends StatelessWidget {
+  const _Heading(this.text);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.only(bottom: 8),
+    child: Semantics(
+      header: true,
+      child: Text(text, style: Theme.of(context).textTheme.titleLarge),
     ),
   );
 }

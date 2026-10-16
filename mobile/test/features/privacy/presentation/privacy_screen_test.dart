@@ -4,6 +4,36 @@ import 'package:sedno_app/app/app_theme.dart';
 import 'package:sedno_app/features/privacy/presentation/privacy_screen.dart';
 
 void main() {
+  testWidgets(
+    'privacy contains controller, legal bases, retention and deployment status',
+    (tester) async {
+      await tester.pumpWidget(const MaterialApp(home: PrivacyScreen()));
+      expect(
+        find.textContaining('Administrator: Mariusz Bąbka'),
+        findsOneWidget,
+      );
+      expect(find.textContaining('mariuszbabka0@gmail.com'), findsWidgets);
+      expect(find.text('https://sedno.xyz'), findsOneWidget);
+      expect(find.textContaining('nie oznacza braku retencji'), findsOneWidget);
+      expect(
+        find.textContaining('Planowana infrastruktura produkcyjna'),
+        findsOneWidget,
+      );
+      expect(find.text(PrivacyScreen.deletionNotice), findsOneWidget);
+      expect(find.text('Cele i podstawy przetwarzania'), findsOneWidget);
+      expect(find.text('Twoje prawa i kontakt'), findsOneWidget);
+      expect(find.text('https://sedno.xyz/#prywatnosc'), findsOneWidget);
+      expect(
+        find.textContaining('Strona zawiera krótkie podsumowanie'),
+        findsOneWidget,
+      );
+      expect(find.text('https://sedno.xyz/usun-konto'), findsOneWidget);
+      expect(find.textContaining('DO UZUPEŁNIENIA'), findsNothing);
+      expect(find.textContaining('DO POTWIERDZENIA'), findsNothing);
+      expect(find.textContaining('wymagają ich wdrożenia'), findsOneWidget);
+    },
+  );
+
   testWidgets('provider and privacy notices remain readable with large text', (
     tester,
   ) async {
@@ -26,6 +56,7 @@ void main() {
     await tester.scrollUntilVisible(
       deletion,
       200,
+      maxScrolls: 250,
       scrollable: find.byType(Scrollable),
     );
     expect(tester.takeException(), isNull);

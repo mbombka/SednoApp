@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sedno_app/app/app_theme.dart';
+import 'package:sedno_app/features/about/presentation/about_screen.dart';
 import 'package:sedno_app/features/privacy/presentation/privacy_screen.dart';
 
 enum UserMenuDestination { start, history, account }
@@ -106,6 +107,16 @@ class UserMenuScreen extends StatelessWidget {
                           onTap: () =>
                               Navigator.of(context)
                                   .pop(UserMenuDestination.history),
+                        ),
+                        const Divider(height: 1, color: _background),
+                        _MenuRow(
+                          label: 'O aplikacji',
+                          icon: Icons.info_outline,
+                          onTap: () => Navigator.of(context).push<void>(
+                            MaterialPageRoute(
+                              builder: (_) => const AboutScreen(),
+                            ),
+                          ),
                         ),
                       ],
                     ),

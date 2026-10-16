@@ -2,6 +2,8 @@
 
 [Wyniki rzeczywistego pomiaru z 16.10.2026](results/2026-10-16.md):
 mediana agent 4,84 s, Responses default 1,51 s, Responses fast 1,21 s.
+[Analiza kosztu z rzeczywistego zużycia tokenów](results/2026-10-16-costs.md)
+opisuje wariant default oraz ograniczenia kalkulacji.
 
 Eksperyment uruchamiany ręcznie. Nie zmienia dostawcy modelu w aplikacji,
 nie uruchamia serwera HTTP, nie wymaga PostgreSQL i nie zużywa limitu Sedno.
