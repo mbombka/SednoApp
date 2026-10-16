@@ -41,6 +41,13 @@ For future schema changes, run `dotnet ef migrations add Name --project src/Sedn
 
 Production requires `Firebase:ProjectId`, `PlayIntegrity:PackageName`, and `PlayIntegrity:ServiceAccountJsonPath`. The path points to a service-account JSON file supplied by the deployment secret store, outside the repository. Enable Play Integrity for the app's Google Cloud project and link that project in Play Console. A guest request must carry a standard Play Integrity token whose request hash is Base64URL(SHA-256(UTF-8(`guest-session:` + installation ID))). The backend exchanges it at Google's decode endpoint and requires a matching package/hash, a verdict no older than five minutes, `PLAY_RECOGNIZED`, and `MEETS_DEVICE_INTEGRITY`. `PlayIntegrity:Provider=mock` is available only in Development and is rejected in production. Development uses it by default. A real package name and Play release setup are needed before production rollout.
 
+Shared `appsettings.json` sets `PlayIntegrity:PackageName` and `Billing:PackageName`
+to `xyz.sedno.app`, matching the Android application ID. Development and Production
+inherit these values. Remove or update any older `PlayIntegrity__PackageName` and
+`Billing__PackageName` environment variables or user secrets, which override the
+tracked configuration. Register the same package in Firebase and Google Play;
+editing these settings does not update external registrations.
+
 The explicit development mock returns text prefixed `Wersja demonstracyjna:`.
 The default provider is `openai`: GPT-6 Luna through stateless Responses API.
 `Model:Provider=disabled` remains an explicit maintenance mode returning 503.
@@ -71,7 +78,7 @@ Billing is disabled by default in both environments. There is no runtime billing
 mock. Configure these values via environment variables or a secret store:
 
 - `Billing__Enabled=true`
-- `Billing__PackageName`: the exact registered Android application ID
+- `Billing__PackageName`: optional override of `xyz.sedno.app`; must match the registered Android application ID
 - `Billing__ProductId`: one subscription product with one monthly auto-renewing
   base plan, no trial/introductory offers; configure PLN 9.99 in Play Console
 - `Billing__ServiceAccountJsonPath`: deployment-mounted Google service account
