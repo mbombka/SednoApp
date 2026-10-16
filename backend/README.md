@@ -242,6 +242,13 @@ benchmark reports are preserved and describe the implementation at measurement t
 
 ## Simplification latency diagnostics
 
+Shared `appsettings.json` keeps application logs at `Information` and filters
+ASP.NET Core and Entity Framework Core to `Warning` in both environments.
+Routine SQL commands, request start/finish, endpoint execution and JSON-writing
+messages are hidden; simplification timings, hosting startup messages, warnings
+and errors remain visible. Environment variables or user secrets can override
+these levels. Do not enable sensitive-data or request/response-body logging.
+
 Request logs report content-free `TotalMs`, `AuthMs`, `ReserveMs`, `ModelMs`,
 `CompleteMs`, `QuotaMs`, `QuotaLockMs`, `ResponsesHeadersMs` and `ResponsesCompleteMs`.
 A missing milestone is -1. Responses milestones start at the provider call, while
