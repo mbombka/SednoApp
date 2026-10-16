@@ -8,7 +8,8 @@ using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Sedno.Application;
 
-namespace Sedno.Infrastructure;
+using Sedno.Infrastructure;
+namespace Sedno.ModelBenchmark.Agents;
 
 public sealed class OpenAiAgentOptions
 {
@@ -23,7 +24,7 @@ public sealed class OpenAiAgentOptions
         if (!AgentId.StartsWith("agent_", StringComparison.Ordinal) || AgentId.Length is < 7 or > 64 ||
             AgentId.Any(c => !char.IsAsciiLetterOrDigit(c) && c != '_'))
             throw new InvalidOperationException("OpenAI:AgentId must be a saved agent identifier.");
-        // Reserve time for the API to return a timeout before the mobile 10-second deadline.
+        // Preserve the former application deadline for comparable benchmark results.
         if (TimeoutSeconds is < 1 or > 8)
             throw new InvalidOperationException("OpenAI:TimeoutSeconds must be between 1 and 8.");
     }
@@ -40,11 +41,10 @@ public sealed class OpenAiAgentProvider : IModelProvider
     private readonly TimeProvider _clock;
     private readonly ILogger<OpenAiAgentProvider> _logger;
     private readonly IAgentSessionCleanupQueue _cleanup;
-    private readonly SimplificationTimings? _timings;
     private readonly AgentStreamRunner _streams;
 
     public OpenAiAgentProvider(HttpClient client, OpenAiAgentOptions options, TimeProvider clock,
-        ILogger<OpenAiAgentProvider> logger, IAgentSessionCleanupQueue cleanup, AgentStreamRunner streams, SimplificationTimings? timings = null)
+        ILogger<OpenAiAgentProvider> logger, IAgentSessionCleanupQueue cleanup, AgentStreamRunner streams)
     {
         options.Validate();
         _client = client;
@@ -52,7 +52,6 @@ public sealed class OpenAiAgentProvider : IModelProvider
         _clock = clock;
         _logger = logger;
         _cleanup = cleanup;
-        _timings = timings;
         _streams = streams;
     }
 
@@ -105,7 +104,6 @@ public sealed class OpenAiAgentProvider : IModelProvider
                     text = new { format = new { type = "text" } }
                 }
             }, linked.Token);
-            _timings?.Milestone(SimplificationStage.AgentHeaders, started);
             if (response.Content.Headers.ContentType?.MediaType != "text/event-stream")
                 throw new ModelProviderException();
             using var stream = await response.Content.ReadAsStreamAsync(linked.Token);
@@ -122,7 +120,6 @@ public sealed class OpenAiAgentProvider : IModelProvider
                     var id = root.GetProperty("session").GetProperty("id").GetString();
                     if (!SafeId(id) || sessionId is not null) throw new ModelProviderException();
                     sessionId = id;
-                    _timings?.Milestone(SimplificationStage.AgentSession, started);
                     await _cleanup.TrackAsync(id!, CancellationToken.None);
                     continue;
                 }
@@ -138,7 +135,6 @@ public sealed class OpenAiAgentProvider : IModelProvider
                 switch (type)
                 {
                     case "agent.session.turn.output_text.delta":
-                        if (!delivered) _timings?.Milestone(SimplificationStage.AgentFirstOutput, started);
                         break;
                     case "agent.session.turn.item.done":
                         var item = root.GetProperty("item");
@@ -148,7 +144,6 @@ public sealed class OpenAiAgentProvider : IModelProvider
                         {
                             if (result is not null || turnId is null) throw new ModelProviderException();
                             result = ReadFinalAnswer(item, turnId);
-                            _timings?.Milestone(SimplificationStage.AgentFinalAnswer, started);
                             finalAt = _clock.GetTimestamp();
                             lock (gate)
                             {
@@ -156,7 +151,7 @@ public sealed class OpenAiAgentProvider : IModelProvider
                                 delivered = true;
                             }
                             // Ownership of the stream stays with this host-managed reader.
-                            // The request can now commit quota and return the validated text.
+                            // The benchmark can now stop timing the validated answer.
                             answer.TrySetResult(result);
                         }
                         break;
@@ -168,7 +163,6 @@ public sealed class OpenAiAgentProvider : IModelProvider
                             throw new ModelProviderException();
                         RecordUsage(root.TryGetProperty("usage", out var usage) && usage.ValueKind == JsonValueKind.Object
                             ? root : turn);
-                        if (!delivered) _timings?.Milestone(SimplificationStage.AgentTurnComplete, started);
                         completed = true;
                         break;
                     case "error":
@@ -208,7 +202,6 @@ public sealed class OpenAiAgentProvider : IModelProvider
         {
             if (SafeId(sessionId)) await _cleanup.ReadyAsync(sessionId!, CancellationToken.None, outcome != "succeeded");
             else if (outcome != "succeeded") _cleanup.RequestRecovery();
-            // No writes to request-scoped timings after publishing the answer.
             // Late failures cannot retract an already accepted simplification.
             if (delivered)
                 _logger.LogInformation("Koniec strumienia agenta Trace={Trace} Outcome={Outcome} FinalizationMs={FinalizationMs:F1}",

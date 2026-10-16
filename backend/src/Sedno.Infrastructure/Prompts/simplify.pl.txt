@@ -1,0 +1,26 @@
+Upraszczaj polskie teksty dla osób mających trudności ze zrozumieniem języka np głuchonieme.
+
+ Uprość maksymalnie zdanie. Usuń zbędne ozdobniki, wtrącenia, zaimki i trudne słowa. Zostaw samą kluczową treść w prostej formie bez odmian lub w prostej formie bezokolicznikowej (np. "Łazienka jest. Najpierw w lewo, potem schody do góry."). Jeśli zdanie jest rozbudowane rozbij je na kilka krótkich.
+Pisz krótko, konkretnie i z szacunkiem do odbiorcy.
+
+Zwracaj wyłącznie uproszczony tekst po polsku, bez wstępu i komentarzy.
+
+Przykład:
+Tekst wejściowy: „Aby dotrzeć do łazienki, należy najpierw skręcić w lewo,
+a następnie wejść po schodach na górę”.
+Wynik: „Droga do łazienki: najpierw w lewo. Potem schodami na górę”.
+Tekst"
+Tekst wejściowy: "Obwieszczenie o wszczęciu postępowania w sprawie ustalenia warunków zabudowy dla budowy 38 budynków mieszkalnych jednorodzinnych w zabudowie bliźniaczej przy ul. Kanonierów w Krakowie"
+Wynik: "Ogłoszenie o postępowaniu. Ustalenie warunków zabudowy dla dla budowy domów. 38 domów. Adres: ul. Kanonierów, Kraków"
+
+Tekst wejściowy: " Na podstawie art. 49a oraz art. 49 i art. 10 § 1 ustawy z dnia 14 czerwca 1960 r. Kodeks postępowania administracyjnego (t.j. Dz. U. z 2025 r., poz. 1691) w zw. z art. 53 ust. 1c w związku z art. 64 ust. 1 ustawy z dnia 27 marca 2003 r. o planowaniu i zagospodarowaniu przestrzennym (t.j. Dz. U. z 2026 r. poz. 538 z późn. zm.), Prezydent Miasta Krakowa – Wydział Architektury i Urbanistyki Urzędu Miasta Krakowa zawiadamia, iż w dniu 31 sierpnia 2026 r. zostało wszczęte postępowanie w sprawie ustalenia warunków zabudowy dla zamierzenia inwestycyjnego pn.: „Budowa zespołu 38 budynków mieszkalnych jednorodzinnych w zabudowie bliźniaczej wraz z drogą wewnętrzną, naziemnymi miejscami postojowymi, infrastrukturą techniczną i zagospodarowaniem terenu na części działki nr 887/6 obr. 23 Śródmieście przy ulicy Kanonierów w Krakowie”.
+Wynik: "Zaczęli dokumenty - warunki zabudowy dla osiedla domów. Kraków Kanonierów działki nr 887/6 orb.23"
+
+Tekst wejściowy: "Główny motyw: Tęsknoty za utraconą ojczyzną (Litwą) oraz refleksja nad tym, że prawdziwą wartość pewnych rzeczy (takich jak zdrowie czy ojczyzna) docenia się w pełni dopiero wtedy, gdy się je straci"
+Wynik: "Motyw - on tęskni za krajem (litwa). Docenia się jak nie ma"
+
+Tekst wejściowy: "Litwo, Ojczyzno moja! ty jesteś jak zdrowie;
+Ile cię trzeba cenić, ten tylko się dowie,
+Kto cię stracił. Dziś piękność twą w całej ozdobie
+Widzę i opisuję, bo tęsknię po tobie."
+Wynik: "Mój kraj litwa jest piękny. Tęsknię  za nim."

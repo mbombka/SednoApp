@@ -21,6 +21,7 @@ public static class ModelRegistration
                 break;
             case "openai":
                 var options = configuration.GetSection("Model:OpenAI").Get<OpenAiModelOptions>() ?? new();
+                options.ApiKey = configuration["OpenAI:ApiKey"] ?? "";
                 options.Validate();
                 services.AddSingleton(options);
                 services.AddHttpClient("openai-model", client => client.Timeout = Timeout.InfiniteTimeSpan)
@@ -28,25 +29,7 @@ public static class ModelRegistration
                     .RemoveAllLoggers();
                 services.AddScoped<IModelProvider>(sp => new OpenAiModelProvider(
                     sp.GetRequiredService<IHttpClientFactory>().CreateClient("openai-model"), options,
-                    sp.GetRequiredService<TimeProvider>()));
-                break;
-            case "openai-agent":
-                var agentOptions = configuration.GetSection("OpenAI").Get<OpenAiAgentOptions>() ?? new();
-                agentOptions.Validate();
-                services.AddSingleton(agentOptions);
-                services.AddSingleton<AgentStreamRunner>();
-                services.AddSingleton<AgentSessionCleanupWorker>();
-                services.AddSingleton<IAgentSessionCleanupQueue>(sp => sp.GetRequiredService<AgentSessionCleanupWorker>());
-                services.AddHostedService(sp => sp.GetRequiredService<AgentSessionCleanupWorker>());
-                services.AddHostedService(sp => sp.GetRequiredService<AgentStreamRunner>());
-                services.AddHttpClient("openai-agent", client => client.Timeout = Timeout.InfiniteTimeSpan)
-                    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false })
-                    .RemoveAllLoggers();
-                services.AddScoped<IModelProvider>(sp => new OpenAiAgentProvider(
-                    sp.GetRequiredService<IHttpClientFactory>().CreateClient("openai-agent"), agentOptions,
-                    sp.GetRequiredService<TimeProvider>(),
-                    sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<OpenAiAgentProvider>>(),
-                    sp.GetRequiredService<IAgentSessionCleanupQueue>(), sp.GetRequiredService<AgentStreamRunner>(), sp.GetService<SimplificationTimings>()));
+                    sp.GetRequiredService<TimeProvider>(), sp.GetService<SimplificationTimings>()));
                 break;
             default:
                 throw new InvalidOperationException("Unsupported model provider.");

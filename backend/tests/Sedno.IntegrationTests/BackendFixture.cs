@@ -103,6 +103,7 @@ public sealed class BackendFixture : IAsyncLifetime
     {
         await _postgres.StartAsync();
         SetEnvironment("ASPNETCORE_ENVIRONMENT", "Development");
+        SetEnvironment("Model__Provider", "mock");
         SetEnvironment("ConnectionStrings__Postgres", _postgres.GetConnectionString());
         SetEnvironment("Security__CredentialKey", Convert.ToBase64String(Enumerable.Repeat((byte)1, 32).ToArray()));
         SetEnvironment("Security__FingerprintKey", Convert.ToBase64String(Enumerable.Repeat((byte)2, 32).ToArray()));

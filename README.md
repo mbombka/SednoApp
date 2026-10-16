@@ -91,11 +91,16 @@ and reset details appear on submission when the remaining allowance is low.
 
 ## Real AI integration
 
-The backend includes opt-in adapters for a saved OpenAI Agent and direct GPT-6 Luna calls. They remain disabled by
-default in production and uses a mock in Development until explicitly configured.
-See [server setup](backend/README.md#openai-simplification) and the
-[Polish acceptance procedure](docs/model-acceptance.pl.md). The API key stays on
-the server. Account access, live quality and real request cost require verification.
-For the saved agent configured in OpenAI Platform, follow
-[Agents API setup](backend/README.md#saved-openai-agent) using `OpenAI:ApiKey` and
-`OpenAI:AgentId`. The prompt and model are managed in the saved agent.
+The backend uses OpenAI Responses API with `gpt-6-luna`, `reasoning.effort=none`,
+`service_tier=default`, `store=false`, 4096 output tokens and an eight-second timeout.
+Configure the server-only `OpenAI:ApiKey` before starting the default `openai` mode.
+Development mocks require an explicit `Model:Provider=mock`; production rejects mocks.
+
+The accepted prompt is versioned in
+[`backend/src/Sedno.Infrastructure/Prompts/simplify.pl.txt`](backend/src/Sedno.Infrastructure/Prompts/simplify.pl.txt)
+and shared with the [model benchmark](backend/tools/Sedno.ModelBenchmark/README.md).
+The benchmark retains agent comparisons and historical timing/quality reports;
+agent code is not part of the application backend.
+See [server setup](backend/README.md#openai-simplification), including the migration
+cleanup procedure, and [acceptance checks](docs/model-acceptance.pl.md).
+The Flutter API contract is unchanged; photos stay on the device.

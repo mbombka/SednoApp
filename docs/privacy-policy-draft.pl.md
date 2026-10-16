@@ -48,23 +48,11 @@ Po wybraniu „Uprość” aplikacja wysyła tekst do backendu Sedno. Backend ni
 oryginału ani wyniku w bazie. Kod nie rejestruje ich w logach. Do obsługi żądania
 używa treści w pamięci. Wynik trafia do aplikacji i lokalnej historii.
 
-**AI po włączeniu konfiguracji:** tekst i instrukcja uproszczenia trafią
-przez backend do API OpenAI, modelu GPT-6 Luna. Nie wyślemy zdjęcia ani całej
-historii. Tryb bezpośrednich wywołań Responses API wysyła `store=false`, co nie
-oznacza zerowej retencji po stronie dostawcy. Tryb zapisanego agenta (Agents API)
-przechowuje treść i wynik w osobnej sesji OpenAI. Backend usuwa sesję w tle po
-zakończeniu przetwarzania; przy przekroczeniu czasu lub przerwaniu zleca również
-anulowanie pracy. W pamięci serwera pozostają tylko identyfikatory sesji oraz
-stan ponawiania prób, bez tekstów i wyników. Nie zapisujemy tabeli kolejki.
-Po restarcie serwer sprawdza listę sesji oznaczonych jako uproszczenia Sedno
-u dostawcy i ponawia sprzątanie. Odzyskiwane sesje usuwa po upływie co najmniej
-minuty od utworzenia. Nieudane próby ponawia z wydłużanym odstępem.
-Awaria, zatrzymany backend lub niedostępność dostawcy mogą opóźnić usunięcie.
-Nie gwarantuje to natychmiastowego fizycznego usunięcia; operator kontroluje
-pozostałości, w tym starsze sesje bez oznaczenia Sedno.
-Także utrata odpowiedzi na utworzenie sesji może pozostawić przesłany tekst
-u dostawcy bez identyfikatora sesji znanego backendowi.
-Obecność adaptera nie potwierdza uruchomienia integracji na serwerze.
+**AI:** tekst i instrukcja uproszczenia trafiają przez backend do OpenAI Responses
+API, modelu GPT-6 Luna. Nie wysyłamy zdjęcia ani całej historii. Żądania mają
+`store=false`, bez identyfikatora rozmowy i wcześniejszych odpowiedzi. Nie oznacza
+to zerowej retencji po stronie dostawcy. Aplikacja nie używa już Agents API.
+Wdrożenie i ustawienia konta dostawcy należy potwierdzić przed publikacją polityki.
 
 OpenAI opisuje brak używania danych API do trenowania domyślnie. Standardowe
 logi bezpieczeństwa mogą zawierać treści i być zachowywane do 30 dni, z wyjątkami

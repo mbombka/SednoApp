@@ -39,12 +39,10 @@ przy implementacji sprawdzić retencję endpointu, cache i projektu. Wyłączeni
 zapisu odpowiedzi przez `store: false` samo nie oznacza zerowej retencji wszystkich
 systemów. Nie obiecywać ZDR ani rezydencji UE bez potwierdzenia ich dostępności
 na koncie i prawidłowej konfiguracji.
-Tryb `openai-agent` korzysta z Agents API i nie ma ustawienia `store=false`:
-treść i wynik trafiają do sesji. Backend zleca usunięcie w bloku `finally`, z
-limitem 3 sekund i maksymalnie dwiema próbami. Przy błędzie pozostawia ostrzeżenie
-bez danych treści i sesji. Po awarii procesu lub błędzie usunięcia operator musi
-sprawdzić i usunąć pozostałe sesje w dedykowanym projekcie; kod nie ma trwałej
-kolejki usuwania ani automatycznego uzgadniania pozostawionych sesji.
+Aplikacja używa bezstanowego Responses API. Przy migracji ze starego agenta
+zatrzymać jego ruch i uruchomić narzędzie benchmarkowe z `--live --cleanup-agent`.
+Potwierdzić zakończenie sprzątania oznaczonych sesji; stare sesje bez oznaczeń
+sprawdzić osobno. Backend aplikacji nie uruchamia już mechanizmu sprzątania agenta.
 [Zasady danych OpenAI API](https://developers.openai.com/api/docs/guides/your-data).
 
 ## Proponowane okresy

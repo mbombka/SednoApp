@@ -22,9 +22,9 @@ public sealed class SimplificationTimingsTests
         measurement.Dispose(); measurement.Dispose();
         using (timings.Measure(SimplificationStage.QuotaLock)) clock.Timestamp += 8;
         Assert.Equal(20, timings[SimplificationStage.QuotaLock]);
-        timings.Milestone(SimplificationStage.AgentFirstOutput, 0);
+        timings.Milestone(SimplificationStage.ResponsesHeaders, 0);
         clock.Timestamp += 100;
-        timings.Milestone(SimplificationStage.AgentFirstOutput, 0);
-        Assert.Equal(20, timings[SimplificationStage.AgentFirstOutput]);
+        timings.Milestone(SimplificationStage.ResponsesHeaders, 0);
+        Assert.Equal(20, timings[SimplificationStage.ResponsesHeaders]);
     }
 }

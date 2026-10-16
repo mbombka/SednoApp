@@ -134,14 +134,12 @@ app.Use(async (context, next) =>
         app.Logger.LogInformation(
             "Czas upraszczania Trace={Trace} Status={Status} TotalMs={TotalMs:F1} AuthMs={AuthMs:F1} " +
             "ReserveMs={ReserveMs:F1} ModelMs={ModelMs:F1} CompleteMs={CompleteMs:F1} QuotaMs={QuotaMs:F1} " +
-            "QuotaLockMs={QuotaLockMs:F1} AgentHeadersMs={AgentHeadersMs:F1} AgentSessionMs={AgentSessionMs:F1} " +
-            "AgentFirstOutputMs={AgentFirstOutputMs:F1} AgentFinalAnswerMs={AgentFinalAnswerMs:F1} AgentTurnMs={AgentTurnMs:F1}",
+            "QuotaLockMs={QuotaLockMs:F1} ResponsesHeadersMs={ResponsesHeadersMs:F1} ResponsesCompleteMs={ResponsesCompleteMs:F1}",
             System.Diagnostics.Activity.Current?.TraceId.ToString() ?? context.TraceIdentifier,
             context.Response.StatusCode, clock.GetElapsedTime(started).TotalMilliseconds,
             timings[SimplificationStage.Authentication], timings[SimplificationStage.Reservation],
             timings[SimplificationStage.Model], timings[SimplificationStage.Completion], timings[SimplificationStage.QuotaRead],
-            timings[SimplificationStage.QuotaLock], timings[SimplificationStage.AgentHeaders], timings[SimplificationStage.AgentSession],
-            timings[SimplificationStage.AgentFirstOutput], timings[SimplificationStage.AgentFinalAnswer], timings[SimplificationStage.AgentTurnComplete]);
+            timings[SimplificationStage.QuotaLock], timings[SimplificationStage.ResponsesHeaders], timings[SimplificationStage.ResponsesComplete]);
     }
 });
 // Covers authentication, database work and model I/O. Leave a network margin

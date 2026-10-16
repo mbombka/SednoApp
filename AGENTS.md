@@ -17,7 +17,10 @@ Read README, existing code, and current dependencies before making changes.
 - Input: typing/pasting or camera → cropping → on-device OCR → manual editing.
   Maximum: 4,000 characters. Reject empty or whitespace-only input.
 - Photos must never leave the device.
-- Simplification through the backend; initially use a mock model.
+- Simplification through the backend using OpenAI Responses API.
+  Production settings: gpt-6-luna, reasoning.effort=none, service_tier=default,
+  store=false, no conversation/previous_response_id, 4096 output tokens, 8 s timeout.
+  Mock models require explicit Development configuration.
 - Full-screen result: Kopiuj, Pokaż oryginał, Nowy tekst.
 - Encrypted, local-only history with manual deletion and 7-day expiration.
   Never display expired entries; delete them on reads, startup, and resume.
@@ -38,6 +41,20 @@ Backend: C#, ASP.NET Core, a supported .NET LTS release, PostgreSQL.
 The backend stores secrets and verifies identity, subscriptions, and limits.
 Use an OpenAPI contract and separate development/production configurations.
 Mocks must be explicit and unavailable in production configurations.
+
+## Model implementation and benchmarks
+- The shared Git-versioned prompt is `backend/src/Sedno.Infrastructure/Prompts/simplify.pl.txt`.
+  Embed it in the Infrastructure assembly; application and benchmarks use `SimplificationPrompt`.
+  Keep the accepted prompt unchanged during migration; evaluate prompt changes separately.
+- `ResponsesClient` owns HTTP, validation and content-free metrics. Production
+  `OpenAiModelProvider` restricts settings; experimental models belong only in benchmarks.
+- Use `OpenAI:ApiKey` on the server. `OpenAI:AgentId` belongs only to benchmarks.
+- Agent adapters, streaming and session cleanup live in `backend/tools/Sedno.ModelBenchmark/Agents`.
+  The application must not reference the benchmark project or register an agent provider.
+- Preserve benchmark tools and historical reports. `--text-report` may explicitly
+  export built-in synthetic fixtures and results for review; never export application traffic.
+- Before retiring an agent deployment, stop its requests and run the benchmark with
+  `--live --cleanup-agent`. Review legacy untagged sessions separately.
 
 ## Security and Privacy
 Use HTTPS. Never include the model API key in the application.

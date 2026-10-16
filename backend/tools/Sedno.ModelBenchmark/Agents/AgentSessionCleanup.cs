@@ -5,7 +5,8 @@ using System.Text.Json;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Sedno.Infrastructure;
+using Sedno.Infrastructure;
+namespace Sedno.ModelBenchmark.Agents;
 
 public interface IAgentSessionCleanupQueue
 {

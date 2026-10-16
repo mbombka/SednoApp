@@ -1,15 +1,12 @@
 # Odbiór uproszczeń AI w Sedno
 
-Adapter: OpenAI GPT-6 Luna (`gpt-6-luna`), Responses API. Stan: adapter i testy
-z imitacją HTTP; sprawdzenie na prawdziwym modelu pozostaje do wykonania.
-Dostępność modelu potwierdzono w oficjalnej dokumentacji, a nie na koncie właściciela.
-Nie uznajemy testów imitowanego API za dowód jakości uproszczeń.
-
-Dostępny jest także tryb `openai-agent`: zapisany agent z OpenAI Platform,
-wybierany przez `OpenAI:AgentId`. W tym trybie instrukcja i model są zarządzane
-w konfiguracji agenta. Przed odbiorem zapisz wersję instrukcji i faktyczny model;
-nie zmieniaj ich w trakcie porównywanej próby. Testy imitacji HTTP nie potwierdzają
-dostępu do zapisanego agenta ani obsługi wybranego modelu na koncie.
+Adapter: OpenAI GPT-6 Luna (`gpt-6-luna`), Responses API, `service_tier=default`,
+`reasoning.effort=none`, `store=false`. Wyniki rzeczywistych prób z 16.10.2026 oraz
+syntetyczne wejścia i odpowiedzi są w
+[raporcie benchmarku](../backend/tools/Sedno.ModelBenchmark/results/2026-10-16.md).
+Użytkownik zaakceptował jakość tych próbek i wybrał tryb default. Nie jest to
+pełna ocena jakości ani odporności. Wspólny prompt pozostaje pod kontrolą Git.
+Agent jest dostępny wyłącznie do porównań w narzędziu benchmarkowym.
 
 ## Przygotowanie
 
@@ -49,20 +46,12 @@ cache, opłat regionalnych ani podatków.
 
 Przy odbiorze zapisz tylko numer syntetycznego przypadku, model, liczbę tokenów
 z pola `usage`, czas i ocenę. Nie włączaj logowania treści lub nagłówków.
-Pomiar wykonaj w kontrolowanym środowisku przez Responses API z takim samym
-żądaniem jak adapter. Adapter nie zapisuje odpowiedzi dostawcy ani pola `usage`
-i nie zmienia kontraktu aplikacji. Porównaj sumę z panelem kosztów projektu.
-Nie wykonano jeszcze pomiaru prawdziwych tokenów, czasu ani kosztów.
-
-Dla `openai-agent` użyj tego samego agenta i protokołu sesji co adapter, zamiast
-bezpośredniego Responses API. Meter `Sedno.OpenAI.Agents` udostępnia czas i tokeny
-zakończonych tur bez treści. Tokeny są orientacyjne i mogą być niekompletne;
-rozliczenia sprawdź w Platform Usage. Sprawdź usunięcie sesji po sukcesie i błędzie
-oraz ostrzeganie i ponawianie po nieudanym usunięciu. Potwierdź, że wynik wraca
-przed zakończeniem zablokowanego DELETE, a po restarcie backend odtwarza sprzątanie z listy oznaczonych
-sesji u dostawcy. Sprawdź limit 8 s dla AI, 9 s dla backendu i 10 s dla Fluttera,
-brak ponawiania HTTP 504 oraz anulowanie żądania HTTP po timeoutcie. Sesje są usuwane z API, więc ich późniejsza
-dostępność w panelu nie jest wymagana do monitorowania rozliczeń.
+Pomiar wykonaj wspólnym narzędziem benchmarkowym. `ResponsesClient` jest używany
+przez aplikację i benchmark, a Meter `Sedno.OpenAI.Responses` rejestruje czas,
+faktyczny tryb oraz orientacyjne tokeny bez treści. Rozliczenia sprawdź w Platform.
+Eksport wbudowanych tekstów syntetycznych do raportu wymaga jawnego `--text-report`.
+Nie eksportuj treści użytkowników aplikacji. Sprawdź limit 8 s dla AI, 9 s dla
+backendu i 10 s dla Fluttera, brak ponawiania HTTP 504 oraz anulowanie żądania.
 
 ## Dostępność i Android
 
@@ -71,9 +60,3 @@ i skalowanie tekstu. Przed publikacją konieczne są ręczne próby na Androidzi
 TalkBack, kolejność odczytu, duży tekst na ekranie wyniku, oknie informacji o AI,
 Historii i Koncie oraz aparat/OCR według procedury w `mobile/docs`.
 Sam przegląd kodu lub testy widgetów nie są pełnym audytem WCAG.
-
-Dla zapisanego agenta dodatkowo zatrzymaj strumień po kompletnej wiadomości
-`final_answer`, przed zakończeniem tury. Wynik ma wrócić i zostać naliczony raz,
-a sesja pozostać otwarta do końca tury. Późniejszy błąd lub timeout nie cofa
-oddanego wyniku; powinien uruchomić anulowanie/usunięcie sesji. Sprawdź zamknięcie
-czytnika podczas zatrzymania backendu oraz brak treści w logu finalizacji.

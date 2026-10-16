@@ -6,9 +6,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Sedno.Application;
 using Sedno.Infrastructure;
+using Sedno.ModelBenchmark.Agents;
 using Xunit;
 
-namespace Sedno.UnitTests;
+namespace Sedno.ModelBenchmark.Tests;
 
 public sealed class OpenAiAgentTests
 {
@@ -340,13 +341,13 @@ public sealed class OpenAiAgentTests
     {
         IConfiguration Config(params (string, string)[] pairs) => new ConfigurationBuilder().AddInMemoryCollection(
             pairs.ToDictionary(p => p.Item1, p => (string?)p.Item2)).Build();
-        Assert.Throws<InvalidOperationException>(() => new ServiceCollection().AddSednoModel(
-            Config(("Model:Provider", "openai-agent")), true));
+        Assert.Throws<InvalidOperationException>(() => new ServiceCollection().AddBenchmarkAgent(
+            Config(("Model:Provider", "openai-agent"))));
         Assert.Throws<InvalidOperationException>(() => Options("agent_../unsafe").Validate());
         Assert.Throws<InvalidOperationException>(() => new OpenAiAgentOptions { ApiKey = "test", AgentId = "agent_test", TimeoutSeconds = 26 }.Validate());
         var services = new ServiceCollection().AddSingleton<TimeProvider>(TimeProvider.System);
-        services.AddSednoModel(Config(("Model:Provider", "openai-agent"), ("OpenAI:ApiKey", "test-secret"),
-            ("OpenAI:AgentId", "agent_test")), false);
+        services.AddBenchmarkAgent(Config(("Model:Provider", "openai-agent"), ("OpenAI:ApiKey", "test-secret"),
+            ("OpenAI:AgentId", "agent_test")));
         services.AddSingleton<IAgentSessionCleanupQueue>(new Queue());
         using var container = services.BuildServiceProvider();
         using var scope = container.CreateScope();

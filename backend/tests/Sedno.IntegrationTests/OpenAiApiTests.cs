@@ -19,20 +19,25 @@ public sealed class OpenAiApiTests(BackendFixture fixture)
     {
         public int Calls;
         public string? Failure;
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken ct)
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken ct)
         {
             Calls++;
+            using var body = JsonDocument.Parse(await request.Content!.ReadAsStringAsync(ct));
+            Assert.Equal("default", body.RootElement.GetProperty("service_tier").GetString());
+            Assert.Equal(SimplificationPrompt.Text, body.RootElement.GetProperty("instructions").GetString());
+            Assert.False(body.RootElement.GetProperty("store").GetBoolean());
             if (Failure == "timeout") throw new TaskCanceledException("sensitive-upstream-error");
-            if (Failure == "incomplete") return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
-            { Content = new StringContent("{\"status\":\"incomplete\",\"output\":[]}") });
-            return Task.FromResult(new HttpResponseMessage(Failure is not null ? HttpStatusCode.TooManyRequests : HttpStatusCode.OK)
+            if (Failure == "incomplete") return new HttpResponseMessage(HttpStatusCode.OK)
+            { Content = new StringContent("{\"status\":\"incomplete\",\"output\":[]}") };
+            return new HttpResponseMessage(Failure is not null ? HttpStatusCode.TooManyRequests : HttpStatusCode.OK)
             {
                 Content = new StringContent(Failure is not null ? "sensitive-upstream-error" : JsonSerializer.Serialize(new
                 {
-                    status = "completed", output = new[] { new { type = "message", role = "assistant", status = "completed",
+                    status = "completed",
+                    output = new[] { new { type = "message", role = "assistant", status = "completed",
                         content = new[] { new { type = "output_text", text = "Nie płać 20 zł po 31.12.2026." } } } }
                 }))
-            });
+            };
         }
     }
 
@@ -49,7 +54,8 @@ public sealed class OpenAiApiTests(BackendFixture fixture)
             services.RemoveAll<IModelProvider>();
             var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
             {
-                ["Model:Provider"] = "openai", ["Model:OpenAI:ApiKey"] = "test-openai-secret"
+                ["Model:Provider"] = "openai",
+                ["OpenAI:ApiKey"] = "test-openai-secret"
             }).Build();
             services.AddSednoModel(config, isDevelopment: false);
             services.AddHttpClient("openai-model").ConfigurePrimaryHttpMessageHandler(() => upstream);
@@ -80,6 +86,7 @@ public sealed class OpenAiApiTests(BackendFixture fixture)
         using var failedDuplicate = await Submit("ai-failed");
         Assert.Equal(HttpStatusCode.Conflict, failedDuplicate.StatusCode);
         Assert.Equal(2, upstream.Calls);
+        Assert.Contains(fixture.Logs.Messages, line => line.Contains("ResponsesCompleteMs="));
         var logs = string.Join('\n', fixture.Logs.Messages);
         Assert.DoesNotContain(input, logs);
         Assert.DoesNotContain("Nie płać 20 zł", logs);

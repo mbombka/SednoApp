@@ -99,19 +99,13 @@ procesy Sklepu Play podlegają zasadom Google. Sedno korzysta z wyniku do ochron
 sesji gościa. Nie deklarować nieużywanych opcjonalnych kontroli innych aplikacji.
 [Opis danych Play Integrity](https://developer.android.com/google/play/integrity/terms#data-safety).
 
-**OpenAI — adapter zaimplementowany, wdrożenie niepotwierdzone:** GPT-6 Luna
-(`gpt-6-luna`) przez Responses API z `store=false` albo zapisany agent przez
-Agents API. Agents API przechowuje sesje z treścią i wynikiem. Backend usuwa je
-w tle, a nieudane próby ponawia na podstawie identyfikatorów w pamięci; nie ma
-tabeli kolejki. Po restarcie odczytuje od dostawcy sesje oznaczone jako uproszczenia
-Sedno i ponawia sprzątanie. Awaria lub niedostępność usuwania może opóźnić usunięcie.
-Wymagana jest operacyjna kontrola pozostałych sesji; nie deklarować
-przetwarzania efemerycznego. Domyślna konfiguracja produkcyjna
-nadal wyłącza uproszczanie. Dokumentacja
-API opisuje domyślny brak trenowania na danych, lecz nie gwarantuje zerowej
-retencji. Weryfikacja projektu i endpointu przed uruchomieniem jest konieczna.
-[Model](https://developers.openai.com/api/docs/models/gpt-6-luna),
-[zasady danych](https://developers.openai.com/api/docs/guides/your-data).
+**OpenAI:** aplikacja używa GPT-6 Luna (`gpt-6-luna`) przez Responses API z
+`store=false`, `service_tier=default`, bez historii rozmowy. Agents API pozostaje
+wyłącznie w narzędziu benchmarkowym dla testów syntetycznych. Domyślna konfiguracja
+backendu wybiera Responses i wymaga klucza po stronie serwera. Wdrożenie produkcyjne
+oraz retencję konta trzeba potwierdzić przed deklaracją w Google Play;
+`store=false` nie gwarantuje zerowej retencji dostawcy.
+[Zasady danych](https://developers.openai.com/api/docs/guides/your-data).
 
 **Hosting — plan:** Firebase; backend wymaga osobnego środowiska dla ASP.NET
 i bazy PostgreSQL. Usługi i regiony pozostają do wskazania; nie deklarować

@@ -1,7 +1,8 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Sedno.Infrastructure;
+using Sedno.Infrastructure;
+namespace Sedno.ModelBenchmark.Agents;
 
 // The host owns detached stream readers, including shutdown cancellation and disposal.
 public sealed class AgentStreamRunner(ILogger<AgentStreamRunner> logger) : IHostedService, IDisposable

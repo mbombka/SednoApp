@@ -14,6 +14,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sedno.UnitTests", "tests/Se
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sedno.IntegrationTests", "tests/Sedno.IntegrationTests/Sedno.IntegrationTests.csproj", "{11111111-1111-1111-1111-000000000006}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sedno.ModelBenchmark", "tools/Sedno.ModelBenchmark/Sedno.ModelBenchmark.csproj", "{4118637C-C6CB-40B1-86DB-AA11393B8345}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sedno.ModelBenchmark.Tests", "tests/Sedno.ModelBenchmark.Tests/Sedno.ModelBenchmark.Tests.csproj", "{11111111-1111-1111-1111-000000000008}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,5 +48,13 @@ Global
 		{11111111-1111-1111-1111-000000000006}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11111111-1111-1111-1111-000000000006}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{11111111-1111-1111-1111-000000000006}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4118637C-C6CB-40B1-86DB-AA11393B8345}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4118637C-C6CB-40B1-86DB-AA11393B8345}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4118637C-C6CB-40B1-86DB-AA11393B8345}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4118637C-C6CB-40B1-86DB-AA11393B8345}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11111111-1111-1111-1111-000000000008}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11111111-1111-1111-1111-000000000008}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11111111-1111-1111-1111-000000000008}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11111111-1111-1111-1111-000000000008}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

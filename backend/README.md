@@ -23,7 +23,7 @@ The development Compose database, user, and volume now use `sedno`; an existing
 development volume under the previous name is not connected automatically.
 Re-enter any local .NET user secrets under the new `sedno-backend-dev` secret ID.
 
-Instead of exported secrets, use `dotnet user-secrets set "Security:CredentialKey" "<base64-32-byte-key>" --project src/Sedno.Api` and similarly set `Security:FingerprintKey` and `ConnectionStrings:Postgres`. Environment variables use double underscores for nested keys. Never put keys or database passwords into tracked configuration. Production uses `appsettings.Production.json` and environment variables or a secret store. The API refuses to start with `Model:Provider=mock` outside Development.
+Instead of exported secrets, use `dotnet user-secrets set "Security:CredentialKey" "<base64-32-byte-key>" --project src/Sedno.Api` and similarly set `Security:FingerprintKey` and `ConnectionStrings:Postgres`. Environment variables use double underscores for nested keys. Never put keys or database passwords into tracked configuration. Production uses `appsettings.Production.json` and environment variables or a secret store. The API refuses to start with `Model:Provider=mock` outside Development. The default provider is `openai`; set `OpenAI:ApiKey` before starting, or explicitly select `Model:Provider=mock` in Development.
 
 For future schema changes, run `dotnet ef migrations add Name --project src/Sedno.Infrastructure --startup-project src/Sedno.Api --output-dir Migrations`, review the migration, then run `database update`. Production migrations should run as an explicit deployment step. The included initial migration creates the schema in an empty database.
 
@@ -35,7 +35,11 @@ For future schema changes, run `dotnet ef migrations add Name --project src/Sedn
 
 Production requires `Firebase:ProjectId`, `PlayIntegrity:PackageName`, and `PlayIntegrity:ServiceAccountJsonPath`. The path points to a service-account JSON file supplied by the deployment secret store, outside the repository. Enable Play Integrity for the app's Google Cloud project and link that project in Play Console. A guest request must carry a standard Play Integrity token whose request hash is Base64URL(SHA-256(UTF-8(`guest-session:` + installation ID))). The backend exchanges it at Google's decode endpoint and requires a matching package/hash, a verdict no older than five minutes, `PLAY_RECOGNIZED`, and `MEETS_DEVICE_INTEGRITY`. `PlayIntegrity:Provider=mock` is available only in Development and is rejected in production. Development uses it by default. A real package name and Play release setup are needed before production rollout.
 
-The development mock returns deterministic text prefixed `Wersja demonstracyjna:`. The OpenAI adapter uses GPT-6 Luna through the Responses API when explicitly enabled (see below). The default `Model:Provider=disabled` makes simplification return 503. The mock and disabled modes need no model key. The client should explain AI provider processing before the first submission and warn that generated text may contain errors. Photos and history have no upload endpoint.
+The explicit development mock returns text prefixed `Wersja demonstracyjna:`.
+The default provider is `openai`: GPT-6 Luna through stateless Responses API.
+`Model:Provider=disabled` remains an explicit maintenance mode returning 503.
+The client explains AI processing and warns about possible mistakes. Photos and
+history have no upload endpoint.
 
 The server counts Unicode grapheme clusters and rejects whitespace-only input or more than 4,000 clusters. It also caps HTTP bodies at 128 KiB. Errors use Problem Details with a stable `code` and Polish `title`. The basic rate limiter allows 60 requests per minute per remote IP, independently of daily quota. Configure a trusted reverse proxy to pass the real client IP before deploying at scale; do not trust arbitrary forwarded headers.
 
@@ -163,179 +167,89 @@ marked missing facts before production publication.
 
 ## OpenAI simplification
 
-There are two explicit modes: `openai-agent` uses a saved Platform Agent (setup
-below), and `openai` calls Responses API directly with code-managed instructions.
-The following Responses API settings apply only to `openai`.
+The application uses `Model:Provider=openai` in Development and Production.
+Set `OpenAI:ApiKey` using user secrets or environment variable `OpenAI__ApiKey`.
+There is one key name shared with benchmarks. The old `Model:OpenAI:ApiKey` is
+not read; migrate it to `OpenAI:ApiKey`. Never put keys in Flutter or tracked JSON.
 
-The adapter is implemented only on the backend; no model key belongs in Flutter,
-`--dart-define`, tracked JSON, screenshots or logs. Model availability is documented
-by [OpenAI](https://developers.openai.com/api/docs/models/gpt-6-luna); access and
-billing on your own project must still be checked. No live call was made as part
-of implementation.
-
-From `backend/`, configure the development API using local user secrets:
+From `backend/`:
 
 ```sh
-dotnet user-secrets set "Model:Provider" "openai" --project src/Sedno.Api
-# Enter the key without echoing it or including it literally in shell history.
 read -rsp 'OpenAI API key: ' SEDNO_OPENAI_KEY
 printf '\n'
-dotnet user-secrets set "Model:OpenAI:ApiKey" "$SEDNO_OPENAI_KEY" --project src/Sedno.Api
+dotnet user-secrets set "OpenAI:ApiKey" "$SEDNO_OPENAI_KEY" --project src/Sedno.Api
 unset SEDNO_OPENAI_KEY
+dotnet user-secrets set "Model:Provider" "openai" --project src/Sedno.Api
 ```
 
-Run the API with `ASPNETCORE_ENVIRONMENT=Development` and the database/security
-configuration from Local setup. User secrets override Development's mock setting.
-To return to the demo, set `Model:Provider` to `mock` in user secrets. Production
-requires a secret store/environment variables `Model__Provider=openai` and
-`Model__OpenAI__ApiKey`; it deliberately remains disabled in tracked configuration.
-Configure the mobile backend URL following the root README.
+For an offline Development demo explicitly set `Model:Provider=mock`.
+Production rejects mocks. Missing keys or unsupported model/settings fail startup.
+The deployed process must be restarted after changing environment/secrets.
 
-Defaults: `Model:OpenAI:Model=gpt-6-luna`, `MaxOutputTokens=4096` (allowed 256–8192),
-`TimeoutSeconds=8` (allowed 1–8). The API has a nine-second simplification deadline;
-Flutter has one ten-second end-to-end deadline, including retries and session access.
-HTTP 504 `simplification_timeout` is terminal and is not automatically retried.
-The Flutter HTTP request is aborted when its deadline expires. Only this
-model has been enabled; changing models requires evaluation and code review.
-Missing/invalid configuration fails startup. Requests have fixed HTTPS destination,
-no redirects, no tools, no automatic provider retries, `reasoning.effort=none`,
-`store=false`, and a 256 KiB upstream response cap. Input remains limited to 4,000
-grapheme clusters; empty, incomplete, refused, malformed or oversized output fails
-without returning partial results. Successful output is capped at 16,000 graphemes.
-Named-client HTTP loggers are disabled. Also exclude content and credentials in
-proxy/APM/outbound tracing at deployment.
+`Model:OpenAI` defaults: `Model=gpt-6-luna`, `ServiceTier=default`,
+`ReasoningEffort=none`, `MaxOutputTokens=4096`, `TimeoutSeconds=8`.
+Production validation allows only the accepted model, tier and reasoning setting.
+Token limits may be 256–8192 and timeout 1–8 s; defaults match the benchmark.
+Use the benchmark for experiments with other models or tiers.
 
-The developer instructions preserve meaning, numbers, amounts, dates, conditions
-and negations. User text is a separate user message and is explicitly treated as
-data, including embedded attempts to override instructions. This is a mitigation,
-not proof that a model always preserves meaning or resists prompt injection.
-A provider failure returns the existing sanitized 503 and releases the reservation;
-client cancellation retains the existing reservation-expiry policy. A retry of a
-failed request key is terminal; a new user attempt needs a new key. Provider costs
-may still occur after a timeout or disconnect.
+`OpenAiModelProvider` delegates to the same `ResponsesClient` used by the benchmark:
+HTTPS, no redirects, tools, automatic retries or conversation IDs; `store=false`.
+A separate user message carries the input. The 256 KiB upstream cap and validation
+reject empty, incomplete, refused, malformed and oversized responses. Output is
+limited to 16,000 graphemes, input to 4,000. Failures are sanitized; failed requests
+release quota through the existing service. The backend deadline remains 9 s and
+Flutter's end-to-end deadline 10 s. No mobile contract or database migration is needed.
 
-`store=false` disables response application-state storage, not all provider
-retention. Verify project data controls, contractual entity, regional eligibility
-and retention before deployment; see [OpenAI data controls](https://developers.openai.com/api/docs/guides/your-data).
-Run the [acceptance procedure](../docs/model-acceptance.pl.md) with synthetic texts
-before enabling real user traffic.
+The prompt is embedded from
+[`src/Sedno.Infrastructure/Prompts/simplify.pl.txt`](src/Sedno.Infrastructure/Prompts/simplify.pl.txt).
+`SimplificationPrompt.Text` and `.Sha256` expose its exact content and version hash.
+The migration preserves the current workspace prompt, including the corrected
+parcel number 887/6. Historical reports retain their original prompt hashes; the
+current hash is `31DA60C0D623E64C7FD6CEABFA9F69FADA2E8321CE839C8B8B37A2F21109DE02`.
+Future prompt revisions require separate evaluation. No prompt guarantees preservation
+of meaning or resistance to instructions embedded in user input.
 
-## Saved OpenAI Agent
+`store=false` disables response application-state storage, not all provider retention.
+Review the project's data controls and [OpenAI data guidance](https://developers.openai.com/api/docs/guides/your-data).
+No request/result content is persisted or logged by the application. Disable body
+capture in proxies/APM too. See [acceptance checks](../docs/model-acceptance.pl.md).
 
-Use this mode for the Agent created in OpenAI Platform → Agents → Setup agent.
-The backend reads the existing `OpenAI:ApiKey` and `OpenAI:AgentId` user secrets;
-it does not copy, replace or append to the saved agent's prompt or model.
-From the repository root, enable the mode:
+## Migration from the saved agent
 
-```sh
-dotnet user-secrets set "Model:Provider" "openai-agent" --project backend/src/Sedno.Api
-ASPNETCORE_ENVIRONMENT=Development dotnet run --project backend/src/Sedno.Api
-```
+The application no longer accepts `Model:Provider=openai-agent` and has no agent
+stream runner, session cleanup worker or `AgentId` dependency. The old adapter,
+stream handling and cleanup now live only in the [benchmark](tools/Sedno.ModelBenchmark/README.md),
+with tests in `tests/Sedno.ModelBenchmark.Tests`. Agent API integration tests for
+production routing were removed; Responses integration tests cover quota and privacy.
 
-This assumes PostgreSQL, migrations and the other Local setup secrets are ready.
-Keep the model and agreed Polish instructions in the saved agent. Change
-`OpenAI:AgentId` to switch agents, then restart the backend. Saved-agent prompt
-and model edits apply to new sessions without changing Flutter or backend code.
-Production remains disabled by default; enable via the deployment secret store:
-`Model__Provider=openai-agent`, `OpenAI__ApiKey`, `OpenAI__AgentId`.
-Missing/invalid key or agent ID fails startup. `OpenAI:TimeoutSeconds` defaults
-to 8 and accepts 1–8. The API deadline is nine seconds and the mobile deadline is
-ten seconds. Existing overrides above eight seconds must be reduced before restart.
-Normal cleanup runs in the background.
+Before retiring an existing agent deployment:
 
-The restricted application key needs `api.agents.read`, `api.agents.write` and
-`api.responses.write`. The Agents scopes also permit configuration management;
-use a dedicated Sedno project. See the [official quickstart](https://developers.openai.com/api/docs/guides/agents-api/quickstart).
-No live account/model-access verification is implied by mocked tests.
+1. Stop new requests to that deployment and let active agent requests finish.
+2. Keep `OpenAI:ApiKey` and `OpenAI:AgentId` available to the benchmark and run,
+   from the repository root:
+   `dotnet run --project backend/tools/Sedno.ModelBenchmark -- --live --cleanup-agent`.
+3. Require exit code 0. The tool recovers tagged Sedno sessions of that agent and
+   deletes them, respecting the existing minimum age. It creates no new sessions.
+   On failure, rerun it; review legacy untagged sessions separately in the provider.
+4. Change deployment secrets/environment to `Model__Provider=openai` and
+   `OpenAI__ApiKey`. Remove agent-only settings from the application deployment;
+   preserve them in user-secrets `sedno-model-benchmark` for local benchmark comparisons
+   if desired (see benchmark README). Restart the API.
 
-Each simplification creates a fresh session with `OpenAI-Beta: agents=v1` and
-the text in a separate user message in `input`. Conversation-only sessions
-require initial input; empty session creation is rejected by the live API.
-The adapter sends `stream=true` and receives the final answer and completed turn
-in that single POST response, with no status polling or items GET. It accepts
-the first validated, completed `final_answer` message for that turn and returns
-it immediately for quota completion and the HTTP response. Idle, EOF, commentary,
-reasoning, incomplete messages and refused output cannot produce a result.
-The host owns a detached reader that keeps the same HTTP stream open until the
-explicit turn-completed event or the original eight-second provider deadline.
-Request completion/disconnect after final-answer delivery does not cancel this
-reader. Shutdown cancels it and awaits disposal. A late failure, duplicate final
-answer, truncated stream or finalization timeout cannot retract an accepted result
-or refund its counted allowance; it schedules cancellation/deletion and emits a
-content-free finalization log. Completion usage metrics still come from the
-terminal turn event when available. SSE frames are capped at 256 KiB, the full stream at 4 MiB, and
-final text at 16,000 graphemes. The saved model and instructions are unchanged. The session
-overrides tools to an empty list, disables multi-agent delegation, selects plain
-text output and uses `environment.type=none`; model/instructions are inherited.
-HTTP redirects and named-client logging are disabled. There are no submission
-retries. Proxy/APM tracing must also exclude bodies, credentials and response text.
-Existing quota, idempotency and sanitized 503 behavior apply unchanged.
-
-Unlike the direct adapter, Agents API stores conversation state: there is no
-`store=false` guarantee here. The backend keeps an in-memory set of session IDs
-and retry times, with no cleanup table or migration. Tracking a session wakes the
-background service. Turn completion (after any early HTTP response) marks it ready
-for deletion; receiving the final answer alone does not. Failure,
-cancellation or timeout marks it for cancellation followed by deletion. The
-request never waits for that HTTP cleanup. Each cleanup attempt has a three-second
-budget; failures retry after 10, 20, 40 seconds, etc., capped at five minutes.
-When no sessions or recovery scans remain, the worker waits for a signal without
-polling the database or OpenAI. HTTP 404 counts as already cleaned up.
-
-At startup the worker lists sessions of the configured saved agent, following
-pagination. It only touches sessions with metadata
-`sedno_purpose=sedno-simplification-v1`, which this adapter sets on creation.
-It schedules recovered sessions no earlier than one minute after creation to
-avoid interrupting a request on another API replica. A lost create response also
-schedules a recovery scan. Failed scans retry with backoff. Recovery can issue
-idempotent cleanup calls from multiple replicas; active normal requests remain
-protected by the age threshold. Old unmarked sessions and sessions of previously
-configured agents require operator reconciliation. Use a dedicated Sedno project.
-
-The set is lost on restart; startup listing reconstructs it from OpenAI. There is
-no periodic global scan while idle, so leftovers from another failed replica can
-remain until a recovery scan/restart. Provider unavailability and a stopped backend
-can delay deletion. Monitor generic cleanup warnings. There is no durable delivery
-guarantee and API deletion does not promise immediate physical erasure.
-A lost session-creation response may leave submitted content at OpenAI without
-a session ID known to this backend. Do not retry creation automatically; include
-these sessions in operational reconciliation. API deletion does not promise
-immediate physical erasure. See [session deletion](https://developers.openai.com/api/docs/guides/agents-api/sessions/manage).
-Upstream HTTP failures log only the numeric status, without response bodies,
-URLs, submitted text, credentials or underlying exceptions.
-
-Content-free .NET metrics use Meter `Sedno.OpenAI.Agents`:
-`sedno.agent.duration` (seconds; `agent_id`, `outcome`) and `sedno.agent.tokens`
-(`agent_id`, `kind=input_tokens|output_tokens`). Token counts come from completed
-turns when available; missing/late usage and failed turns make these counters
-incomplete, not a final bill. Export this Meter through your monitoring system;
-no exporter or admin dashboard is deployed here. Use Platform Usage filtered to
-the Sedno project/key for provider billing. Session deletion removes the session
-from the API, so do not rely on retaining content-bearing traces for accounting.
-
+The tool cannot stop or reconfigure a remote deployment automatically. Agent recovery
+uses IDs in memory and provider listing; run it again if interrupted. Historical
+benchmark reports are preserved and describe the implementation at measurement time.
 
 ## Simplification latency diagnostics
 
-Each `/v1/simplifications` request emits one content-free `Czas upraszczania` log:
-`TotalMs`, `AuthMs`, `ReserveMs`, `ModelMs`, `CompleteMs`, `QuotaMs`, and
-`QuotaLockMs`. The lock timing includes topology/installation lookup and advisory
-lock acquisition and is a subset of reservation/completion, not an extra duration.
-For saved agents, `AgentHeadersMs`, `AgentSessionMs`, `AgentFirstOutputMs`,
-`AgentFinalAnswerMs` and `AgentTurnMs` are milestones measured from the start of
-the provider call. With early answer delivery, `ModelMs` ends at the final answer
-and `AgentTurnMs` is normally -1 in the HTTP log. Detached completion emits a
-separate `Koniec strumienia agenta` log with the same trace, terminal outcome and
-`FinalizationMs` elapsed since answer delivery. No request-scoped timings are
-mutated after publishing the result. They are cumulative, not additive. First output can include
-commentary; it does not establish a completed final answer. `-1` means the stage
-was not reached or does not apply. Trace is a request trace identifier, not a user,
-installation or OpenAI session ID. No submitted/generated text or credentials
-are included. Logging remains subject to your operational log retention policy.
+Request logs report content-free `TotalMs`, `AuthMs`, `ReserveMs`, `ModelMs`,
+`CompleteMs`, `QuotaMs`, `QuotaLockMs`, `ResponsesHeadersMs` and `ResponsesCompleteMs`.
+A missing milestone is -1. Responses milestones start at the provider call, while
+ModelMs measures the entire provider operation. Trace/status support correlation;
+no input, output, token credentials or session identifiers are logged.
 
-Compare several requests after startup. A slow first request can include JIT,
-EF initialization and connection setup. Large `ModelMs` identifies the upstream
-path (network plus provider processing), while its milestones distinguish early
-response/session setup from waiting for output and turn completion. They cannot
-separate provider queueing from inference or DNS/TLS without additional upstream
-telemetry. Cleanup HTTP is outside these foreground timings. Do not enable HTTP
-body logging or sensitive-data logging to investigate latency.
+Meter `Sedno.OpenAI.Responses` publishes `sedno.responses.duration` (seconds),
+tagged with outcome and actual service tier, and `sedno.responses.tokens`, tagged
+with input/output kind. Usage is best-effort and absent usage is not zero usage.
+The benchmark additionally prints per-call HTTP status, tier and token counts;
+see [benchmark instructions](tools/Sedno.ModelBenchmark/README.md).

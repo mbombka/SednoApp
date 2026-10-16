@@ -2,9 +2,10 @@ using System.Net;
 using System.Text.Json;
 using Microsoft.Extensions.Logging.Abstractions;
 using Sedno.Infrastructure;
+using Sedno.ModelBenchmark.Agents;
 using Xunit;
 
-namespace Sedno.UnitTests;
+namespace Sedno.ModelBenchmark.Tests;
 
 public sealed class AgentSessionCleanupTests
 {

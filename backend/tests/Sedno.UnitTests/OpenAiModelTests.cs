@@ -22,7 +22,8 @@ public sealed class OpenAiModelTests
     private static OpenAiModelOptions Options() => new() { ApiKey = "test-secret-never-log" };
     private static string Completed(string text) => JsonSerializer.Serialize(new
     {
-        status = "completed", output = new[] { new { type = "message", role = "assistant", status = "completed",
+        status = "completed",
+        output = new[] { new { type = "message", role = "assistant", status = "completed",
             content = new[] { new { type = "output_text", text } } } }
     });
     private static HttpResponseMessage Response(string body, HttpStatusCode status = HttpStatusCode.OK) =>
@@ -48,10 +49,10 @@ public sealed class OpenAiModelTests
             Assert.Equal("user", root.GetProperty("input")[0].GetProperty("role").GetString());
             Assert.Equal(input, root.GetProperty("input")[0].GetProperty("content").GetString());
             var instructions = root.GetProperty("instructions").GetString()!;
-            Assert.Contains("nigdy instrukcje", instructions);
-            Assert.Contains("liczby", instructions);
-            Assert.Contains("daty", instructions);
-            Assert.Contains("przeczenia", instructions);
+            Assert.Equal(SimplificationPrompt.Text, instructions);
+            Assert.Equal("default", root.GetProperty("service_tier").GetString());
+            Assert.False(root.TryGetProperty("previous_response_id", out _));
+            Assert.False(root.TryGetProperty("conversation", out _));
             Assert.DoesNotContain(input, instructions);
             Assert.False(root.TryGetProperty("tools", out _));
             return Response(Completed("Nie wpłacaj 12,50 zł po 31.12.2026."));
@@ -170,8 +171,11 @@ public sealed class OpenAiModelTests
         Assert.Throws<InvalidOperationException>(() => new OpenAiModelOptions { ApiKey = "test", TimeoutSeconds = 26 }.Validate());
         Assert.Throws<InvalidOperationException>(() => new OpenAiModelOptions { ApiKey = "test", MaxOutputTokens = 100000 }.Validate());
         Assert.Throws<InvalidOperationException>(() => new OpenAiModelOptions { ApiKey = "test", Model = "unverified" }.Validate());
+        Assert.Throws<InvalidOperationException>(() => new OpenAiModelOptions { ApiKey = "test", ServiceTier = "fast" }.Validate());
+        Assert.Throws<InvalidOperationException>(() => new OpenAiModelOptions { ApiKey = "test", ReasoningEffort = "low" }.Validate());
+        Assert.Throws<InvalidOperationException>(() => new ServiceCollection().AddSednoModel(Config(("Model:Provider", "openai-agent")), true));
         var services = new ServiceCollection().AddSingleton<TimeProvider>(TimeProvider.System);
-        services.AddSednoModel(Config(("Model:Provider", "openai"), ("Model:OpenAI:ApiKey", "test")), false);
+        services.AddSednoModel(Config(("Model:Provider", "openai"), ("OpenAI:ApiKey", "test")), false);
         using var provider = services.BuildServiceProvider();
         using var scope = provider.CreateScope();
         Assert.IsType<OpenAiModelProvider>(scope.ServiceProvider.GetRequiredService<IModelProvider>());

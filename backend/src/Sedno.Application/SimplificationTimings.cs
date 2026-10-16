@@ -3,7 +3,7 @@ namespace Sedno.Application;
 public enum SimplificationStage
 {
     Authentication, Reservation, Model, Completion, QuotaRead, QuotaLock,
-    AgentHeaders, AgentSession, AgentFirstOutput, AgentFinalAnswer, AgentTurnComplete
+    ResponsesHeaders, ResponsesComplete
 }
 
 // Per-request durations only. Never accepts content, credentials or session IDs.
