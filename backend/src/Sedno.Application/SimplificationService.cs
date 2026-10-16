@@ -9,7 +9,7 @@ public sealed class InputValidationException(string code, string message) : Exce
     public string Code { get; } = code;
 }
 
-public sealed class SimplificationService(IUsageStore usage, IModelProvider model, TimeProvider clock, byte[] fingerprintKey)
+public sealed class SimplificationService(IUsageStore usage, IModelProvider model, TimeProvider clock, byte[] fingerprintKey, SimplificationTimings? timings = null)
 {
     public static void Validate(SimplificationInput input)
     {
@@ -27,10 +27,16 @@ public sealed class SimplificationService(IUsageStore usage, IModelProvider mode
     {
         Validate(input);
         var fingerprint = Convert.ToHexString(HMACSHA256.HashData(fingerprintKey, Encoding.UTF8.GetBytes(input.Text)));
-        var reservation = await usage.ReserveAsync(identityId, input.RequestId, fingerprint, cancellationToken);
+        ReservationOutcome reservation;
+        using (timings?.Measure(SimplificationStage.Reservation))
+            reservation = await usage.ReserveAsync(identityId, input.RequestId, fingerprint, cancellationToken);
         if (reservation.Kind != "reserved") return (reservation.Kind, null, reservation.Quota);
         string output;
-        try { output = await model.SimplifyAsync(input.Text, cancellationToken); }
+        try
+        {
+            using (timings?.Measure(SimplificationStage.Model))
+                output = await model.SimplifyAsync(input.Text, cancellationToken);
+        }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
             // A client disconnect does not prove the provider failed. The reservation expires later.
@@ -46,9 +52,14 @@ public sealed class SimplificationService(IUsageStore usage, IModelProvider mode
             await usage.FailAsync(identityId, input.RequestId, CancellationToken.None);
             return ("provider_failed", null, await usage.GetQuotaAsync(identityId, CancellationToken.None));
         }
-        if (!await usage.CompleteAsync(identityId, input.RequestId, cancellationToken))
+        bool completed;
+        using (timings?.Measure(SimplificationStage.Completion))
+            completed = await usage.CompleteAsync(identityId, input.RequestId, cancellationToken);
+        if (!completed)
             return ("expired", null, await usage.GetQuotaAsync(identityId, cancellationToken));
-        var quota = await usage.GetQuotaAsync(identityId, cancellationToken);
+        QuotaDto quota;
+        using (timings?.Measure(SimplificationStage.QuotaRead))
+            quota = await usage.GetQuotaAsync(identityId, cancellationToken);
         return ("succeeded", new(new(input.RequestId, output, clock.GetUtcNow()), quota), quota);
     }
 }

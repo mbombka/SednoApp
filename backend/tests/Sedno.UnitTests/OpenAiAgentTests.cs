@@ -54,19 +54,23 @@ public sealed class OpenAiAgentTests
     {
         public List<string> Tracked { get; } = [];
         public List<string> Ready { get; } = [];
+        public TaskCompletionSource Readied = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        public bool CancelRequested;
         public Task TrackAsync(string id, CancellationToken ct)
         {
             Assert.False(ct.IsCancellationRequested);
+            Readied = new(TaskCreationOptions.RunContinuationsAsynchronously);
             Tracked.Add(id); return Task.CompletedTask;
         }
         public Task ReadyAsync(string id, CancellationToken ct, bool cancel = false)
         {
             Assert.False(ct.IsCancellationRequested);
-            Ready.Add(id); return Task.CompletedTask;
+            CancelRequested = cancel;
+            Ready.Add(id); Readied.TrySetResult(); return Task.CompletedTask;
         }
     }
     private static OpenAiAgentProvider Provider(HttpClient client, TimeProvider? clock = null, Queue? queue = null) =>
-        new(client, Options(), clock ?? TimeProvider.System, NullLogger<OpenAiAgentProvider>.Instance, queue ?? new Queue());
+        new(client, Options(), clock ?? TimeProvider.System, NullLogger<OpenAiAgentProvider>.Instance, queue ?? new Queue(), new AgentStreamRunner(NullLogger<AgentStreamRunner>.Instance));
 
     [Theory]
     [InlineData("Tekst do uproszczenia")]
@@ -78,7 +82,9 @@ public sealed class OpenAiAgentTests
         var queue = new Queue();
         var provider = Provider(client, queue: queue);
         Assert.Equal("Prosty tekst", await provider.SimplifyAsync(input, default));
+        await queue.Readied.Task.WaitAsync(TimeSpan.FromSeconds(5));
         Assert.Equal("Prosty tekst", await provider.SimplifyAsync(input, default));
+        await queue.Readied.Task.WaitAsync(TimeSpan.FromSeconds(5));
         Assert.Equal(new[] { "POST", "POST" }, handler.Requests.Select(r => r.Method));
         Assert.Equal(2, queue.Tracked.Count);
         Assert.Equal(queue.Tracked, queue.Ready);
@@ -100,10 +106,10 @@ public sealed class OpenAiAgentTests
     [InlineData("cancelled")]
     [InlineData("idle")]
     [InlineData("in_progress")]
-    public async Task PartialTextAndUnsuccessfulTurnNeverReturnResult(string state)
+    public async Task UnsuccessfulTurnWithoutFinalAnswerNeverReturnsResult(string state)
     {
         var handler = new Handler { Respond = (r, _) => r.Method == HttpMethod.Post
-            ? Stream(Created + Item() + Completed(state)) : Handler.Default(r) };
+            ? Stream(Created + Completed(state)) : Handler.Default(r) };
         using var client = new HttpClient(handler);
         await Assert.ThrowsAsync<ModelProviderException>(() => Provider(client).SimplifyAsync("Tekst", default));
         Assert.DoesNotContain(handler.Requests, r => r.Method == "DELETE");
@@ -209,6 +215,7 @@ public sealed class OpenAiAgentTests
             await Assert.ThrowsAsync<OperationCanceledException>(() => Provider(client, clock, queue).SimplifyAsync("Tekst", cancellation.Token));
         else
             await Assert.ThrowsAsync<SimplificationTimeoutException>(() => Provider(client, clock, queue).SimplifyAsync("Tekst", cancellation.Token));
+        await queue.Readied.Task.WaitAsync(TimeSpan.FromSeconds(5));
         Assert.DoesNotContain(handler.Requests, r => r.Method == "DELETE");
         Assert.Single(queue.Tracked);
         Assert.Equal(queue.Tracked, queue.Ready);
@@ -242,12 +249,78 @@ public sealed class OpenAiAgentTests
     }
 
     [Fact]
-    public async Task RejectsMultipleFinalAnswers()
+    public async Task ExtraFinalAnswerAfterDeliveryDoesNotRetractFirstResult()
     {
         var handler = new Handler { Respond = (r, _) => r.Method == HttpMethod.Post
             ? Stream(Created + Item() + Item() + Completed()) : Handler.Default(r) };
         using var client = new HttpClient(handler);
-        await Assert.ThrowsAsync<ModelProviderException>(() => Provider(client).SimplifyAsync("Tekst", default));
+        var queue = new Queue();
+        Assert.Equal("Prosty tekst", await Provider(client, queue: queue).SimplifyAsync("Tekst", default));
+        await queue.Readied.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        Assert.True(queue.CancelRequested);
+    }
+
+    private sealed class PausedStream(string prefix, Task<byte[]> tail) : Stream
+    {
+        private readonly MemoryStream _prefix = new(System.Text.Encoding.UTF8.GetBytes(prefix));
+        private MemoryStream? _tail;
+        public bool Disposed;
+        public override bool CanRead => true;
+        public override bool CanSeek => false;
+        public override bool CanWrite => false;
+        public override long Length => throw new NotSupportedException();
+        public override long Position { get => throw new NotSupportedException(); set => throw new NotSupportedException(); }
+        public override async ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken ct = default)
+        {
+            var count = await _prefix.ReadAsync(buffer, ct);
+            if (count > 0) return count;
+            _tail ??= new MemoryStream(await tail.WaitAsync(ct));
+            return await _tail.ReadAsync(buffer, ct);
+        }
+        protected override void Dispose(bool disposing)
+        {
+            Disposed = true; _prefix.Dispose(); _tail?.Dispose(); base.Dispose(disposing);
+        }
+        public override int Read(byte[] b, int o, int c) => throw new NotSupportedException();
+        public override void Flush() => throw new NotSupportedException();
+        public override long Seek(long o, SeekOrigin s) => throw new NotSupportedException();
+        public override void SetLength(long v) => throw new NotSupportedException();
+        public override void Write(byte[] b, int o, int c) => throw new NotSupportedException();
+    }
+
+    [Theory]
+    [InlineData("completed")]
+    [InlineData("failed")]
+    [InlineData("timeout")]
+    [InlineData("shutdown")]
+    public async Task DeliversFinalAnswerBeforeTurnEndsAndKeepsStreamAliveUntilFinalization(string ending)
+    {
+        using var cancellation = new CancellationTokenSource();
+        var tail = new TaskCompletionSource<byte[]>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var stream = new PausedStream(Created + Item(), tail.Task);
+        var handler = new Handler { Respond = (_, _) =>
+        {
+            var response = new HttpResponseMessage(HttpStatusCode.OK) { Content = new StreamContent(stream) };
+            response.Content.Headers.ContentType = new("text/event-stream");
+            return response;
+        } };
+        using var client = new HttpClient(handler);
+        using var runner = new AgentStreamRunner(NullLogger<AgentStreamRunner>.Instance);
+        var clock = new Clock();
+        var queue = new Queue();
+        var provider = new OpenAiAgentProvider(client, Options(), clock, NullLogger<OpenAiAgentProvider>.Instance, queue, runner);
+        Assert.Equal("Prosty tekst", await provider.SimplifyAsync("Tekst", cancellation.Token).WaitAsync(TimeSpan.FromSeconds(5)));
+        Assert.False(stream.Disposed);
+        Assert.Empty(queue.Ready); // No DELETE/cancellation can be scheduled before the terminal event.
+        cancellation.Cancel(); // HTTP request ending must not abort background finalization.
+        Assert.False(stream.Disposed);
+        if (ending == "timeout") clock.Timeout!();
+        else if (ending == "shutdown") await runner.StopAsync(default);
+        else tail.SetResult(System.Text.Encoding.UTF8.GetBytes(Completed(ending)));
+        await queue.Readied.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        Assert.True(stream.Disposed);
+        Assert.Equal(ending != "completed", queue.CancelRequested);
+        Assert.Single(queue.Ready);
     }
 
     [Theory]

@@ -14,6 +14,7 @@ var connectionString = builder.Configuration.GetConnectionString("Postgres");
 if (string.IsNullOrWhiteSpace(connectionString)) throw new InvalidOperationException("ConnectionStrings:Postgres is required.");
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
 builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddScoped<SimplificationTimings>();
 builder.Services.AddScoped<IUsageStore, UsageStore>();
 var dataProtection = builder.Services.AddDataProtection().SetApplicationName("Sedno");
 builder.Services.AddScoped<SubscriptionService>();
@@ -99,7 +100,7 @@ builder.Services.AddScoped<GuestStore>(sp => new(sp.GetRequiredService<AppDbCont
     sp.GetRequiredService<IIdentityAccountDeletion>()));
 builder.Services.AddScoped<IGuestStore>(sp => sp.GetRequiredService<GuestStore>());
 builder.Services.AddScoped<SimplificationService>(sp => new(sp.GetRequiredService<IUsageStore>(),
-    sp.GetRequiredService<IModelProvider>(), sp.GetRequiredService<TimeProvider>(), fingerprintKey));
+    sp.GetRequiredService<IModelProvider>(), sp.GetRequiredService<TimeProvider>(), fingerprintKey, sp.GetRequiredService<SimplificationTimings>()));
 builder.Services.AddSednoModel(builder.Configuration, builder.Environment.IsDevelopment());
 
 builder.Services.AddRateLimiter(options =>
@@ -120,6 +121,29 @@ builder.Services.AddRateLimiter(options =>
 });
 
 var app = builder.Build();
+// Content-free stage breakdown for each simplification, including authentication.
+app.Use(async (context, next) =>
+{
+    if (context.Request.Path != "/v1/simplifications") { await next(context); return; }
+    var clock = context.RequestServices.GetRequiredService<TimeProvider>();
+    var timings = context.RequestServices.GetRequiredService<SimplificationTimings>();
+    var started = clock.GetTimestamp();
+    try { await next(context); }
+    finally
+    {
+        app.Logger.LogInformation(
+            "Czas upraszczania Trace={Trace} Status={Status} TotalMs={TotalMs:F1} AuthMs={AuthMs:F1} " +
+            "ReserveMs={ReserveMs:F1} ModelMs={ModelMs:F1} CompleteMs={CompleteMs:F1} QuotaMs={QuotaMs:F1} " +
+            "QuotaLockMs={QuotaLockMs:F1} AgentHeadersMs={AgentHeadersMs:F1} AgentSessionMs={AgentSessionMs:F1} " +
+            "AgentFirstOutputMs={AgentFirstOutputMs:F1} AgentFinalAnswerMs={AgentFinalAnswerMs:F1} AgentTurnMs={AgentTurnMs:F1}",
+            System.Diagnostics.Activity.Current?.TraceId.ToString() ?? context.TraceIdentifier,
+            context.Response.StatusCode, clock.GetElapsedTime(started).TotalMilliseconds,
+            timings[SimplificationStage.Authentication], timings[SimplificationStage.Reservation],
+            timings[SimplificationStage.Model], timings[SimplificationStage.Completion], timings[SimplificationStage.QuotaRead],
+            timings[SimplificationStage.QuotaLock], timings[SimplificationStage.AgentHeaders], timings[SimplificationStage.AgentSession],
+            timings[SimplificationStage.AgentFirstOutput], timings[SimplificationStage.AgentFinalAnswer], timings[SimplificationStage.AgentTurnComplete]);
+    }
+});
 // Covers authentication, database work and model I/O. Leave a network margin
 // before the mobile client's single 10-second end-to-end deadline.
 app.Use(async (context, next) =>
@@ -168,6 +192,8 @@ app.Use(async (context, next) =>
     if (context.Request.Path.StartsWithSegments("/v1") &&
         !string.Equals(context.Request.Path.Value, "/v1/guest-sessions", StringComparison.OrdinalIgnoreCase))
     {
+        using var authentication = context.Request.Path == "/v1/simplifications"
+            ? context.RequestServices.GetRequiredService<SimplificationTimings>().Measure(SimplificationStage.Authentication) : null;
         var authorization = context.Request.Headers.Authorization.ToString();
         if (!authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase) ||
             await context.RequestServices.GetRequiredService<IGuestStore>()

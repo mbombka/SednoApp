@@ -186,6 +186,9 @@ paths:
     post:
       operationId: simplifyText
       description: >-
+        In saved-agent mode, a validated completed final_answer is accepted before
+        the agent turn finishes. Later upstream failures do not retract the result
+        or refund the successful quota use; session finalization continues in background.
         The server deadline is 9 seconds. HTTP 504 uses code simplification_timeout
         and must not be automatically retried.
         requestId is unique per authenticated identity. Active duplicates return

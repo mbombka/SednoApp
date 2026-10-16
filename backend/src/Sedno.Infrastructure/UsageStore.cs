@@ -4,7 +4,7 @@ using Sedno.Domain;
 
 namespace Sedno.Infrastructure;
 
-public sealed class UsageStore(AppDbContext db, IEntitlementResolver entitlements, TimeProvider clock) : IUsageStore
+public sealed class UsageStore(AppDbContext db, IEntitlementResolver entitlements, TimeProvider clock, SimplificationTimings? timings = null) : IUsageStore
 {
     private static readonly TimeSpan ReservationLife = TimeSpan.FromMinutes(5);
 
@@ -116,6 +116,7 @@ public sealed class UsageStore(AppDbContext db, IEntitlementResolver entitlement
 
     private async Task LockAsync(Guid identityId, CancellationToken ct)
     {
+        using var measurement = timings?.Measure(SimplificationStage.QuotaLock);
         // Shared topology lock: quota operations run concurrently. Linking/deletion
         // take its exclusive counterpart while changing which installations share usage.
         await db.Database.ExecuteSqlRawAsync("SELECT pg_advisory_xact_lock_shared(1748392201)", ct);

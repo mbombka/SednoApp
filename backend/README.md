@@ -253,9 +253,17 @@ the text in a separate user message in `input`. Conversation-only sessions
 require initial input; empty session creation is rejected by the live API.
 The adapter sends `stream=true` and receives the final answer and completed turn
 in that single POST response, with no status polling or items GET. It accepts
-one completed `final_answer` message for that turn and waits for the explicit
-turn-completed event. Idle, EOF, commentary, reasoning and partial output are
-not success. SSE frames are capped at 256 KiB, the full stream at 4 MiB, and
+the first validated, completed `final_answer` message for that turn and returns
+it immediately for quota completion and the HTTP response. Idle, EOF, commentary,
+reasoning, incomplete messages and refused output cannot produce a result.
+The host owns a detached reader that keeps the same HTTP stream open until the
+explicit turn-completed event or the original eight-second provider deadline.
+Request completion/disconnect after final-answer delivery does not cancel this
+reader. Shutdown cancels it and awaits disposal. A late failure, duplicate final
+answer, truncated stream or finalization timeout cannot retract an accepted result
+or refund its counted allowance; it schedules cancellation/deletion and emits a
+content-free finalization log. Completion usage metrics still come from the
+terminal turn event when available. SSE frames are capped at 256 KiB, the full stream at 4 MiB, and
 final text at 16,000 graphemes. The saved model and instructions are unchanged. The session
 overrides tools to an empty list, disables multi-agent delegation, selects plain
 text output and uses `environment.type=none`; model/instructions are inherited.
@@ -266,7 +274,8 @@ Existing quota, idempotency and sanitized 503 behavior apply unchanged.
 Unlike the direct adapter, Agents API stores conversation state: there is no
 `store=false` guarantee here. The backend keeps an in-memory set of session IDs
 and retry times, with no cleanup table or migration. Tracking a session wakes the
-background service. Completion marks it ready for immediate deletion; failure,
+background service. Turn completion (after any early HTTP response) marks it ready
+for deletion; receiving the final answer alone does not. Failure,
 cancellation or timeout marks it for cancellation followed by deletion. The
 request never waits for that HTTP cleanup. Each cleanup attempt has a three-second
 budget; failures retry after 10, 20, 40 seconds, etc., capped at five minutes.
@@ -303,3 +312,30 @@ incomplete, not a final bill. Export this Meter through your monitoring system;
 no exporter or admin dashboard is deployed here. Use Platform Usage filtered to
 the Sedno project/key for provider billing. Session deletion removes the session
 from the API, so do not rely on retaining content-bearing traces for accounting.
+
+
+## Simplification latency diagnostics
+
+Each `/v1/simplifications` request emits one content-free `Czas upraszczania` log:
+`TotalMs`, `AuthMs`, `ReserveMs`, `ModelMs`, `CompleteMs`, `QuotaMs`, and
+`QuotaLockMs`. The lock timing includes topology/installation lookup and advisory
+lock acquisition and is a subset of reservation/completion, not an extra duration.
+For saved agents, `AgentHeadersMs`, `AgentSessionMs`, `AgentFirstOutputMs`,
+`AgentFinalAnswerMs` and `AgentTurnMs` are milestones measured from the start of
+the provider call. With early answer delivery, `ModelMs` ends at the final answer
+and `AgentTurnMs` is normally -1 in the HTTP log. Detached completion emits a
+separate `Koniec strumienia agenta` log with the same trace, terminal outcome and
+`FinalizationMs` elapsed since answer delivery. No request-scoped timings are
+mutated after publishing the result. They are cumulative, not additive. First output can include
+commentary; it does not establish a completed final answer. `-1` means the stage
+was not reached or does not apply. Trace is a request trace identifier, not a user,
+installation or OpenAI session ID. No submitted/generated text or credentials
+are included. Logging remains subject to your operational log retention policy.
+
+Compare several requests after startup. A slow first request can include JIT,
+EF initialization and connection setup. Large `ModelMs` identifies the upstream
+path (network plus provider processing), while its milestones distinguish early
+response/session setup from waiting for output and turn completion. They cannot
+separate provider queueing from inference or DNS/TLS without additional upstream
+telemetry. Cleanup HTTP is outside these foreground timings. Do not enable HTTP
+body logging or sensitive-data logging to investigate latency.

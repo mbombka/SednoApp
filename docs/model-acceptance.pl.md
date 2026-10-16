@@ -71,3 +71,9 @@ i skalowanie tekstu. Przed publikacją konieczne są ręczne próby na Androidzi
 TalkBack, kolejność odczytu, duży tekst na ekranie wyniku, oknie informacji o AI,
 Historii i Koncie oraz aparat/OCR według procedury w `mobile/docs`.
 Sam przegląd kodu lub testy widgetów nie są pełnym audytem WCAG.
+
+Dla zapisanego agenta dodatkowo zatrzymaj strumień po kompletnej wiadomości
+`final_answer`, przed zakończeniem tury. Wynik ma wrócić i zostać naliczony raz,
+a sesja pozostać otwarta do końca tury. Późniejszy błąd lub timeout nie cofa
+oddanego wyniku; powinien uruchomić anulowanie/usunięcie sesji. Sprawdź zamknięcie
+czytnika podczas zatrzymania backendu oraz brak treści w logu finalizacji.

@@ -44,10 +44,10 @@ public sealed class OpenAiAgentApiTests(BackendFixture fixture)
                 var sessionId = "sess_" + Guid.NewGuid().ToString("N");
                 string Event(object value) => "data: " + JsonSerializer.Serialize(value) + "\n\n";
                 var data = Event(new { type = "agent.session.created", session = new { id = sessionId } }) +
-                    Event(new { type = "agent.session.turn.item.done", session_id = sessionId, turn_id = "turn_test",
+                    (Failure == "failed" ? "" : Event(new { type = "agent.session.turn.item.done", session_id = sessionId, turn_id = "turn_test",
                         item = new { type = "message", role = "assistant", phase = "final_answer", status = "completed",
-                            turn_id = "turn_test", content = new[] { new { type = "output_text", text = "Dostarcz dokumenty do 20 listopada." } } } }) +
-                    Event(new { type = Failure == "failed" ? "agent.session.turn.failed" : "agent.session.turn.completed",
+                            turn_id = "turn_test", content = new[] { new { type = "output_text", text = "Dostarcz dokumenty do 20 listopada." } } } })) +
+                    Event(new { type = Failure is "failed" or "late" ? "agent.session.turn.failed" : "agent.session.turn.completed",
                         session_id = sessionId, turn_id = "turn_test", turn = new { id = "turn_test", status = "completed" } });
                 return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
                     { Content = new StringContent(data, System.Text.Encoding.UTF8, "text/event-stream") });
@@ -62,6 +62,7 @@ public sealed class OpenAiAgentApiTests(BackendFixture fixture)
     [InlineData("http")]
     [InlineData("timeout")]
     [InlineData("failed")]
+    [InlineData("late")]
     public async Task AgentAdapterPreservesQuotaIdempotencyAndContentPrivacy(string failure)
     {
         fixture.Clock.Set(new(2026, 10, 14, 12, 0, 0, TimeSpan.Zero));
@@ -97,17 +98,19 @@ public sealed class OpenAiAgentApiTests(BackendFixture fixture)
         Assert.Equal(1, upstream.Submissions);
         upstream.Failure = failure;
         using var failed = await Submit("agent-failed");
-        Assert.Equal(HttpStatusCode.ServiceUnavailable, failed.StatusCode);
+        Assert.Equal(failure == "late" ? HttpStatusCode.OK : HttpStatusCode.ServiceUnavailable, failed.StatusCode);
         Assert.DoesNotContain("sensitive-agent-error", await failed.Content.ReadAsStringAsync());
         using var quota = JsonDocument.Parse(await client.GetStringAsync("/v1/quota"));
-        Assert.Equal(4, quota.RootElement.GetProperty("remaining").GetInt32());
+        Assert.Equal(failure == "late" ? 3 : 4, quota.RootElement.GetProperty("remaining").GetInt32());
         using var retry = await Submit("agent-failed");
         Assert.Equal(HttpStatusCode.Conflict, retry.StatusCode);
         Assert.Equal(2, upstream.Submissions);
-        var expected = failure == "failed" ? 2 : 1;
+        var expected = failure is "failed" or "late" ? 2 : 1;
         using var wait = new CancellationTokenSource(TimeSpan.FromSeconds(10));
         while (Volatile.Read(ref upstream.Deletions) < expected) await Task.Delay(20, wait.Token);
         Assert.Equal(expected, upstream.Deletions);
+        Assert.Contains(fixture.Logs.Messages, line => line.Contains("Czas upraszczania") &&
+            line.Contains("ModelMs=") && line.Contains("AgentFinalAnswerMs="));
         var logs = string.Join('\n', fixture.Logs.Messages);
         foreach (var sensitive in new[] { text, "Dostarcz dokumenty do 20 listopada.", "test-agent-secret",
             "sensitive-agent-error", token!, "https://api.openai.com/v1/agents" })

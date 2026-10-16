@@ -40,9 +40,11 @@ public sealed class OpenAiAgentProvider : IModelProvider
     private readonly TimeProvider _clock;
     private readonly ILogger<OpenAiAgentProvider> _logger;
     private readonly IAgentSessionCleanupQueue _cleanup;
+    private readonly SimplificationTimings? _timings;
+    private readonly AgentStreamRunner _streams;
 
     public OpenAiAgentProvider(HttpClient client, OpenAiAgentOptions options, TimeProvider clock,
-        ILogger<OpenAiAgentProvider> logger, IAgentSessionCleanupQueue cleanup)
+        ILogger<OpenAiAgentProvider> logger, IAgentSessionCleanupQueue cleanup, AgentStreamRunner streams, SimplificationTimings? timings = null)
     {
         options.Validate();
         _client = client;
@@ -50,17 +52,40 @@ public sealed class OpenAiAgentProvider : IModelProvider
         _clock = clock;
         _logger = logger;
         _cleanup = cleanup;
+        _timings = timings;
+        _streams = streams;
     }
 
     public async Task<string> SimplifyAsync(string text, CancellationToken cancellationToken)
     {
         SimplificationService.Validate(new("agent", text));
         cancellationToken.ThrowIfCancellationRequested();
+        var answer = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
+        _streams.Run(stopping => ConsumeAsync(text, cancellationToken, stopping, answer));
+        try { return await answer.Task.WaitAsync(cancellationToken); }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw new OperationCanceledException(cancellationToken);
+        }
+    }
+
+    private async Task ConsumeAsync(string text, CancellationToken cancellationToken, CancellationToken stoppingToken,
+        TaskCompletionSource<string> answer)
+    {
+        var gate = new object();
+        var delivered = false;
+        using var requestLifetime = new CancellationTokenSource();
+        using var registration = cancellationToken.Register(() =>
+        {
+            lock (gate) { if (!delivered) requestLifetime.Cancel(); }
+        });
         var started = _clock.GetTimestamp();
+        long? finalAt = null;
+        var trace = System.Diagnostics.Activity.Current?.TraceId.ToString();
         var outcome = "failed";
         string? sessionId = null;
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(_options.TimeoutSeconds), _clock);
-        using var linked = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeout.Token);
+        using var linked = CancellationTokenSource.CreateLinkedTokenSource(requestLifetime.Token, timeout.Token, stoppingToken);
         try
         {
             // Conversation-only sessions require initial input. Do not retry a lost
@@ -80,6 +105,7 @@ public sealed class OpenAiAgentProvider : IModelProvider
                     text = new { format = new { type = "text" } }
                 }
             }, linked.Token);
+            _timings?.Milestone(SimplificationStage.AgentHeaders, started);
             if (response.Content.Headers.ContentType?.MediaType != "text/event-stream")
                 throw new ModelProviderException();
             using var stream = await response.Content.ReadAsStreamAsync(linked.Token);
@@ -96,6 +122,7 @@ public sealed class OpenAiAgentProvider : IModelProvider
                     var id = root.GetProperty("session").GetProperty("id").GetString();
                     if (!SafeId(id) || sessionId is not null) throw new ModelProviderException();
                     sessionId = id;
+                    _timings?.Milestone(SimplificationStage.AgentSession, started);
                     await _cleanup.TrackAsync(id!, CancellationToken.None);
                     continue;
                 }
@@ -110,6 +137,9 @@ public sealed class OpenAiAgentProvider : IModelProvider
                 }
                 switch (type)
                 {
+                    case "agent.session.turn.output_text.delta":
+                        if (!delivered) _timings?.Milestone(SimplificationStage.AgentFirstOutput, started);
+                        break;
                     case "agent.session.turn.item.done":
                         var item = root.GetProperty("item");
                         if (item.GetProperty("type").GetString() == "message" &&
@@ -118,6 +148,16 @@ public sealed class OpenAiAgentProvider : IModelProvider
                         {
                             if (result is not null || turnId is null) throw new ModelProviderException();
                             result = ReadFinalAnswer(item, turnId);
+                            _timings?.Milestone(SimplificationStage.AgentFinalAnswer, started);
+                            finalAt = _clock.GetTimestamp();
+                            lock (gate)
+                            {
+                                linked.Token.ThrowIfCancellationRequested();
+                                delivered = true;
+                            }
+                            // Ownership of the stream stays with this host-managed reader.
+                            // The request can now commit quota and return the validated text.
+                            answer.TrySetResult(result);
                         }
                         break;
                     case "agent.session.turn.completed":
@@ -128,6 +168,7 @@ public sealed class OpenAiAgentProvider : IModelProvider
                             throw new ModelProviderException();
                         RecordUsage(root.TryGetProperty("usage", out var usage) && usage.ValueKind == JsonValueKind.Object
                             ? root : turn);
+                        if (!delivered) _timings?.Milestone(SimplificationStage.AgentTurnComplete, started);
                         completed = true;
                         break;
                     case "error":
@@ -139,31 +180,40 @@ public sealed class OpenAiAgentProvider : IModelProvider
                 }
                 if (completed) break;
             }
-            // Neither EOF, idle, nor text deltas prove a successful complete turn.
+            // The detached reader still requires explicit turn completion before normal deletion.
             if (!completed || result is null) throw new ModelProviderException();
             outcome = "succeeded";
-            return result;
         }
-        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        catch (OperationCanceledException) when (requestLifetime.IsCancellationRequested || stoppingToken.IsCancellationRequested)
         {
             outcome = "cancelled";
-            throw new OperationCanceledException(cancellationToken);
+            answer.TrySetCanceled(cancellationToken.IsCancellationRequested ? cancellationToken : stoppingToken);
         }
         catch (OperationCanceledException) when (timeout.IsCancellationRequested)
         {
-            throw new SimplificationTimeoutException();
+            answer.TrySetException(new SimplificationTimeoutException());
         }
         catch (Exception ex) when (ex is HttpRequestException or OperationCanceledException or JsonException
             or KeyNotFoundException or InvalidOperationException or ModelProviderException or FormatException
             or IOException or DecoderFallbackException)
         {
             // Never attach the upstream exception: it can contain credentials or content.
-            throw new ModelProviderException();
+            answer.TrySetException(new ModelProviderException());
+        }
+        catch (Exception)
+        {
+            answer.TrySetException(new ModelProviderException());
         }
         finally
         {
             if (SafeId(sessionId)) await _cleanup.ReadyAsync(sessionId!, CancellationToken.None, outcome != "succeeded");
             else if (outcome != "succeeded") _cleanup.RequestRecovery();
+            // No writes to request-scoped timings after publishing the answer.
+            // Late failures cannot retract an already accepted simplification.
+            if (delivered)
+                _logger.LogInformation("Koniec strumienia agenta Trace={Trace} Outcome={Outcome} FinalizationMs={FinalizationMs:F1}",
+                    trace, outcome, finalAt is long timestamp ? _clock.GetElapsedTime(timestamp).TotalMilliseconds : -1);
+            answer.TrySetException(new ModelProviderException());
             Duration.Record(_clock.GetElapsedTime(started).TotalSeconds,
                 new("agent_id", _options.AgentId), new("outcome", outcome));
         }
