@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sedno_app/app/app.dart';
 import 'package:sedno_app/features/subscription/domain/subscription_repository.dart';
 import 'package:sedno_app/features/subscription/presentation/subscription_view_model.dart';
 import 'package:sedno_app/features/subscription/presentation/subscription_panel.dart';
@@ -10,11 +11,13 @@ class Store implements SubscriptionStore {
   final events = StreamController<List<StorePurchase>>.broadcast(sync: true);
   String? binding;
   bool restored = false;
+  Completer<SubscriptionOffer>? delayedOffer;
   @override
   Stream<List<StorePurchase>> get purchases => events.stream;
   @override
-  Future<SubscriptionOffer> offer() async =>
-      const SubscriptionOffer('12,34 zł');
+  Future<SubscriptionOffer> offer() async => delayedOffer == null
+      ? const SubscriptionOffer('12,34 zł')
+      : await delayedOffer!.future;
   @override
   Future<void> buy(String accountBinding) async {
     binding = accountBinding;
@@ -30,12 +33,17 @@ class Backend implements SubscriptionRepository {
   bool active = false;
   bool fail = false;
   int verifications = 0;
+  int reads = 0;
   @override
-  Future<SubscriptionStatus> current() async => SubscriptionStatus(
-    active: active,
-    state: active ? 'ACTIVE' : 'none',
-    accountBinding: 'server-binding',
-  );
+  Future<SubscriptionStatus> current() async {
+    reads++;
+    return SubscriptionStatus(
+      active: active,
+      state: active ? 'ACTIVE' : 'none',
+      accountBinding: 'server-binding',
+    );
+  }
+
   @override
   Future<SubscriptionStatus> verify(String token) async {
     verifications++;
@@ -48,7 +56,9 @@ void main() {
   late Store store;
   late Backend backend;
   late SubscriptionViewModel model;
+  var modelDisposed = false;
   setUp(() {
+    modelDisposed = false;
     store = Store();
     backend = Backend();
     model = SubscriptionViewModel(
@@ -58,7 +68,7 @@ void main() {
     );
   });
   tearDown(() async {
-    model.dispose();
+    if (!modelDisposed) model.dispose();
     await store.events.close();
   });
   Future<void> event(
@@ -68,6 +78,36 @@ void main() {
     store.events.add([StorePurchase(product, 'token', state)]);
     await Future<void>.delayed(Duration.zero);
   }
+
+  test('server verification starts before the store offer resolves', () async {
+    store.delayedOffer = Completer<SubscriptionOffer>();
+    final starting = model.start();
+    await Future<void>.delayed(Duration.zero);
+    expect(backend.reads, 1);
+    expect(model.status, isNotNull);
+    store.delayedOffer!.complete(const SubscriptionOffer('9,99 zł'));
+    await starting;
+  });
+
+  testWidgets(
+    'refreshes at startup while input remains usable and periodically',
+    (tester) async {
+      await tester.pumpWidget(SednoApp(subscriptionModel: model));
+      await tester.pump();
+      expect(backend.reads, 1);
+      await tester.enterText(find.byType(TextField), 'Tekst do uproszczenia');
+      expect(find.text('Tekst do uproszczenia'), findsOneWidget);
+      await tester.pump(const Duration(minutes: 5));
+      expect(backend.reads, 2);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+      await tester.pump();
+      expect(backend.reads, 3);
+      model.dispose();
+      modelDisposed = true;
+      await tester.pumpWidget(const SizedBox());
+    },
+  );
 
   test(
     'purchase uses server account binding and pending never grants access',
@@ -123,5 +163,8 @@ void main() {
     await tester.tap(find.text('Przywróć zakupy'));
     await tester.pumpAndSettle();
     expect(store.restored, true);
+    await tester.pumpWidget(const SizedBox());
+    model.dispose();
+    modelDisposed = true;
   });
 }

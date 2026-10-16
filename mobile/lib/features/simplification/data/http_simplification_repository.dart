@@ -33,7 +33,7 @@ class HttpSimplificationRepository
     required this.baseUrl,
     required this.client,
     required this.sessions,
-    this.requestTimeout = const Duration(seconds: 30),
+    this.requestTimeout = const Duration(seconds: 10),
     this.retryDelay = const Duration(milliseconds: 250),
     this.maxAttempts = 3,
     Future<void> Function(Duration)? wait,
@@ -46,6 +46,7 @@ class HttpSimplificationRepository
     }
     if (maxAttempts < 1) throw ArgumentError.value(maxAttempts, 'maxAttempts');
     sessions.sessionRevision.addListener(_refreshAfterSessionChange);
+    sessions.quotaRevision.addListener(_refreshQuota);
   }
 
   final Uri baseUrl;
@@ -59,36 +60,71 @@ class HttpSimplificationRepository
 
   void _refreshAfterSessionChange() {
     _quota.value = null;
+    _refreshQuota();
+  }
+
+  void _refreshQuota() {
     unawaited(current().then<void>((_) {}, onError: (Object _) {}));
   }
+
+  int _quotaRequest = 0;
 
   @override
   ValueListenable<QuotaState?> get quotaListenable => _quota;
 
   @override
   Future<QuotaState> current() async {
-    final response = await _send('GET', '/v1/quota');
+    final revision = sessions.sessionRevision.value;
+    final request = ++_quotaRequest;
+    final response = await _send('GET', '/v1/quota', sessionRevision: revision);
+    _requireSession(revision);
     if (response.statusCode != 200) throw _failure(response);
     final quota = QuotaState.fromJson(_object(response.body));
-    _quota.value = quota;
+    if (request == _quotaRequest) _quota.value = quota;
     return quota;
   }
 
   @override
   Future<SimplificationResponse> simplify(SimplificationRequest request) async {
+    final abort = Completer<void>();
+    try {
+      return await _simplify(request, abort).timeout(
+        requestTimeout,
+        onTimeout: () {
+          if (!abort.isCompleted) abort.complete();
+          throw const SimplificationApiException(SimplificationFailure.timeout);
+        },
+      );
+    } finally {
+      if (!abort.isCompleted) abort.complete();
+    }
+  }
+
+  Future<SimplificationResponse> _simplify(
+    SimplificationRequest request,
+    Completer<void> abort,
+  ) async {
     final revision = sessions.sessionRevision.value;
     for (var attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
+        if (abort.isCompleted) {
+          throw const SimplificationApiException(SimplificationFailure.timeout);
+        }
         _requireSession(revision);
         final response = await _send(
           'POST',
           '/v1/simplifications',
           body: jsonEncode(request.toJson()),
           sessionRevision: revision,
+          abortTrigger: abort.future,
         );
+        if (abort.isCompleted) {
+          throw const SimplificationApiException(SimplificationFailure.timeout);
+        }
         _requireSession(revision);
         if (response.statusCode == 200) {
           final value = SimplificationResponse.fromJson(_object(response.body));
+          _quotaRequest++;
           _quota.value = value.quota;
           return value;
         }
@@ -103,6 +139,7 @@ class HttpSimplificationRepository
           );
         }
         if (response.statusCode == 429) _readQuota(response.body);
+        if (response.statusCode == 504) throw _failure(response);
         if (response.statusCode >= 500 && attempt < maxAttempts) {
           await _wait(retryDelay * attempt);
           continue;
@@ -117,9 +154,11 @@ class HttpSimplificationRepository
           throw const SimplificationApiException(SimplificationFailure.offline);
         }
       } on TimeoutException {
-        if (attempt == maxAttempts) {
-          throw const SimplificationApiException(SimplificationFailure.timeout);
-        }
+        if (!abort.isCompleted) abort.complete();
+        throw const SimplificationApiException(SimplificationFailure.timeout);
+      }
+      if (abort.isCompleted) {
+        throw const SimplificationApiException(SimplificationFailure.timeout);
       }
       await _wait(retryDelay * attempt);
     }
@@ -139,12 +178,23 @@ class HttpSimplificationRepository
     String path, {
     String? body,
     int? sessionRevision,
+    Future<void>? abortTrigger,
   }) async {
     final token = await sessions.accessToken().timeout(requestTimeout);
     if (sessionRevision != null) _requireSession(sessionRevision);
     final url = baseUrl.resolve(path);
     final headers = <String, String>{'Authorization': 'Bearer $token'};
     if (body != null) headers['Content-Type'] = 'application/json';
+    if (abortTrigger != null) {
+      final request = http.AbortableRequest(
+        method,
+        url,
+        abortTrigger: abortTrigger,
+      );
+      request.headers.addAll(headers);
+      if (body != null) request.body = body;
+      return http.Response.fromStream(await client.send(request));
+    }
     return (method == 'GET'
             ? client.get(url, headers: headers)
             : client.post(url, headers: headers, body: body))
@@ -163,6 +213,9 @@ class HttpSimplificationRepository
   }
 
   SimplificationApiException _failure(http.Response response) {
+    if (response.statusCode == 504) {
+      return const SimplificationApiException(SimplificationFailure.timeout);
+    }
     if (response.statusCode == 401) {
       return const SimplificationApiException(
         SimplificationFailure.unauthorized,

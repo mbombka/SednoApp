@@ -39,7 +39,7 @@ The development mock returns deterministic text prefixed `Wersja demonstracyjna:
 
 The server counts Unicode grapheme clusters and rejects whitespace-only input or more than 4,000 clusters. It also caps HTTP bodies at 128 KiB. Errors use Problem Details with a stable `code` and Polish `title`. The basic rate limiter allows 60 requests per minute per remote IP, independently of daily quota. Configure a trusted reverse proxy to pass the real client IP before deploying at scale; do not trust arbitrary forwarded headers.
 
-Quota reservation is serialized per hashed installation bucket with a PostgreSQL transaction advisory lock. Request status and idempotency remain scoped to the authenticated identity. The transaction commits before calling the model. Active reservations reduce `remaining`, while `used` counts only successful requests. Reservations expire after five minutes; reads mark expired reservations and release their capacity. A late model response cannot commit an expired reservation. A request crossing 00:00 UTC stays on its reservation day. Quota queries use server time. The free policy is 5 successful simplifications per UTC day, including guests. The paid policy is 400 total uses per UTC day, including any free uses; Google Play entitlements resolve the paid tier without resetting existing daily usage.
+Quota reservation is serialized only across overlapping installation buckets with PostgreSQL transaction advisory locks acquired in sorted order. Independent installations reserve concurrently. A shared topology lock allows quota transactions to overlap; linking and account deletion take its exclusive counterpart while changing quota membership. Those less frequent database mutations can still briefly pause quota writes, but their Firebase network calls run before taking the exclusive topology lock, protected by a per-UID lock. Request status and idempotency remain scoped to the authenticated identity. The transaction commits before calling the model. Active reservations reduce `remaining`, while `used` counts only successful requests. Reservations expire after five minutes; reads mark expired reservations and release their capacity. A late model response cannot commit an expired reservation. A request crossing 00:00 UTC stays on its reservation day. Quota queries use server time. The free policy is 5 successful simplifications per UTC day, including guests. The paid policy is 400 total uses per UTC day, including any free uses; Google Play entitlements resolve the paid tier without resetting existing daily usage.
 
 The database stores guest identity/session metadata, keyed input fingerprints, request status, and reservation day/timestamps. It stores neither submitted text nor result text. The idempotency key is scoped to the bearer identity. An active duplicate returns 202 and a status URL. A completed duplicate returns 409 `result_unavailable`; the result cannot be replayed if the original response was lost. The client must keep a received result locally. A new key can start a new simplification and may consume quota. Failed or expired keys remain terminal, so use a new key to retry. `GET /v1/simplifications/requests/{requestId}` reports status only to the owner.
 
@@ -87,9 +87,20 @@ plus SHA-256 lookup hash and minimal state metadata. Pending purchases receive n
 entitlement or acknowledgement. Active/grace-period and canceled-but-unexpired
 purchases grant access. Paused, held, pending and expired purchases do not.
 Replacement tokens retire the linked old entitlement. Every quota decision
-rechecks Google (including expiry), so a missed RTDN cannot extend stale access.
-Google unavailability fails the request closed; this trades API latency and
-availability for immediate verification. Monitor Publisher API quota before scale.
+uses the server-side verified purchase snapshot, with no Google network call.
+`GET /v1/subscription` refreshes and persists that snapshot; the app starts it
+without blocking text input, on startup, resume, session changes, and every five
+minutes while running. Store offer loading does not delay server verification.
+Successful refresh also updates the displayed server quota. Purchase/restore and
+RTDN update the same snapshot. A snapshot is valid for at most 15 minutes and
+never past the Google purchase expiry. Missing/stale state uses the free limit
+without resetting usage. A missed RTDN can therefore leave access stale for at
+most 15 minutes; Google unavailability does not extend that window. Apply the
+`CachedSubscriptionVerification` migration before deploying this version.
+Verification uses per-account and per-token locks; different accounts refresh
+concurrently. Deploy this lock-protocol change with all API instances restarted
+together (do not mix old and new writers during a rolling deployment).
+This trades immediate verification on every request for bounded staleness and lower latency. Monitor Publisher API quota before scale.
 
 Publish RTDN to a dedicated Pub/Sub topic. Grant
 `google-play-developer-notifications@system.gserviceaccount.com` publisher access.
@@ -181,7 +192,10 @@ requires a secret store/environment variables `Model__Provider=openai` and
 Configure the mobile backend URL following the root README.
 
 Defaults: `Model:OpenAI:Model=gpt-6-luna`, `MaxOutputTokens=4096` (allowed 256–8192),
-`TimeoutSeconds=20` (allowed 1–25). The mobile HTTP timeout is 30 seconds. Only this
+`TimeoutSeconds=8` (allowed 1–8). The API has a nine-second simplification deadline;
+Flutter has one ten-second end-to-end deadline, including retries and session access.
+HTTP 504 `simplification_timeout` is terminal and is not automatically retried.
+The Flutter HTTP request is aborted when its deadline expires. Only this
 model has been enabled; changing models requires evaluation and code review.
 Missing/invalid configuration fails startup. Requests have fixed HTTPS destination,
 no redirects, no tools, no automatic provider retries, `reasoning.effort=none`,
@@ -225,7 +239,9 @@ and model edits apply to new sessions without changing Flutter or backend code.
 Production remains disabled by default; enable via the deployment secret store:
 `Model__Provider=openai-agent`, `OpenAI__ApiKey`, `OpenAI__AgentId`.
 Missing/invalid key or agent ID fails startup. `OpenAI:TimeoutSeconds` defaults
-to 20 and accepts 1–25, plus up to 3 seconds for cleanup; the mobile timeout is 30.
+to 8 and accepts 1–8. The API deadline is nine seconds and the mobile deadline is
+ten seconds. Existing overrides above eight seconds must be reduced before restart.
+Normal cleanup runs in the background.
 
 The restricted application key needs `api.agents.read`, `api.agents.write` and
 `api.responses.write`. The Agents scopes also permit configuration management;
@@ -235,10 +251,12 @@ No live account/model-access verification is implied by mocked tests.
 Each simplification creates a fresh session with `OpenAI-Beta: agents=v1` and
 the text in a separate user message in `input`. Conversation-only sessions
 require initial input; empty session creation is rejected by the live API.
-The adapter polls the turn outcome (idle alone is not success), then
-accepts one completed `final_answer` message for that turn. It never returns
-commentary, reasoning or partial output. Responses are capped at 256 KiB and
-final text at 16,000 graphemes. Unexpected pagination fails closed. The session
+The adapter sends `stream=true` and receives the final answer and completed turn
+in that single POST response, with no status polling or items GET. It accepts
+one completed `final_answer` message for that turn and waits for the explicit
+turn-completed event. Idle, EOF, commentary, reasoning and partial output are
+not success. SSE frames are capped at 256 KiB, the full stream at 4 MiB, and
+final text at 16,000 graphemes. The saved model and instructions are unchanged. The session
 overrides tools to an empty list, disables multi-agent delegation, selects plain
 text output and uses `environment.type=none`; model/instructions are inherited.
 HTTP redirects and named-client logging are disabled. There are no submission
@@ -246,14 +264,30 @@ retries. Proxy/APM tracing must also exclude bodies, credentials and response te
 Existing quota, idempotency and sanitized 503 behavior apply unchanged.
 
 Unlike the direct adapter, Agents API stores conversation state: there is no
-`store=false` guarantee here. A `finally` block requests session deletion after
-success, failure, timeout or cancellation, with an independent three-second
-budget and at most two deletion attempts. A failed cleanup emits a generic
-warning without session ID, text, key or upstream exception; it does not discard
-an already received result. If cleanup fails or the process crashes, sessions
-can remain at OpenAI. There is no durable cleanup queue in this implementation.
-Operators must reconcile retained sessions in the dedicated project, account
-for this in the privacy policy, and verify provider retention before production.
+`store=false` guarantee here. The backend keeps an in-memory set of session IDs
+and retry times, with no cleanup table or migration. Tracking a session wakes the
+background service. Completion marks it ready for immediate deletion; failure,
+cancellation or timeout marks it for cancellation followed by deletion. The
+request never waits for that HTTP cleanup. Each cleanup attempt has a three-second
+budget; failures retry after 10, 20, 40 seconds, etc., capped at five minutes.
+When no sessions or recovery scans remain, the worker waits for a signal without
+polling the database or OpenAI. HTTP 404 counts as already cleaned up.
+
+At startup the worker lists sessions of the configured saved agent, following
+pagination. It only touches sessions with metadata
+`sedno_purpose=sedno-simplification-v1`, which this adapter sets on creation.
+It schedules recovered sessions no earlier than one minute after creation to
+avoid interrupting a request on another API replica. A lost create response also
+schedules a recovery scan. Failed scans retry with backoff. Recovery can issue
+idempotent cleanup calls from multiple replicas; active normal requests remain
+protected by the age threshold. Old unmarked sessions and sessions of previously
+configured agents require operator reconciliation. Use a dedicated Sedno project.
+
+The set is lost on restart; startup listing reconstructs it from OpenAI. There is
+no periodic global scan while idle, so leftovers from another failed replica can
+remain until a recovery scan/restart. Provider unavailability and a stopped backend
+can delay deletion. Monitor generic cleanup warnings. There is no durable delivery
+guarantee and API deletion does not promise immediate physical erasure.
 A lost session-creation response may leave submitted content at OpenAI without
 a session ID known to this backend. Do not retry creation automatically; include
 these sessions in operational reconciliation. API deletion does not promise

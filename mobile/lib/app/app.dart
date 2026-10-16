@@ -93,6 +93,7 @@ class _AppNavigationState extends State<_AppNavigation>
             : MockHistoryRepository(clock: DateTime.now));
     _purgeHistory();
     _simplificationRepository = widget.simplificationRepository;
+    unawaited(widget.subscriptionModel?.start());
   }
 
   Future<void> _purgeHistory() async {

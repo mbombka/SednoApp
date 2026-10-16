@@ -10,7 +10,7 @@ import 'package:sedno_app/features/simplification/domain/simplification_result.d
 class SimplificationViewModel {
   SimplificationViewModel({
     required this.repository,
-    this.timeout = const Duration(seconds: 30),
+    this.timeout = const Duration(seconds: 10),
     String Function()? newRequestId,
   }) : _newRequestId = newRequestId ?? _randomRequestId;
 

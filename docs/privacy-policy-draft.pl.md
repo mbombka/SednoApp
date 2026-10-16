@@ -52,10 +52,16 @@ używa treści w pamięci. Wynik trafia do aplikacji i lokalnej historii.
 przez backend do API OpenAI, modelu GPT-6 Luna. Nie wyślemy zdjęcia ani całej
 historii. Tryb bezpośrednich wywołań Responses API wysyła `store=false`, co nie
 oznacza zerowej retencji po stronie dostawcy. Tryb zapisanego agenta (Agents API)
-przechowuje treść i wynik w osobnej sesji OpenAI. Backend zleca usunięcie sesji
-po zakończeniu żądania, także przy błędzie lub przerwaniu. Nie gwarantuje to
-natychmiastowego fizycznego usunięcia. Awaria procesu lub nieudane usunięcie
-mogą pozostawić sesję u dostawcy; wymaga to kontroli i usunięcia przez operatora.
+przechowuje treść i wynik w osobnej sesji OpenAI. Backend usuwa sesję w tle po
+zakończeniu przetwarzania; przy przekroczeniu czasu lub przerwaniu zleca również
+anulowanie pracy. W pamięci serwera pozostają tylko identyfikatory sesji oraz
+stan ponawiania prób, bez tekstów i wyników. Nie zapisujemy tabeli kolejki.
+Po restarcie serwer sprawdza listę sesji oznaczonych jako uproszczenia Sedno
+u dostawcy i ponawia sprzątanie. Odzyskiwane sesje usuwa po upływie co najmniej
+minuty od utworzenia. Nieudane próby ponawia z wydłużanym odstępem.
+Awaria, zatrzymany backend lub niedostępność dostawcy mogą opóźnić usunięcie.
+Nie gwarantuje to natychmiastowego fizycznego usunięcia; operator kontroluje
+pozostałości, w tym starsze sesje bez oznaczenia Sedno.
 Także utrata odpowiedzi na utworzenie sesji może pozostawić przesłany tekst
 u dostawcy bez identyfikatora sesji znanego backendowi.
 Obecność adaptera nie potwierdza uruchomienia integracji na serwerze.
@@ -121,7 +127,7 @@ ograniczaniu nadużyć. Nie przekazujemy do niego tekstu ani zdjęcia do uproszc
 
 Płatność obsługuje Google Play. Sedno nie zbiera numeru karty ani danych konta
 bankowego. Backend zapisuje szyfrowany token zakupu, jego skrót, powiązanie z
-kontem, stan i termin subskrypcji oraz ID obsłużonych powiadomień zakupowych.
+kontem, stan i termin subskrypcji, czas ostatniej weryfikacji zakupu oraz ID obsłużonych powiadomień zakupowych.
 Jeśli napiszesz do nas, dostawca poczty i administrator otrzymają adres nadawcy,
 treść wiadomości oraz dane potrzebne do obsługi sprawy. Nie przesyłaj haseł,
 tokenów, zdjęć ani tekstów do uproszczenia w zgłoszeniu.

@@ -1,7 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using Sedno.Application;
 using Sedno.Domain;
 
@@ -50,15 +49,11 @@ public sealed class GuestStore(AppDbContext db, IUsageStore usage, TimeProvider 
         if (guest.AccountId is not null || verified.Uid.Length is < 1 or > 128 ||
             verified.Provider is not ("google" or "email")) return null;
         await using var transaction = await db.Database.BeginTransactionAsync(ct);
-        await using (var command = db.Database.GetDbConnection().CreateCommand())
-        {
-            command.Transaction = transaction.GetDbTransaction();
-            command.CommandText = "SELECT pg_advisory_xact_lock(1748392201)";
-            await command.ExecuteNonQueryAsync(ct);
-        }
-        // Check after acquiring the deletion/link lock: a token verified before
-        // deletion must not recreate its Firebase account after deletion commits.
+        // Serialize Firebase lookup/deletion only for this UID. Network latency must
+        // not hold the exclusive quota-topology lock for unrelated users.
+        await IdentityCoordination.LockAsync(db, verified.Uid, ct);
         if (!await identityAccounts.ExistsAsync(verified.Uid, ct)) return null;
+        await db.Database.ExecuteSqlRawAsync("SELECT pg_advisory_xact_lock(1748392201)", ct);
         var identity = await db.Identities.SingleOrDefaultAsync(x => x.Id == guest.IdentityId, ct);
         if (identity is null) return null;
         var account = await db.Accounts.SingleOrDefaultAsync(x => x.FirebaseUid == verified.Uid, ct);

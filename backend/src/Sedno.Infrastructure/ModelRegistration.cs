@@ -34,13 +34,17 @@ public static class ModelRegistration
                 var agentOptions = configuration.GetSection("OpenAI").Get<OpenAiAgentOptions>() ?? new();
                 agentOptions.Validate();
                 services.AddSingleton(agentOptions);
+                services.AddSingleton<AgentSessionCleanupWorker>();
+                services.AddSingleton<IAgentSessionCleanupQueue>(sp => sp.GetRequiredService<AgentSessionCleanupWorker>());
+                services.AddHostedService(sp => sp.GetRequiredService<AgentSessionCleanupWorker>());
                 services.AddHttpClient("openai-agent", client => client.Timeout = Timeout.InfiniteTimeSpan)
                     .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false })
                     .RemoveAllLoggers();
                 services.AddScoped<IModelProvider>(sp => new OpenAiAgentProvider(
                     sp.GetRequiredService<IHttpClientFactory>().CreateClient("openai-agent"), agentOptions,
                     sp.GetRequiredService<TimeProvider>(),
-                    sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<OpenAiAgentProvider>>()));
+                    sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<OpenAiAgentProvider>>(),
+                    sp.GetRequiredService<IAgentSessionCleanupQueue>()));
                 break;
             default:
                 throw new InvalidOperationException("Unsupported model provider.");

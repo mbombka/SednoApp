@@ -16,30 +16,42 @@ public sealed class SubscriptionService(AppDbContext db, IPlayBillingClient play
 
     public async Task<SubscriptionDto> CurrentAsync(Guid accountId, CancellationToken ct)
     {
-        var rows = await db.Purchases.AsNoTracking().Where(x => x.AccountId == accountId).ToListAsync(ct);
-        PlaySubscription? best = null;
-        foreach (var row in rows.Where(x => !x.Revoked))
+        // This endpoint is refreshed in the background by the app, never by quota checks.
+        await using var transaction = await db.Database.BeginTransactionAsync(ct);
+        await BillingCoordination.AccountAsync(db, accountId, ct);
+        var rows = await db.Purchases.AsNoTracking().Where(x => x.AccountId == accountId && !x.Revoked).ToListAsync(ct);
+        SubscriptionDto? best = null;
+        foreach (var row in rows)
         {
-            var status = await play.GetAsync(_protector.Unprotect(row.ProtectedToken), ct);
-            if (status.AccountBinding != Binding(accountId)) continue;
-            if (status.Entitled(clock.GetUtcNow()) && !status.Acknowledged)
-                await play.AcknowledgeAsync(_protector.Unprotect(row.ProtectedToken), ct);
-            if (best is null || (!best.Entitled(clock.GetUtcNow()) && status.Entitled(clock.GetUtcNow())) ||
-                (status.Entitled(clock.GetUtcNow()) == best.Entitled(clock.GetUtcNow()) && status.ExpiresAt > best.ExpiresAt)) best = status;
+            var status = await UpdateAsync(accountId, _protector.Unprotect(row.ProtectedToken), ct);
+            if (best is null || (!best.Active && status.Active) ||
+                (status.Active == best.Active && status.ExpiresAt > best.ExpiresAt)) best = status;
         }
-        return new(best?.State ?? "none", best?.Entitled(clock.GetUtcNow()) == true, best?.ExpiresAt, Binding(accountId));
+        await db.SaveChangesAsync(ct);
+        await transaction.CommitAsync(ct);
+        return best ?? new("none", false, null, Binding(accountId));
     }
+
+    // Bounds stale access if an RTDN notification is missed. Refresh never extends
+    // the Google expiry time; a stale/missing verification falls back to the free tier.
+    public static readonly TimeSpan VerificationLifetime = TimeSpan.FromMinutes(15);
+
     public async Task<bool> HasSubscriptionAsync(Guid identityId, CancellationToken ct)
     {
         var accountId = await db.Identities.Where(x => x.Id == identityId).Select(x => x.AccountId).SingleAsync(ct);
         if (accountId is null) return false;
-        // Refresh against Google on every quota decision: missed RTDN cannot prolong refunded access.
-        return (await CurrentAsync(accountId.Value, ct)).Active;
+        var now = clock.GetUtcNow();
+        var oldest = now - VerificationLifetime;
+        return await db.Purchases.AsNoTracking().AnyAsync(x => x.AccountId == accountId && !x.Revoked &&
+            x.VerifiedAt > oldest && x.VerifiedAt <= now && x.ExpiresAt > now &&
+            (x.State == "SUBSCRIPTION_STATE_ACTIVE" || x.State == "SUBSCRIPTION_STATE_IN_GRACE_PERIOD" ||
+             x.State == "SUBSCRIPTION_STATE_CANCELED"), ct);
     }
     public async Task<SubscriptionDto> VerifyAsync(Guid accountId, string token, CancellationToken ct)
     {
         await using var transaction = await db.Database.BeginTransactionAsync(ct);
-        await LockAsync(ct);
+        await BillingCoordination.TokenAsync(db, token, ct);
+        await BillingCoordination.AccountAsync(db, accountId, ct);
         var status = await UpdateAsync(accountId, token, ct);
         await db.SaveChangesAsync(ct);
         await transaction.CommitAsync(ct);
@@ -48,10 +60,11 @@ public sealed class SubscriptionService(AppDbContext db, IPlayBillingClient play
     public async Task NotifyAsync(string messageId, string token, CancellationToken ct)
     {
         await using var transaction = await db.Database.BeginTransactionAsync(ct);
-        await LockAsync(ct);
+        await BillingCoordination.NotificationAsync(db, messageId, ct);
         if (await db.PlayNotifications.AnyAsync(x => x.Id == messageId, ct)) return;
+        await BillingCoordination.TokenAsync(db, token, ct);
         var hash = Hash(token);
-        var row = await db.Purchases.SingleOrDefaultAsync(x => x.TokenHash == hash, ct);
+        var row = await db.Purchases.AsNoTracking().SingleOrDefaultAsync(x => x.TokenHash == hash, ct);
         var verified = await play.GetAsync(token, ct);
         var account = row is null
             ? await db.Accounts.AsNoTracking().ToListAsync(ct)
@@ -59,6 +72,7 @@ public sealed class SubscriptionService(AppDbContext db, IPlayBillingClient play
         var accountId = row?.AccountId ?? account.SingleOrDefault(x => Binding(x.Id) == verified.AccountBinding)?.Id;
         // Do not acknowledge unknown ownership: retry until client/account association is available.
         if (accountId is null) throw new InvalidOperationException("Unknown purchase owner.");
+        await BillingCoordination.AccountAsync(db, accountId.Value, ct);
         await UpdateAsync(accountId.Value, token, ct);
         db.PlayNotifications.Add(new() { Id = messageId, ProcessedAt = clock.GetUtcNow() });
         await db.SaveChangesAsync(ct);
@@ -80,6 +94,7 @@ public sealed class SubscriptionService(AppDbContext db, IPlayBillingClient play
         }
         row.State = status.State;
         row.ExpiresAt = status.ExpiresAt;
+        row.VerifiedAt = clock.GetUtcNow();
         if (!row.Revoked && status.Entitled(clock.GetUtcNow()) && !status.Acknowledged)
             await play.AcknowledgeAsync(token, ct);
         if (status.LinkedToken is not null && status.Entitled(clock.GetUtcNow()))
@@ -95,5 +110,4 @@ public sealed class SubscriptionService(AppDbContext db, IPlayBillingClient play
         return new(row.Revoked ? "revoked" : status.State,
             !row.Revoked && status.Entitled(clock.GetUtcNow()), status.ExpiresAt, Binding(accountId));
     }
-    private Task LockAsync(CancellationToken ct) => db.Database.ExecuteSqlRawAsync("SELECT pg_advisory_xact_lock(1748392202)", ct);
 }

@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/widgets.dart';
@@ -71,7 +69,6 @@ Future<void> main() async {
         );
   if (subscription != null) {
     sessions!.sessionRevision.addListener(subscription.refresh);
-    unawaited(subscription.start());
   }
   runApp(
     SednoApp(

@@ -1,6 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
-using Npgsql;
 using Sedno.Application;
 using Sedno.Domain;
 
@@ -118,11 +116,21 @@ public sealed class UsageStore(AppDbContext db, IEntitlementResolver entitlement
 
     private async Task LockAsync(Guid identityId, CancellationToken ct)
     {
-        var connection = db.Database.GetDbConnection();
-        await using var command = connection.CreateCommand();
-        command.Transaction = db.Database.CurrentTransaction!.GetDbTransaction();
-        // Linking can merge several installation buckets. Serialize quota writes with linking.
-        command.CommandText = "SELECT pg_advisory_xact_lock(1748392201)";
-        await command.ExecuteNonQueryAsync(ct);
+        // Shared topology lock: quota operations run concurrently. Linking/deletion
+        // take its exclusive counterpart while changing which installations share usage.
+        await db.Database.ExecuteSqlRawAsync("SELECT pg_advisory_xact_lock_shared(1748392201)", ct);
+        var identity = await db.Identities.AsNoTracking().Where(x => x.Id == identityId)
+            .Select(x => new { x.InstallationHash, x.AccountId }).SingleAsync(ct);
+        var hashes = identity.AccountId is null ? new[] { identity.InstallationHash } :
+            await db.Identities.AsNoTracking().Where(x => x.AccountId == identity.AccountId)
+                .Select(x => x.InstallationHash).Distinct().ToArrayAsync(ct);
+        // Lock every contributing installation, including guest sessions on the same
+        // installation. Sort the actual lock keys to avoid deadlocks for overlapping accounts.
+        var keys = hashes.Select(hash => System.Buffers.Binary.BinaryPrimitives.ReadInt32BigEndian(
+            System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(hash))))
+            .Distinct().Order().ToArray();
+        foreach (var key in keys)
+            await db.Database.ExecuteSqlInterpolatedAsync(
+                $"SELECT pg_advisory_xact_lock(1748392203, {key})", ct);
     }
 }

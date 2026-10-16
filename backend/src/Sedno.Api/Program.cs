@@ -120,6 +120,24 @@ builder.Services.AddRateLimiter(options =>
 });
 
 var app = builder.Build();
+// Covers authentication, database work and model I/O. Leave a network margin
+// before the mobile client's single 10-second end-to-end deadline.
+app.Use(async (context, next) =>
+{
+    if (context.Request.Path != "/v1/simplifications") { await next(context); return; }
+    var clientAborted = context.RequestAborted;
+    using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(9),
+        context.RequestServices.GetRequiredService<TimeProvider>());
+    using var linked = CancellationTokenSource.CreateLinkedTokenSource(clientAborted, deadline.Token);
+    context.RequestAborted = linked.Token;
+    try { await next(context); }
+    catch (OperationCanceledException) when (deadline.IsCancellationRequested && !clientAborted.IsCancellationRequested && !context.Response.HasStarted)
+    {
+        context.RequestAborted = clientAborted;
+        await Problem(context, 504, "simplification_timeout", "Upraszczanie trwało zbyt długo. Spróbuj ponownie.").ExecuteAsync(context);
+    }
+    finally { context.RequestAborted = clientAborted; }
+});
 app.Use(async (context, next) =>
 {
     try { await next(context); }
@@ -272,6 +290,7 @@ app.MapPost("/v1/simplifications", async (HttpContext context, SimplificationSer
         return outcome.Kind switch
         {
             "succeeded" => Results.Ok(outcome.Response),
+            "timeout" => Problem(context, 504, "simplification_timeout", "Upraszczanie trwało zbyt długo. Spróbuj ponownie."),
             "processing" => Results.Accepted($"/v1/simplifications/requests/{input.RequestId}",
                 new { status = "processing", quota = outcome.Quota }),
             "key_conflict" => Problem(context, 409, "key_conflict", "Identyfikator żądania jest już użyty."),

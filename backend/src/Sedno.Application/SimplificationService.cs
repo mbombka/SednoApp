@@ -36,6 +36,11 @@ public sealed class SimplificationService(IUsageStore usage, IModelProvider mode
             // A client disconnect does not prove the provider failed. The reservation expires later.
             throw;
         }
+        catch (SimplificationTimeoutException)
+        {
+            await usage.FailAsync(identityId, input.RequestId, cancellationToken);
+            return ("timeout", null, await usage.GetQuotaAsync(identityId, cancellationToken));
+        }
         catch
         {
             await usage.FailAsync(identityId, input.RequestId, CancellationToken.None);

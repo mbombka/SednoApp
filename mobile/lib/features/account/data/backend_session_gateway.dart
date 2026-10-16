@@ -73,6 +73,7 @@ class BackendSessionGateway {
   final SessionStorage storage;
   final IntegrityTokenSource integrity;
   final ValueNotifier<int> sessionRevision = ValueNotifier(0);
+  final ValueNotifier<int> quotaRevision = ValueNotifier(0);
 
   static const _installationKey = 'installation_id';
   static const _guestKey = 'guest_token';

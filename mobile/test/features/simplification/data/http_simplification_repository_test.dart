@@ -25,10 +25,23 @@ class _NoIntegrity implements IntegrityTokenSource {
   Future<String?> tokenFor(String hash) async => null;
 }
 
+class _AbortClient extends http.BaseClient {
+  int calls = 0;
+  final aborted = Completer<void>();
+  @override
+  Future<http.StreamedResponse> send(http.BaseRequest request) async {
+    calls++;
+    final abortable = request as http.AbortableRequest;
+    await abortable.abortTrigger;
+    aborted.complete();
+    throw http.RequestAbortedException(request.url);
+  }
+}
+
 final _url = Uri.parse('https://api.example.test');
 
 HttpSimplificationRepository _repository(
-  MockClient client, {
+  http.Client client, {
   int attempts = 3,
 }) {
   return HttpSimplificationRepository(
@@ -78,6 +91,58 @@ SimplificationRequest _request(String id) =>
     SimplificationRequest(input: InputText('Trudny tekst'), requestId: id);
 
 void main() {
+  test(
+    'deadline aborts the HTTP request and does not launch another attempt',
+    () async {
+      final client = _AbortClient();
+      final repo = _repository(client);
+      await expectLater(
+        repo.simplify(_request('abort')),
+        throwsA(
+          isA<SimplificationApiException>().having(
+            (e) => e.kind,
+            'kind',
+            SimplificationFailure.timeout,
+          ),
+        ),
+      );
+      await client.aborted.future;
+      await Future<void>.delayed(Duration.zero);
+      expect(client.calls, 1);
+      expect(repo.quotaListenable.value, isNull);
+    },
+  );
+
+  test('server 504 is terminal and a late result cannot update quota after timeout', () async {
+    var calls = 0;
+    final failed = _repository(
+      MockClient((_) async {
+        calls++;
+        return http.Response('{"code":"simplification_timeout"}', 504);
+      }),
+    );
+    await expectLater(
+      failed.simplify(_request('server-timeout')),
+      throwsA(
+        isA<SimplificationApiException>().having(
+          (e) => e.kind,
+          'kind',
+          SimplificationFailure.timeout,
+        ),
+      ),
+    );
+    expect(calls, 1);
+    final pending = Completer<http.Response>();
+    final late = _repository(MockClient((_) => pending.future));
+    await expectLater(
+      late.simplify(_request('late')),
+      throwsA(isA<SimplificationApiException>()),
+    );
+    pending.complete(_success('late', 1));
+    await Future<void>.delayed(Duration.zero);
+    expect(late.quotaListenable.value, isNull);
+  });
+
   test(
     'reads ASP.NET UTC offsets in quota and simplification result',
     () async {
@@ -182,7 +247,7 @@ void main() {
     expect(repo.quotaListenable.value!.resetAt, DateTime.utc(2026, 10, 16));
   });
 
-  test('timeout and 202 retries keep one key and one quota charge', () async {
+  test('202 retries keep one key and one quota charge', () async {
     var calls = 0;
     var charges = 0;
     final ids = <String>[];
@@ -193,8 +258,7 @@ void main() {
             (jsonDecode(request.body) as Map<String, dynamic>)['requestId']
                 as String;
         ids.add(id);
-        if (calls == 1) return Completer<http.Response>().future;
-        if (calls == 2) {
+        if (calls < 3) {
           return http.Response(
             jsonEncode({
               'status': 'processing',

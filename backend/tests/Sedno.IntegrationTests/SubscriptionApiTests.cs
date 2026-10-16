@@ -31,6 +31,103 @@ public sealed class SubscriptionApiTests(BackendFixture fixture)
             : new { packageName = "pl.sedno.test", subscriptionNotification = new { purchaseToken = token, notificationType = 2 } };
         return client.PostAsJsonAsync("/notifications/google-play", new { message = new { messageId = id, data = Convert.ToBase64String(JsonSerializer.SerializeToUtf8Bytes(payload)) } });
     }
+    private sealed class NoNetworkBilling : IPlayBillingClient
+    {
+        public Task<PlaySubscription> GetAsync(string token, CancellationToken ct) => throw new InvalidOperationException("Quota must not call Google.");
+        public Task AcknowledgeAsync(string token, CancellationToken ct) => throw new InvalidOperationException("Quota must not acknowledge.");
+    }
+
+    [Fact]
+    public async Task QuotaUsesVerifiedSnapshotAndBackgroundRefreshUpdatesIt()
+    {
+        var now = new DateTimeOffset(2026, 10, 16, 12, 0, 0, TimeSpan.Zero);
+        fixture.Clock.Set(now);
+        var (client, account) = await AccountAsync();
+        var token = Guid.NewGuid().ToString();
+        fixture.Billing.Purchases[token] = new("SUBSCRIPTION_STATE_ACTIVE", now.AddDays(1), true, SubscriptionService.Binding(account));
+        (await client.PostAsJsonAsync("/v1/subscription", new { purchaseToken = token })).EnsureSuccessStatusCode();
+        using var scope = fixture.Factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var identity = await db.Accounts.Where(x => x.Id == account).Select(x => x.PrimaryIdentityId).SingleAsync();
+        var resolver = new SubscriptionService(db, new NoNetworkBilling(),
+            scope.ServiceProvider.GetRequiredService<Microsoft.AspNetCore.DataProtection.IDataProtectionProvider>(), fixture.Clock);
+        Assert.True(await resolver.HasSubscriptionAsync(identity, default));
+        fixture.Clock.Set(now + SubscriptionService.VerificationLifetime);
+        Assert.False(await resolver.HasSubscriptionAsync(identity, default));
+        // The app's background GET refreshes the persisted verification.
+        Assert.True((await client.GetFromJsonAsync<SubscriptionDto>("/v1/subscription"))!.Active);
+        Assert.True(await resolver.HasSubscriptionAsync(identity, default));
+        fixture.Billing.Purchases[token] = fixture.Billing.Purchases[token] with { State = "SUBSCRIPTION_STATE_EXPIRED" };
+        Assert.Equal(HttpStatusCode.NoContent, (await NotifyAsync(token, Guid.NewGuid().ToString())).StatusCode);
+        Assert.False(await resolver.HasSubscriptionAsync(identity, default));
+        fixture.Clock.Set(now);
+    }
+
+    [Fact]
+    public async Task CachedVerificationNeverExtendsPurchaseExpiry()
+    {
+        var now = new DateTimeOffset(2026, 10, 16, 12, 0, 0, TimeSpan.Zero);
+        fixture.Clock.Set(now);
+        var (client, account) = await AccountAsync();
+        var token = Guid.NewGuid().ToString();
+        fixture.Billing.Purchases[token] = new("SUBSCRIPTION_STATE_CANCELED", now.AddMinutes(1), true, SubscriptionService.Binding(account));
+        (await client.PostAsJsonAsync("/v1/subscription", new { purchaseToken = token })).EnsureSuccessStatusCode();
+        using var scope = fixture.Factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var identity = await db.Accounts.Where(x => x.Id == account).Select(x => x.PrimaryIdentityId).SingleAsync();
+        var resolver = new SubscriptionService(db, new NoNetworkBilling(),
+            scope.ServiceProvider.GetRequiredService<Microsoft.AspNetCore.DataProtection.IDataProtectionProvider>(), fixture.Clock);
+        Assert.True(await resolver.HasSubscriptionAsync(identity, default));
+        fixture.Clock.Set(now.AddMinutes(1));
+        Assert.False(await resolver.HasSubscriptionAsync(identity, default));
+        fixture.Clock.Set(now);
+    }
+
+    private sealed class GatedBilling(TestBilling inner, string blockedToken) : IPlayBillingClient
+    {
+        public TaskCompletionSource Entered { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        public TaskCompletionSource Release { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        public async Task<PlaySubscription> GetAsync(string token, CancellationToken ct)
+        {
+            if (token == blockedToken)
+            {
+                Entered.TrySetResult();
+                await Release.Task.WaitAsync(ct);
+            }
+            return await inner.GetAsync(token, ct);
+        }
+        public Task AcknowledgeAsync(string token, CancellationToken ct) => inner.AcknowledgeAsync(token, ct);
+    }
+
+    [Fact]
+    public async Task SlowGoogleVerificationDoesNotBlockAnotherAccount()
+    {
+        var (_, first) = await AccountAsync();
+        var (_, other) = await AccountAsync();
+        var firstToken = Guid.NewGuid().ToString();
+        var otherToken = Guid.NewGuid().ToString();
+        fixture.Billing.Purchases[firstToken] = new("SUBSCRIPTION_STATE_ACTIVE", fixture.Clock.GetUtcNow().AddDays(1), true, SubscriptionService.Binding(first));
+        fixture.Billing.Purchases[otherToken] = new("SUBSCRIPTION_STATE_ACTIVE", fixture.Clock.GetUtcNow().AddDays(1), true, SubscriptionService.Binding(other));
+        var gate = new GatedBilling(fixture.Billing, firstToken);
+        using var firstScope = fixture.Factory.Services.CreateScope();
+        using var otherScope = fixture.Factory.Services.CreateScope();
+        SubscriptionService Service(IServiceScope scope) => new(scope.ServiceProvider.GetRequiredService<AppDbContext>(), gate,
+            scope.ServiceProvider.GetRequiredService<Microsoft.AspNetCore.DataProtection.IDataProtectionProvider>(), fixture.Clock);
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        var pending = Service(firstScope).VerifyAsync(first, firstToken, timeout.Token);
+        try
+        {
+            await gate.Entered.Task.WaitAsync(timeout.Token);
+            Assert.True((await Service(otherScope).VerifyAsync(other, otherToken, timeout.Token)).Active);
+            Assert.False(pending.IsCompleted);
+        }
+        finally
+        {
+            gate.Release.TrySetResult();
+            await pending;
+        }
+    }
+
     [Theory]
     [InlineData("PENDING", false, 0)]
     [InlineData("ACTIVE", true, 1)]

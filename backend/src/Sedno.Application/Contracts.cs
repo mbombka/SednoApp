@@ -14,6 +14,8 @@ public record RequestStatusDto(string RequestId, string Status, DateTimeOffset R
 public record SimplificationInput(string RequestId, string Text);
 public record ReservationOutcome(string Kind, QuotaDto Quota);
 
+public sealed class SimplificationTimeoutException() : Exception("Upraszczanie trwało zbyt długo. Spróbuj ponownie.");
+
 public interface IModelProvider
 {
     Task<string> SimplifyAsync(string text, CancellationToken cancellationToken);

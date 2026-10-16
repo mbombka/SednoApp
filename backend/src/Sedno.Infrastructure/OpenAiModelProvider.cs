@@ -11,7 +11,7 @@ public sealed class OpenAiModelOptions
     public string ApiKey { get; init; } = "";
     public string Model { get; init; } = "gpt-6-luna";
     public int MaxOutputTokens { get; init; } = 4096;
-    public int TimeoutSeconds { get; init; } = 20;
+    public int TimeoutSeconds { get; init; } = 8;
 
     public void Validate()
     {
@@ -21,8 +21,8 @@ public sealed class OpenAiModelOptions
             throw new InvalidOperationException("Model:OpenAI:Model must be gpt-6-luna; evaluate other models before enabling them.");
         if (MaxOutputTokens is < 256 or > 8192)
             throw new InvalidOperationException("Model:OpenAI:MaxOutputTokens must be between 256 and 8192.");
-        if (TimeoutSeconds is < 1 or > 25)
-            throw new InvalidOperationException("Model:OpenAI:TimeoutSeconds must be between 1 and 25.");
+        if (TimeoutSeconds is < 1 or > 8)
+            throw new InvalidOperationException("Model:OpenAI:TimeoutSeconds must be between 1 and 8.");
     }
 }
 
@@ -99,6 +99,10 @@ public sealed class OpenAiModelProvider : IModelProvider
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
             throw new OperationCanceledException(cancellationToken);
+        }
+        catch (OperationCanceledException) when (timeout.IsCancellationRequested)
+        {
+            throw new SimplificationTimeoutException();
         }
         catch (Exception ex) when (ex is HttpRequestException or OperationCanceledException or JsonException
             or KeyNotFoundException or InvalidOperationException or ModelProviderException)

@@ -14,6 +14,7 @@ class SubscriptionViewModel extends ChangeNotifier {
   final String productId;
   StreamSubscription<List<StorePurchase>>? _listener;
   Future<void> _queue = Future.value();
+  Timer? _refreshTimer;
   bool _disposed = false;
   bool busy = false;
   SubscriptionOffer? offer;
@@ -30,19 +31,37 @@ class SubscriptionViewModel extends ChangeNotifier {
         _notify();
       },
     );
+    _refreshTimer ??= Timer.periodic(const Duration(minutes: 5), (_) {
+      unawaited(refresh());
+    });
     await refresh();
   }
 
   Future<void> refresh() async {
     await _run(() async {
-      offer = await store.offer();
-      status = await repository.current();
+      // Start server verification immediately; store availability must not delay it.
+      final offerTask = () async {
+        try {
+          offer = await store.offer();
+        } catch (_) {
+          offer = null;
+        }
+      }();
+      try {
+        status = await repository.current();
+        _notify();
+      } finally {
+        await offerTask;
+      }
     });
   }
 
   Future<void> buy() => _run(() async {
     final current = await repository.current();
     status = current;
+    if (current.accountBinding.isEmpty) {
+      throw StateError('Zaloguj się przed zakupem.');
+    }
     if (current.active) {
       message = 'Subskrypcja jest już aktywna.';
       return;
@@ -50,8 +69,10 @@ class SubscriptionViewModel extends ChangeNotifier {
     await store.buy(current.accountBinding);
   });
   Future<void> restore() => _run(() async {
-    await repository
-        .current(); // Require an authenticated account before restoring.
+    final current = await repository.current();
+    if (current.accountBinding.isEmpty) {
+      throw StateError('Zaloguj się przed przywróceniem zakupu.');
+    }
     await store.restore();
     status = await repository.current();
     message = 'Sprawdzono zakupy. Potwierdzenie może potrwać chwilę.';
@@ -103,6 +124,7 @@ class SubscriptionViewModel extends ChangeNotifier {
   @override
   void dispose() {
     _disposed = true;
+    _refreshTimer?.cancel();
     unawaited(_listener?.cancel());
     super.dispose();
   }

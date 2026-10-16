@@ -20,32 +20,39 @@ public sealed class OpenAiAgentApiTests(BackendFixture fixture)
         public int Submissions;
         public int Deletions;
         public string? Failure;
+        public TaskCompletionSource DeleteGate { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        private async Task<HttpResponseMessage> DeleteAsync(CancellationToken ct)
+        {
+            await DeleteGate.Task.WaitAsync(ct);
+            return Json(new { deleted = true });
+        }
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken ct)
         {
             var path = request.RequestUri!.AbsolutePath;
+            if (request.Method == HttpMethod.Get) return Task.FromResult(Json(new { data = Array.Empty<object>(), has_more = false }));
+            if (path.EndsWith("/events")) return Task.FromResult(Json(new { }));
             if (request.Method == HttpMethod.Delete)
             {
-                Deletions++;
-                return Task.FromResult(Json(new { deleted = true }));
+                Interlocked.Increment(ref Deletions);
+                return DeleteAsync(ct);
             }
             if (request.Method == HttpMethod.Post && path.EndsWith("/sessions"))
             {
                 Submissions++;
                 if (Failure == "timeout") throw new TaskCanceledException("sensitive-agent-error");
                 if (Failure == "http") return Task.FromResult(Json(new { error = "sensitive-agent-error" }, HttpStatusCode.TooManyRequests));
-                return Task.FromResult(Json(new { id = "sess_test" }, HttpStatusCode.Created));
+                var sessionId = "sess_" + Guid.NewGuid().ToString("N");
+                string Event(object value) => "data: " + JsonSerializer.Serialize(value) + "\n\n";
+                var data = Event(new { type = "agent.session.created", session = new { id = sessionId } }) +
+                    Event(new { type = "agent.session.turn.item.done", session_id = sessionId, turn_id = "turn_test",
+                        item = new { type = "message", role = "assistant", phase = "final_answer", status = "completed",
+                            turn_id = "turn_test", content = new[] { new { type = "output_text", text = "Dostarcz dokumenty do 20 listopada." } } } }) +
+                    Event(new { type = Failure == "failed" ? "agent.session.turn.failed" : "agent.session.turn.completed",
+                        session_id = sessionId, turn_id = "turn_test", turn = new { id = "turn_test", status = "completed" } });
+                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+                    { Content = new StringContent(data, System.Text.Encoding.UTF8, "text/event-stream") });
             }
-            if (path.EndsWith("/turns")) return Task.FromResult(Json(new
-            {
-                has_more = false, data = new[] { new { id = "turn_test", status = Failure == "failed" ? "failed" : "completed" } }
-            }));
-            if (path.EndsWith("/items")) return Task.FromResult(Json(new
-            {
-                has_more = false, data = new[] { new { type = "message", role = "assistant", phase = "final_answer",
-                    status = "completed", turn_id = "turn_test", content = new[]
-                    { new { type = "output_text", text = "Dostarcz dokumenty do 20 listopada." } } } }
-            }));
-            return Task.FromResult(Json(new { id = "sess_test" }, HttpStatusCode.Created));
+            throw new InvalidOperationException("Unexpected polling request.");
         }
         private static HttpResponseMessage Json(object value, HttpStatusCode status = HttpStatusCode.OK) =>
             new(status) { Content = new StringContent(JsonSerializer.Serialize(value)) };
@@ -78,7 +85,9 @@ public sealed class OpenAiAgentApiTests(BackendFixture fixture)
         const string text = "Dokumenty należy dostarczyć do 20 listopada. PoufnyTekstAgenta987";
         Task<HttpResponseMessage> Submit(string id) => client.PostAsJsonAsync("/v1/simplifications", new { requestId = id, text });
 
-        using var success = await Submit("agent-success");
+        using var success = await Submit("agent-success").WaitAsync(TimeSpan.FromSeconds(5));
+        // The client already has its result even while upstream deletion is gated.
+        upstream.DeleteGate.TrySetResult();
         Assert.Equal(HttpStatusCode.OK, success.StatusCode);
         using var result = JsonDocument.Parse(await success.Content.ReadAsStringAsync());
         Assert.Equal("Dostarcz dokumenty do 20 listopada.", result.RootElement.GetProperty("result").GetProperty("text").GetString());
@@ -95,7 +104,10 @@ public sealed class OpenAiAgentApiTests(BackendFixture fixture)
         using var retry = await Submit("agent-failed");
         Assert.Equal(HttpStatusCode.Conflict, retry.StatusCode);
         Assert.Equal(2, upstream.Submissions);
-        Assert.Equal(failure == "failed" ? 2 : 1, upstream.Deletions);
+        var expected = failure == "failed" ? 2 : 1;
+        using var wait = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        while (Volatile.Read(ref upstream.Deletions) < expected) await Task.Delay(20, wait.Token);
+        Assert.Equal(expected, upstream.Deletions);
         var logs = string.Join('\n', fixture.Logs.Messages);
         foreach (var sensitive in new[] { text, "Dostarcz dokumenty do 20 listopada.", "test-agent-secret",
             "sensitive-agent-error", token!, "https://api.openai.com/v1/agents" })

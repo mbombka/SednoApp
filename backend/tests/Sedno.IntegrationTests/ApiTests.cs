@@ -3,6 +3,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
+using Sedno.Infrastructure;
 using Sedno.Application;
 using Xunit;
 
@@ -249,6 +250,92 @@ public sealed class ApiTests(BackendFixture fixture)
         var logs = string.Join('\n', fixture.Logs.Messages);
         Assert.DoesNotContain(sensitive, logs);
         Assert.DoesNotContain(guest.Token, logs);
+    }
+
+    private sealed class GatedEntitlements(Guid blockedIdentity) : IEntitlementResolver
+    {
+        public TaskCompletionSource Entered { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        public TaskCompletionSource Release { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        public async Task<bool> HasSubscriptionAsync(Guid id, CancellationToken ct)
+        {
+            if (id == blockedIdentity)
+            {
+                Entered.TrySetResult();
+                await Release.Task.WaitAsync(ct);
+            }
+            return false;
+        }
+    }
+
+    [Fact]
+    public async Task IndependentInstallationsReserveConcurrentlyWhileSameInstallationWaits()
+    {
+        var installation = Guid.NewGuid().ToString();
+        var first = await GuestAsync(installation);
+        var same = await GuestAsync(installation);
+        var other = await GuestAsync();
+        using var firstScope = fixture.Factory.Services.CreateScope();
+        using var sameScope = fixture.Factory.Services.CreateScope();
+        using var otherScope = fixture.Factory.Services.CreateScope();
+        var gate = new GatedEntitlements(first.Id);
+        UsageStore Store(IServiceScope scope) => new(scope.ServiceProvider.GetRequiredService<AppDbContext>(), gate, fixture.Clock);
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        var pending = Store(firstScope).ReserveAsync(first.Id, "held", "fingerprint", timeout.Token);
+        Task<ReservationOutcome>? samePending = null;
+        try
+        {
+            await gate.Entered.Task.WaitAsync(timeout.Token);
+            samePending = Store(sameScope).ReserveAsync(same.Id, "same", "fingerprint", timeout.Token);
+            // With the old global exclusive lock this cannot finish until first releases.
+            var independent = await Store(otherScope).ReserveAsync(other.Id, "other", "fingerprint", timeout.Token);
+            Assert.Equal("reserved", independent.Kind);
+            Assert.False(samePending.IsCompleted);
+        }
+        finally
+        {
+            gate.Release.TrySetResult();
+            await pending;
+            if (samePending is not null) await samePending;
+        }
+    }
+
+    private sealed class GatedIdentity : IIdentityAccountDeletion
+    {
+        public TaskCompletionSource Entered { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        public TaskCompletionSource Release { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        public async Task<bool> ExistsAsync(string uid, CancellationToken ct)
+        {
+            Entered.TrySetResult();
+            await Release.Task.WaitAsync(ct);
+            return true;
+        }
+        public Task DeleteAsync(string uid, CancellationToken ct) => Task.CompletedTask;
+    }
+
+    [Fact]
+    public async Task SlowIdentityLookupDoesNotBlockUnrelatedSimplification()
+    {
+        var first = await GuestAsync();
+        var other = await GuestAsync();
+        using var scope = fixture.Factory.Services.CreateScope();
+        var gate = new GatedIdentity();
+        var store = new GuestStore(scope.ServiceProvider.GetRequiredService<AppDbContext>(),
+            scope.ServiceProvider.GetRequiredService<IUsageStore>(), fixture.Clock,
+            Enumerable.Repeat((byte)1, 32).ToArray(), gate);
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        var pending = store.LinkAsync(new(first.Id, null, Guid.NewGuid()), new("parallel-" + Guid.NewGuid(), "google"), timeout.Token);
+        try
+        {
+            await gate.Entered.Task.WaitAsync(timeout.Token);
+            var response = await Submit(other.Client, "during-login", "Tekst").WaitAsync(timeout.Token);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.False(pending.IsCompleted);
+        }
+        finally
+        {
+            gate.Release.TrySetResult();
+            await pending;
+        }
     }
 
     private static async Task SpinWaitUntil(Func<bool> condition)

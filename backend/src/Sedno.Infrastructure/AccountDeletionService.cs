@@ -60,12 +60,14 @@ public sealed class AccountDeletionService(AppDbContext db, IIdentityAccountDele
     {
         if (session.AccountId is not Guid accountId) throw new InvalidOperationException("Account required.");
         await using var transaction = await db.Database.BeginTransactionAsync(ct);
-        // Same locks and ordering as linking/quota and billing, so deletion cannot leave linked rows behind.
-        await db.Database.ExecuteSqlRawAsync("SELECT pg_advisory_xact_lock(1748392201)", ct);
-        await db.Database.ExecuteSqlRawAsync("SELECT pg_advisory_xact_lock(1748392202)", ct);
-        var account = await db.Accounts.SingleOrDefaultAsync(x => x.Id == accountId, ct);
+        var account = await db.Accounts.AsNoTracking().SingleOrDefaultAsync(x => x.Id == accountId, ct);
         if (account is null) return;
+        await IdentityCoordination.LockAsync(db, account.FirebaseUid, ct);
         await identity.DeleteAsync(account.FirebaseUid, ct);
+        // Wait for billing BEFORE taking the exclusive topology lock; slow Google
+        // verification must not stop unrelated simplifications during deletion.
+        await BillingCoordination.AccountAsync(db, accountId, ct);
+        await db.Database.ExecuteSqlRawAsync("SELECT pg_advisory_xact_lock(1748392201)", ct);
         await db.Sessions.Where(x => x.AccountId == accountId).ExecuteDeleteAsync(ct);
         // Requests and all sessions on linked identities cascade. Purchases cascade from account.
         await db.Identities.Where(x => x.AccountId == accountId).ExecuteDeleteAsync(ct);

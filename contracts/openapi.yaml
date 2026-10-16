@@ -102,7 +102,11 @@ paths:
       description: Requires an account bearer. Refreshes stored purchases against Google Play. No client-side entitlement is trusted.
       responses:
         '200':
-          description: Current subscription and the obfuscated account ID to pass to Play Billing.
+          description: >-
+            Refreshes the server-verified purchase snapshot and returns the subscription
+            and obfuscated account ID. Call in the background at app startup/resume.
+            Quota checks use this snapshot for up to 15 minutes, never past purchase expiry;
+            stale or missing verification falls back to the free tier without resetting usage.
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Subscription' }
@@ -182,6 +186,8 @@ paths:
     post:
       operationId: simplifyText
       description: >-
+        The server deadline is 9 seconds. HTTP 504 uses code simplification_timeout
+        and must not be automatically retried.
         requestId is unique per authenticated identity. Active duplicates return
         202. Completed duplicates return 409 result_unavailable because result
         text is never persisted; the client must keep its successful response.
@@ -213,6 +219,11 @@ paths:
         '409': { $ref: '#/components/responses/Problem' }
         '413': { $ref: '#/components/responses/Problem' }
         '429': { $ref: '#/components/responses/Problem' }
+        '504':
+          description: Simplification exceeded the server deadline (simplification_timeout); do not automatically retry.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
         '503': { $ref: '#/components/responses/Problem' }
   /v1/simplifications/requests/{requestId}:
     get:

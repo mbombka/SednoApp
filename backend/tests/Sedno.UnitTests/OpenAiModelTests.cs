@@ -119,7 +119,7 @@ public sealed class OpenAiModelTests
         public Action? Elapse;
         public override ITimer CreateTimer(TimerCallback callback, object? state, TimeSpan dueTime, TimeSpan period)
         {
-            Assert.Equal(TimeSpan.FromSeconds(20), dueTime);
+            Assert.Equal(TimeSpan.FromSeconds(8), dueTime);
             Elapse = () => callback(state);
             return new ManualTimer();
         }
@@ -141,7 +141,7 @@ public sealed class OpenAiModelTests
             await Task.Delay(Timeout.Infinite, ct);
             return Response(Completed("unused"));
         }));
-        await Assert.ThrowsAsync<ModelProviderException>(() =>
+        await Assert.ThrowsAsync<SimplificationTimeoutException>(() =>
             new OpenAiModelProvider(client, Options(), clock).SimplifyAsync("Tekst", default));
     }
 

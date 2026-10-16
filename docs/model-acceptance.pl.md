@@ -58,7 +58,10 @@ Dla `openai-agent` użyj tego samego agenta i protokołu sesji co adapter, zamia
 bezpośredniego Responses API. Meter `Sedno.OpenAI.Agents` udostępnia czas i tokeny
 zakończonych tur bez treści. Tokeny są orientacyjne i mogą być niekompletne;
 rozliczenia sprawdź w Platform Usage. Sprawdź usunięcie sesji po sukcesie i błędzie
-oraz ostrzeganie po nieudanym usunięciu. Sesje są usuwane z API, więc ich późniejsza
+oraz ostrzeganie i ponawianie po nieudanym usunięciu. Potwierdź, że wynik wraca
+przed zakończeniem zablokowanego DELETE, a po restarcie backend odtwarza sprzątanie z listy oznaczonych
+sesji u dostawcy. Sprawdź limit 8 s dla AI, 9 s dla backendu i 10 s dla Fluttera,
+brak ponawiania HTTP 504 oraz anulowanie żądania HTTP po timeoutcie. Sesje są usuwane z API, więc ich późniejsza
 dostępność w panelu nie jest wymagana do monitorowania rozliczeń.
 
 ## Dostępność i Android

@@ -1,7 +1,7 @@
-using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using System.Text;
 using System.Diagnostics.Metrics;
 using System.Globalization;
-using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -14,7 +14,7 @@ public sealed class OpenAiAgentOptions
 {
     public string ApiKey { get; init; } = "";
     public string AgentId { get; init; } = "";
-    public int TimeoutSeconds { get; init; } = 20;
+    public int TimeoutSeconds { get; init; } = 8;
 
     public void Validate()
     {
@@ -23,9 +23,9 @@ public sealed class OpenAiAgentOptions
         if (!AgentId.StartsWith("agent_", StringComparison.Ordinal) || AgentId.Length is < 7 or > 64 ||
             AgentId.Any(c => !char.IsAsciiLetterOrDigit(c) && c != '_'))
             throw new InvalidOperationException("OpenAI:AgentId must be a saved agent identifier.");
-        // Leave room for cleanup within the mobile client's 30-second request timeout.
-        if (TimeoutSeconds is < 1 or > 25)
-            throw new InvalidOperationException("OpenAI:TimeoutSeconds must be between 1 and 25.");
+        // Reserve time for the API to return a timeout before the mobile 10-second deadline.
+        if (TimeoutSeconds is < 1 or > 8)
+            throw new InvalidOperationException("OpenAI:TimeoutSeconds must be between 1 and 8.");
     }
 }
 
@@ -39,15 +39,17 @@ public sealed class OpenAiAgentProvider : IModelProvider
     private readonly OpenAiAgentOptions _options;
     private readonly TimeProvider _clock;
     private readonly ILogger<OpenAiAgentProvider> _logger;
+    private readonly IAgentSessionCleanupQueue _cleanup;
 
     public OpenAiAgentProvider(HttpClient client, OpenAiAgentOptions options, TimeProvider clock,
-        ILogger<OpenAiAgentProvider> logger)
+        ILogger<OpenAiAgentProvider> logger, IAgentSessionCleanupQueue cleanup)
     {
         options.Validate();
         _client = client;
         _options = options;
         _clock = clock;
         _logger = logger;
+        _cleanup = cleanup;
     }
 
     public async Task<string> SimplifyAsync(string text, CancellationToken cancellationToken)
@@ -63,9 +65,11 @@ public sealed class OpenAiAgentProvider : IModelProvider
         {
             // Conversation-only sessions require initial input. Do not retry a lost
             // create response: the provider may already be processing this text.
-            using (var created = await SendJsonAsync(HttpMethod.Post, Sessions, new
+            using var response = await SendAsync(HttpMethod.Post, Sessions, new
             {
                 agent_id = _options.AgentId,
+                stream = true,
+                metadata = new { sedno_purpose = AgentSessionCleanupWorker.Purpose },
                 environment = new { type = "none" },
                 input = new[] { new { role = "user", content = new[] { new { type = "input_text", text } } } },
                 agent = new
@@ -75,45 +79,68 @@ public sealed class OpenAiAgentProvider : IModelProvider
                     multi_agent = new { enabled = false },
                     text = new { format = new { type = "text" } }
                 }
-            }, linked.Token))
-            {
-                sessionId = created.RootElement.GetProperty("id").GetString();
-                if (!SafeId(sessionId)) throw new ModelProviderException();
-            }
-
-            var sessionUrl = $"{Sessions}/{sessionId}";
+            }, linked.Token);
+            if (response.Content.Headers.ContentType?.MediaType != "text/event-stream")
+                throw new ModelProviderException();
+            using var stream = await response.Content.ReadAsStreamAsync(linked.Token);
             string? turnId = null;
-            while (turnId is null)
+            string? result = null;
+            var completed = false;
+            await foreach (var data in ReadEventsAsync(stream, linked.Token))
             {
-                using var turns = await SendJsonAsync(HttpMethod.Get, $"{sessionUrl}/turns?order=asc&limit=2", null, linked.Token);
-                var root = turns.RootElement;
-                if (root.GetProperty("has_more").GetBoolean()) throw new ModelProviderException();
-                var data = root.GetProperty("data").EnumerateArray().ToArray();
-                if (data.Length > 1) throw new ModelProviderException();
-                if (data.Length == 1)
+                using var document = JsonDocument.Parse(data);
+                var root = document.RootElement;
+                var type = root.GetProperty("type").GetString();
+                if (type == "agent.session.created")
                 {
-                    var turn = data[0];
-                    switch (turn.GetProperty("status").GetString())
-                    {
-                        case "completed":
-                            if (turn.TryGetProperty("error", out var error) && error.ValueKind != JsonValueKind.Null)
-                                throw new ModelProviderException();
-                            turnId = turn.GetProperty("id").GetString();
-                            if (!SafeId(turnId)) throw new ModelProviderException();
-                            RecordUsage(turn);
-                            break;
-                        case "queued":
-                        case "in_progress":
-                            break;
-                        default:
-                            throw new ModelProviderException();
-                    }
+                    var id = root.GetProperty("session").GetProperty("id").GetString();
+                    if (!SafeId(id) || sessionId is not null) throw new ModelProviderException();
+                    sessionId = id;
+                    await _cleanup.TrackAsync(id!, CancellationToken.None);
+                    continue;
                 }
-                if (turnId is null) await Task.Delay(TimeSpan.FromMilliseconds(250), _clock, linked.Token);
+                if (sessionId is null) throw new ModelProviderException();
+                if (root.TryGetProperty("session_id", out var session) && session.GetString() != sessionId)
+                    throw new ModelProviderException();
+                if (root.TryGetProperty("turn_id", out var turnRef) && turnRef.ValueKind != JsonValueKind.Null)
+                {
+                    var id = turnRef.GetString();
+                    if (!SafeId(id) || (turnId is not null && turnId != id)) throw new ModelProviderException();
+                    turnId = id;
+                }
+                switch (type)
+                {
+                    case "agent.session.turn.item.done":
+                        var item = root.GetProperty("item");
+                        if (item.GetProperty("type").GetString() == "message" &&
+                            item.GetProperty("role").GetString() == "assistant" &&
+                            item.GetProperty("phase").GetString() == "final_answer")
+                        {
+                            if (result is not null || turnId is null) throw new ModelProviderException();
+                            result = ReadFinalAnswer(item, turnId);
+                        }
+                        break;
+                    case "agent.session.turn.completed":
+                        var turn = root.GetProperty("turn");
+                        if (turnId is null || turn.GetProperty("id").GetString() != turnId ||
+                            turn.GetProperty("status").GetString() != "completed" || result is null ||
+                            (turn.TryGetProperty("error", out var error) && error.ValueKind != JsonValueKind.Null))
+                            throw new ModelProviderException();
+                        RecordUsage(root.TryGetProperty("usage", out var usage) && usage.ValueKind == JsonValueKind.Object
+                            ? root : turn);
+                        completed = true;
+                        break;
+                    case "error":
+                    case "agent.session.turn.failed":
+                    case "agent.session.turn.cancelled":
+                    case "agent.session.failed":
+                    case "agent.session.requires_action":
+                        throw new ModelProviderException();
+                }
+                if (completed) break;
             }
-
-            using var items = await SendJsonAsync(HttpMethod.Get, $"{sessionUrl}/items?order=asc&limit=100", null, linked.Token);
-            var result = ReadFinalAnswer(items.RootElement, turnId);
+            // Neither EOF, idle, nor text deltas prove a successful complete turn.
+            if (!completed || result is null) throw new ModelProviderException();
             outcome = "succeeded";
             return result;
         }
@@ -122,15 +149,21 @@ public sealed class OpenAiAgentProvider : IModelProvider
             outcome = "cancelled";
             throw new OperationCanceledException(cancellationToken);
         }
+        catch (OperationCanceledException) when (timeout.IsCancellationRequested)
+        {
+            throw new SimplificationTimeoutException();
+        }
         catch (Exception ex) when (ex is HttpRequestException or OperationCanceledException or JsonException
-            or KeyNotFoundException or InvalidOperationException or ModelProviderException or FormatException)
+            or KeyNotFoundException or InvalidOperationException or ModelProviderException or FormatException
+            or IOException or DecoderFallbackException)
         {
             // Never attach the upstream exception: it can contain credentials or content.
             throw new ModelProviderException();
         }
         finally
         {
-            if (SafeId(sessionId)) await DeleteSessionAsync(sessionId!);
+            if (SafeId(sessionId)) await _cleanup.ReadyAsync(sessionId!, CancellationToken.None, outcome != "succeeded");
+            else if (outcome != "succeeded") _cleanup.RequestRecovery();
             Duration.Record(_clock.GetElapsedTime(started).TotalSeconds,
                 new("agent_id", _options.AgentId), new("outcome", outcome));
         }
@@ -139,15 +172,8 @@ public sealed class OpenAiAgentProvider : IModelProvider
     private static bool SafeId(string? id) => !string.IsNullOrEmpty(id) && id.Length <= 128 &&
         id.All(c => char.IsAsciiLetterOrDigit(c) || c is '_' or '-');
 
-    private static string ReadFinalAnswer(JsonElement root, string turnId)
+    private static string ReadFinalAnswer(JsonElement message, string turnId)
     {
-        if (root.GetProperty("has_more").GetBoolean()) throw new ModelProviderException();
-        var messages = root.GetProperty("data").EnumerateArray()
-            .Where(item => item.GetProperty("type").GetString() == "message" &&
-                item.GetProperty("role").GetString() == "assistant" &&
-                item.GetProperty("phase").GetString() == "final_answer").ToArray();
-        if (messages.Length != 1) throw new ModelProviderException();
-        var message = messages[0];
         if (message.GetProperty("status").GetString() != "completed" ||
             message.GetProperty("turn_id").GetString() != turnId) throw new ModelProviderException();
         var parts = message.GetProperty("content").EnumerateArray().ToArray();
@@ -183,32 +209,47 @@ public sealed class OpenAiAgentProvider : IModelProvider
         throw new ModelProviderException();
     }
 
-    private async Task<JsonDocument> SendJsonAsync(HttpMethod method, string url, object? body, CancellationToken ct)
+    private static async IAsyncEnumerable<string> ReadEventsAsync(Stream stream,
+        [EnumeratorCancellation] CancellationToken ct)
     {
-        using var response = await SendAsync(method, url, body, ct);
-        await response.Content.LoadIntoBufferAsync(256 * 1024, ct);
-        return JsonDocument.Parse(await response.Content.ReadAsByteArrayAsync(ct));
+        // Bound both individual SSE frames and the full stream, including ignored deltas.
+        const int frameLimit = 256 * 1024;
+        var buffer = new byte[4096];
+        var line = new List<byte>();
+        var data = new StringBuilder();
+        var encoding = new UTF8Encoding(false, true);
+        var total = 0;
+        int count;
+        while ((count = await stream.ReadAsync(buffer, ct)) != 0)
+        {
+            total += count;
+            if (total > 4 * 1024 * 1024) throw new ModelProviderException();
+            for (var i = 0; i < count; i++)
+            {
+                if (buffer[i] != (byte)'\n')
+                {
+                    line.Add(buffer[i]);
+                    if (line.Count > frameLimit) throw new ModelProviderException();
+                    continue;
+                }
+                var value = encoding.GetString(line.ToArray()).TrimEnd('\r');
+                line.Clear();
+                if (value.Length == 0)
+                {
+                    if (data.Length == 0) continue;
+                    yield return data.ToString();
+                    data.Clear();
+                }
+                else if (value.StartsWith("data:", StringComparison.Ordinal))
+                {
+                    var part = value[5..];
+                    if (part.StartsWith(' ')) part = part[1..];
+                    if (data.Length > 0) data.Append('\n');
+                    data.Append(part);
+                    if (data.Length > frameLimit) throw new ModelProviderException();
+                }
+            }
+        }
     }
 
-    private async Task DeleteSessionAsync(string sessionId)
-    {
-        // Independent of client cancellation and model timeout. Retry deletion only.
-        using var cleanup = new CancellationTokenSource(TimeSpan.FromSeconds(3), _clock);
-        for (var attempt = 0; attempt < 2; attempt++)
-        {
-            try
-            {
-                using var request = new HttpRequestMessage(HttpMethod.Delete, $"{Sessions}/{sessionId}");
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _options.ApiKey);
-                request.Headers.Add("OpenAI-Beta", "agents=v1");
-                using var response = await _client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cleanup.Token);
-                if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.NotFound) return;
-            }
-            catch (Exception ex) when (ex is HttpRequestException or OperationCanceledException) { }
-            if (cleanup.IsCancellationRequested) break;
-        }
-        // No session ID, body, credentials or exception in logs. Operators reconcile
-        // retained sessions in the dedicated project if cleanup fails or the process dies.
-        _logger.LogWarning("Nie udało się usunąć sesji OpenAI. Sprawdź retencję sesji w projekcie Sedno.");
-    }
 }

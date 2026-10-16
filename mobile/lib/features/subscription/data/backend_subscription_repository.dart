@@ -8,7 +8,19 @@ class BackendSubscriptionRepository implements SubscriptionRepository {
   final BackendSessionGateway sessions;
 
   Future<SubscriptionStatus> _request(String? token) async {
+    final revision = sessions.sessionRevision.value;
+    if (await sessions.savedAccount() == null) {
+      if (token != null) throw StateError('Zaloguj się, aby przywrócić zakup.');
+      return const SubscriptionStatus(
+        active: false,
+        state: 'none',
+        accountBinding: '',
+      );
+    }
     final bearer = await sessions.accessToken();
+    if (revision != sessions.sessionRevision.value) {
+      throw StateError('Sesja uległa zmianie.');
+    }
     final url = sessions.baseUrl.resolve('/v1/subscription');
     final headers = {
       'Authorization': 'Bearer $bearer',
@@ -23,12 +35,16 @@ class BackendSubscriptionRepository implements SubscriptionRepository {
                     body: jsonEncode({'purchaseToken': token}),
                   ))
             .timeout(const Duration(seconds: 30));
+    if (revision != sessions.sessionRevision.value) {
+      throw StateError('Sesja uległa zmianie.');
+    }
     if (response.statusCode != 200) {
       throw StateError(
         'Nie można sprawdzić subskrypcji. Zaloguj się i spróbuj ponownie.',
       );
     }
     final data = jsonDecode(response.body) as Map<String, dynamic>;
+    sessions.quotaRevision.value++;
     return SubscriptionStatus(
       active: data['active'] as bool,
       state: data['state'] as String,
@@ -39,9 +55,5 @@ class BackendSubscriptionRepository implements SubscriptionRepository {
   @override
   Future<SubscriptionStatus> current() => _request(null);
   @override
-  Future<SubscriptionStatus> verify(String token) async {
-    final status = await _request(token);
-    sessions.sessionRevision.value++;
-    return status;
-  }
+  Future<SubscriptionStatus> verify(String token) => _request(token);
 }

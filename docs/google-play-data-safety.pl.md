@@ -101,9 +101,11 @@ sesji gościa. Nie deklarować nieużywanych opcjonalnych kontroli innych aplika
 
 **OpenAI — adapter zaimplementowany, wdrożenie niepotwierdzone:** GPT-6 Luna
 (`gpt-6-luna`) przez Responses API z `store=false` albo zapisany agent przez
-Agents API. Agents API przechowuje sesje z treścią i wynikiem. Adapter zleca ich
-usunięcie po zakończeniu, ale awaria procesu lub nieudane usunięcie może pozostawić
-sesję u dostawcy. Wymagana jest operacyjna kontrola pozostałych sesji; nie deklarować
+Agents API. Agents API przechowuje sesje z treścią i wynikiem. Backend usuwa je
+w tle, a nieudane próby ponawia na podstawie identyfikatorów w pamięci; nie ma
+tabeli kolejki. Po restarcie odczytuje od dostawcy sesje oznaczone jako uproszczenia
+Sedno i ponawia sprzątanie. Awaria lub niedostępność usuwania może opóźnić usunięcie.
+Wymagana jest operacyjna kontrola pozostałych sesji; nie deklarować
 przetwarzania efemerycznego. Domyślna konfiguracja produkcyjna
 nadal wyłącza uproszczanie. Dokumentacja
 API opisuje domyślny brak trenowania na danych, lecz nie gwarantuje zerowej

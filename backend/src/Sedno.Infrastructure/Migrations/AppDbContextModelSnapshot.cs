@@ -120,6 +120,9 @@ namespace Sedno.Infrastructure.Migrations
                         .HasMaxLength(80)
                         .HasColumnType("character varying(80)");
 
+                    b.Property<DateTimeOffset?>("VerifiedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.HasKey("TokenHash");
 
                     b.HasIndex("AccountId");
