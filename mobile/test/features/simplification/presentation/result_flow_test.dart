@@ -1,7 +1,6 @@
 import '../../../helpers.dart';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sedno_app/app/app.dart';
 import 'package:sedno_app/features/quota/domain/quota_state.dart';
@@ -33,67 +32,47 @@ SimplificationResponse response(String id) => SimplificationResponse(
 );
 
 void main() {
-  testWidgets(
-    'success opens result, copies, shows original and starts new text',
-    (tester) async {
-      String? sentText;
-      String? copiedText;
-      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-        SystemChannels.platform,
-        (call) async {
-          if (call.method == 'Clipboard.setData') {
-            copiedText =
-                (call.arguments as Map<Object?, Object?>)['text'] as String?;
-          }
-          return null;
-        },
-      );
-      addTearDown(
-        () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-          SystemChannels.platform,
-          null,
-        ),
-      );
-      await tester.pumpWidget(
-        SednoApp(
-          simplificationRepository: StubRepository((request) async {
-            sentText = request.input.value;
-            return response(request.requestId);
-          }),
-        ),
-      );
-      await tester.enterText(find.byType(TextField), 'Trudny tekst');
-      await submitText(tester);
-      await tester.pumpAndSettle();
+  testWidgets('success opens result, shows original and starts new text', (
+    tester,
+  ) async {
+    String? sentText;
+    await tester.pumpWidget(
+      SednoApp(
+        simplificationRepository: StubRepository((request) async {
+          sentText = request.input.value;
+          return response(request.requestId);
+        }),
+      ),
+    );
+    await tester.enterText(find.byType(TextField), 'Trudny tekst');
+    await submitText(tester);
+    await tester.pumpAndSettle();
 
-      expect(sentText, 'Trudny tekst');
-      expect(find.text('Uproszczony tekst'), findsOneWidget);
-      expect(find.text('To jest prosty tekst.'), findsOneWidget);
-      expect(find.byKey(const Key('aiErrorWarning')), findsOneWidget);
-      expect(find.byType(TabBar), findsNothing);
-      expect(find.byKey(const Key('originalText')), findsNothing);
+    expect(sentText, 'Trudny tekst');
+    expect(find.text('Uproszczony tekst'), findsOneWidget);
+    expect(find.text('To jest prosty tekst.'), findsOneWidget);
+    expect(find.byKey(const Key('aiErrorWarning')), findsNothing);
+    expect(find.byType(TabBar), findsNothing);
+    expect(find.byKey(const Key('originalText')), findsNothing);
 
-      await tester.tap(find.text('Pokaż oryginał'));
-      await tester.pump();
-      expect(find.text('Trudny tekst'), findsOneWidget);
-      await tester.tap(find.text('Ukryj oryginał'));
-      await tester.pump();
-      expect(find.byKey(const Key('originalText')), findsNothing);
+    await tester.tap(find.text('Pokaż oryginał'));
+    await tester.pump();
+    expect(find.text('Trudny tekst'), findsOneWidget);
+    await tester.tap(find.text('Ukryj oryginał'));
+    await tester.pump();
+    expect(find.byKey(const Key('originalText')), findsNothing);
 
-      await tester.tap(find.text('Kopiuj'));
-      await tester.pump();
-      expect(copiedText, 'To jest prosty tekst.');
-      expect(find.text('Skopiowano uproszczony tekst.'), findsOneWidget);
+    expect(find.text('Kopiuj'), findsNothing);
+    expect(find.widgetWithText(FilledButton, 'Nowy tekst'), findsOneWidget);
 
-      await tester.tap(find.text('Nowy tekst'));
-      await tester.pumpAndSettle();
-      expect(find.byType(TextField), findsOneWidget);
-      expect(
-        tester.widget<TextField>(find.byType(TextField)).controller!.text,
-        isEmpty,
-      );
-    },
-  );
+    await tester.tap(find.text('Nowy tekst'));
+    await tester.pumpAndSettle();
+    expect(find.byType(TextField), findsOneWidget);
+    expect(
+      tester.widget<TextField>(find.byType(TextField)).controller!.text,
+      isEmpty,
+    );
+  });
 
   testWidgets('error keeps input and retry opens result', (tester) async {
     var calls = 0;

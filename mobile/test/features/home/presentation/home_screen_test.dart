@@ -70,6 +70,10 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('aiProcessingNotice')), findsOneWidget);
     expect(find.textContaining('OpenAI'), findsOneWidget);
+    expect(
+      find.textContaining('AI może popełniać błędy. Sprawdź wynik.'),
+      findsOneWidget,
+    );
     expect(calls, 0);
     await tester.tap(find.text('Anuluj'));
     await tester.pumpAndSettle();
