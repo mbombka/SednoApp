@@ -1,0 +1,6 @@
+# Skopiuj do key.properties i uzupełnij lokalnie. Nie zapisuj haseł w Git.
+# Ścieżka storeFile jest liczona od katalogu mobile/android/.
+storeFile=keystore/sedno-upload.jks
+storePassword=UZUPELNIJ_LOKALNIE
+keyAlias=sedno-upload
+keyPassword=UZUPELNIJ_LOKALNIE

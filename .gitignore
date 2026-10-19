@@ -66,3 +66,10 @@ firebase-debug.log*
 /backend/.local-tools/
 /mobile/config/*.local.json
 firepit-log.txt
+
+# Android upload signing credentials (keep a separate secure backup)
+/mobile/android/key.properties
+/mobile/android/keystore/
+*.jks
+*.keystore
+**/.kotlin/

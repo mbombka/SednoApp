@@ -5,6 +5,9 @@ na telefonie i przygotowania wydania w Google Play.
 
 - [ ] Powiązać projekt z Play Integrity w Play Console i sprawdzić aplikację
   zainstalowaną z kanału testowego, w tym upraszczanie i logowanie.
+  Powiązanie projektu potwierdzone przez właściciela 19.10.2026; podpisany AAB gotowy.
+  Pozostało przesłanie wydania do Google Play i test na telefonie.
+  [Instrukcja pierwszego wydania testowego](mobile/docs/google_play_internal_test.md).
 - [ ] Sprawdzić certyfikaty podpisu Androida w Firebase i przygotować podpisane wydanie AAB.
 - [ ] Wykonać próby aparatu, OCR, TalkBack i powiększonego tekstu.
 - [ ] Przećwiczyć usuwanie konta, obsługę zgłoszeń e-mail i odtwarzanie bazy z kopii.

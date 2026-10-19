@@ -50,6 +50,13 @@ flutter build apk --debug --dart-define-from-file=config/firebase.local.json
 
 Plik powstaje w `build/app/outputs/flutter-apk/app-debug.apk`.
 To wersja testowa. Publikacja w Google Play wymaga podpisanego wydania AAB.
+[Pierwsze wydanie w testach wewnętrznych](docs/google_play_internal_test.md).
+
+Podpis wydania jest w lokalnych `android/key.properties` i
+`android/keystore/sedno-upload.jks`. Zachowaj ich zabezpieczoną kopię poza projektem.
+Po pobraniu projektu odtwórz je z kopii; układ ustawień pokazuje
+[key.properties.example](android/key.properties.example). Bez klucza release nie zbuduje się.
+
 Próby na urządzeniu: [aparat i OCR](docs/android_camera_ocr_manual_check.md),
 [subskrypcje](docs/google_play_subscription_sandbox.md) i
 [dostępność](../docs/model-acceptance.pl.md#dostępność).

@@ -5,6 +5,7 @@ Na początek przeczytaj [opis projektu](../README.md) i [listę prac przed publi
 | Czego szukasz? | Dokument |
 | --- | --- |
 | Uruchomienie aplikacji | [Aplikacja Android](../mobile/README.md) |
+| Pierwszy test przez Google Play | [Play Integrity, logowanie i upraszczanie](../mobile/docs/google_play_internal_test.md) |
 | Lokalny serwer i testy | [Backend](../backend/README.md) |
 | Wdrożenie do Firebase / Google Cloud | [Instrukcja wdrożenia](../backend/deploy/firebase/README.pl.md) |
 | Zasady przetwarzania danych | [Polityka prywatności](privacy-policy.pl.md) |
