@@ -1,7 +1,7 @@
 # Prywatność — obsługa i przechowywanie danych
 
 Pełne zasady i dane administratora: [polityka prywatności](privacy-policy.pl.md).
-Kontakt do zgłoszeń: **mariuszbabka0@gmail.com**. Pierwszy rynek: Polska, odbiorcy 16+.
+Kontakt do zgłoszeń: **contact@sedno.xyz**. Pierwszy rynek: Polska, odbiorcy 16+.
 
 Backend działa od 19.10.2026 w Warszawie; tego dnia produkcję przełączono na Firestore.
 Płatności są wyłączone. Właściciel zrezygnował z backupów nowej bazy na obecnym etapie.

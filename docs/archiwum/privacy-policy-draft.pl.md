@@ -19,7 +19,7 @@ Administratorem danych związanych z korzystaniem z Sedno jest
 Adres korespondencyjny: **ul. Słowiańska 91, Modlniczka, Polska**.
 
 W sprawach danych osobowych, realizacji praw i usunięcia konta napisz na
-**mariuszbabka0@gmail.com**. Administrator nie wyznaczył inspektora ochrony danych.
+**contact@sedno.xyz**. Administrator nie wyznaczył inspektora ochrony danych.
 
 Strona aplikacji: [www.sedno.xyz](https://www.sedno.xyz).
 Dokładny adres opublikowanej polityki: **[DO PODANIA: adres HTTPS polityki]**.
@@ -161,7 +161,7 @@ dane zakupu — przy subskrypcji. Możesz nie używać aparatu i wpisać tekst r
 
 Korzystamy z dostawców logowania, ochrony usługi, OCR i płatności Google oraz
 **OpenAI (planowane API)** oraz Google w zakresie **Gmail** do korespondencji
-pod adresem mariuszbabka0@gmail.com. Administrator wskazał Firebase jako docelową
+pod adresem contact@sedno.xyz. Administrator wskazał Firebase jako docelową
 platformę hostingu; **[DO POTWIERDZENIA: dokładne usługi, podmioty umowne i regiony
 backendu ASP.NET oraz bazy PostgreSQL]**. Wybór marki Firebase nie potwierdza
 miejsca przetwarzania ani uruchomienia bazy.

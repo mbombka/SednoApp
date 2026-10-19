@@ -12,7 +12,7 @@ void main() {
         find.textContaining('Administrator: Mariusz Bąbka'),
         findsOneWidget,
       );
-      expect(find.textContaining('mariuszbabka0@gmail.com'), findsWidgets);
+      expect(find.textContaining('contact@sedno.xyz'), findsWidgets);
       expect(find.text('https://sedno.xyz'), findsOneWidget);
       expect(find.textContaining('nie oznacza braku retencji'), findsOneWidget);
       expect(find.textContaining('Infrastruktura Sedno'), findsOneWidget);

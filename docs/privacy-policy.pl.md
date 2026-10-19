@@ -4,7 +4,7 @@ Wersja: 19 października 2026 r.
 
 ## Administrator i kontakt
 
-Administrator: Mariusz Bąbka, osoba fizyczna, ul. Słowiańska 91, Modlniczka, Polska. Kontakt w sprawach prywatności i usunięcia konta: mariuszbabka0@gmail.com. Administrator nie wyznaczył inspektora ochrony danych.
+Administrator: Mariusz Bąbka, osoba fizyczna, ul. Słowiańska 91, Modlniczka, Polska. Kontakt w sprawach prywatności i usunięcia konta: contact@sedno.xyz. Administrator nie wyznaczył inspektora ochrony danych.
 
 Polityka dotyczy aplikacji Sedno i obsługi jej użytkowników. Pierwszym wybranym rynkiem jest Polska. Aplikacja jest przeznaczona dla osób od 16. roku życia. Osoby w wieku 16–17 lat powinny korzystać z niej za zgodą rodzica lub opiekuna. Aplikacja nie sprawdza wieku ani nie zbiera daty urodzenia.
 
@@ -26,13 +26,13 @@ Usuniemy konto Sedno, jego dane na serwerze i lokalną historię na tym urządze
 
 W aplikacji wybierz Konto → Usuń konto → Usuń konto i dane. Po powodzeniu usuwamy tożsamość Sedno w Firebase, sesje konta, powiązane instalacje, metadane żądań oraz rekordy zakupów w bazie Sedno. Nie usuwamy Twojego konta Google.
 
-Bez aplikacji napisz na mariuszbabka0@gmail.com z tematem „Usunięcie konta Sedno”. Podaj e-mail używany do logowania. Nie wysyłaj hasła, kodów logowania, tokenów, dokumentu tożsamości, zdjęć ani tekstów do uproszczenia. Samo wysłanie wiadomości nie usuwa konta. Przed usunięciem potwierdzimy, że kontrolujesz konto; w razie wątpliwości poprosimy tylko o dodatkowe informacje niezbędne do weryfikacji.
+Bez aplikacji napisz na contact@sedno.xyz z tematem „Usunięcie konta Sedno”. Podaj e-mail używany do logowania. Nie wysyłaj hasła, kodów logowania, tokenów, dokumentu tożsamości, zdjęć ani tekstów do uproszczenia. Samo wysłanie wiadomości nie usuwa konta. Przed usunięciem potwierdzimy, że kontrolujesz konto; w razie wątpliwości poprosimy tylko o dodatkowe informacje niezbędne do weryfikacji.
 
 Usunięcie konta przez e-mail lub na innym urządzeniu nie usuwa historii na pozostałych urządzeniach. Usuń ją w Historii albo wyczyść dane aplikacji w ustawieniach Androida. Nie mamy zdalnego dostępu do lokalnej historii. Zakupy i dane zachowane przez Google podlegają zasadom Google.
 
 ## Zdjęcia i historia na urządzeniu
 
-Zdjęcia, kadrowanie i rozpoznawanie tekstu odbywają się na urządzeniu. Sedno nie wysyła zdjęć do serwera ani dostawcy AI. Rozpoznany tekst możesz poprawić przed wysłaniem. Po odczycie, anulowaniu lub błędzie aplikacja podejmuje próbę usunięcia kopii roboczych zdjęcia; nagłe zatrzymanie procesu może przerwać czyszczenie. Osobne kopie zapisane przez aplikację aparatu pozostają pod Twoją kontrolą.
+Zdjęcia, kadrowanie i rozpoznawanie tekstu odbywają się na urządzeniu. Sedno nie wysyła zdjęć do serwera ani dostawcy AI. Rozpoznany tekst trafia od razu do uproszczenia. Po błędzie lub anulowaniu możesz go poprawić. Po odczycie, anulowaniu lub błędzie aplikacja podejmuje próbę usunięcia kopii roboczych zdjęcia; nagłe zatrzymanie procesu może przerwać czyszczenie. Osobne kopie zapisane przez aplikację aparatu pozostają pod Twoją kontrolą.
 
 Historia zawiera oryginał, uproszczenie i datę. Jest szyfrowana, lokalna i wyłączona z kopii zapasowych Androida. Wpis wygasa po 7 dniach. Wygasłe wpisy nie są wyświetlane; czyszczenie następuje przy odczycie, uruchomieniu i wznowieniu aplikacji. Gdy aplikacja jest zamknięta, usunięcie następuje przy następnym takim zdarzeniu. Możesz usunąć wpisy wcześniej. Wylogowanie czyści lokalną historię.
 
@@ -50,7 +50,7 @@ Google Play obsługuje płatność i subskrypcję. Sedno nie otrzymuje numeru ka
 
 OpenAI obsługuje uproszczenie tekstu przez API. Dla standardowej umowy klienta z Polski podmiotem umownym wskazanym w warunkach OpenAI jest OpenAI Ireland Ltd. Dostawca przetwarza treść na potrzeby wykonania usługi oraz dane niezbędne do bezpieczeństwa zgodnie ze swoimi warunkami.
 
-Google obsługuje Firebase Authentication, Google Sign-In, ML Kit, Play Integrity i Google Play. Google Ireland Limited i Google LLC uczestniczą w świadczeniu usług zgodnie z warunkami odpowiednich produktów. Gmail obsługuje korespondencję administratora.
+Google obsługuje Firebase Authentication, Google Sign-In, ML Kit, Play Integrity i Google Play. Google Ireland Limited i Google LLC uczestniczą w świadczeniu usług zgodnie z warunkami odpowiednich produktów. OVHcloud obsługuje pocztę administratora w domenie sedno.xyz.
 
 ML Kit rozpoznaje tekst na urządzeniu. SDK może przekazywać Google metryki techniczne i użycia, na przykład identyfikatory instalacji, model urządzenia, wersję aplikacji, błędy i czas działania. Lokalny OCR nie oznacza braku takiej komunikacji. Zdjęcie i rozpoznana treść nie są częścią tej telemetrii. Nie integrujemy reklam, Firebase Analytics ani Crashlytics.
 
@@ -94,7 +94,7 @@ Własne terminy Sedno nie zmieniają okresów dostawców. Firebase opisuje reten
 
 W zakresie wynikającym z RODO możesz żądać dostępu do danych i ich kopii, sprostowania, usunięcia, ograniczenia przetwarzania oraz przeniesienia odpowiednich danych. Możesz wnieść sprzeciw wobec przetwarzania opartego na uzasadnionym interesie. Jeśli operacja opiera się na zgodzie, możesz ją wycofać bez wpływu na wcześniejsze przetwarzanie. Prawa podlegają warunkom i wyjątkom przepisów.
 
-Napisz na mariuszbabka0@gmail.com. Odpowiadamy bez zbędnej zwłoki, co do zasady w ciągu miesiąca od otrzymania żądania. W przypadkach przewidzianych przez RODO termin można przedłużyć o dwa miesiące; o przyczynie poinformujemy w pierwszym miesiącu. W razie uzasadnionych wątpliwości dotyczących tożsamości poprosimy o niezbędne potwierdzenie, bez rutynowego żądania dokumentu tożsamości.
+Napisz na contact@sedno.xyz. Odpowiadamy bez zbędnej zwłoki, co do zasady w ciągu miesiąca od otrzymania żądania. W przypadkach przewidzianych przez RODO termin można przedłużyć o dwa miesiące; o przyczynie poinformujemy w pierwszym miesiącu. W razie uzasadnionych wątpliwości dotyczących tożsamości poprosimy o niezbędne potwierdzenie, bez rutynowego żądania dokumentu tożsamości.
 
 Możesz złożyć skargę do Prezesa Urzędu Ochrony Danych Osobowych: https://uodo.gov.pl. Zwykła wiadomość dotycząca danych nie wymaga podawania tekstów, które upraszczasz.
 
