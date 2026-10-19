@@ -63,17 +63,23 @@ odtworzenia danych po ich utracie; jest to decyzja właściciela na obecnym etap
 - Pełną ścieżkę telefonu z Play Integrity, logowaniem i AI trzeba nadal sprawdzić
   według instrukcji Google Play. Nie wykonywano płatnego wywołania modelu w tej operacji.
 
-## Pozostałości SQL i ograniczenia
+## Wycofanie SQL i ograniczenia
 
-Instancja `sedno-postgres` ma stan STOPPED, `activationPolicy=NEVER`, zachowaną
-`deletionProtectionEnabled=true`. Automatyczna kontrola odrzuciła wyłączenie
-tej ochrony, uznając, że migracja bez backupu nie stanowi precyzyjnej zgody na
-trwałe usunięcie instancji. Potrzebne jest osobne zatwierdzenie przez właściciela.
-Nie podejmowano próby obejścia blokady; zastosowano odwracalne zatrzymanie.
+Początkowo instancję `sedno-postgres` zatrzymano z zachowaną ochroną usunięcia.
+Automatyczna kontrola odrzuciła usuwanie bez jednoznacznej zgody na konkretną
+instancję i kopie. Nie obchodzono blokady. Następnie właściciel wyraźnie zatwierdził
+trwałe usunięcie instancji i wszystkich czterech kopii, bez możliwości odzyskania.
 
-W źródle pozostały 4 stare kopie automatyczne. Nowej kopii nie wykonano.
-Dysk SQL i stare kopie mogą nadal kosztować. Sekrety połączeń SQL pozostają do
-usunięcia wraz z zatwierdzonym wycofaniem źródła.
+19.10.2026 usunięto kolejno kopie `1792375200000`, `1792288800000`,
+`1792202400000`, `1792172438455`. Potwierdzono pustą listę kopii (`[]`).
+Wyłączono ochronę usunięcia, zachowanie kopii po usunięciu i tworzenie końcowej
+kopii. Usunięcie instancji zakończyło się powodzeniem; lista instancji SQL
+projektu `sednoapp-79241` jest pusta (`[]`). Nie wykonano nowej ani końcowej kopii.
+Po usunięciu ponownie sprawdzono publiczne API: gotowość i żywotność HTTP 200,
+a `/v1/quota` bez sesji HTTP 401.
+
+Sekrety połączeń SQL pozostawiono; nie są używane przez bieżące API ani zadanie
+sprzątania. Ich usuwanie nie było częścią tej operacji.
 
 Usunięto zadanie `sedno-migrate` i dwie nieużywane rewizje SQL
 `sedno-api-00001-ll4`, `sedno-api-00002-cc7`. Odebrano kontu backendu

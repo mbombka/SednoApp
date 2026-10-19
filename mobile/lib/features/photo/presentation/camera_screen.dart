@@ -47,10 +47,6 @@ class _CameraScreenState extends State<CameraScreen>
           body: SafeArea(
             child: Column(
               children: [
-                const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Text('Umieść tekst w kadrze. Zadbaj o dobre światło.'),
-                ),
                 Expanded(
                   child: Center(
                     child: model.ready && controller != null

@@ -7,10 +7,10 @@ API: **https://sednoapp-79241-api.web.app**, projekt `sednoapp-79241`, numer
 7 dokumentów testowych; kont i zakupów w źródle było 0. Indeksy są gotowe,
 a godzinowe sprzątanie działa także przez Cloud Scheduler.
 
-Stara instancja `sedno-postgres` jest **STOPPED** (`activationPolicy=NEVER`),
-z zachowaną ochroną usunięcia. Jej trwałe usunięcie wraz z 4 starymi kopiami
-wymaga jeszcze osobnej zgody właściciela po odrzuceniu przez automatyczną kontrolę.
-Dysk i stare kopie mogą nadal naliczać opłaty. Nie utworzono nowej kopii.
+Starą instancję `sedno-postgres` i wszystkie 4 stare kopie **trwale usunięto
+19.10.2026**, po jednoznacznej zgodzie właściciela. Przed usunięciem instancji
+potwierdzono pustą listę kopii, a po usunięciu — pustą listę instancji SQL projektu.
+Nie utworzono nowej ani końcowej kopii.
 [Raport wdrożenia](../../../docs/archiwum/firestore-deployment-2026-10-19.pl.md).
 
 ## Działające zasoby

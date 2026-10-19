@@ -42,7 +42,7 @@ class _PhotoCropScreenState extends State<PhotoCropScreen> {
                   padding: EdgeInsets.fromLTRB(16, 8, 16, 0),
                   child: Text(
                     'Przesuń rogi ramki, aby zaznaczyć tekst. '
-                    'Bez zmian odczytamy całe zdjęcie.',
+                    'Bez zmian uprościmy tekst z całego zdjęcia.',
                   ),
                 ),
                 Expanded(
@@ -80,7 +80,7 @@ class _PhotoCropScreenState extends State<PhotoCropScreen> {
                                 Navigator.pop(context, path);
                               }
                             },
-                      child: Text(model.busy ? 'Przygotowywanie…' : 'Odczytaj'),
+                      child: Text(model.busy ? 'Przygotowywanie…' : 'Uprość'),
                     ),
                   ),
                 ),

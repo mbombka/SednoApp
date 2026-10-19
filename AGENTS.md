@@ -14,7 +14,9 @@ Read README, existing code, and current dependencies before making changes.
 
 ## Features
 - Top navigation tabs: Start, Historia, Konto. No login required to start.
-- Input: typing/pasting or camera → cropping → on-device OCR → manual editing.
+- Input: typing/pasting or camera → cropping → on-device OCR.
+  The crop screen's Uprość button submits recognized text directly; after a
+  validation error, failure or cancellation it stays in the editor for manual editing.
   Maximum: 4,000 characters. Reject empty or whitespace-only input.
 - Photos must never leave the device.
 - Simplification through the backend using OpenAI Responses API.

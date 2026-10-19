@@ -315,6 +315,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         text: text,
         selection: TextSelection.collapsed(offset: text.length),
       );
+      // The crop screen's Uprość button submits the recognized text directly.
+      // Validation, quota and AI notice still apply; on failure the text stays
+      // in the editor for manual correction.
+      await _requestSubmission();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Aparat będzie dostępny wkrótce.')),

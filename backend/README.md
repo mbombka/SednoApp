@@ -6,7 +6,8 @@ Dostęp do bazy ma wyłącznie backend przez IAM; aplikacja Flutter korzysta z A
 Zdjęcia, teksty i wyniki nie są zapisywane w bazie backendu.
 
 Serwer `https://sednoapp-79241-api.web.app` działa z Firestore od 19.10.2026.
-Przeniesiono metadane testowe; stary Cloud SQL zatrzymano. Płatności pozostają wyłączone.
+Przeniesiono metadane testowe; starą instancję Cloud SQL i cztery kopie zapasowe
+usunięto 19.10.2026. Płatności pozostają wyłączone.
 [Wdrożenie, migracja i pozostałe porządki](deploy/firebase/README.pl.md).
 
 ## Uruchomienie lokalne

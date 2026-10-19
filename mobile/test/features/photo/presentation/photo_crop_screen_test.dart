@@ -46,7 +46,7 @@ void main() {
     expect(model.selection.height, closeTo(0.05, 0.0001));
   });
 
-  testWidgets('one Odczytaj button reads the whole photo by default', (
+  testWidgets('one Uprość button reads the whole photo by default', (
     tester,
   ) async {
     final image = await tester.runAsync(testPhoto);
@@ -72,10 +72,10 @@ void main() {
     );
     await tester.tap(find.text('Otwórz'));
     await tester.pumpAndSettle();
-    expect(find.widgetWithText(FilledButton, 'Odczytaj'), findsOneWidget);
+    expect(find.widgetWithText(FilledButton, 'Uprość'), findsOneWidget);
     expect(find.byType(FilledButton), findsOneWidget);
     expect(find.byType(InteractiveViewer), findsNothing);
-    await tester.tap(find.text('Odczytaj'));
+    await tester.tap(find.text('Uprość'));
     await tester.pumpAndSettle();
     expect(result, 'photo.jpg');
     expect(images.selected, const Rect.fromLTWH(0, 0, 1, 1));

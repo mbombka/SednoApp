@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sedno_app/features/home/presentation/home_screen.dart';
+import 'package:sedno_app/features/home/presentation/text_input_view_model.dart';
 import 'package:sedno_app/features/photo/domain/photo_text_repository.dart';
 
 class FakePhotoRepository implements PhotoTextRepository {
@@ -16,52 +17,88 @@ void main() {
   Future<void> showScreen(
     WidgetTester tester,
     TextEditingController controller,
-    PhotoTextRepository repository,
-  ) => tester.pumpWidget(
+    PhotoTextRepository repository, {
+    SubmitText? onSubmit,
+  }) => tester.pumpWidget(
     MaterialApp(
       home: Scaffold(
         body: HomeScreen(
           appName: 'Sedno',
           textController: controller,
           photoRepository: repository,
+          onSubmit: onSubmit,
         ),
       ),
     ),
   );
 
-  testWidgets('recognized Polish text enters editable field', (tester) async {
+  testWidgets('recognized Polish text is submitted without a second tap', (
+    tester,
+  ) async {
     final controller = TextEditingController(text: 'Stary tekst');
     addTearDown(controller.dispose);
+    final submitted = <String>[];
     await showScreen(
       tester,
       controller,
       FakePhotoRepository(() async => 'Zażółć gęślą jaźń'),
+      onSubmit: (input) async => submitted.add(input.value),
     );
 
     await tester.tap(find.byKey(const Key('cameraButton')));
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(controller.text, 'Zażółć gęślą jaźń');
-    expect(find.byKey(const Key('characterCounter')), findsNothing);
+    // The AI processing notice is still required before the first submission.
+    expect(find.byKey(const Key('aiProcessingNotice')), findsOneWidget);
+    expect(submitted, isEmpty);
+
+    await tester.tap(find.text('Rozumiem, wyślij'));
+    await tester.pumpAndSettle();
+    expect(submitted, ['Zażółć gęślą jaźń']);
+  });
+
+  testWidgets('declined AI notice keeps recognized text editable', (
+    tester,
+  ) async {
+    final controller = TextEditingController();
+    addTearDown(controller.dispose);
+    final submitted = <String>[];
+    await showScreen(
+      tester,
+      controller,
+      FakePhotoRepository(() async => 'Zażółć gęślą jaźń'),
+      onSubmit: (input) async => submitted.add(input.value),
+    );
+
+    await tester.tap(find.byKey(const Key('cameraButton')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Anuluj'));
+    await tester.pumpAndSettle();
+    expect(submitted, isEmpty);
+    expect(controller.text, 'Zażółć gęślą jaźń');
 
     await tester.enterText(find.byType(TextField), 'Poprawiony tekst');
     await tester.pump();
     expect(controller.text, 'Poprawiony tekst');
   });
 
-  testWidgets('too much recognized text stays editable and blocks submit', (
+  testWidgets('too much recognized text is not submitted and stays editable', (
     tester,
   ) async {
     final controller = TextEditingController();
     addTearDown(controller.dispose);
+    final submitted = <String>[];
     await showScreen(
       tester,
       controller,
       FakePhotoRepository(() async => 'x' * 4001),
+      onSubmit: (input) async => submitted.add(input.value),
     );
 
     await tester.tap(find.byKey(const Key('cameraButton')));
-    await tester.pump();
-    expect(controller.text.length, 4001);
+    await tester.pumpAndSettle();
+    expect(submitted, isEmpty);
+    expect(find.byKey(const Key('aiProcessingNotice')), findsNothing);
     expect(controller.text.length, 4001);
     expect(
       find.text('Tekst może mieć maksymalnie 4000 znaków.'),

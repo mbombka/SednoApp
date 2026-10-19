@@ -23,12 +23,12 @@ Google i OpenAI mają własne zasady przetwarzania; region bazy nie oznacza,
 | Konto i rekordy zakupów | Do usunięcia konta; brak automatycznego usuwania nieaktywnych kont |
 | Identyfikatory powiadomień zakupowych | Brak automatycznego terminu; bez tokenu i powiązania z kontem |
 | Cloud Logging `_Default` | 30 dni; pozostałe magazyny i eksporty trzeba kontrolować osobno |
-| Kopie bazy | Kopie SQL nie obejmują Firestore; nowe backupy/PITR nie są włączane przez manifesty. Wymagają osobnej konfiguracji i testu; górna granica 30 dni |
+| Kopie bazy | Instancję SQL i wszystkie 4 stare kopie usunięto 19.10.2026. Backupy/PITR Firestore pozostają wyłączone zgodnie z decyzją właściciela; ich ewentualne wdrożenie wymaga konfiguracji i testu, z retencją do 30 dni |
 | Korespondencja zgłoszeń | Przyjęta zasada: 90 dni od zamknięcia; ręczna kontrola co miesiąc |
 | Minimalny zapis obsługi praw | Przyjęta zasada: 12 miesięcy, tylko data, rodzaj żądania i wynik |
 
-Ustawienia kopii SQL i głównego magazynu logów potwierdzono przy poprzednim wdrożeniu;
-nie potwierdza to konfiguracji kopii Firestore.
+Ustawienia głównego magazynu logów potwierdzono przy poprzednim wdrożeniu.
+Usunięcie starego SQL i jego kopii potwierdzono 19.10.2026; nie wykonano nowej kopii.
 Obsługę poczty i rejestr usunięć trzeba wdrożyć organizacyjnie. Po odtworzeniu
 bazy ponownie zastosuj usunięcia przed przywróceniem dostępu użytkownikom.
 Nie wykonano jeszcze próby odtwarzania.

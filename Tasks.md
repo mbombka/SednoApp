@@ -6,9 +6,9 @@ na telefonie i przygotowania wydania w Google Play.
 - [x] Przełączyć backend PostgreSQL → Firestore. Wdrożono 19.10.2026: 7 dokumentów
   testowych, indeksy READY, publiczne API oraz godzinowe sprzątanie działają.
   [Raport](docs/archiwum/firestore-deployment-2026-10-19.pl.md).
-- [ ] Po osobnej zgodzie trwale usunąć zatrzymany `sedno-postgres` i 4 stare kopie;
-  do tego czasu dysk/kopie mogą kosztować. Nowych backupów Firestore nie włączono
-  zgodnie z decyzją właściciela. Nie jest to blokada działania nowego API.
+- [x] Trwale usunąć `sedno-postgres` i 4 stare kopie. Usunięto 19.10.2026 po
+  jednoznacznej zgodzie właściciela; lista instancji SQL projektu jest pusta.
+  Nowych backupów Firestore nie włączono zgodnie z decyzją właściciela.
 - [ ] Opublikować przygotowaną politykę Firestore na osobnej domenie `sedno.xyz`;
   kopia dostępna przez API została już wdrożona.
 - [ ] Powiązać projekt z Play Integrity w Play Console i sprawdzić aplikację

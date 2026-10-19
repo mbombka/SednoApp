@@ -10,7 +10,7 @@ Serwer uruchomiono 19.10.2026. Przed udostępnieniem aplikacji pozostają
 [testy na telefonie i przygotowanie Google Play](Tasks.md). Płatności są wyłączone.
 
 Backend przełączono na Firestore 19.10.2026. API i godzinowe sprzątanie działają.
-Stary Cloud SQL zatrzymano; jego trwałe usunięcie pozostaje do zatwierdzenia.
+Starą instancję Cloud SQL i wszystkie cztery kopie zapasowe usunięto 19.10.2026.
 [Stan wdrożenia](backend/deploy/firebase/README.pl.md).
 
 | Informacja | Wartość |

@@ -61,9 +61,10 @@ Próby na urządzeniu: [aparat i OCR](docs/android_camera_ocr_manual_check.md),
 [subskrypcje](docs/google_play_subscription_sandbox.md) i
 [dostępność](../docs/model-acceptance.pl.md#dostępność).
 
-Aparat działa wewnątrz Sedna: **Zrób zdjęcie → Zaznacz tekst → Odczytaj**.
-Ramka początkowo obejmuje całe zdjęcie. Można przesunąć jej rogi, aby odczytać
-fragment. Zdjęcie pozostaje nieruchome; nie ma dodatkowego zatwierdzania zdjęcia
+Aparat działa wewnątrz Sedna: **Zrób zdjęcie → Zaznacz tekst → Uprość**.
+Ramka początkowo obejmuje całe zdjęcie. Można przesunąć jej rogi, aby wybrać
+fragment. Odczytany tekst trafia do pola i od razu do uproszczenia. Po błędzie
+albo przy zbyt długim tekście zostaje w polu do ręcznej poprawy. Zdjęcie pozostaje nieruchome; nie ma dodatkowego zatwierdzania zdjęcia
 ani wyboru proporcji. Zdjęcia i wycinanie fragmentów pozostają na urządzeniu.
 
 Kod jest w `lib/app/` i `lib/features/`; testy mają odpowiadający układ w `test/`.
