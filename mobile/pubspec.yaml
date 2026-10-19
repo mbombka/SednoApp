@@ -10,8 +10,6 @@ dependencies:
   flutter:
     sdk: flutter
   characters: ^1.4.1
-  image_picker: ^1.2.4
-  image_cropper: ^13.0.0
   google_mlkit_text_recognition: ^0.17.1
   firebase_core: ^4.15.0
   firebase_auth: ^6.7.0
@@ -20,6 +18,7 @@ dependencies:
   http: ^1.6.0
   crypto: ^3.0.7
   in_app_purchase: ^3.3.1
+  camera: ^0.12.1
 
 dev_dependencies:
   flutter_test:

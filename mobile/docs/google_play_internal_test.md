@@ -25,21 +25,35 @@ Publiczny certyfikat przesyłania jest w `mobile/android/keystore/sedno-upload-c
 ## 2. Prześlij wydanie i dodaj testera
 
 1. W Play Console wybierz Sedno → **Testuj i publikuj → Testowanie → Test wewnętrzny**.
-2. Utwórz wydanie, włącz podpisywanie aplikacji przez Google Play i prześlij AAB.
-   Wykonaj wymagane kroki panelu. To kanał testowy, dostępny wybranym testerom.
+2. Utwórz wydanie i prześlij AAB. Dla nowej aplikacji Google domyślnie konfiguruje
+   podpisywanie własnymi kluczami. Wykonaj wymagane kroki panelu.
+   To kanał testowy, dostępny wybranym testerom.
 3. Dodaj adres konta Google używanego na telefonie do listy testerów, zapisz listę
    i udostępnij wydanie. Otwórz link dołączenia na tym koncie i zaakceptuj udział.
 
 ## 3. Dodaj certyfikat Google Play do Firebase
 
-W Play Console otwórz **Podpisywanie aplikacji / App signing**.
+W Play Console najpierw wybierz **Sedno**, a następnie w lewym menu:
+**Chronione przez Google Play → Dystrybucja w Sklepie Play →
+Przejdź do podpisywania aplikacji przez Google Play**.
+W części widoków karta ma nazwę **Ochrona w Sklepie Play**, a przycisk
+**Zarządzaj podpisywaniem aplikacji przez Google Play**.
+To ta sama część panelu, w której znajduje się Play Integrity API.
+
 Skopiuj SHA-1 i SHA-256 z sekcji **Certyfikat klucza podpisywania aplikacji**
-(App signing key certificate). Dodaj je w Firebase → Ustawienia projektu →
-Twoje aplikacje → Android `xyz.sedno.app` → Odciski certyfikatów SHA.
+(App signing key certificate). W Firebase otwórz
+[ustawienia projektu sednoapp-79241](https://console.firebase.google.com/project/sednoapp-79241/settings/general).
+Możesz też kliknąć koło zębate przy przeglądzie projektu → **Ustawienia projektu
+/ Project settings → Ogólne / General**. Przewiń do **Twoje aplikacje / Your apps**,
+wybierz Android `xyz.sedno.app`, a pod **Odciski certyfikatów SHA / SHA certificate
+fingerprints** kliknij **Dodaj odcisk / Add fingerprint**. Wklej SHA-1 i zapisz,
+następnie dodaj SHA-256 jako osobny wpis.
 Certyfikat klucza przesyłania jest osobnym certyfikatem; do logowania wersji
 zainstalowanej z Play potrzebny jest podpis używany przez Google Play.
+Jeśli panel pokazuje kilka kluczy podpisywania dla różnych wersji Androida,
+dodaj odciski każdego z nich. [Instrukcja Google](https://support.google.com/googleplay/android-developer/answer/9842756?hl=pl).
 
-Projekt powiąż w **Protected with Play / Integralność aplikacji → Play Integrity API
+Projekt powiąż w **Chronione przez Google Play → Play Integrity API
 → Link Cloud project**. Wybierz `sednoapp-79241`. Pozostaw sprawdzanie tokenów
 przez serwery Google. Nie ustawiaj wymuszonych odpowiedzi testowych dla końcowej próby.
 

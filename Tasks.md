@@ -10,6 +10,9 @@ na telefonie i przygotowania wydania w Google Play.
   [Instrukcja pierwszego wydania testowego](mobile/docs/google_play_internal_test.md).
 - [ ] Sprawdzić certyfikaty podpisu Androida w Firebase i przygotować podpisane wydanie AAB.
 - [ ] Wykonać próby aparatu, OCR, TalkBack i powiększonego tekstu.
+  Właściciel potwierdził działanie aplikacji i OCR na telefonie 19.10.2026.
+  Po zmianie aparatu i kadrowania powtórzyć próby według
+  [listy kontroli](mobile/docs/android_camera_ocr_manual_check.md).
 - [ ] Przećwiczyć usuwanie konta, obsługę zgłoszeń e-mail i odtwarzanie bazy z kopii.
 - [ ] Sprawdzić treść opublikowanej polityki, ustawienia dostawców i formularz Data Safety.
 - [ ] Przed włączeniem płatności utworzyć produkt w Google Play, skonfigurować

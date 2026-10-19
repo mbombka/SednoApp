@@ -1,8 +1,6 @@
 import 'dart:io';
 
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:sedno_app/features/photo/data/local_photo_text_repository.dart';
 import 'package:sedno_app/features/photo/domain/photo_text_repository.dart';
 
@@ -49,32 +47,7 @@ class FakeTemporaryStore implements TemporaryPhotoStore {
   Future<void> delete(String path) async => deleted.add(path);
 }
 
-class DeniedImagePicker extends ImagePicker {
-  @override
-  Future<XFile?> pickImage({
-    required ImageSource source,
-    double? maxWidth,
-    double? maxHeight,
-    int? imageQuality,
-    CameraDevice preferredCameraDevice = CameraDevice.rear,
-    bool requestFullMetadata = true,
-  }) async {
-    throw PlatformException(
-      code: 'camera_access_denied',
-      message: 'private detail',
-    );
-  }
-}
-
 void main() {
-  test('maps Android camera permission denial', () async {
-    final capture = ImagePickerCaptureService(picker: DeniedImagePicker());
-    await expectLater(
-      capture.capture(),
-      throwsA(isA<CameraPermissionDenied>()),
-    );
-  });
-
   test('deletes a real temporary file', () async {
     final directory = await Directory.systemTemp.createTemp(
       'sedno-photo-test-',

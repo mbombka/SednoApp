@@ -14,6 +14,7 @@ import 'package:sedno_app/features/history/domain/history_repository.dart';
 import 'package:sedno_app/features/history/presentation/history_screen.dart';
 import 'package:sedno_app/features/home/presentation/home_screen.dart';
 import 'package:sedno_app/features/photo/data/local_photo_text_repository.dart';
+import 'package:sedno_app/features/photo/presentation/photo_navigation_service.dart';
 import 'package:sedno_app/features/shared/data/development_mocks.dart';
 import 'package:sedno_app/features/simplification/domain/simplification_repository.dart';
 
@@ -71,7 +72,13 @@ class _AppNavigation extends StatefulWidget {
 class _AppNavigationState extends State<_AppNavigation>
     with WidgetsBindingObserver {
   final TextEditingController _inputController = TextEditingController();
-  final _photoRepository = LocalPhotoTextRepository.android();
+  late final _photoNavigation = PhotoNavigationService(() => context);
+  late final _photoRepository = LocalPhotoTextRepository(
+    captureService: _photoNavigation,
+    cropService: _photoNavigation,
+    ocrService: MlKitPhotoOcrService(),
+    temporaryPhotoStore: FileTemporaryPhotoStore(),
+  );
   late final SimplificationRepository? _simplificationRepository;
   late final HistoryRepository _historyRepository;
   final ValueNotifier<int> _historyRevision = ValueNotifier<int>(0);

@@ -1,9 +1,6 @@
 import 'dart:io';
 
-import 'package:flutter/services.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
-import 'package:image_cropper/image_cropper.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:sedno_app/features/photo/domain/photo_text_repository.dart';
 
 abstract interface class PhotoCaptureService {
@@ -30,13 +27,6 @@ class LocalPhotoTextRepository implements PhotoTextRepository {
     required this.temporaryPhotoStore,
   });
 
-  factory LocalPhotoTextRepository.android() => LocalPhotoTextRepository(
-    captureService: ImagePickerCaptureService(),
-    cropService: ImageCropperService(),
-    ocrService: MlKitPhotoOcrService(),
-    temporaryPhotoStore: FileTemporaryPhotoStore(),
-  );
-
   final PhotoCaptureService captureService;
   final PhotoCropService cropService;
   final PhotoOcrService ocrService;
@@ -53,7 +43,7 @@ class LocalPhotoTextRepository implements PhotoTextRepository {
       if (croppedPath == null) return null;
       return await ocrService.recognize(croppedPath);
     } finally {
-      // image_picker and image_cropper write into temporary app storage.
+      // Capture and cropping write into temporary app storage.
       // Delete both copies after OCR, cancellation, and processing errors.
       for (final path in {?capturedPath, ?croppedPath}) {
         try {
@@ -64,48 +54,6 @@ class LocalPhotoTextRepository implements PhotoTextRepository {
       }
     }
   }
-}
-
-class ImagePickerCaptureService implements PhotoCaptureService {
-  ImagePickerCaptureService({ImagePicker? picker})
-    : _picker = picker ?? ImagePicker();
-
-  final ImagePicker _picker;
-
-  @override
-  Future<String?> capture() async {
-    try {
-      return (await _picker.pickImage(source: ImageSource.camera))?.path;
-    } on PlatformException catch (error) {
-      if (error.code == 'camera_access_denied' ||
-          error.code == 'camera_access_denied_without_prompt' ||
-          error.code == 'camera_access_restricted') {
-        throw const CameraPermissionDenied();
-      }
-      rethrow;
-    }
-  }
-}
-
-class ImageCropperService implements PhotoCropService {
-  ImageCropperService({ImageCropper? cropper})
-    : _cropper = cropper ?? ImageCropper();
-
-  final ImageCropper _cropper;
-
-  @override
-  Future<String?> crop(String path) async => (await _cropper.cropImage(
-    sourcePath: path,
-    uiSettings: [
-      AndroidUiSettings(
-        toolbarTitle: 'Przytnij zdjęcie',
-        toolbarColor: const Color(0xFF0057B7),
-        toolbarWidgetColor: const Color(0xFFFFFFFF),
-        activeControlsWidgetColor: const Color(0xFF0057B7),
-        lockAspectRatio: false,
-      ),
-    ],
-  ))?.path;
 }
 
 class MlKitPhotoOcrService implements PhotoOcrService {
