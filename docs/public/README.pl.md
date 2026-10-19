@@ -5,13 +5,19 @@ Działający adres informacji o prywatności podany przez właściciela:
 głównej, nie oddzielną trasę HTTP. Odczyt 16.10.2026 potwierdził krótkie
 podsumowanie o zdjęciach, AI i historii; nie obejmuje pełnej polityki.
 
+Kontrola z zadania 14 (16.10.2026) potwierdziła również odpowiedź HTTPS 200
+pod `https://sedno.xyz/prywatnosc/` i `https://sedno.xyz/usun-konto/`, po przekierowaniu
+z adresów bez końcowego ukośnika. Strony zawierają pełną politykę i instrukcję
+usuwania; ich HTML różni się od lokalnych plików. To kontrola opublikowanej strony,
+nie potwierdzenie wdrożenia API ani zgodności każdego punktu dokumentu.
+
 Gotowe pliki:
 
 - `prywatnosc/index.html`: pełna polityka. Włącz jej treść do istniejącej sekcji
   albo opublikuj dokument i dodaj do niego link w tej sekcji. Samo skopiowanie
   katalogu nie aktualizuje fragmentu istniejącej strony głównej.
-- `usun-konto/index.html`: planowany adres `https://sedno.xyz/usun-konto`.
-  Opublikuj plik z obsługą `index.html` dla tej ścieżki i sprawdź kontakt mailowy.
+- `usun-konto/index.html`: adres `https://sedno.xyz/usun-konto` odpowiada przez HTTPS.
+  Przy aktualizacji zachowaj obsługę `index.html` i sprawdź kontakt mailowy.
 
 Przed zgłoszeniem w Play Console sprawdź pełną politykę i usuwanie przez HTTPS
 bez logowania. Ta zmiana nie publikuje plików ani nie zmienia hostingu i DNS.

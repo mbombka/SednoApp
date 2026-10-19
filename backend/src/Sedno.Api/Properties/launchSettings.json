@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "Development": {
+      "commandName": "Project",
+      "applicationUrl": "http://127.0.0.1:5000",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "DevelopmentMock": {
+      "commandName": "Project",
+      "applicationUrl": "http://127.0.0.1:5000",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "Model__Provider": "mock",
+        "PlayIntegrity__Provider": "mock"
+      }
+    }
+  }
+}

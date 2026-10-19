@@ -287,3 +287,18 @@ portalem usuwania konta ani narzędziem operatora.
 `python3 tools/generate_privacy_policy.py`, weryfikacja: ten sam program z `--check`.
 Po zmianie dokumentów trzeba przebudować backend, aby zaktualizować zasób osadzony.
 Zasady i rzeczywisty stan wdrożenia: `docs/privacy-operations-plan.pl.md`.
+
+## Firebase / Cloud Run deployment
+
+The API is deployed at **https://sednoapp-79241-api.web.app** (19 October 2026).
+See the [deployment procedure](deploy/firebase/README.pl.md) and
+[verification report](../docs/task-14-deployment.pl.md). Production uses PostgreSQL
+in Warsaw, Secret Manager and the attached Cloud Run service account with
+explicit OAuth scopes. Billing is explicitly disabled for the first stage.
+A real-device test still requires Play Integrity configuration in Play Console.
+
+Set `Google__CredentialProvider=cloud-run` only in Production Cloud Run. The
+existing `file` provider still requires the Firebase/Integrity/Billing JSON paths;
+Cloud Run service identity needs none of those private-key files. Local profiles
+`Development` and `DevelopmentMock` bind to `http://127.0.0.1:5000`; local database
+and user secrets remain required. Production rejects mocks.

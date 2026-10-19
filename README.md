@@ -115,7 +115,8 @@ Ekran **Prywatność i dane** zawiera pełne zasady, dane administratora, prawa,
 retencję i sposób usunięcia konta. Adresy informacji:
 
 - https://sedno.xyz/#prywatnosc — działające podsumowanie; pełna polityka jest w aplikacji.
-- https://sedno.xyz/usun-konto — planowany adres zgłoszeń, wymaga publikacji.
+- https://sedno.xyz/prywatnosc/ — publiczna polityka, odpowiedź HTTPS 200 sprawdzona 16.10.2026.
+- https://sedno.xyz/usun-konto/ — publiczna instrukcja zgłoszeń, odpowiedź HTTPS 200 sprawdzona 16.10.2026.
 
 Dokumenty i adresy mają jedno źródło: `docs/privacy-policy.pl.json`. Po edycji:
 
@@ -131,9 +132,20 @@ Backend osadza politykę w assembly i udostępnia `/prywatnosc` bez logowania.
 Adres strony głównej nie jest adresem API. Przygotowanie plików nie publikuje ich
 na domenie. Sekcja `#prywatnosc` jest częścią istniejącej strony głównej.
 Pełny dokument HTML można włączyć do tej sekcji lub udostępnić z niej odnośnik.
-Przed zgłoszeniem w Play Console trzeba opublikować pełną politykę i stronę usuwania.
+Podczas kontroli zadania 14 obie strony odpowiadały przez HTTPS; przed zgłoszeniem
+w Play Console trzeba sprawdzić ich zgodność z bieżącą konfiguracją usługi.
 
 [Przyjęte zasady i procedura wdrożenia](docs/privacy-operations-plan.pl.md)
 odróżniają działający kod od wybranego hostingu, retencji logów/kopii/poczty
 oraz prac wymaganych przed produkcją. Nie utworzono zasobów Google ani nie zmieniono
 umów lub kont dostawców. Dawna polityka robocza pozostaje archiwum.
+
+## Firebase / Cloud Run
+
+Od 19.10.2026 API działa pod **https://sednoapp-79241-api.web.app**.
+Backend C# w Cloud Run korzysta z PostgreSQL w Warszawie oraz Secret Manager.
+Pierwszy etap ma wyłączone płatności Google Play. Test na telefonie wymaga
+powiązania projektu z Play Integrity i konfiguracji aplikacji w kanale testowym.
+
+[Instrukcja wdrożenia i lokalne profile Development](backend/deploy/firebase/README.pl.md)
+· [Raport i pozostałe ograniczenia](docs/task-14-deployment.pl.md).

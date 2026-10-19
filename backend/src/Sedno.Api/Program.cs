@@ -7,12 +7,35 @@ using Sedno.Application;
 using Sedno.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+if (args is ["--init-billing-keyring", var directory])
+{
+    if (!builder.Environment.IsDevelopment())
+        throw new InvalidOperationException("Key ring initialization is Development-only.");
+    builder.Services.AddDataProtection().SetApplicationName("Sedno")
+        .PersistKeysToFileSystem(new DirectoryInfo(directory));
+    await using var keyApp = builder.Build();
+    var manager = keyApp.Services.GetRequiredService<Microsoft.AspNetCore.DataProtection.KeyManagement.IKeyManager>();
+    if (manager.GetAllKeys().Count > 0)
+        throw new InvalidOperationException("Use the existing key ring; initialization requires an empty directory.");
+    var now = DateTimeOffset.UtcNow;
+    manager.CreateNewKey(now, now.AddYears(1));
+    return;
+}
+var cloudRun = CloudRunHosting.Configure(builder);
 builder.WebHost.ConfigureKestrel(options => options.Limits.MaxRequestBodySize = 128 * 1024);
 builder.Services.AddProblemDetails();
 builder.Services.AddHealthChecks();
 var connectionString = builder.Configuration.GetConnectionString("Postgres");
 if (string.IsNullOrWhiteSpace(connectionString)) throw new InvalidOperationException("ConnectionStrings:Postgres is required.");
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
+// Run explicitly as a one-off deployment job, before serving a new revision.
+if (args.Contains("--migrate", StringComparer.Ordinal))
+{
+    await using var migrationApp = builder.Build();
+    await using var scope = migrationApp.Services.CreateAsyncScope();
+    await scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.MigrateAsync();
+    return;
+}
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddScoped<SimplificationTimings>();
 builder.Services.AddScoped<IUsageStore, UsageStore>();
@@ -21,6 +44,21 @@ builder.Services.AddScoped<SubscriptionService>();
 builder.Services.AddScoped<IEntitlementResolver>(sp => sp.GetRequiredService<SubscriptionService>());
 builder.Services.AddHostedService<MetadataCleanup>();
 builder.Services.AddHttpClient();
+var credentialProvider = builder.Configuration["Google:CredentialProvider"] ?? "file";
+if (credentialProvider is not ("file" or "cloud-run") || (credentialProvider == "cloud-run" && !cloudRun))
+    throw new InvalidOperationException("Google:CredentialProvider cloud-run requires the Production Cloud Run runtime.");
+var serviceIdentity = credentialProvider == "cloud-run";
+if (serviceIdentity)
+{
+    builder.Services.AddHttpClient("google-metadata", client => client.Timeout = TimeSpan.FromSeconds(3))
+        .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler { AllowAutoRedirect = false, UseProxy = false })
+        .RemoveAllLoggers();
+}
+IPlayAccessTokenSource GoogleTokens(IServiceProvider sp, HttpClient client, string? path, string scope) => serviceIdentity
+    ? new CloudRunAccessTokenSource(sp.GetRequiredService<IHttpClientFactory>().CreateClient("google-metadata"),
+        sp.GetRequiredService<TimeProvider>(), scope)
+    : new ServiceAccountAccessTokenSource(client, path!, sp.GetRequiredService<TimeProvider>(), scope);
+
 // Purchase tokens appear in Google API URLs. Disable all HTTP client loggers for this client.
 builder.Services.AddHttpClient("play-billing", client => client.Timeout = TimeSpan.FromSeconds(15)).RemoveAllLoggers();
 var billingEnabled = builder.Configuration.GetValue<bool>("Billing:Enabled");
@@ -32,16 +70,19 @@ if (billingEnabled)
     if (!builder.Environment.IsDevelopment() && string.IsNullOrWhiteSpace(keyPath))
         throw new InvalidOperationException("Billing:DataProtectionKeyPath is required in production.");
     if (!string.IsNullOrWhiteSpace(keyPath)) dataProtection.PersistKeysToFileSystem(new DirectoryInfo(keyPath));
+    if (builder.Configuration.GetValue<bool>("Billing:ReadOnlyKeyRing"))
+        dataProtection.DisableAutomaticKeyGeneration();
+    if (cloudRun && (string.IsNullOrWhiteSpace(keyPath) || !builder.Configuration.GetValue<bool>("Billing:ReadOnlyKeyRing")))
+        throw new InvalidOperationException("Cloud Run billing requires a shared, read-only key ring from Secret Manager.");
     var path = builder.Configuration["Billing:ServiceAccountJsonPath"];
     var audience = builder.Configuration["Billing:NotificationAudience"];
     var email = builder.Configuration["Billing:PushServiceAccountEmail"];
-    if (new[] { billingPackage, billingProduct, path, audience, email }.Any(string.IsNullOrWhiteSpace))
+    if (new[] { billingPackage, billingProduct, serviceIdentity ? "service-identity" : path, audience, email }.Any(string.IsNullOrWhiteSpace))
         throw new InvalidOperationException("Complete Google Play Billing configuration is required.");
     builder.Services.AddSingleton<IPlayBillingClient>(sp =>
     {
         var client = sp.GetRequiredService<IHttpClientFactory>().CreateClient("play-billing");
-        return new PlayBillingClient(client, new ServiceAccountAccessTokenSource(client, path!,
-            sp.GetRequiredService<TimeProvider>(), "https://www.googleapis.com/auth/androidpublisher"),
+        return new PlayBillingClient(client, GoogleTokens(sp, client, path, "https://www.googleapis.com/auth/androidpublisher"),
             new(billingPackage, billingProduct));
     });
     builder.Services.AddSingleton<INotificationVerifier>(sp => new PubSubTokenVerifier(
@@ -61,14 +102,13 @@ builder.Services.AddSingleton<IIdentityTokenVerifier>(sp => new FirebaseTokenVer
 builder.Services.AddScoped<AccountDeletionService>();
 builder.Services.AddHttpClient("identity-deletion", client => client.Timeout = TimeSpan.FromSeconds(15)).RemoveAllLoggers();
 var deletionCredentials = builder.Configuration["Firebase:DeletionServiceAccountJsonPath"];
-if (!builder.Environment.IsDevelopment() && string.IsNullOrWhiteSpace(deletionCredentials))
+if (!serviceIdentity && !builder.Environment.IsDevelopment() && string.IsNullOrWhiteSpace(deletionCredentials))
     throw new InvalidOperationException("Firebase:DeletionServiceAccountJsonPath is required.");
-if (!string.IsNullOrWhiteSpace(deletionCredentials))
+if (serviceIdentity || !string.IsNullOrWhiteSpace(deletionCredentials))
     builder.Services.AddSingleton<IIdentityAccountDeletion>(sp =>
     {
         var client = sp.GetRequiredService<IHttpClientFactory>().CreateClient("identity-deletion");
-        return new FirebaseAccountDeletion(client, new ServiceAccountAccessTokenSource(client, deletionCredentials,
-            sp.GetRequiredService<TimeProvider>(), "https://www.googleapis.com/auth/identitytoolkit"), firebaseProject!);
+        return new FirebaseAccountDeletion(client, GoogleTokens(sp, client, deletionCredentials, "https://www.googleapis.com/auth/identitytoolkit"), firebaseProject!);
     });
 else builder.Services.AddSingleton<IIdentityAccountDeletion, UnavailableAccountDeletion>();
 var deletionEmail = builder.Configuration["Privacy:DeletionEmail"];
@@ -82,11 +122,10 @@ else if (integrityProvider == "google")
 {
     var packageName = builder.Configuration["PlayIntegrity:PackageName"];
     var credentialsPath = builder.Configuration["PlayIntegrity:ServiceAccountJsonPath"];
-    if (string.IsNullOrWhiteSpace(packageName) || string.IsNullOrWhiteSpace(credentialsPath))
+    if (string.IsNullOrWhiteSpace(packageName) || (!serviceIdentity && string.IsNullOrWhiteSpace(credentialsPath)))
         throw new InvalidOperationException("Play Integrity package and service account path are required.");
-    builder.Services.AddSingleton<IPlayAccessTokenSource>(sp => new ServiceAccountAccessTokenSource(
-        sp.GetRequiredService<IHttpClientFactory>().CreateClient(), credentialsPath,
-        sp.GetRequiredService<TimeProvider>()));
+    builder.Services.AddSingleton<IPlayAccessTokenSource>(sp => GoogleTokens(sp,
+        sp.GetRequiredService<IHttpClientFactory>().CreateClient(), credentialsPath, "https://www.googleapis.com/auth/playintegrity"));
     builder.Services.AddSingleton<IIntegrityVerifier>(sp => new PlayIntegrityVerifier(
         sp.GetRequiredService<IHttpClientFactory>().CreateClient(),
         sp.GetRequiredService<IPlayAccessTokenSource>(), packageName, sp.GetRequiredService<TimeProvider>()));
@@ -121,6 +160,18 @@ builder.Services.AddRateLimiter(options =>
 });
 
 var app = builder.Build();
+if (cloudRun && billingEnabled)
+{
+    // Fail before serving traffic if a mounted key ring is missing or unusable.
+    CloudRunHosting.VerifyBillingKeyRing(app.Services);
+}
+if (cloudRun) app.UseCloudRunTransport();
+// Firebase Hosting must never cache authenticated quota, sessions or results.
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.CacheControl = "no-store";
+    await next(context);
+});
 // Content-free stage breakdown for each simplification, including authentication.
 app.Use(async (context, next) =>
 {

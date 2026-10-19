@@ -55,3 +55,14 @@ app.*.map.json
 **/obj/
 backend/.env
 backend/**/appsettings.Local.json
+
+# Local Firebase deployment manifests and Android Firebase configuration
+/backend/deploy/generated/
+**/google-services.json
+.firebase/
+firebase-debug.log*
+
+# Local deployment tools and Firebase build configuration
+/backend/.local-tools/
+/mobile/config/*.local.json
+firepit-log.txt

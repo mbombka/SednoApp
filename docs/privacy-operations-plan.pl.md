@@ -14,32 +14,40 @@ związanych z publiczną usługą, płatnościami czy danymi.
 | Kontakt | mariuszbabka0@gmail.com | Potwierdzony; Gmail wymaga obsługi i MFA |
 | Rynek i wiek | Pierwszy rynek: Polska; 16+; 16–17 za zgodą opiekuna | Wybrano; ustawienia Play Console i warunki usługi do zastosowania |
 | Informacje o prywatności | https://sedno.xyz/#prywatnosc | Podsumowanie odczytane przez HTTPS 16.10.2026; pełna polityka gotowa lokalnie i w aplikacji |
-| Usuwanie | https://sedno.xyz/usun-konto | Treść i HTML gotowe lokalnie; backend ma publiczną trasę; publikacja niepotwierdzona |
-| Strona dokumentów | Firebase Hosting, własna domena i HTTPS | Wybór; nie utworzono zasobów ani certyfikatu |
-| Serwer | Google Cloud Run, europe-central2 (Warszawa) | Wybór; brak wdrożenia w tej zmianie |
-| Baza | Cloud SQL for PostgreSQL, europe-central2; kopie w tym regionie | Wybór; brak instancji i konfiguracji kopii |
+| Usuwanie | https://sedno.xyz/usun-konto | HTTPS 200 po przekierowaniu do /usun-konto/ sprawdzone w zadaniu 14; backend ma też publiczną trasę |
+| Strona dokumentów | Firebase Hosting, własna domena i HTTPS | Osobna witryna API z dokumentami działa przez HTTPS; strona sedno.xyz i DNS pozostają oddzielne |
+| Serwer | Google Cloud Run, europe-central2 (Warszawa) | Wdrożony 19.10.2026 jako pierwszy etap bez płatności; raport zadania 14 |
+| Baza | Cloud SQL for PostgreSQL, europe-central2; kopie w tym regionie | Działa; 7 codziennych kopii, logi PITR z 1 dnia; odtworzenie do przećwiczenia |
 | AI | OpenAI Responses, gpt-6-luna, store=false, bez rozmów; standardowa retencja dostawcy | Kod gotowy; nie deklarujemy ZDR ani rezydencji UE bez kwalifikacji projektu |
 | Diagnostyka SDK | Bez reklam i własnej analityki; ocena konkretnego APK oraz potrzeby zgody przed udostępnieniem OCR | Nie rozstrzygamy spełnienia wymagań prawnych samą treścią polityki |
 | Zmiany polityki | Data wersji, strona prywatności i informacje do aktualizacji przed zmianą przetwarzania | Wybrany sposób komunikacji; publikacja jest czynnością administratora |
+
+W zadaniu 14 przygotowano [kontener i manifesty Firebase/Cloud Run](../backend/deploy/firebase/README.pl.md)
+z domyślnym regionem Warszawa. API i bazę uruchomiono 19.10.2026;
+[aktualne dowody i ograniczenia](task-14-deployment.pl.md). Osobna witryna
+Hosting dla API nie zastępuje istniejącej strony. Dnia 16.10.2026 potwierdzono
+HTTPS 200 także dla `/prywatnosc/` i `/usun-konto/`; HTML opublikowanych dokumentów
+różni się od lokalnych plików, więc sama dostępność nie potwierdza ich pełnej zgodności.
 
 Cloud Run i Cloud SQL obsługują wybrany region:
 [Cloud Run](https://docs.cloud.google.com/run/docs/locations),
 [Cloud SQL](https://docs.cloud.google.com/sql/docs/postgres/locations).
 Jest to wybór miejsca własnego backendu, a nie obietnica pozostawania wszystkich
 danych w EOG. Firebase Authentication i globalni dostawcy mają osobne zasady.
-Nie utworzono płatnych usług ani nie zmieniono kont Google/OpenAI.
+Aktualizacja 19.10.2026: uruchomiono płatne zasoby Cloud Run i Cloud SQL oraz
+serwerowe sekrety w Google Cloud. Nie zmieniano DNS ani warunków umów dostawców.
 
 ## Retencja
 
 | Dane | Przyjęta zasada | Realizacja |
 | --- | --- | --- |
 | Historia lokalna | 7 dni; ręczne usunięcie, wylogowanie | Istniejący kod; czyszczenie przy odczycie, starcie i wznowieniu |
-| Metadane żądań | 8 dni; proces co godzinę | Istniejący kod; zapewnić jego pracę w produkcji |
+| Metadane żądań | 8 dni; proces co godzinę | Cloud Run ma min. 1 instancję i CPU bez throttlingu, aby podtrzymać proces |
 | Sesje | Konto 7 dni, gość 90 dni | Istniejący kod; wygasłe rekordy usuwa proces godzinowy |
 | Niepowiązani goście | Ponad 90 dni i brak sesji/żądań | Istniejący kod; nie obiecujemy usunięcia dokładnie w 90. dniu |
 | Konta i rekordy zakupów | Do usunięcia konta | Pozostawiono rzeczywiste działanie; nie obiecujemy automatyki po nieaktywności |
 | ID powiadomień zakupowych | Obecnie bez automatycznego terminu | Jawnie opisane w polityce; automatyczna retencja wymaga osobnego zadania |
-| Logi własnego hostingu/proxy | Maksymalnie 30 dni, bez treści i poświadczeń | Wymaga konfiguracji każdego magazynu i eksportu przed startem |
+| Logi własnego hostingu/proxy | Maksymalnie 30 dni, bez treści i poświadczeń | Cloud Logging `_Default`: potwierdzono 30 dni; pozostałe magazyny/eksporty wymagają osobnej kontroli |
 | Kopie bazy | Maksymalnie 30 dni, rotacja i ponowne zastosowanie usunięć po odtworzeniu | Wymaga konfiguracji backupów i zabezpieczonego rejestru usunięć |
 | Poczta zgłoszeń | 90 dni od zamknięcia sprawy | Ręczna kontrola miesięczna; usuwanie kopii, załączników i opróżnianie kosza |
 | Minimalna ewidencja obsługi praw | 12 miesięcy; data, rodzaj żądania, wynik | Ograniczony dostęp; bez pełnej korespondencji, haseł i tokenów |

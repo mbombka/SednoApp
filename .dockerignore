@@ -1,0 +1,13 @@
+**
+!backend/
+!backend/src/
+!backend/src/**
+!docs/
+!docs/public/
+!docs/public/prywatnosc/
+!docs/public/prywatnosc/index.html
+**/bin*
+**/obj*
+**/appsettings.Local.json
+**/*.user
+**/google-services.json

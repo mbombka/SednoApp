@@ -1,0 +1,7 @@
+# Build from repository root. _IMAGE must include a unique release tag.
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: [build, -f, backend/Dockerfile, -t, '${_IMAGE}', .]
+images: ['${_IMAGE}']
+options:
+  logging: CLOUD_LOGGING_ONLY

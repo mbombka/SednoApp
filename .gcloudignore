@@ -1,0 +1,19 @@
+# Cloud Build receives only the production container source and public policy.
+**
+!.dockerignore
+!backend/
+!backend/Dockerfile
+!backend/deploy/
+!backend/deploy/firebase/
+!backend/deploy/firebase/cloudbuild.yaml
+!backend/src/
+!backend/src/**
+!docs/
+!docs/public/
+!docs/public/prywatnosc/
+!docs/public/prywatnosc/index.html
+**/bin*
+**/obj*
+**/appsettings.Local.json
+**/*.user
+**/google-services.json
