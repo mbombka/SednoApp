@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Sedno.Application;
+using Sedno.Infrastructure;
 using Xunit;
 
 namespace Sedno.IntegrationTests;
@@ -65,4 +66,43 @@ public sealed class SimplificationDeadlineTests(BackendFixture fixture)
             Assert.Equal(5, quota!.Remaining);
         }
     }
+    private sealed class CancelledFirestoreUsage(IUsageStore inner, TaskCompletionSource entered) : IUsageStore
+    {
+        public Task<QuotaDto> GetQuotaAsync(Guid id, CancellationToken ct) => inner.GetQuotaAsync(id, ct);
+        public async Task<ReservationOutcome> ReserveAsync(Guid id, string request, string fingerprint, CancellationToken ct)
+        {
+            entered.TrySetResult();
+            try { await Task.Delay(Timeout.InfiniteTimeSpan, ct); }
+            catch (OperationCanceledException) { throw new Grpc.Core.RpcException(new(Grpc.Core.StatusCode.Cancelled, "synthetic cancellation")); }
+            throw new InvalidOperationException();
+        }
+        public Task<bool> CompleteAsync(Guid id, string request, CancellationToken ct) => inner.CompleteAsync(id, request, ct);
+        public Task FailAsync(Guid id, string request, CancellationToken ct) => inner.FailAsync(id, request, ct);
+        public Task<RequestStatusDto?> GetStatusAsync(Guid id, string request, CancellationToken ct) => inner.GetStatusAsync(id, request, ct);
+    }
+
+    [Fact]
+    public async Task FirestoreCancellationAtOverallDeadlineReturns504()
+    {
+        var clock = new DeadlineClock(fixture.Clock.GetUtcNow());
+        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        await using var factory = fixture.Factory.WithWebHostBuilder(web => web.ConfigureTestServices(services =>
+        {
+            services.RemoveAll<TimeProvider>(); services.AddSingleton<TimeProvider>(clock);
+            services.RemoveAll<IUsageStore>();
+            services.AddScoped<IUsageStore>(sp => new CancelledFirestoreUsage(
+                new UsageStore(sp.GetRequiredService<FirestoreStore>(), fixture.Entitlements, clock), entered));
+        }));
+        using var client = factory.CreateClient();
+        var guest = await (await client.PostAsJsonAsync("/v1/guest-sessions", new { installationId = Guid.NewGuid().ToString() }))
+            .Content.ReadFromJsonAsync<GuestSessionDto>();
+        client.DefaultRequestHeaders.Authorization = new("Bearer", guest!.AccessToken);
+        var request = client.PostAsJsonAsync("/v1/simplifications", new { requestId = "database-deadline", text = "Tekst" });
+        await entered.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        clock.Expire!();
+        using var response = await request.WaitAsync(TimeSpan.FromSeconds(5));
+        Assert.Equal(HttpStatusCode.GatewayTimeout, response.StatusCode);
+        Assert.Contains("simplification_timeout", await response.Content.ReadAsStringAsync());
+    }
+
 }

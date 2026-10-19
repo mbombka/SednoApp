@@ -37,7 +37,10 @@ Read README, existing code, and current dependencies before making changes.
 ## Architecture
 Flutter: feature-first, views → ViewModels → repositories → services.
 Use dependency injection and extend existing architectural choices.
-Backend: C#, ASP.NET Core, a supported .NET LTS release, PostgreSQL.
+Backend: C#, ASP.NET Core, a supported .NET LTS release, Cloud Firestore Standard (Native mode).
+Firestore is accessed only by the backend with IAM; mobile clients have no database access.
+Daily quota reservations and identity linking must remain transactional.
+The emulator is Development-only; metadata cleanup runs as a scheduled job.
 The backend stores secrets and verifies identity, subscriptions, and limits.
 Use an OpenAPI contract and separate development/production configurations.
 Mocks must be explicit and unavailable in production configurations.

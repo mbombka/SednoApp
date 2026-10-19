@@ -1,113 +1,101 @@
-using System.Security.Cryptography;
-using System.Text;
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.EntityFrameworkCore;
 using Sedno.Application;
 using Sedno.Domain;
 
 namespace Sedno.Infrastructure;
 
-public sealed class SubscriptionService(AppDbContext db, IPlayBillingClient play,
-    IDataProtectionProvider protection, TimeProvider clock) : IEntitlementResolver
+public sealed class SubscriptionService(FirestoreStore db, IPlayBillingClient play, IDataProtectionProvider protection, TimeProvider clock) : IEntitlementResolver
 {
     private readonly IDataProtector _protector = protection.CreateProtector("Sedno.PlayPurchase.v1");
-    public static string Binding(Guid accountId) => Hash("sedno-account:" + accountId.ToString("N"));
-    private static string Hash(string token) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(token)));
+    public static string Binding(Guid accountId) => FirestoreStore.Hash("sedno-account:" + accountId.ToString("N"));
+    public static readonly TimeSpan VerificationLifetime = TimeSpan.FromMinutes(15);
 
     public async Task<SubscriptionDto> CurrentAsync(Guid accountId, CancellationToken ct)
     {
-        // This endpoint is refreshed in the background by the app, never by quota checks.
-        await using var transaction = await db.Database.BeginTransactionAsync(ct);
-        await BillingCoordination.AccountAsync(db, accountId, ct);
-        var rows = await db.Purchases.AsNoTracking().Where(x => x.AccountId == accountId && !x.Revoked).ToListAsync(ct);
+        await using var lease = await FirestoreLease.AcquireAsync(db, "account:" + accountId.ToString("N"), clock, ct);
+        var rows = await db.ListAsync<PlayPurchase>(db.Purchases.WhereEqualTo("AccountId", accountId.ToString()).WhereEqualTo("Revoked", false), ct);
         SubscriptionDto? best = null;
         foreach (var row in rows)
         {
-            var status = await UpdateAsync(accountId, _protector.Unprotect(row.ProtectedToken), ct);
-            if (best is null || (!best.Active && status.Active) ||
-                (status.Active == best.Active && status.ExpiresAt > best.ExpiresAt)) best = status;
+            var status = await UpdateAsync(accountId, _protector.Unprotect(row.ProtectedToken), lease, null, ct);
+            if (best is null || (!best.Active && status.Active) || (status.Active == best.Active && status.ExpiresAt > best.ExpiresAt)) best = status;
         }
-        await db.SaveChangesAsync(ct);
-        await transaction.CommitAsync(ct);
         return best ?? new("none", false, null, Binding(accountId));
     }
 
-    // Bounds stale access if an RTDN notification is missed. Refresh never extends
-    // the Google expiry time; a stale/missing verification falls back to the free tier.
-    public static readonly TimeSpan VerificationLifetime = TimeSpan.FromMinutes(15);
-
     public async Task<bool> HasSubscriptionAsync(Guid identityId, CancellationToken ct)
     {
-        var accountId = await db.Identities.Where(x => x.Id == identityId).Select(x => x.AccountId).SingleAsync(ct);
-        if (accountId is null) return false;
+        var identity = await db.GetAsync<GuestIdentity>(db.Identities.Document(FirestoreStore.Id(identityId)), ct);
+        if (identity?.AccountId is not Guid accountId) return false;
+        var rows = await db.ListAsync<PlayPurchase>(db.Purchases.WhereEqualTo("AccountId", accountId.ToString()).WhereEqualTo("Revoked", false), ct);
         var now = clock.GetUtcNow();
-        var oldest = now - VerificationLifetime;
-        return await db.Purchases.AsNoTracking().AnyAsync(x => x.AccountId == accountId && !x.Revoked &&
-            x.VerifiedAt > oldest && x.VerifiedAt <= now && x.ExpiresAt > now &&
-            (x.State == "SUBSCRIPTION_STATE_ACTIVE" || x.State == "SUBSCRIPTION_STATE_IN_GRACE_PERIOD" ||
-             x.State == "SUBSCRIPTION_STATE_CANCELED"), ct);
+        return rows.Any(x => x.VerifiedAt > now - VerificationLifetime && x.VerifiedAt <= now && x.ExpiresAt > now &&
+            x.State is "SUBSCRIPTION_STATE_ACTIVE" or "SUBSCRIPTION_STATE_IN_GRACE_PERIOD" or "SUBSCRIPTION_STATE_CANCELED");
     }
+
     public async Task<SubscriptionDto> VerifyAsync(Guid accountId, string token, CancellationToken ct)
     {
-        await using var transaction = await db.Database.BeginTransactionAsync(ct);
-        await BillingCoordination.TokenAsync(db, token, ct);
-        await BillingCoordination.AccountAsync(db, accountId, ct);
-        var status = await UpdateAsync(accountId, token, ct);
-        await db.SaveChangesAsync(ct);
-        await transaction.CommitAsync(ct);
-        return status;
+        await using var lease = await FirestoreLease.AcquireAsync(db, "account:" + accountId.ToString("N"), clock, ct);
+        return await UpdateAsync(accountId, token, lease, null, ct);
     }
+
     public async Task NotifyAsync(string messageId, string token, CancellationToken ct)
     {
-        await using var transaction = await db.Database.BeginTransactionAsync(ct);
-        await BillingCoordination.NotificationAsync(db, messageId, ct);
-        if (await db.PlayNotifications.AnyAsync(x => x.Id == messageId, ct)) return;
-        await BillingCoordination.TokenAsync(db, token, ct);
-        var hash = Hash(token);
-        var row = await db.Purchases.AsNoTracking().SingleOrDefaultAsync(x => x.TokenHash == hash, ct);
-        var verified = await play.GetAsync(token, ct);
-        var account = row is null
-            ? await db.Accounts.AsNoTracking().ToListAsync(ct)
-            : [];
-        var accountId = row?.AccountId ?? account.SingleOrDefault(x => Binding(x.Id) == verified.AccountBinding)?.Id;
-        // Do not acknowledge unknown ownership: retry until client/account association is available.
+        var notification = db.PlayNotifications.Document(FirestoreStore.Hash(messageId));
+        if ((await notification.GetSnapshotAsync(ct)).Exists) return;
+        var row = await db.GetAsync<PlayPurchase>(db.Purchases.Document(FirestoreStore.Hash(token)), ct);
+        var accountId = row?.AccountId;
+        if (accountId is null)
+        {
+            var verified = await play.GetAsync(token, ct);
+            var pointer = verified.AccountBinding is null ? null : await db.GetAsync<AccountPointer>(db.Bindings.Document(verified.AccountBinding), ct);
+            accountId = pointer?.AccountId;
+        }
         if (accountId is null) throw new InvalidOperationException("Unknown purchase owner.");
-        await BillingCoordination.AccountAsync(db, accountId.Value, ct);
-        await UpdateAsync(accountId.Value, token, ct);
-        db.PlayNotifications.Add(new() { Id = messageId, ProcessedAt = clock.GetUtcNow() });
-        await db.SaveChangesAsync(ct);
-        await transaction.CommitAsync(ct);
+        await using var lease = await FirestoreLease.AcquireAsync(db, "account:" + accountId.Value.ToString("N"), clock, ct);
+        if ((await notification.GetSnapshotAsync(ct)).Exists) return;
+        await UpdateAsync(accountId.Value, token, lease, messageId, ct);
     }
-    private async Task<SubscriptionDto> UpdateAsync(Guid accountId, string token, CancellationToken ct)
+
+    private async Task<SubscriptionDto> UpdateAsync(Guid accountId, string token, FirestoreLease lease, string? messageId, CancellationToken ct)
     {
+        var accountReference = db.Accounts.Document(FirestoreStore.Id(accountId));
+        var account = await db.GetAsync<VerifiedAccount>(accountReference, ct);
+        if (account is null || account.Deleting) throw new InvalidOperationException("Account unavailable.");
         var status = await play.GetAsync(token, ct);
-        var hash = Hash(token);
-        var row = await db.Purchases.SingleOrDefaultAsync(x => x.TokenHash == hash, ct);
-        if (status.AccountBinding != Binding(accountId) &&
-            !(row?.AccountId == accountId && status.AccountBinding is null && status.State == "SUBSCRIPTION_STATE_EXPIRED"))
-            throw new InvalidOperationException("Purchase owner mismatch.");
-        if (row is not null && row.AccountId != accountId) throw new InvalidOperationException("Purchase already owned.");
-        if (row is null)
-        {
-            row = new() { TokenHash = hash, ProtectedToken = _protector.Protect(token), AccountId = accountId };
-            db.Purchases.Add(row);
-        }
-        row.State = status.State;
-        row.ExpiresAt = status.ExpiresAt;
-        row.VerifiedAt = clock.GetUtcNow();
-        if (!row.Revoked && status.Entitled(clock.GetUtcNow()) && !status.Acknowledged)
+        var reference = db.Purchases.Document(FirestoreStore.Hash(token));
+        var existing = await db.GetAsync<PlayPurchase>(reference, ct);
+        ValidateOwner(existing);
+        if (existing?.Revoked != true && status.Entitled(clock.GetUtcNow()) && !status.Acknowledged)
             await play.AcknowledgeAsync(token, ct);
-        if (status.LinkedToken is not null && status.Entitled(clock.GetUtcNow()))
+        // No external calls in this retryable callback. The account lease serializes
+        // verification, RTDN and deletion; token ownership is checked transactionally.
+        return await db.Database.RunTransactionAsync(async transaction =>
         {
-            var oldHash = Hash(status.LinkedToken);
-            var old = await db.Purchases.SingleOrDefaultAsync(x => x.TokenHash == oldHash, ct);
-            if (old is not null)
-            {
-                if (old.AccountId != accountId) throw new InvalidOperationException("Linked owner mismatch.");
-                old.Revoked = true;
-            }
+            await lease.CheckAsync(transaction, ct);
+            var currentAccount = await db.GetAsync<VerifiedAccount>(transaction, accountReference, ct);
+            if (currentAccount is null || currentAccount.Deleting) throw new InvalidOperationException("Account unavailable.");
+            var row = await db.GetAsync<PlayPurchase>(transaction, reference, ct);
+            ValidateOwner(row);
+            var oldReference = status.LinkedToken is null ? null : db.Purchases.Document(FirestoreStore.Hash(status.LinkedToken));
+            var old = oldReference is null ? null : await db.GetAsync<PlayPurchase>(transaction, oldReference, ct);
+            if (old is not null && status.Entitled(clock.GetUtcNow()) && old.AccountId != accountId)
+                throw new InvalidOperationException("Linked owner mismatch.");
+            row ??= new() { TokenHash = reference.Id, ProtectedToken = _protector.Protect(token), AccountId = accountId };
+            row.State = status.State; row.ExpiresAt = status.ExpiresAt; row.VerifiedAt = clock.GetUtcNow();
+            if (old is not null && status.Entitled(clock.GetUtcNow())) { old.Revoked = true; db.Put(transaction, oldReference!, old); }
+            db.Put(transaction, reference, row);
+            if (messageId is not null) db.Put(transaction, db.PlayNotifications.Document(FirestoreStore.Hash(messageId)),
+                new PlayNotification { Id = messageId, ProcessedAt = clock.GetUtcNow() });
+            return new SubscriptionDto(row.Revoked ? "revoked" : status.State,
+                !row.Revoked && status.Entitled(clock.GetUtcNow()), status.ExpiresAt, Binding(accountId));
+        }, cancellationToken: ct);
+
+        void ValidateOwner(PlayPurchase? row)
+        {
+            if (status.AccountBinding != Binding(accountId) && !(row?.AccountId == accountId && status.AccountBinding is null && status.State == "SUBSCRIPTION_STATE_EXPIRED"))
+                throw new InvalidOperationException("Purchase owner mismatch.");
+            if (row is not null && row.AccountId != accountId) throw new InvalidOperationException("Purchase already owned.");
         }
-        return new(row.Revoked ? "revoked" : status.State,
-            !row.Revoked && status.Entitled(clock.GetUtcNow()), status.ExpiresAt, Binding(accountId));
     }
 }

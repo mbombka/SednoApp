@@ -1,3 +1,6 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Google.Cloud.Firestore;
 using System.Net;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Hosting;
@@ -20,6 +23,8 @@ public sealed class FirebaseTransportApiTests(BackendFixture fixture)
         var values = new Dictionary<string, string?>
         {
             ["K_SERVICE"] = cloud ? "sedno-api" : null,
+            ["Firestore__UseEmulator"] = "false",
+            ["FIRESTORE_EMULATOR_HOST"] = null,
             ["PORT"] = "8080",
             ["Model__Provider"] = "openai",
             ["OpenAI__ApiKey"] = "synthetic-test-key",
@@ -34,7 +39,15 @@ public sealed class FirebaseTransportApiTests(BackendFixture fixture)
         try
         {
             foreach (var (key, value) in values) Environment.SetEnvironmentVariable(key, value);
-            await using var factory = fixture.Factory.WithWebHostBuilder(web => web.UseEnvironment("Production"));
+            await using var factory = fixture.Factory.WithWebHostBuilder(web =>
+            {
+                web.UseEnvironment("Production");
+                web.ConfigureServices(services =>
+                {
+                    services.RemoveAll<FirestoreDb>();
+                    services.AddSingleton(fixture.Factory.Services.GetRequiredService<FirestoreDb>());
+                });
+            });
             if (serviceIdentity && !cloud)
             {
                 var error = Assert.Throws<InvalidOperationException>(() => factory.CreateClient());

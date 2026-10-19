@@ -1,7 +1,8 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
-using Microsoft.EntityFrameworkCore;
+using Google.Cloud.Firestore;
+using Sedno.Domain;
 using Sedno.Application;
 
 namespace Sedno.Infrastructure;
@@ -54,24 +55,80 @@ public sealed class UnavailableAccountDeletion : IIdentityAccountDeletion
         throw new InvalidOperationException("Identity deletion is not configured.");
 }
 
-public sealed class AccountDeletionService(AppDbContext db, IIdentityAccountDeletion identity)
+public sealed class AccountDeletionService(FirestoreStore db, IIdentityAccountDeletion identity, TimeProvider clock)
 {
     public async Task DeleteAsync(SessionIdentity session, CancellationToken ct)
     {
         if (session.AccountId is not Guid accountId) throw new InvalidOperationException("Account required.");
-        await using var transaction = await db.Database.BeginTransactionAsync(ct);
-        var account = await db.Accounts.AsNoTracking().SingleOrDefaultAsync(x => x.Id == accountId, ct);
+        var reference = db.Accounts.Document(FirestoreStore.Id(accountId));
+        var account = await db.GetAsync<VerifiedAccount>(reference, ct);
         if (account is null) return;
-        await IdentityCoordination.LockAsync(db, account.FirebaseUid, ct);
+        await using var uidLease = await FirestoreLease.AcquireAsync(db, "uid:" + account.FirebaseUid, clock, ct);
+        await using var accountLease = await FirestoreLease.AcquireAsync(db, "account:" + accountId.ToString("N"), clock, ct);
+        // Persist a tombstone before external I/O. Every writer reads the account or
+        // identity in its transaction, so no new child can race physical deletion.
+        await db.Database.RunTransactionAsync(async transaction =>
+        {
+            await uidLease.CheckAsync(transaction, ct);
+            await accountLease.CheckAsync(transaction, ct);
+            var current = await db.GetAsync<VerifiedAccount>(transaction, reference, ct);
+            if (current is null) return;
+            current.Deleting = true;
+            db.Put(transaction, reference, current);
+        }, cancellationToken: ct);
+        // Even a timeout may mean Firebase already deleted the user. Keep the
+        // tombstone on failure so the hourly job resumes instead of restoring access.
+        // Existing credentials can still retry DELETE, but quota/billing/linking refuse it.
         await identity.DeleteAsync(account.FirebaseUid, ct);
-        // Wait for billing BEFORE taking the exclusive topology lock; slow Google
-        // verification must not stop unrelated simplifications during deletion.
-        await BillingCoordination.AccountAsync(db, accountId, ct);
-        await db.Database.ExecuteSqlRawAsync("SELECT pg_advisory_xact_lock(1748392201)", ct);
-        await db.Sessions.Where(x => x.AccountId == accountId).ExecuteDeleteAsync(ct);
-        // Requests and all sessions on linked identities cascade. Purchases cascade from account.
-        await db.Identities.Where(x => x.AccountId == accountId).ExecuteDeleteAsync(ct);
-        await db.Accounts.Where(x => x.Id == accountId).ExecuteDeleteAsync(ct);
-        await transaction.CommitAsync(ct);
+        var identities = await db.ListAsync<GuestIdentity>(db.Identities.WhereEqualTo("AccountId", accountId.ToString()), ct);
+        foreach (var linked in identities)
+        {
+            await DeleteQueryAsync(db.Requests.WhereEqualTo("IdentityId", linked.Id.ToString()), ct);
+            await DeleteQueryAsync(db.Sessions.WhereEqualTo("IdentityId", linked.Id.ToString()), ct);
+        }
+        await DeleteQueryAsync(db.Sessions.WhereEqualTo("AccountId", accountId.ToString()), ct);
+        await DeleteQueryAsync(db.Purchases.WhereEqualTo("AccountId", accountId.ToString()), ct);
+        // Shared installation ledgers may also contain another account's usage.
+        // Remove only the deleted identities, retaining other users' allowances.
+        var ids = identities.Select(x => FirestoreStore.Id(x.Id)).ToHashSet();
+        foreach (var hash in account.InstallationHashes)
+        {
+            var days = await db.DailyUsage.WhereEqualTo("InstallationHash", hash).GetSnapshotAsync(ct);
+            foreach (var day in days.Documents)
+                await db.Database.RunTransactionAsync(async transaction =>
+                {
+                    await accountLease.CheckAsync(transaction, ct);
+                    var usage = await db.GetAsync<DailyUsage>(transaction, day.Reference, ct);
+                    if (usage is null) return;
+                    foreach (var id in ids) usage.Used.Remove(id);
+                    foreach (var key in usage.Reservations.Where(x => ids.Contains(FirestoreStore.Id(x.Value.IdentityId))).Select(x => x.Key).ToArray())
+                        usage.Reservations.Remove(key);
+                    if (usage.Used.Count == 0 && usage.Reservations.Count == 0) transaction.Delete(day.Reference);
+                    else db.Put(transaction, day.Reference, usage);
+                }, cancellationToken: ct);
+        }
+        // Keep identities until ledger cleanup finishes, enabling recovery after a
+        // process crash. A later DELETE or scheduled cleanup resumes the tombstone.
+        await DeleteQueryAsync(db.Identities.WhereEqualTo("AccountId", accountId.ToString()), ct);
+        await db.Database.RunTransactionAsync(async transaction =>
+        {
+            await uidLease.CheckAsync(transaction, ct);
+            await accountLease.CheckAsync(transaction, ct);
+            transaction.Delete(db.Uids.Document(FirestoreStore.Hash(account.FirebaseUid)));
+            transaction.Delete(db.Bindings.Document(SubscriptionService.Binding(accountId)));
+            transaction.Delete(reference);
+        }, cancellationToken: ct);
+    }
+
+    private async Task DeleteQueryAsync(Query query, CancellationToken ct)
+    {
+        while (true)
+        {
+            var page = await query.Limit(200).GetSnapshotAsync(ct);
+            if (page.Count == 0) return;
+            var batch = db.Database.StartBatch();
+            foreach (var document in page.Documents) batch.Delete(document.Reference, Precondition.LastUpdated(document.UpdateTime!.Value));
+            await batch.CommitAsync(ct);
+        }
     }
 }

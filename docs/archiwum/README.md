@@ -13,5 +13,6 @@ ustawienia, ograniczenia i liczby testów. Bieżące instrukcje są w
 | [Migracja modelu](responses-migration.pl.md) | Przejście z agenta na Responses API |
 | [Przygotowanie Firebase](task-14-report.pl.md) | Etapy przygotowania wdrożenia |
 | [Wdrożenie z 19.10.2026](task-14-deployment.pl.md) | Konfiguracja, identyfikatory wydania i wyniki kontroli |
+| [Firestore — 19.10.2026](firestore-deployment-2026-10-19.pl.md) | Migracja produkcji, weryfikacja, brak nowych backupów i zatrzymanie starego SQL |
 | [Dawny szkic API](openapi-szkic.yaml) | Zastąpiony przez contracts/openapi.yaml |
 | [Dawny szkic polityki](privacy-policy-draft.pl.md) | Zastąpiony przez aktualną politykę |

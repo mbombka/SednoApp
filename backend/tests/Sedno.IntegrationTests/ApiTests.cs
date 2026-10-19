@@ -164,7 +164,7 @@ public sealed class ApiTests(BackendFixture fixture)
         var guest = await GuestAsync();
         var calls = Enumerable.Range(0, 6).Select(i => Submit(guest.Client, $"parallel{i}", "Tekst" + i));
         var results = await Task.WhenAll(calls);
-        Assert.Equal(5, results.Count(x => x.StatusCode == HttpStatusCode.OK));
+        Assert.True(results.Count(x => x.StatusCode == HttpStatusCode.OK) == 5, string.Join(", ", results.Select(x => x.StatusCode)) + "\n" + string.Join("\n", fixture.Logs.Messages.Where(x => x.StartsWith("Czas upraszczania")).TakeLast(6)));
         Assert.Single(results, x => x.StatusCode == HttpStatusCode.TooManyRequests);
         Assert.Equal(5, fixture.Model.Calls);
         var completed = Array.FindIndex(results, x => x.StatusCode == HttpStatusCode.OK);
@@ -268,7 +268,7 @@ public sealed class ApiTests(BackendFixture fixture)
     }
 
     [Fact]
-    public async Task IndependentInstallationsReserveConcurrentlyWhileSameInstallationWaits()
+    public async Task SlowEntitlementLookupDoesNotBlockOtherReservations()
     {
         var installation = Guid.NewGuid().ToString();
         var first = await GuestAsync(installation);
@@ -278,7 +278,7 @@ public sealed class ApiTests(BackendFixture fixture)
         using var sameScope = fixture.Factory.Services.CreateScope();
         using var otherScope = fixture.Factory.Services.CreateScope();
         var gate = new GatedEntitlements(first.Id);
-        UsageStore Store(IServiceScope scope) => new(scope.ServiceProvider.GetRequiredService<AppDbContext>(), gate, fixture.Clock);
+        UsageStore Store(IServiceScope scope) => new(scope.ServiceProvider.GetRequiredService<FirestoreStore>(), gate, fixture.Clock);
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
         var pending = Store(firstScope).ReserveAsync(first.Id, "held", "fingerprint", timeout.Token);
         Task<ReservationOutcome>? samePending = null;
@@ -286,10 +286,10 @@ public sealed class ApiTests(BackendFixture fixture)
         {
             await gate.Entered.Task.WaitAsync(timeout.Token);
             samePending = Store(sameScope).ReserveAsync(same.Id, "same", "fingerprint", timeout.Token);
-            // With the old global exclusive lock this cannot finish until first releases.
+            // External dependency waits do not hold Firestore transaction locks.
             var independent = await Store(otherScope).ReserveAsync(other.Id, "other", "fingerprint", timeout.Token);
             Assert.Equal("reserved", independent.Kind);
-            Assert.False(samePending.IsCompleted);
+            Assert.Equal("reserved", (await samePending).Kind);
         }
         finally
         {
@@ -319,11 +319,11 @@ public sealed class ApiTests(BackendFixture fixture)
         var other = await GuestAsync();
         using var scope = fixture.Factory.Services.CreateScope();
         var gate = new GatedIdentity();
-        var store = new GuestStore(scope.ServiceProvider.GetRequiredService<AppDbContext>(),
+        var store = new GuestStore(scope.ServiceProvider.GetRequiredService<FirestoreStore>(),
             scope.ServiceProvider.GetRequiredService<IUsageStore>(), fixture.Clock,
             Enumerable.Repeat((byte)1, 32).ToArray(), gate);
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-        var pending = store.LinkAsync(new(first.Id, null, Guid.NewGuid()), new("parallel-" + Guid.NewGuid(), "google"), timeout.Token);
+        var pending = store.LinkAsync(new(first.Id, null, Guid.ParseExact(first.Token.Split('.')[0], "N")), new("parallel-" + Guid.NewGuid(), "google"), timeout.Token);
         try
         {
             await gate.Entered.Task.WaitAsync(timeout.Token);

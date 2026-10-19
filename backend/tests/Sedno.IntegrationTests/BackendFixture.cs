@@ -2,13 +2,13 @@ using System.Collections.Concurrent;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.EntityFrameworkCore;
+using DotNet.Testcontainers.Builders;
+using DotNet.Testcontainers.Containers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Sedno.Application;
 using Sedno.Infrastructure;
-using Testcontainers.PostgreSql;
 using Xunit;
 
 namespace Sedno.IntegrationTests;
@@ -87,7 +87,11 @@ public sealed class CaptureLogs : ILoggerProvider
 
 public sealed class BackendFixture : IAsyncLifetime
 {
-    private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder("postgres:17-alpine").Build();
+    private readonly IContainer _firestore = new ContainerBuilder("gcr.io/google.com/cloudsdktool/google-cloud-cli:emulators")
+        .WithPortBinding(8080, true)
+        .WithCommand("gcloud", "emulators", "firestore", "start", "--host-port=0.0.0.0:8080", "--quiet")
+        .WithWaitStrategy(Wait.ForUnixContainer().UntilMessageIsLogged("Dev App Server is now running"))
+        .Build();
     private readonly Dictionary<string, string?> _originalEnvironment = new();
     public TestBilling Billing { get; } = new();
     public TestClock Clock { get; } = new();
@@ -101,10 +105,12 @@ public sealed class BackendFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        await _postgres.StartAsync();
+        await _firestore.StartAsync();
         SetEnvironment("ASPNETCORE_ENVIRONMENT", "Development");
         SetEnvironment("Model__Provider", "mock");
-        SetEnvironment("ConnectionStrings__Postgres", _postgres.GetConnectionString());
+        SetEnvironment("Firestore__ProjectId", "demo-sedno-tests");
+        SetEnvironment("Firestore__UseEmulator", "true");
+        SetEnvironment("FIRESTORE_EMULATOR_HOST", _firestore.Hostname + ":" + _firestore.GetMappedPublicPort(8080));
         SetEnvironment("Security__CredentialKey", Convert.ToBase64String(Enumerable.Repeat((byte)1, 32).ToArray()));
         SetEnvironment("Security__FingerprintKey", Convert.ToBase64String(Enumerable.Repeat((byte)2, 32).ToArray()));
         SetEnvironment("RateLimiting__PermitLimit", "1000");
@@ -132,14 +138,13 @@ public sealed class BackendFixture : IAsyncLifetime
             });
         });
         _ = Factory.CreateClient();
-        using var scope = Factory.Services.CreateScope();
-        await scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.MigrateAsync();
+
     }
 
     public async Task DisposeAsync()
     {
         await Factory.DisposeAsync();
-        await _postgres.DisposeAsync();
+        await _firestore.DisposeAsync();
         foreach (var (name, value) in _originalEnvironment)
             Environment.SetEnvironmentVariable(name, value);
     }

@@ -10,15 +10,13 @@ ROOT = Path(__file__).resolve().parents[1]
 REGIONS = ("europe-central2", "europe-west1", "europe-west4")
 
 
-def manifests(project, region, site, image, sql_instance, billing_product, push_email, *, without_billing=False, google_credentials="file"):
+def manifests(project, region, site, image, billing_product, push_email, *, without_billing=False, google_credentials="file"):
     if not re.fullmatch(r"[a-z][a-z0-9-]{4,28}[a-z0-9]", project):
         raise ValueError("Nieprawidłowy identyfikator projektu Google Cloud.")
     if region not in REGIONS:
         raise ValueError("Wybierz europe-central2, europe-west1 lub europe-west4 obsługiwany przez Firebase Hosting.")
     if not re.fullmatch(r"[a-z0-9][a-z0-9-]{2,61}[a-z0-9]", site):
         raise ValueError("Nieprawidłowy identyfikator witryny Firebase Hosting.")
-    if not re.fullmatch(re.escape(project) + ":" + re.escape(region) + r":[a-z][a-z0-9-]*", sql_instance):
-        raise ValueError("Cloud SQL musi należeć do tego projektu i regionu.")
     if not re.fullmatch(re.escape(region) + r"-docker\.pkg\.dev/" + re.escape(project) + r"/[^\s]+@sha256:[a-f0-9]{64}", image):
         raise ValueError("Podaj obraz Artifact Registry z niezmiennym digestem sha256.")
     if google_credentials not in ("file", "cloud-run"):
@@ -37,6 +35,10 @@ def manifests(project, region, site, image, sql_instance, billing_product, push_
     env = [{"name": key, "value": value} for key, value in {
         "ASPNETCORE_ENVIRONMENT": "Production",
         "Firebase__ProjectId": project,
+        "Firestore__ProjectId": project,
+        "Firestore__DatabaseId": "(default)",
+        "Firestore__UseEmulator": "false",
+        "Firestore__RequireMigration": "true",
         "Model__Provider": "openai",
         "PlayIntegrity__Provider": "google",
         "PlayIntegrity__PackageName": "xyz.sedno.app",
@@ -58,7 +60,6 @@ def manifests(project, region, site, image, sql_instance, billing_product, push_
         env = [item for item in env if not item["name"].endswith("ServiceAccountJsonPath")]
         env.append({"name": "Google__CredentialProvider", "value": "cloud-run"})
     env += [secret_env(name, secret) for name, secret in {
-        "ConnectionStrings__Postgres": "sedno-postgres",
         "Security__CredentialKey": "sedno-credential-key",
         "Security__FingerprintKey": "sedno-fingerprint-key",
         "OpenAI__ApiKey": "sedno-openai-key",
@@ -82,9 +83,8 @@ def manifests(project, region, site, image, sql_instance, billing_product, push_
         "metadata": {"name": "sedno-api", "annotations": {"run.googleapis.com/ingress": "all"}},
         "spec": {"template": {
             "metadata": {"annotations": {
-                "autoscaling.knative.dev/minScale": "1", "autoscaling.knative.dev/maxScale": "3",
-                "run.googleapis.com/cpu-throttling": "false",
-                "run.googleapis.com/cloudsql-instances": sql_instance,
+                "autoscaling.knative.dev/minScale": "0", "autoscaling.knative.dev/maxScale": "3",
+                "run.googleapis.com/cpu-throttling": "true",
             }},
             "spec": {"serviceAccountName": f"sedno-api@{project}.iam.gserviceaccount.com",
                      "containerConcurrency": 20, "timeoutSeconds": 30,
@@ -96,27 +96,33 @@ def manifests(project, region, site, image, sql_instance, billing_product, push_
                                      "livenessProbe": {"httpGet": {"path": "/health/live", "port": 8080},
                                                        "periodSeconds": 30, "timeoutSeconds": 2}}],
                      "volumes": volumes}}}}
-    migration = {
-        "apiVersion": "run.googleapis.com/v1", "kind": "Job", "metadata": {"name": "sedno-migrate"},
-        "spec": {"template": {"metadata": {"annotations": {"run.googleapis.com/cloudsql-instances": sql_instance}},
-            "spec": {"taskCount": 1, "template": {
-            "spec": {"serviceAccountName": f"sedno-migrate@{project}.iam.gserviceaccount.com",
-                     "maxRetries": 0, "timeoutSeconds": "600",
-                     "containers": [{"image": image, "args": ["--migrate"],
-                                     "env": [{"name": "ASPNETCORE_ENVIRONMENT", "value": "Production"},
-                                             secret_env("ConnectionStrings__Postgres", "sedno-postgres-migration")],
-                                     "resources": {"limits": {"cpu": "1", "memory": "512Mi"}}}]}}}}}}
-    hosting = {"hosting": {"site": site, "public": "empty", "ignore": ["**/.*"],
+    # Cleanup uses Firestore + Firebase Auth only, without model/purchase secrets.
+    cleanup_env = [item for item in env if item["name"] in {
+        "ASPNETCORE_ENVIRONMENT", "Firebase__ProjectId", "Firestore__ProjectId",
+        "Firestore__DatabaseId", "Firestore__UseEmulator", "Firestore__RequireMigration", "Google__CredentialProvider",
+        "Firebase__DeletionServiceAccountJsonPath"}]
+    cleanup_mounts = [item for item in mounts if item["name"] == "firebase"]
+    cleanup_volumes = [item for item in volumes if item["name"] == "firebase"]
+    cleanup = {
+        "apiVersion": "run.googleapis.com/v1", "kind": "Job", "metadata": {"name": "sedno-cleanup"},
+        "spec": {"template": {"spec": {"taskCount": 1, "template": {"spec": {
+            "serviceAccountName": f"sedno-api@{project}.iam.gserviceaccount.com",
+            "maxRetries": 1, "timeoutSeconds": "600",
+            "containers": [{"image": image, "args": ["--cleanup"], "env": cleanup_env,
+                            "volumeMounts": cleanup_mounts,
+                            "resources": {"limits": {"cpu": "1", "memory": "512Mi"}}}],
+            "volumes": cleanup_volumes}}}}}}
+    hosting = {"firestore": {"rules": "firestore.rules", "indexes": "firestore.indexes.json"}, "hosting": {"site": site, "public": "empty", "ignore": ["**/.*"],
                            # A single pinned rule prevents concurrent updates of one Cloud Run service.
                            "rewrites": [{"regex": "^/(v1(/.*)?|health(/.*)?|notifications/google-play|prywatnosc/?|usun-konto/?)$",
                                          "run": {"serviceId": "sedno-api", "region": region, "pinTag": True}}],
                            "headers": [{"source": "**", "headers": [{"key": "Cache-Control", "value": "no-store"}]}]}}
-    return {"service.json": service, "migration.json": migration, "firebase.json": hosting}
+    return {"service.json": service, "cleanup.json": cleanup, "firebase.json": hosting}
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    for name in ("project", "site", "image", "sql-instance", "output"):
+    for name in ("project", "site", "image", "output"):
         parser.add_argument(f"--{name}", required=True)
     parser.add_argument("--billing-product", default="")
     parser.add_argument("--push-email", default="")
@@ -125,7 +131,7 @@ def main():
     parser.add_argument("--region", choices=REGIONS, default="europe-central2")
     args = parser.parse_args()
     try:
-        result = manifests(args.project, args.region, args.site, args.image, args.sql_instance, args.billing_product, args.push_email, without_billing=args.without_billing, google_credentials=args.google_credentials)
+        result = manifests(args.project, args.region, args.site, args.image, args.billing_product, args.push_email, without_billing=args.without_billing, google_credentials=args.google_credentials)
     except ValueError as error:
         parser.error(str(error))
     output = Path(args.output)
@@ -133,7 +139,8 @@ def main():
     (output / "empty").mkdir(exist_ok=True)
     for name, content in result.items():
         (output / name).write_text(json.dumps(content, indent=2) + "\n", encoding="utf-8")
-    shutil.copyfile(ROOT / "backend/deploy/firebase/deploy.sh", output / "deploy.sh")
+    for name in ("deploy.sh", "firestore.rules", "firestore.indexes.json"):
+        shutil.copyfile(ROOT / "backend/deploy/firebase" / name, output / name)
     print(f"Przygotowano pliki w {output}. Nie wdrożono zasobów.")
 
 

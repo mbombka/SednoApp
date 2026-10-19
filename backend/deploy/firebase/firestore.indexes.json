@@ -1,0 +1,21 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "guest_sessions", "queryScope": "COLLECTION",
+      "fields": [{"fieldPath": "IdentityId", "order": "ASCENDING"}, {"fieldPath": "AccountId", "order": "ASCENDING"}]
+    },
+    {
+      "collectionGroup": "play_purchases", "queryScope": "COLLECTION",
+      "fields": [{"fieldPath": "AccountId", "order": "ASCENDING"}, {"fieldPath": "Revoked", "order": "ASCENDING"}]
+    }
+  ],
+  "fieldOverrides": [
+    {"collectionGroup": "daily_usage", "fieldPath": "Used", "indexes": []},
+    {"collectionGroup": "daily_usage", "fieldPath": "Reservations", "indexes": []},
+    {"collectionGroup": "guest_sessions", "fieldPath": "CredentialHash", "indexes": []},
+    {"collectionGroup": "simplification_requests", "fieldPath": "Fingerprint", "indexes": []},
+    {"collectionGroup": "play_purchases", "fieldPath": "ProtectedToken", "indexes": []},
+    {"collectionGroup": "verified_accounts", "fieldPath": "InstallationHashes", "indexes": []},
+    {"collectionGroup": "verified_accounts", "fieldPath": "FirebaseUid", "indexes": []}
+  ]
+}

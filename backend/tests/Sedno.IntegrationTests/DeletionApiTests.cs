@@ -2,7 +2,6 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Sedno.Infrastructure;
 using Sedno.Domain;
@@ -48,16 +47,18 @@ public sealed class DeletionApiTests(BackendFixture fixture)
         var otherAccount = await LinkAsync(other, "deletion-other");
         using (var scope = fixture.Factory.Services.CreateScope())
         {
-            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-            db.Purchases.Add(new PlayPurchase { TokenHash = new string('D', 64), ProtectedToken = "encrypted-test", AccountId = accountId });
-            await db.SaveChangesAsync();
+            var db = scope.ServiceProvider.GetRequiredService<FirestoreStore>();
+            await db.PutAsync(db.Purchases.Document(new string('D', 64)), new PlayPurchase { TokenHash = new string('D', 64), ProtectedToken = "encrypted-test", AccountId = accountId });
         }
         fixture.IdentityAccounts.Fail = true;
         try
         {
             Assert.Equal(HttpStatusCode.InternalServerError, (await first.DeleteAsync("/v1/account")).StatusCode);
             using var scope = fixture.Factory.Services.CreateScope();
-            Assert.True(await scope.ServiceProvider.GetRequiredService<AppDbContext>().Accounts.AnyAsync(x => x.Id == accountId));
+            var db = scope.ServiceProvider.GetRequiredService<FirestoreStore>();
+            var pending = await db.GetAsync<VerifiedAccount>(db.Accounts.Document(FirestoreStore.Id(accountId)));
+            Assert.NotNull(pending);
+            Assert.True(pending.Deleting);
         }
         finally { fixture.IdentityAccounts.Fail = false; }
         var bearer = first.DefaultRequestHeaders.Authorization!.Parameter!;
@@ -67,13 +68,18 @@ public sealed class DeletionApiTests(BackendFixture fixture)
         Assert.Equal(HttpStatusCode.OK, (await other.GetAsync("/v1/quota")).StatusCode);
         using (var scope = fixture.Factory.Services.CreateScope())
         {
-            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-            Assert.False(await db.Accounts.AnyAsync(x => x.Id == accountId));
-            Assert.False(await db.Identities.AnyAsync(x => x.Id == firstId || x.Id == secondId));
-            Assert.False(await db.Sessions.AnyAsync(x => x.AccountId == accountId || x.IdentityId == firstId || x.IdentityId == secondId));
-            Assert.False(await db.Requests.AnyAsync(x => x.IdentityId == firstId || x.IdentityId == secondId));
-            Assert.False(await db.Purchases.AnyAsync(x => x.AccountId == accountId));
-            Assert.True(await db.Accounts.AnyAsync(x => x.Id == otherAccount));
+            var db = scope.ServiceProvider.GetRequiredService<FirestoreStore>();
+            Assert.False((await db.Accounts.Document(FirestoreStore.Id(accountId)).GetSnapshotAsync()).Exists);
+            Assert.False((await db.Identities.Document(FirestoreStore.Id(firstId)).GetSnapshotAsync()).Exists);
+            Assert.False((await db.Identities.Document(FirestoreStore.Id(secondId)).GetSnapshotAsync()).Exists);
+            Assert.Empty(await db.ListAsync<GuestSession>(db.Sessions.WhereEqualTo("AccountId", accountId.ToString())));
+            foreach (var id in new[] { firstId, secondId })
+            {
+                Assert.Empty(await db.ListAsync<GuestSession>(db.Sessions.WhereEqualTo("IdentityId", id.ToString())));
+                Assert.Empty(await db.ListAsync<SimplificationRecord>(db.Requests.WhereEqualTo("IdentityId", id.ToString())));
+            }
+            Assert.Empty(await db.ListAsync<PlayPurchase>(db.Purchases.WhereEqualTo("AccountId", accountId.ToString())));
+            Assert.True((await db.Accounts.Document(FirestoreStore.Id(otherAccount)).GetSnapshotAsync()).Exists);
         }
         Assert.True(fixture.IdentityAccounts.Deleted.ContainsKey("user-delete"));
         var (newGuest, _) = await GuestAsync();

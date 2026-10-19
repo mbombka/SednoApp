@@ -3,6 +3,14 @@
 Stan na 19.10.2026: backend działa w chmurze; aplikacja wymaga pełnych prób
 na telefonie i przygotowania wydania w Google Play.
 
+- [x] Przełączyć backend PostgreSQL → Firestore. Wdrożono 19.10.2026: 7 dokumentów
+  testowych, indeksy READY, publiczne API oraz godzinowe sprzątanie działają.
+  [Raport](docs/archiwum/firestore-deployment-2026-10-19.pl.md).
+- [ ] Po osobnej zgodzie trwale usunąć zatrzymany `sedno-postgres` i 4 stare kopie;
+  do tego czasu dysk/kopie mogą kosztować. Nowych backupów Firestore nie włączono
+  zgodnie z decyzją właściciela. Nie jest to blokada działania nowego API.
+- [ ] Opublikować przygotowaną politykę Firestore na osobnej domenie `sedno.xyz`;
+  kopia dostępna przez API została już wdrożona.
 - [ ] Powiązać projekt z Play Integrity w Play Console i sprawdzić aplikację
   zainstalowaną z kanału testowego, w tym upraszczanie i logowanie.
   Powiązanie projektu potwierdzone przez właściciela 19.10.2026; podpisany AAB gotowy.
@@ -13,7 +21,8 @@ na telefonie i przygotowania wydania w Google Play.
   Właściciel potwierdził działanie aplikacji i OCR na telefonie 19.10.2026.
   Po zmianie aparatu i kadrowania powtórzyć próby według
   [listy kontroli](mobile/docs/android_camera_ocr_manual_check.md).
-- [ ] Przećwiczyć usuwanie konta, obsługę zgłoszeń e-mail i odtwarzanie bazy z kopii.
+- [ ] Przećwiczyć usuwanie konta i obsługę zgłoszeń e-mail.
+  Backupy Firestore wyłączone decyzją właściciela; próbę odtwarzania zaplanować, jeśli zostaną włączone.
 - [ ] Sprawdzić treść opublikowanej polityki, ustawienia dostawców i formularz Data Safety.
 - [ ] Przed włączeniem płatności utworzyć produkt w Google Play, skonfigurować
   serwer i wykonać testy zakupów oraz powiadomień.

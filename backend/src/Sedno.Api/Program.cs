@@ -2,7 +2,8 @@ using System.Text.Json;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.EntityFrameworkCore;
+using Google.Cloud.Firestore;
+using Google.Api.Gax;
 using Sedno.Application;
 using Sedno.Infrastructure;
 
@@ -22,27 +23,61 @@ if (args is ["--init-billing-keyring", var directory])
     return;
 }
 var cloudRun = CloudRunHosting.Configure(builder);
+var cloudRunJob = !string.IsNullOrWhiteSpace(builder.Configuration["CLOUD_RUN_JOB"]);
+if (cloudRunJob && (!builder.Environment.IsProduction() || !args.Contains("--cleanup", StringComparer.Ordinal)))
+    throw new InvalidOperationException("Cloud Run jobs require Production and --cleanup.");
 builder.WebHost.ConfigureKestrel(options => options.Limits.MaxRequestBodySize = 128 * 1024);
 builder.Services.AddProblemDetails();
 builder.Services.AddHealthChecks();
-var connectionString = builder.Configuration.GetConnectionString("Postgres");
-if (string.IsNullOrWhiteSpace(connectionString)) throw new InvalidOperationException("ConnectionStrings:Postgres is required.");
-builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
-// Run explicitly as a one-off deployment job, before serving a new revision.
-if (args.Contains("--migrate", StringComparer.Ordinal))
+var firestoreProject = builder.Configuration["Firestore:ProjectId"] ?? builder.Configuration["Firebase:ProjectId"];
+if (string.IsNullOrWhiteSpace(firestoreProject)) throw new InvalidOperationException("Firestore:ProjectId is required.");
+var emulator = builder.Configuration.GetValue<bool>("Firestore:UseEmulator");
+if (!builder.Environment.IsDevelopment() && (emulator || !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("FIRESTORE_EMULATOR_HOST"))))
+    throw new InvalidOperationException("Firestore emulator is Development-only.");
+builder.Services.AddSingleton(_ => new FirestoreDbBuilder
 {
-    await using var migrationApp = builder.Build();
-    await using var scope = migrationApp.Services.CreateAsyncScope();
-    await scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.MigrateAsync();
+    ProjectId = firestoreProject,
+    DatabaseId = builder.Configuration["Firestore:DatabaseId"] ?? "(default)",
+    EmulatorDetection = emulator ? EmulatorDetection.EmulatorOnly : EmulatorDetection.None
+}.Build());
+builder.Services.AddSingleton(sp => new FirestoreStore(sp.GetRequiredService<FirestoreDb>(),
+    builder.Configuration.GetValue<bool>("Firestore:RequireMigration")));
+builder.Services.AddSingleton(TimeProvider.System);
+if (args.Contains("--cleanup", StringComparer.Ordinal))
+{
+    // The scheduled job does not need AI, billing, bearer or fingerprint secrets.
+    var cleanupCloudIdentity = builder.Configuration["Google:CredentialProvider"] == "cloud-run";
+    if (cleanupCloudIdentity && !cloudRun && !cloudRunJob) throw new InvalidOperationException("Cloud Run identity requires Production Cloud Run.");
+    builder.Services.AddHttpClient("cleanup-identity", client => client.Timeout = TimeSpan.FromSeconds(15)).RemoveAllLoggers();
+    builder.Services.AddHttpClient("cleanup-metadata", client => client.Timeout = TimeSpan.FromSeconds(3))
+        .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler { AllowAutoRedirect = false, UseProxy = false }).RemoveAllLoggers();
+    builder.Services.AddSingleton<IIdentityAccountDeletion>(sp =>
+    {
+        var clients = sp.GetRequiredService<IHttpClientFactory>();
+        var clock = sp.GetRequiredService<TimeProvider>();
+        IPlayAccessTokenSource tokens;
+        if (cleanupCloudIdentity)
+            tokens = new CloudRunAccessTokenSource(clients.CreateClient("cleanup-metadata"), clock, "https://www.googleapis.com/auth/identitytoolkit");
+        else if (builder.Configuration["Firebase:DeletionServiceAccountJsonPath"] is { Length: > 0 } path)
+            tokens = new ServiceAccountAccessTokenSource(clients.CreateClient("cleanup-identity"), path, clock, "https://www.googleapis.com/auth/identitytoolkit");
+        else if (builder.Environment.IsDevelopment()) return new UnavailableAccountDeletion();
+        else throw new InvalidOperationException("Firebase deletion credentials are required for cleanup recovery.");
+        return new FirebaseAccountDeletion(clients.CreateClient("cleanup-identity"), tokens, firestoreProject);
+    });
+    builder.Services.AddScoped<AccountDeletionService>();
+    builder.Services.AddScoped<MetadataCleanup>();
+    await using var cleanupApp = builder.Build();
+    await using var cleanupScope = cleanupApp.Services.CreateAsyncScope();
+    await cleanupScope.ServiceProvider.GetRequiredService<MetadataCleanup>().RunAsync(CancellationToken.None);
     return;
 }
-builder.Services.AddSingleton(TimeProvider.System);
+
 builder.Services.AddScoped<SimplificationTimings>();
 builder.Services.AddScoped<IUsageStore, UsageStore>();
 var dataProtection = builder.Services.AddDataProtection().SetApplicationName("Sedno");
 builder.Services.AddScoped<SubscriptionService>();
 builder.Services.AddScoped<IEntitlementResolver>(sp => sp.GetRequiredService<SubscriptionService>());
-builder.Services.AddHostedService<MetadataCleanup>();
+builder.Services.AddScoped<MetadataCleanup>();
 builder.Services.AddHttpClient();
 var credentialProvider = builder.Configuration["Google:CredentialProvider"] ?? "file";
 if (credentialProvider is not ("file" or "cloud-run") || (credentialProvider == "cloud-run" && !cloudRun))
@@ -134,7 +169,7 @@ else throw new InvalidOperationException("Unsupported Play Integrity provider.")
 
 var credentialKey = ReadKey(builder.Configuration, "Security:CredentialKey");
 var fingerprintKey = ReadKey(builder.Configuration, "Security:FingerprintKey");
-builder.Services.AddScoped<GuestStore>(sp => new(sp.GetRequiredService<AppDbContext>(),
+builder.Services.AddScoped<GuestStore>(sp => new(sp.GetRequiredService<FirestoreStore>(),
     sp.GetRequiredService<IUsageStore>(), sp.GetRequiredService<TimeProvider>(), credentialKey,
     sp.GetRequiredService<IIdentityAccountDeletion>()));
 builder.Services.AddScoped<IGuestStore>(sp => sp.GetRequiredService<GuestStore>());
@@ -204,7 +239,10 @@ app.Use(async (context, next) =>
     using var linked = CancellationTokenSource.CreateLinkedTokenSource(clientAborted, deadline.Token);
     context.RequestAborted = linked.Token;
     try { await next(context); }
-    catch (OperationCanceledException) when (deadline.IsCancellationRequested && !clientAborted.IsCancellationRequested && !context.Response.HasStarted)
+    catch (Exception error) when (
+        (error is OperationCanceledException || error is Grpc.Core.RpcException
+            { StatusCode: Grpc.Core.StatusCode.Cancelled or Grpc.Core.StatusCode.DeadlineExceeded }) &&
+        deadline.IsCancellationRequested && !clientAborted.IsCancellationRequested && !context.Response.HasStarted)
     {
         context.RequestAborted = clientAborted;
         await Problem(context, 504, "simplification_timeout", "Upraszczanie trwało zbyt długo. Spróbuj ponownie.").ExecuteAsync(context);
@@ -319,8 +357,8 @@ app.MapPost("/notifications/google-play", async (PubSubEnvelope envelope, HttpCo
 });
 
 app.MapHealthChecks("/health/live", new() { Predicate = _ => false });
-app.MapGet("/health/ready", async (AppDbContext db, CancellationToken ct) =>
-    await db.Database.CanConnectAsync(ct) ? Results.Ok(new { status = "ready" }) : Results.StatusCode(503));
+app.MapGet("/health/ready", async (FirestoreStore db, CancellationToken ct) =>
+    await db.ReadyAsync(ct) ? Results.Ok(new { status = "ready" }) : Results.StatusCode(503));
 
 app.MapPost("/v1/guest-sessions", async (HttpContext context, IGuestStore guests, IIntegrityVerifier integrity) =>
 {

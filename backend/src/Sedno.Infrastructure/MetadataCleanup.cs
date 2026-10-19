@@ -1,28 +1,44 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using Google.Cloud.Firestore;
+using Sedno.Application;
+using Sedno.Domain;
 
 namespace Sedno.Infrastructure;
 
-public sealed class MetadataCleanup(IServiceScopeFactory scopes, TimeProvider clock) : BackgroundService
+// Invoked hourly by a Cloud Run job, not by a permanently running API instance.
+public sealed class MetadataCleanup(FirestoreStore db, TimeProvider clock, AccountDeletionService deletion)
 {
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    public async Task RunAsync(CancellationToken ct)
     {
-        while (!stoppingToken.IsCancellationRequested)
-        {
-            await Task.Delay(TimeSpan.FromHours(1), clock, stoppingToken);
-            using (var scope = scopes.CreateScope())
+        if (!await db.ReadyAsync(ct)) throw new InvalidOperationException("Firestore migration must complete before cleanup.");
+        var now = clock.GetUtcNow();
+        foreach (var account in await db.ListAsync<VerifiedAccount>(db.Accounts.WhereEqualTo("Deleting", true), ct))
+            await deletion.DeleteAsync(new SessionIdentity(account.PrimaryIdentityId, account.Id, Guid.Empty), ct);
+        await DeleteAsync(db.Requests.WhereLessThan("CreatedAt", FirestoreStore.Date(now.AddDays(-8))), ct);
+        await DeleteAsync(db.Sessions.WhereLessThanOrEqualTo("ExpiresAt", FirestoreStore.Date(now)), ct);
+        await DeleteAsync(db.DailyUsage.WhereLessThanOrEqualTo("ExpiresAt", FirestoreStore.Date(now)), ct);
+        var candidates = await db.Identities.WhereLessThan("CreatedAt", FirestoreStore.Date(now.AddDays(-90))).GetSnapshotAsync(ct);
+        foreach (var candidate in candidates.Documents)
+            await db.Database.RunTransactionAsync(async transaction =>
             {
-                var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                var now = clock.GetUtcNow();
-                await db.Requests.Where(x => x.CreatedAt < now.AddDays(-8)).ExecuteDeleteAsync(stoppingToken);
-                await db.Sessions.Where(x => x.ExpiresAt < now).ExecuteDeleteAsync(stoppingToken);
-                await db.Identities.Where(x => x.CreatedAt < now.AddDays(-90) &&
-                    !db.Sessions.Any(s => s.IdentityId == x.Id) &&
-                    !db.Requests.Any(r => r.IdentityId == x.Id) &&
-                    !db.Accounts.Any(a => a.PrimaryIdentityId == x.Id) && x.AccountId == null)
-                    .ExecuteDeleteAsync(stoppingToken);
-            }
+                var identity = await db.GetAsync<GuestIdentity>(transaction, candidate.Reference, ct);
+                if (identity is null || identity.AccountId is not null) return;
+                var sessions = await transaction.GetSnapshotAsync(db.Sessions.WhereEqualTo("IdentityId", identity.Id.ToString()).Limit(1), ct);
+                var requests = await transaction.GetSnapshotAsync(db.Requests.WhereEqualTo("IdentityId", identity.Id.ToString()).Limit(1), ct);
+                if (sessions.Count == 0 && requests.Count == 0) transaction.Delete(candidate.Reference);
+            }, cancellationToken: ct);
+        // Crashed callers leave bounded leases; do not retain coordination metadata forever.
+        await DeleteAsync(db.Leases.WhereLessThan("ExpiresAt", FirestoreStore.Date(now)), ct);
+    }
+
+    private async Task DeleteAsync(Query query, CancellationToken ct)
+    {
+        while (true)
+        {
+            var page = await query.Limit(200).GetSnapshotAsync(ct);
+            if (page.Count == 0) return;
+            var batch = db.Database.StartBatch();
+            foreach (var document in page.Documents) batch.Delete(document.Reference, Precondition.LastUpdated(document.UpdateTime!.Value));
+            await batch.CommitAsync(ct);
         }
     }
 }

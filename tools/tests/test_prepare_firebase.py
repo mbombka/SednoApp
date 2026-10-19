@@ -12,29 +12,30 @@ class FirebaseDeploymentTests(unittest.TestCase):
     def config(self, **overrides):
         args = dict(project="sedno-example", region="europe-west1", site="sedno-example-api",
                     image="europe-west1-docker.pkg.dev/sedno-example/backend/api@sha256:" + "a" * 64,
-                    sql_instance="sedno-example:europe-west1:sedno", billing_product="monthly",
+                    billing_product="monthly",
                     push_email="sedno-push@sedno-example.iam.gserviceaccount.com")
         args.update(overrides)
         return MODULE.manifests(**args)
 
     def test_rejects_unsafe_or_inconsistent_deployments(self):
         for args in (dict(project="$(echo bad)"), dict(region="us-central1"),
-                     dict(image="image:latest"), dict(sql_instance="other:europe-west1:db"),
+                     dict(image="image:latest"),
                      dict(site="../public"), dict(billing_product=""), dict(push_email="user@example.com")):
             with self.subTest(args=args), self.assertRaises(ValueError):
                 self.config(**args)
 
-    def test_production_preserves_security_and_background_retention(self):
+    def test_production_preserves_security_and_scales_to_zero(self):
         service = self.config()["service.json"]["spec"]["template"]
-        self.assertEqual("false", service["metadata"]["annotations"]["run.googleapis.com/cpu-throttling"])
-        self.assertEqual("1", service["metadata"]["annotations"]["autoscaling.knative.dev/minScale"])
+        self.assertEqual("true", service["metadata"]["annotations"]["run.googleapis.com/cpu-throttling"])
+        self.assertEqual("0", service["metadata"]["annotations"]["autoscaling.knative.dev/minScale"])
+        self.assertNotIn("run.googleapis.com/cloudsql-instances", service["metadata"]["annotations"])
         container = service["spec"]["containers"][0]
         env = {item["name"]: item for item in container["env"]}
         for key, value in {"ASPNETCORE_ENVIRONMENT": "Production", "Model__Provider": "openai",
                            "PlayIntegrity__Provider": "google", "Billing__Enabled": "true",
                            "Billing__ReadOnlyKeyRing": "true", "Billing__PackageName": "xyz.sedno.app"}.items():
             self.assertEqual(value, env[key]["value"])
-        for key in ("OpenAI__ApiKey", "ConnectionStrings__Postgres", "Security__CredentialKey", "Security__FingerprintKey"):
+        for key in ("OpenAI__ApiKey", "Security__CredentialKey", "Security__FingerprintKey"):
             self.assertNotIn("value", env[key])
             self.assertEqual("1", env[key]["valueFrom"]["secretKeyRef"]["key"])
         self.assertEqual("/health/ready", container["startupProbe"]["httpGet"]["path"])
@@ -60,17 +61,18 @@ class FirebaseDeploymentTests(unittest.TestCase):
             self.assertFalse(any(name.endswith("ServiceAccountJsonPath") for name in env))
             self.assertEqual(set() if no_billing else {"keyring"}, {item["name"] for item in spec["volumes"]})
 
-    def test_migration_has_only_database_secret_and_no_retry(self):
-        template = self.config()["migration.json"]["spec"]["template"]
-        self.assertEqual("sedno-example:europe-west1:sedno", template["metadata"]["annotations"]["run.googleapis.com/cloudsql-instances"])
-        spec = template["spec"]
-        self.assertNotIn("metadata", spec["template"])
-        self.assertEqual(1, spec["taskCount"])
-        task = spec["template"]["spec"]
-        self.assertEqual(0, task["maxRetries"])
-        self.assertEqual(["--migrate"], task["containers"][0]["args"])
-        self.assertEqual(2, len(task["containers"][0]["env"]))
-        self.assertEqual("sedno-postgres-migration", task["containers"][0]["env"][1]["valueFrom"]["secretKeyRef"]["name"])
+    def test_cleanup_has_no_model_or_database_password_and_uses_same_image(self):
+        config = self.config(google_credentials="cloud-run")
+        task = config["cleanup.json"]["spec"]["template"]["spec"]["template"]["spec"]
+        container = task["containers"][0]
+        self.assertEqual(["--cleanup"], container["args"])
+        self.assertEqual(config["service.json"]["spec"]["template"]["spec"]["containers"][0]["image"], container["image"])
+        env = {item["name"]: item for item in container["env"]}
+        self.assertEqual("false", env["Firestore__UseEmulator"]["value"])
+        self.assertEqual("(default)", env["Firestore__DatabaseId"]["value"])
+        self.assertFalse(any("valueFrom" in item for item in env.values()))
+        self.assertNotIn("migration.json", config)
+        self.assertIn("firestore", config["firebase.json"])
 
     def test_api_site_does_not_replace_existing_homepage_and_pins_revision(self):
         hosting = self.config()["firebase.json"]["hosting"]

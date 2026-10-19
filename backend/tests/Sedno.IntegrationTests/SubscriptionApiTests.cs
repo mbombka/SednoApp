@@ -2,7 +2,6 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Sedno.Application;
 using Sedno.Infrastructure;
@@ -47,8 +46,8 @@ public sealed class SubscriptionApiTests(BackendFixture fixture)
         fixture.Billing.Purchases[token] = new("SUBSCRIPTION_STATE_ACTIVE", now.AddDays(1), true, SubscriptionService.Binding(account));
         (await client.PostAsJsonAsync("/v1/subscription", new { purchaseToken = token })).EnsureSuccessStatusCode();
         using var scope = fixture.Factory.Services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        var identity = await db.Accounts.Where(x => x.Id == account).Select(x => x.PrimaryIdentityId).SingleAsync();
+        var db = scope.ServiceProvider.GetRequiredService<FirestoreStore>();
+        var identity = (await db.GetAsync<Sedno.Domain.VerifiedAccount>(db.Accounts.Document(FirestoreStore.Id(account))))!.PrimaryIdentityId;
         var resolver = new SubscriptionService(db, new NoNetworkBilling(),
             scope.ServiceProvider.GetRequiredService<Microsoft.AspNetCore.DataProtection.IDataProtectionProvider>(), fixture.Clock);
         Assert.True(await resolver.HasSubscriptionAsync(identity, default));
@@ -73,8 +72,8 @@ public sealed class SubscriptionApiTests(BackendFixture fixture)
         fixture.Billing.Purchases[token] = new("SUBSCRIPTION_STATE_CANCELED", now.AddMinutes(1), true, SubscriptionService.Binding(account));
         (await client.PostAsJsonAsync("/v1/subscription", new { purchaseToken = token })).EnsureSuccessStatusCode();
         using var scope = fixture.Factory.Services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        var identity = await db.Accounts.Where(x => x.Id == account).Select(x => x.PrimaryIdentityId).SingleAsync();
+        var db = scope.ServiceProvider.GetRequiredService<FirestoreStore>();
+        var identity = (await db.GetAsync<Sedno.Domain.VerifiedAccount>(db.Accounts.Document(FirestoreStore.Id(account))))!.PrimaryIdentityId;
         var resolver = new SubscriptionService(db, new NoNetworkBilling(),
             scope.ServiceProvider.GetRequiredService<Microsoft.AspNetCore.DataProtection.IDataProtectionProvider>(), fixture.Clock);
         Assert.True(await resolver.HasSubscriptionAsync(identity, default));
@@ -111,7 +110,7 @@ public sealed class SubscriptionApiTests(BackendFixture fixture)
         var gate = new GatedBilling(fixture.Billing, firstToken);
         using var firstScope = fixture.Factory.Services.CreateScope();
         using var otherScope = fixture.Factory.Services.CreateScope();
-        SubscriptionService Service(IServiceScope scope) => new(scope.ServiceProvider.GetRequiredService<AppDbContext>(), gate,
+        SubscriptionService Service(IServiceScope scope) => new(scope.ServiceProvider.GetRequiredService<FirestoreStore>(), gate,
             scope.ServiceProvider.GetRequiredService<Microsoft.AspNetCore.DataProtection.IDataProtectionProvider>(), fixture.Clock);
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
         var pending = Service(firstScope).VerifyAsync(first, firstToken, timeout.Token);
@@ -148,12 +147,12 @@ public sealed class SubscriptionApiTests(BackendFixture fixture)
         Assert.Equal(HttpStatusCode.NoContent, (await NotifyAsync(token, id)).StatusCode);
         Assert.Equal(acknowledgements, fixture.Billing.Acknowledgements.GetValueOrDefault(token));
         using var scope = fixture.Factory.Services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        Assert.Equal(1, await db.PlayNotifications.CountAsync(x => x.Id == id));
-        var row = await db.Purchases.SingleAsync(x => x.TokenHash == Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(token))));
+        var db = scope.ServiceProvider.GetRequiredService<FirestoreStore>();
+        Assert.True((await db.PlayNotifications.Document(FirestoreStore.Hash(id)).GetSnapshotAsync()).Exists);
+        var row = (await db.GetAsync<Sedno.Domain.PlayPurchase>(db.Purchases.Document(FirestoreStore.Hash(token))))!;
         Assert.DoesNotContain(token, row.ProtectedToken);
         var resolver = new SubscriptionService(db, fixture.Billing, scope.ServiceProvider.GetRequiredService<Microsoft.AspNetCore.DataProtection.IDataProtectionProvider>(), fixture.Clock);
-        var identity = await db.Accounts.Where(x => x.Id == account).Select(x => x.PrimaryIdentityId).SingleAsync();
+        var identity = (await db.GetAsync<Sedno.Domain.VerifiedAccount>(db.Accounts.Document(FirestoreStore.Id(account))))!.PrimaryIdentityId;
         // Resolver is real here; existing quota tests retain their injected entitlement mock.
         Assert.Equal(active, await resolver.HasSubscriptionAsync(identity, default));
         var quota = await new UsageStore(db, resolver, fixture.Clock).GetQuotaAsync(identity, default);

@@ -3,6 +3,9 @@
 Projekt: `sednoapp-79241` (numer `1003558402460`), pakiet: `xyz.sedno.app`.
 API: `https://sednoapp-79241-api.web.app`. Płatności pozostają wyłączone.
 
+Serwer przełączono na Firestore 19.10.2026. Zachowano testowe sesje i metadane limitów.
+Przed kolejnym testem sprawdź [aktualny stan wdrożenia](../../backend/deploy/firebase/README.pl.md).
+
 Stan 19.10.2026: Play Integrity API jest włączone w Google Cloud;
 właściciel potwierdził powiązanie projektu w Play Console. Test aplikacji
 zainstalowanej z Google Play pozostaje do wykonania.

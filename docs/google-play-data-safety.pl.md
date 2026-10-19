@@ -44,7 +44,7 @@ Dowolny tekst użytkownika może zawierać dane wrażliwe mimo braku takich form
 - **Firebase Authentication / Google Sign-In:** konto, IP i techniczne dane logowania.
 - **Play Integrity:** kontrola aplikacji i urządzenia, bez tekstów i zdjęć.
 - **ML Kit:** rozpoznaje tekst lokalnie, ale może wysyłać diagnostykę i metryki.
-- **Google Cloud:** Hosting, Cloud Run i PostgreSQL w Warszawie; region bazy
+- **Google Cloud:** Hosting, Cloud Run i Firestore w Warszawie (migrację wdrożono 19.10.2026); region bazy
   nie gwarantuje przetwarzania wszystkich danych wyłącznie w UE.
 - **Google Play:** dane płatności i subskrypcji po włączeniu zakupów.
 

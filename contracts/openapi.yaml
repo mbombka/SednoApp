@@ -272,8 +272,8 @@ paths:
       operationId: readiness
       security: []
       responses:
-        '200': { description: PostgreSQL is reachable. }
-        '503': { description: PostgreSQL is unavailable. }
+        '200': { description: Firestore is reachable and no data import is in progress. }
+        '503': { description: Firestore is unavailable or a data import is in progress. }
 components:
   securitySchemes:
     googlePushBearer:

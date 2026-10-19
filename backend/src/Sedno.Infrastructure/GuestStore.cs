@@ -1,12 +1,11 @@
 using System.Security.Cryptography;
 using System.Text;
-using Microsoft.EntityFrameworkCore;
 using Sedno.Application;
 using Sedno.Domain;
 
 namespace Sedno.Infrastructure;
 
-public sealed class GuestStore(AppDbContext db, IUsageStore usage, TimeProvider clock, byte[] credentialKey, IIdentityAccountDeletion identityAccounts) : IGuestStore
+public sealed class GuestStore(FirestoreStore db, IUsageStore usage, TimeProvider clock, byte[] credentialKey, IIdentityAccountDeletion identityAccounts) : IGuestStore
 {
     public async Task<GuestSessionDto> CreateAsync(string installationId, CancellationToken ct)
     {
@@ -19,75 +18,72 @@ public sealed class GuestStore(AppDbContext db, IUsageStore usage, TimeProvider 
         var secret = Base64Url(RandomNumberGenerator.GetBytes(32));
         var session = new GuestSession
         {
-            Id = Guid.NewGuid(), Identity = identity, CreatedAt = now, ExpiresAt = now.AddDays(90),
-            CredentialHash = Hash(secret)
+            Id = Guid.NewGuid(), IdentityId = identity.Id, CreatedAt = now,
+            ExpiresAt = now.AddDays(90), CredentialHash = Hash(secret)
         };
-        db.Sessions.Add(session);
-        await db.SaveChangesAsync(ct);
-        return new($"{session.Id:N}.{secret}", new(identity.Id.ToString(), "guest"),
-            await usage.GetQuotaAsync(identity.Id, ct));
+        var batch = db.Database.StartBatch();
+        batch.Create(db.Identities.Document(FirestoreStore.Id(identity.Id)), FirestoreStore.Encode(identity));
+        batch.Create(db.Sessions.Document(FirestoreStore.Id(session.Id)), FirestoreStore.Encode(session));
+        await batch.CommitAsync(ct);
+        return new($"{session.Id:N}.{secret}", new(identity.Id.ToString(), "guest"), await usage.GetQuotaAsync(identity.Id, ct));
     }
 
     public async Task<SessionIdentity?> AuthenticateAsync(string credential, CancellationToken ct)
     {
         var parts = credential.Split('.', 2);
-        if (parts.Length != 2 || !Guid.TryParseExact(parts[0], "N", out var sessionId) || parts[1].Length != 43)
-            return null;
-        var session = await db.Sessions.AsNoTracking().SingleOrDefaultAsync(x => x.Id == sessionId, ct);
+        if (parts.Length != 2 || !Guid.TryParseExact(parts[0], "N", out var sessionId) || parts[1].Length != 43) return null;
+        var session = await db.GetAsync<GuestSession>(db.Sessions.Document(FirestoreStore.Id(sessionId)), ct);
         if (session is null || session.ExpiresAt <= clock.GetUtcNow()) return null;
-        var given = Convert.FromHexString(Hash(parts[1]));
-        var stored = Convert.FromHexString(session.CredentialHash);
-        return CryptographicOperations.FixedTimeEquals(given, stored)
-            ? new(session.AccountId is null ? session.IdentityId :
-                await db.Accounts.AsNoTracking().Where(x => x.Id == session.AccountId)
-                    .Select(x => x.PrimaryIdentityId).SingleAsync(ct), session.AccountId, session.Id)
-            : null;
+        if (!CryptographicOperations.FixedTimeEquals(Convert.FromHexString(Hash(parts[1])), Convert.FromHexString(session.CredentialHash))) return null;
+        var identity = await db.GetAsync<GuestIdentity>(db.Identities.Document(FirestoreStore.Id(session.IdentityId)), ct);
+        if (identity is null) return null;
+        // Previously issued guest credentials never acquire account privileges.
+        if (session.AccountId is null) return identity.AccountId is null ? new(identity.Id, null, session.Id) : null;
+        var account = await db.GetAsync<VerifiedAccount>(db.Accounts.Document(FirestoreStore.Id(session.AccountId.Value)), ct);
+        return account is null ? null : new(account.PrimaryIdentityId, account.Id, session.Id);
     }
 
     public async Task<AuthenticatedSessionDto?> LinkAsync(SessionIdentity guest, VerifiedIdentity verified, CancellationToken ct)
     {
-        if (guest.AccountId is not null || verified.Uid.Length is < 1 or > 128 ||
-            verified.Provider is not ("google" or "email")) return null;
-        await using var transaction = await db.Database.BeginTransactionAsync(ct);
-        // Serialize Firebase lookup/deletion only for this UID. Network latency must
-        // not hold the exclusive quota-topology lock for unrelated users.
-        await IdentityCoordination.LockAsync(db, verified.Uid, ct);
+        if (guest.AccountId is not null || verified.Uid.Length is < 1 or > 128 || verified.Provider is not ("google" or "email")) return null;
+        await using var lease = await FirestoreLease.AcquireAsync(db, "uid:" + verified.Uid, clock, ct);
         if (!await identityAccounts.ExistsAsync(verified.Uid, ct)) return null;
-        await db.Database.ExecuteSqlRawAsync("SELECT pg_advisory_xact_lock(1748392201)", ct);
-        var identity = await db.Identities.SingleOrDefaultAsync(x => x.Id == guest.IdentityId, ct);
-        if (identity is null) return null;
-        var account = await db.Accounts.SingleOrDefaultAsync(x => x.FirebaseUid == verified.Uid, ct);
-        if (identity.AccountId is not null && identity.AccountId != account?.Id) return null;
-        if (account is null)
-        {
-            account = new VerifiedAccount
-            {
-                Id = Guid.NewGuid(), FirebaseUid = verified.Uid, Provider = verified.Provider,
-                PrimaryIdentityId = identity.Id, CreatedAt = clock.GetUtcNow()
-            };
-            db.Accounts.Add(account);
-        }
-        else account.Provider = verified.Provider;
-        identity.AccountId = account.Id;
-        // A guest bearer must not become an account bearer after linking.
-        await db.Sessions.Where(x => x.IdentityId == identity.Id && x.AccountId == null).ExecuteDeleteAsync(ct);
         var secret = Base64Url(RandomNumberGenerator.GetBytes(32));
-        var now = clock.GetUtcNow();
-        var session = new GuestSession
+        var accountId = Guid.NewGuid();
+        var sessionId = Guid.NewGuid();
+        var result = await db.Database.RunTransactionAsync(async transaction =>
         {
-            Id = Guid.NewGuid(), IdentityId = account.PrimaryIdentityId, AccountId = account.Id,
-            CredentialHash = Hash(secret), CreatedAt = now, ExpiresAt = now.AddDays(7)
-        };
-        db.Sessions.Add(session);
-        await db.SaveChangesAsync(ct);
-        await transaction.CommitAsync(ct);
-        return new($"{session.Id:N}.{secret}", new(account.Id.ToString(), account.Provider),
-            await usage.GetQuotaAsync(account.PrimaryIdentityId, ct));
+            await lease.CheckAsync(transaction, ct);
+            var identityReference = db.Identities.Document(FirestoreStore.Id(guest.IdentityId));
+            var identity = await db.GetAsync<GuestIdentity>(transaction, identityReference, ct);
+            var guestSession = await db.GetAsync<GuestSession>(transaction, db.Sessions.Document(FirestoreStore.Id(guest.SessionId)), ct);
+            if (identity is null || guestSession is null || guestSession.IdentityId != guest.IdentityId || guestSession.AccountId is not null || guestSession.ExpiresAt <= clock.GetUtcNow()) return null;
+            var uidReference = db.Uids.Document(FirestoreStore.Hash(verified.Uid));
+            var pointer = await db.GetAsync<AccountPointer>(transaction, uidReference, ct);
+            var accountReference = db.Accounts.Document(FirestoreStore.Id(pointer?.AccountId ?? accountId));
+            var account = await db.GetAsync<VerifiedAccount>(transaction, accountReference, ct);
+            if (pointer is not null && account is null) return null;
+            if (account?.Deleting == true || (identity.AccountId is not null && identity.AccountId != account?.Id)) return null;
+            account ??= new VerifiedAccount { Id = accountId, FirebaseUid = verified.Uid, PrimaryIdentityId = identity.Id, CreatedAt = clock.GetUtcNow() };
+            var oldSessions = await transaction.GetSnapshotAsync(db.Sessions.WhereEqualTo("IdentityId", identity.Id.ToString()).WhereEqualTo("AccountId", null), ct);
+            account.Provider = verified.Provider;
+            if (!account.InstallationHashes.Contains(identity.InstallationHash)) account.InstallationHashes.Add(identity.InstallationHash);
+            identity.AccountId = account.Id;
+            var now = clock.GetUtcNow();
+            var session = new GuestSession { Id = sessionId, IdentityId = account.PrimaryIdentityId, AccountId = account.Id,
+                CredentialHash = Hash(secret), CreatedAt = now, ExpiresAt = now.AddDays(7) };
+            db.Put(transaction, identityReference, identity);
+            db.Put(transaction, accountReference, account);
+            db.Put(transaction, uidReference, new AccountPointer { AccountId = account.Id });
+            db.Put(transaction, db.Bindings.Document(SubscriptionService.Binding(account.Id)), new AccountPointer { AccountId = account.Id });
+            foreach (var old in oldSessions.Documents) transaction.Delete(old.Reference);
+            db.Put(transaction, db.Sessions.Document(FirestoreStore.Id(sessionId)), session);
+            return account;
+        }, cancellationToken: ct);
+        return result is null ? null : new($"{sessionId:N}.{secret}", new(result.Id.ToString(), result.Provider), await usage.GetQuotaAsync(result.PrimaryIdentityId, ct));
     }
 
-    public Task SignOutAsync(SessionIdentity session, CancellationToken ct) =>
-        db.Sessions.Where(x => x.Id == session.SessionId).ExecuteDeleteAsync(ct);
-
+    public Task SignOutAsync(SessionIdentity session, CancellationToken ct) => db.Sessions.Document(FirestoreStore.Id(session.SessionId)).DeleteAsync(cancellationToken: ct);
     private string Hash(string value) => Convert.ToHexString(HMACSHA256.HashData(credentialKey, Encoding.UTF8.GetBytes(value)));
     private static string Base64Url(byte[] value) => Convert.ToBase64String(value).TrimEnd('=').Replace('+', '-').Replace('/', '_');
 }

@@ -3,7 +3,8 @@
 Pełne zasady i dane administratora: [polityka prywatności](privacy-policy.pl.md).
 Kontakt do zgłoszeń: **mariuszbabka0@gmail.com**. Pierwszy rynek: Polska, odbiorcy 16+.
 
-Backend i baza działają od 19.10.2026 w Warszawie. Płatności są wyłączone.
+Backend działa od 19.10.2026 w Warszawie; tego dnia produkcję przełączono na Firestore.
+Płatności są wyłączone. Właściciel zrezygnował z backupów nowej bazy na obecnym etapie.
 [Konfiguracja serwera](../backend/deploy/firebase/README.pl.md).
 Google i OpenAI mają własne zasady przetwarzania; region bazy nie oznacza,
 że wszystkie dane pozostają w Polsce lub UE.
@@ -14,17 +15,20 @@ Google i OpenAI mają własne zasady przetwarzania; region bazy nie oznacza,
 | --- | --- |
 | Tekst i wynik na serwerze Sedno | Bez zapisu treści w bazie i logach |
 | Historia na telefonie | 7 dni; czyszczenie przy odczycie, starcie, wznowieniu i wylogowaniu; także ręczne |
-| Metadane żądań | 8 dni; usuwanie co godzinę |
-| Sesje | Konto: 7 dni; gość: 90 dni; wygasłe rekordy usuwa proces godzinowy |
+| Metadane żądań | 8 dni; osobne zadanie Cloud Run uruchamiane co godzinę |
+| Dzienne liczniki i rezerwacje | Do 8 dni; to samo zadanie; rezerwacja przestaje obciążać limit po 5 minutach |
+| Dzierżawy operacji konta | 2 minuty; zwalnianie po operacji, porzucone rekordy usuwa zadanie godzinowe |
+| Sesje | Konto: 7 dni; gość: 90 dni; wygasłe rekordy usuwa zadanie godzinowe |
 | Niepowiązani goście | Po 90 dniach, gdy nie mają już sesji ani żądań |
 | Konto i rekordy zakupów | Do usunięcia konta; brak automatycznego usuwania nieaktywnych kont |
 | Identyfikatory powiadomień zakupowych | Brak automatycznego terminu; bez tokenu i powiązania z kontem |
 | Cloud Logging `_Default` | 30 dni; pozostałe magazyny i eksporty trzeba kontrolować osobno |
-| Kopie bazy | 7 codziennych kopii i logi odtwarzania z 1 dnia; przyjęta górna granica 30 dni |
+| Kopie bazy | Kopie SQL nie obejmują Firestore; nowe backupy/PITR nie są włączane przez manifesty. Wymagają osobnej konfiguracji i testu; górna granica 30 dni |
 | Korespondencja zgłoszeń | Przyjęta zasada: 90 dni od zamknięcia; ręczna kontrola co miesiąc |
 | Minimalny zapis obsługi praw | Przyjęta zasada: 12 miesięcy, tylko data, rodzaj żądania i wynik |
 
-Ustawienia kopii i głównego magazynu logów potwierdzono przy wdrożeniu.
+Ustawienia kopii SQL i głównego magazynu logów potwierdzono przy poprzednim wdrożeniu;
+nie potwierdza to konfiguracji kopii Firestore.
 Obsługę poczty i rejestr usunięć trzeba wdrożyć organizacyjnie. Po odtworzeniu
 bazy ponownie zastosuj usunięcia przed przywróceniem dostępu użytkownikom.
 Nie wykonano jeszcze próby odtwarzania.

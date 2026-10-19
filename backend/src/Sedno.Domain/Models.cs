@@ -10,6 +10,8 @@ public sealed class GuestIdentity
 
 public sealed class VerifiedAccount
 {
+    public List<string> InstallationHashes { get; set; } = [];
+    public bool Deleting { get; set; }
     public Guid Id { get; set; }
     public string FirebaseUid { get; set; } = "";
     public string Provider { get; set; } = "email";
