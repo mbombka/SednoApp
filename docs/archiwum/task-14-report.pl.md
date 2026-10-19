@@ -1,3 +1,5 @@
+> Dokument archiwalny. Opisuje stan z czasu zadania. [Bieżąca dokumentacja](../README.md).
+
 # Zadanie 14 — przygotowanie backendu do Firebase
 
 Aktualny stan wdrożenia z 19.10.2026 opisuje [raport wdrożenia](task-14-deployment.pl.md).
@@ -89,8 +91,8 @@ oraz 3 próbki dla default i fast. Wszystkie się powiodły. Produkcyjny default
 bez rozgrzewki: 4369 tokenów wejścia i 178 wyjścia, bazowo 0,00052590 USD razem,
 średnio 0,00017530 USD na wywołanie. Mediana: 1771,16 ms.
 
-[Szczegóły kosztów](../backend/tools/Sedno.ModelBenchmark/results/2026-10-16-firebase-costs.md)
-i [metryki bez treści](../backend/tools/Sedno.ModelBenchmark/results/2026-10-16-firebase.jsonl).
+[Szczegóły kosztów](../../backend/tools/Sedno.ModelBenchmark/results/2026-10-16-firebase-costs.md)
+i [metryki bez treści](../../backend/tools/Sedno.ModelBenchmark/results/2026-10-16-firebase.jsonl).
 To kalkulacja po aktualnych stawkach, bez faktury, cache, dopłat, podatków i hostingu.
 Nie zmierzono kosztów chmury, ponieważ jej nie uruchomiono. Jedna stale działająca
 instancja Cloud Run i CPU bez throttlingu zapewniają sprzątanie metadanych co godzinę,
@@ -98,7 +100,7 @@ ale generują koszt stały. Małe powtarzalne próbki nie przewidują pełnego r
 
 ## Ograniczenia i dalsze wdrożenie
 
-Pełna procedura: [Firebase / Cloud Run](../backend/deploy/firebase/README.pl.md).
+Pełna procedura: [Firebase / Cloud Run](../../backend/deploy/firebase/README.pl.md).
 Potrzebne są projekt Firebase, konfiguracja produktu Play, kont i sekretów, baza,
 przeniesienie jej danych i kluczy, kontrola migracji, wdrożenie oraz sprawdzenie
 rzeczywistego Androida z Firebase Auth, Play Integrity i Billing/RTDN. Nie skasowano

@@ -1,3 +1,5 @@
+> Dokument archiwalny. Opisuje stan z czasu zadania. [Bieżąca dokumentacja](../README.md).
+
 # Zadanie 11 — raport zmian
 
 Dodano informację o przetwarzaniu tekstu przez AI przed przyciskiem wysłania,

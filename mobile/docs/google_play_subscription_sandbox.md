@@ -1,65 +1,51 @@
-# Testy subskrypcji Google Play w środowisku testowym
+# Testy subskrypcji Google Play
 
-Procedura wymaga urządzenia z Google Play, dostępu do Play Console i oddzielnego
-backendu testowego. Testów z prawdziwym sklepem nie zastępują automatyczne testy
-z atrapami. Nie przeprowadzono ich przez samo uruchomienie testów repozytorium.
+Płatności są obecnie wyłączone. Wykonaj te próby przed ich włączeniem,
+na oddzielnym backendzie testowym i telefonie z Google Play.
+Testy automatyczne z atrapami nie zastępują zakupów w sklepie.
 
 ## Przygotowanie
 
-1. Zarejestruj pakiet `xyz.sedno.app` w Google Play i dodaj aplikację
-   Android z tym pakietem w projekcie Firebase. Skonfiguruj podpisywanie, odciski
-   certyfikatów i ten sam pakiet w Play Integrity oraz backendzie
-   (`PlayIntegrity__PackageName` i `Billing__PackageName`). Wgraj podpisany AAB na ścieżkę testów wewnętrznych.
-2. Utwórz produkt subskrypcji, np. `sedno_monthly`: jeden aktywny, miesięczny plan
-   odnawiany automatycznie, bez okresu próbnego i cen wprowadzających. Ustaw cenę
-   w Polsce na 9,99 PLN. Inne kraje mogą zwracać inną walutę i cenę.
-3. Dodaj konto Google do **testerów licencji** oraz do testerów ścieżki wewnętrznej.
-   Zaakceptuj zaproszenie i zainstaluj aplikację z Google Play na tym koncie.
-   Sama obecność na ścieżce testowej nie zapewnia płatności testowych. W oknie
-   zakupu sprawdź, czy Google pokazuje testowy instrument płatniczy.
-4. Skonfiguruj Firebase i backend zgodnie z [instrukcją backendu](../../backend/README.md#google-play-subscriptions).
-   Zastosuj migracje bazy. Ustaw `Billing__Enabled=true`, pakiet, produkt, konto
-   usługowe Publisher API, HTTPS audience i konto podpisujące push.
-   Klucze Data Protection muszą przetrwać restart backendu.
-5. Utwórz temat Pub/Sub dla RTDN, uprawnienia publikowania Google Play i
-   uwierzytelnioną subskrypcję push do `/notifications/google-play`. Skonfiguruj
-   ponowienia, dead letter i alerty. Wyślij test z Play Console: oczekiwane HTTP 204.
-6. Uruchom przygotowaną wersję aplikacji z `BACKEND_BASE_URL`, konfiguracją
-   Firebase/Integrity i `--dart-define=PLAY_SUBSCRIPTION_PRODUCT_ID=sedno_monthly`.
-   Identyfikator musi odpowiadać `Billing__ProductId`. Zaloguj się na konto Sedno.
-   Zakup i przywrócenie wymagają konta; upraszczanie w planie darmowym nadal działa
-   bez logowania. Zdjęcia pozostają na urządzeniu.
+1. Sprawdź pakiet `xyz.sedno.app` w Google Play i Firebase `sednoapp-79241`,
+   certyfikaty podpisu oraz Play Integrity. Wgraj podpisany AAB do testów wewnętrznych.
+2. Utwórz subskrypcję z jednym miesięcznym planem odnawianym automatycznie,
+   bez okresu próbnego i promocji. Docelowa cena w Polsce: 9,99 zł.
+3. Dodaj konto do testerów licencji i testów wewnętrznych, zaakceptuj zaproszenie
+   i zainstaluj aplikację z Play. W oknie zakupu musi być widoczna metoda testowa.
+4. Zastosuj migracje i [konfigurację płatności backendu](../../backend/README.md#subskrypcje-google-play).
+   Klucze szyfrujące zakupy muszą przetrwać restart serwera.
+5. Skonfiguruj powiadomienia Google Play (RTDN) przez uwierzytelniony Pub/Sub do
+   `/notifications/google-play`, ponowienia i obsługę niedostarczonych wiadomości.
+   Test z Play Console powinien otrzymać HTTP 204.
+6. Ustaw w aplikacji `PLAY_SUBSCRIPTION_PRODUCT_ID` taki sam jak serwerowy
+   `Billing__ProductId`, wraz z adresem backendu i konfiguracją Firebase/Integrity.
+   Zaloguj się do Sedno — zakup i przywrócenie wymagają konta.
 
-## Scenariusze i wyniki
+## Co sprawdzić
 
-| Scenariusz | Czynności | Oczekiwany wynik |
-| --- | --- | --- |
-| Cena | Otwórz Konto na polskim koncie sklepu; porównaj z oknem zakupu. | Cena i waluta pochodzą z Play, okres to miesiąc. Nie ma ceny zastępczej. |
-| Aktywna | Kup z instrumentem „zawsze zatwierdza”. | Backend sprawdza zakup i potwierdza go. Konto pokazuje aktywność; limit to 400 **łącznie**, z zachowaniem dzisiejszego użycia. |
-| Potwierdzenie | Sprawdź zakup w zamówieniach po kilku minutach i po restarcie serwera. | Zakup pozostaje potwierdzony; token daje się odczytać po restarcie. Brak automatycznego zwrotu za brak potwierdzenia. |
-| Oczekująca | Użyj testowej metody opóźnionej płatności; wybierz późniejsze zatwierdzenie. | Komunikat o oczekiwaniu, brak nowego dostępu i potwierdzenia przed opłaceniem. Po zatwierdzeniu dostęp jest weryfikowany na backendzie. |
-| Odrzucona/anulowana płatność | Anuluj okno, użyj „zawsze odrzuca”, potem opóźnionej metody odrzucającej. | Brak płatnego dostępu; komunikat po polsku, możliwość ponowienia. |
-| Przywrócenie | Zamknij aplikację, usuń jej dane lub zainstaluj ponownie; zaloguj się na **to samo konto Sedno** i konto Play; wybierz Przywróć zakupy. | Ten sam token zostaje ponownie zweryfikowany. Brak drugiej opłaty i nowej puli użyć. |
-| Inne konto | Spróbuj przywrócić zakup na drugim koncie Sedno. | Backend odrzuca powiązanie z innym właścicielem. |
-| Anulowana subskrypcja | Anuluj odnawianie w Google Play przed końcem okresu, odśwież Konto. | Dostęp utrzymuje się do `expiryTime`; samo anulowanie odnawiania go nie odbiera. |
-| Wygasła | Poczekaj na koniec przyspieszonego okresu testowego po anulowaniu. | Backend i Start wracają do limitu 5, bez zerowania użycia. |
-| Zwrot z odebraniem dostępu | W testowym zamówieniu wybierz zwrot i odebranie dostępu. | RTDN wywołuje ponowną weryfikację; gdy Play zwraca stan wygasły, znika limit 400. Odświeżenie działa także bez dostarczonego RTDN. |
-| Zwrot bez odebrania dostępu | Wykonaj zwrot bez odwołania subskrypcji, jeśli opcja jest dostępna. | Dostęp odpowiada bieżącemu stanowi Play. Zwrot starego zamówienia nie odbiera nowego opłaconego okresu. |
-| Powtórzone RTDN | W kontrolowanym narzędziu testowym z prawem do konta push wyślij dwa razy tę samą kopertę z tym samym messageId, także równolegle. | HTTP 204; jeden zapis przetworzenia, bez ponownego przyznania puli lub drugiej operacji zakupu. Nie kopiuj tokenów do logów. |
-| Zmieniona kolejność RTDN | Po wygaśnięciu dostarcz opóźnione powiadomienie o odnowieniu. | Bieżący odczyt Play nadal wskazuje wygaśnięcie; stare zdarzenie nie przywraca dostępu. |
-| Fałszywe RTDN | Wyślij kopertę bez podpisanego bearer lub z błędnym audience. | HTTP 401; brak zmiany uprawnień. |
-| Awaria sieci | Odłącz sieć po zakupie przed weryfikacją; przywróć połączenie i zakupy. | Brak zaufania do samej odpowiedzi klienta; backend potwierdza po ponowieniu. Niepotwierdzony zakup wymaga szybkiego ponowienia. |
-| Wznowienie i dostępność | Wróć do aplikacji po zmianie stanu w Play; sprawdź TalkBack i duży tekst. | Odświeżenie stanu, czytelne polskie opisy i przyciski; cena nie jest ucinana. |
+| Próba | Oczekiwany wynik |
+| --- | --- |
+| Cena | Cena i waluta zgadzają się z oknem Google Play; okres to miesiąc |
+| Zakup zatwierdzony | Serwer weryfikuje i potwierdza zakup; limit 400 łącznie, bez zerowania użycia |
+| Restart serwera | Zakup pozostaje potwierdzony; zapisany token daje się odszyfrować |
+| Płatność oczekująca | Brak płatnego dostępu i potwierdzenia do czasu opłacenia |
+| Płatność odrzucona lub anulowana | Brak dostępu, polski komunikat i możliwość ponowienia |
+| Przywrócenie po reinstalacji | To samo konto Sedno i Play odzyskuje zakup bez drugiej opłaty i nowej puli |
+| Przywrócenie na innym koncie Sedno | Serwer odrzuca zmianę właściciela zakupu |
+| Anulowanie odnawiania | Dostęp pozostaje do końca opłaconego okresu |
+| Wygaśnięcie | Powrót do limitu 5 bez zerowania dzisiejszego użycia |
+| Zwrot z odebraniem dostępu | Gdy Google potwierdzi wygaśnięcie, znika limit 400; sprawdź także odświeżenie bez RTDN |
+| Zwrot bez odebrania dostępu | Dostęp zgodny z bieżącym stanem Google; zwrot starego zamówienia nie odbiera nowego okresu |
+| Powtórzone RTDN, także równoległe | Ta sama wiadomość przetworzona raz, HTTP 204, bez dodatkowej puli |
+| Opóźnione RTDN o odnowieniu po wygaśnięciu | Stare zdarzenie nie przywraca dostępu; decyduje aktualny stan Google |
+| Fałszywe RTDN | Bez poprawnego podpisu lub odbiorcy: HTTP 401, brak zmiany dostępu |
+| Brak sieci po zakupie | Dostęp dopiero po weryfikacji serwera; przywrócenie pozwala ponowić weryfikację |
+| Powrót do aplikacji | Stan odświeżony; cena i opisy czytelne z TalkBack i dużym tekstem |
 
-U testerów licencji Google może zwrócić zakup już po 3 minutach bez potwierdzenia.
-Czas odnowień i dostępne instrumenty zależą od konfiguracji; aktualne warianty
-sprawdź w [dokumentacji testów Google Play](https://developer.android.com/google/play/billing/test).
-Można użyć Play Billing Lab do przyspieszenia zmian stanu.
+Do zmian stanu używaj testowych metod płatności i narzędzi Google Play.
+Czasy odnowień oraz automatycznego zwrotu sprawdź w
+[dokumentacji testów](https://developer.android.com/google/play/billing/test).
+Niepotwierdzony zakup wymaga szybkiego ponowienia weryfikacji.
 
-Zapisz wersję aplikacji/backendu, czas UTC, scenariusz, stan zamówienia i wynik.
-Nie zapisuj tokenów, danych logowania, tekstów użytkownika ani zdjęć. Po testach
-anuluj odnawianie i usuń dane testowe zgodnie z przyjętą polityką retencji.
-
-Dokumentacja odniesienia: [cykl subskrypcji](https://developer.android.com/google/play/billing/lifecycle/subscriptions),
-[RTDN](https://developer.android.com/google/play/billing/rtdn-reference),
-[uwierzytelnienie Pub/Sub](https://docs.cloud.google.com/pubsub/docs/authenticate-push-subscriptions).
+Zapisz wersję aplikacji i serwera, czas UTC, scenariusz oraz wynik, bez tokenów,
+danych logowania, tekstów i zdjęć. Po próbach anuluj odnawianie i usuń dane testowe.

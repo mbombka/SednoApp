@@ -15,9 +15,14 @@ void main() {
       expect(find.textContaining('mariuszbabka0@gmail.com'), findsWidgets);
       expect(find.text('https://sedno.xyz'), findsOneWidget);
       expect(find.textContaining('nie oznacza braku retencji'), findsOneWidget);
+      expect(find.textContaining('Infrastruktura Sedno'), findsOneWidget);
+      expect(
+        find.textContaining('płatności Google Play pozostają wyłączone'),
+        findsOneWidget,
+      );
       expect(
         find.textContaining('Planowana infrastruktura produkcyjna'),
-        findsOneWidget,
+        findsNothing,
       );
       expect(find.text(PrivacyScreen.deletionNotice), findsOneWidget);
       expect(find.text('Cele i podstawy przetwarzania'), findsOneWidget);
@@ -30,7 +35,10 @@ void main() {
       expect(find.text('https://sedno.xyz/usun-konto'), findsOneWidget);
       expect(find.textContaining('DO UZUPEŁNIENIA'), findsNothing);
       expect(find.textContaining('DO POTWIERDZENIA'), findsNothing);
-      expect(find.textContaining('wymagają ich wdrożenia'), findsOneWidget);
+      expect(
+        find.textContaining('Pozostałe magazyny, eksporty'),
+        findsOneWidget,
+      );
     },
   );
 

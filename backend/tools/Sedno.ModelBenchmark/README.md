@@ -1,98 +1,58 @@
-# Porównanie Responses API i agenta
+# Pomiar czasu i kosztów AI
 
-[Wyniki rzeczywistego pomiaru z 16.10.2026](results/2026-10-16.md):
-mediana agent 4,84 s, Responses default 1,51 s, Responses fast 1,21 s.
-[Analiza kosztu z rzeczywistego zużycia tokenów](results/2026-10-16-costs.md)
-opisuje wariant default oraz ograniczenia kalkulacji.
+Narzędzie porównuje Responses `default` i `fast`; opcjonalnie także zapisanego
+agenta. Działa niezależnie od aplikacji, bez bazy i limitów Sedno.
+**Rzeczywiste wywołania OpenAI są płatne.** Bez `--live` pokazuje tylko pomoc.
 
-Eksperyment uruchamiany ręcznie. Nie zmienia dostawcy modelu w aplikacji,
-nie uruchamia serwera HTTP, nie wymaga PostgreSQL i nie zużywa limitu Sedno.
-Wywołania OpenAI są płatne. Zwykłe `dotnet test` używa atrap sieci.
+## Uruchomienie
 
-Z katalogu repozytorium:
+Z katalogu głównego projektu, z kluczem `OpenAI:ApiKey` w lokalnym magazynie
+`sedno-backend-dev` lub zmiennej `OpenAI__ApiKey`:
 
 ```sh
-dotnet run --project backend/tools/Sedno.ModelBenchmark -- --live --agent --rounds 5
+dotnet run --project backend/tools/Sedno.ModelBenchmark -- --live --rounds 5
 ```
 
-Klucz `OpenAI:ApiKey` jest współdzielony z aplikacją przez sekrety
-`sedno-backend-dev`. Ustawienia agenta (`OpenAI:AgentId`, opcjonalnie
-`OpenAI:TimeoutSeconds`) przechowuj osobno w `sedno-model-benchmark`:
-`dotnet user-secrets set "OpenAI:AgentId" "agent_..." --id sedno-model-benchmark`.
-Narzędzie odczytuje najpierw sekrety aplikacji, potem benchmarku, a na końcu
-zmienne środowiskowe (`OpenAI__ApiKey`, `OpenAI__AgentId`).
-Nie podawaj klucza w argumentach polecenia. Bez `--live` program pokazuje pomoc
-i nie wysyła żądań. Bez `--agent` testuje tylko dwa warianty Responses.
+Każdy wariant ma rozgrzewkę oraz 3 syntetyczne próbki na rundę. Raport JSONL na
+standardowym wyjściu zawiera czas, status i zużycie tokenów bez treści tekstów.
+Rozgrzewka nie wchodzi do podsumowania. Mediana i p95 obejmują tylko sukcesy;
+mała próbka nie daje miarodajnej prognozy szybkości ani kosztów całej aplikacji.
 
-Domyślne ustawienia to `--model gpt-6-luna --effort none`.
-Oba warianty używają tego samego modelu, promptu, limitu 4096 tokenów wyjściowych,
-`store=false` i niezależnych wiadomości bez `conversation`/`previous_response_id`.
-Różnią się wyłącznie `service_tier`: `default` i `fast`.
-[Fast mode](https://developers.openai.com/api/docs/guides/fast-mode) może zwrócić
-`priority` jako faktycznie użyty tryb; raport zapisuje `trybOtrzymany`.
-`store=false` nie oznacza wyłączenia wszystkich zasad retencji dostawcy.
-
-Prompt znajduje się w [wspólnym pliku simplify.pl.txt](../../src/Sedno.Infrastructure/Prompts/simplify.pl.txt), jest
-osadzony w programie podczas kompilacji i podlega wersjonowaniu w Git.
-To prompt przekazany przez użytkownika do porównania z zapisanym agentem.
-Migracja zachowała aktualny plik użytkownika, z poprawionym numerem działki 887/6.
-Historyczne raporty zachowują wcześniejsze hashe; nowy prompt ma hash
-`31DA60C0D623E64C7FD6CEABFA9F69FADA2E8321CE839C8B8B37A2F21109DE02`.
-Można wskazać inny plik przez `--prompt ścieżka`; raport zawiera SHA-256 użytej treści.
-Narzędzie nie aktualizuje konfiguracji zapisanego agenta. Przed porównaniem należy
-potwierdzić zgodność modelu, reasoning i promptu w Platform.
-
-Każdy wariant ma jedno wywołanie rozgrzewkowe, wyłączone z podsumowania.
-Następnie wykonuje 3 syntetyczne próbki różnej długości na rundę (1–20 rund).
-Kolejność wariantów rotuje, żądania są sekwencyjne, klient HTTP jest współdzielony
-między wariantami Responses. Dla 5 rund i 3 wariantów to 48 wywołań.
-Próbki średnia i długa powtarzają zdania, więc nie zastępują reprezentatywnego
-korpusu tekstów. Cache i zmienne obciążenie dostawcy mogą wpływać na wynik.
-
-JSONL na stdout zawiera czas do gotowego, zweryfikowanego tekstu, długości,
-status, HTTP i liczbę tokenów dla Responses. Agent używa istniejącego
-`OpenAiAgentProvider` z katalogu `Agents` i zwraca wynik przy final answer, jak dawny backend.
-Nie mierzymy czasu do pierwszego tokenu ani pełnego czasu mobilnej aplikacji,
-bazy i autoryzacji. Limit 8 sekund odpowiada obecnym adapterom.
-Błędy i timeouty są liczone oddzielnie; mediana i p95 dotyczą tylko sukcesów.
-Mała próbka nie daje stabilnego p95. Porównuj także poszczególne próbki i długości
-wyników — krótszy wynik może być szybszy, ale mniej kompletny.
-
-Domyślnie nie zapisujemy treści wejść ani odpowiedzi. Na wyraźne życzenie można
-wyeksportować wbudowane syntetyczne próbki i ich wyniki do tabeli Markdown:
+Eksport **wyłącznie wbudowanych próbek syntetycznych** i ich odpowiedzi:
 
 ```sh
-dotnet run --project backend/tools/Sedno.ModelBenchmark -- --live --agent --rounds 5 --text-report backend/tools/Sedno.ModelBenchmark/results/2026-10-16.md
+dotnet run --project backend/tools/Sedno.ModelBenchmark -- --live --rounds 5 --text-report /tmp/sedno-pomiar.md
 ```
 
-Opcja `--text-report` dopisuje nową sekcję do istniejącego pliku, z podsumowaniem
-i wszystkimi wywołaniami (także rozgrzewką). Nie zmienia logów JSONL ani zachowania
-aplikacji. Raport powstaje po zakończeniu serii; przerwanie programu może utracić
-odpowiedzi przechowywane dotąd w pamięci. Nie zapisujemy sekretów ani identyfikatorów sesji.
-Agent korzysta z istniejącego mechanizmu sprzątania, w tym odzyskiwania starych
-sesji Sedno tego agenta. Najlepiej testować na dedykowanym agencie deweloperskim.
-Po serii program czeka do 30 sekund na sprzątanie. Jeżeli go nie potwierdzi,
-zwraca błąd i zaleca uruchomienie `--live --cleanup-agent` z tym samym agentem, by ponowić usuwanie.
-Brak automatycznych ponowień generowania. Kod wyjścia: 0 sukces, 1 błędy pomiarów
-lub sprzątania, 2 błąd konfiguracji, 130 przerwanie.
+`--text-report` dopisuje raport po zakończeniu serii. Nie eksportuj ruchu użytkowników.
+Wspólny [prompt](../../src/Sedno.Infrastructure/Prompts/simplify.pl.txt) i `ResponsesClient`
+są używane także przez aplikację. Domyślnie: `gpt-6-luna`, effort `none`, 4096 tokenów,
+8 sekund i `store=false`. Ten ostatni parametr nie oznacza zerowej retencji dostawcy.
+Opcje `--model`, `--effort` i `--prompt` służą do oddzielnych eksperymentów.
 
-Decyzja o migracji wymaga powtarzalnej poprawy czasu bez wzrostu liczby błędów
-oraz osobnego sprawdzenia zachowania sensu, liczb i przeczeń. Aplikacja używa Responses default. Narzędzie nie zmienia jej konfiguracji.
+## Agent i usuwanie sesji
 
-## Wspólny kod i sprzątanie migracji
+Dodaj `--agent`, aby uwzględnić agenta w porównaniu. Ustaw jego `OpenAI:AgentId`
+w magazynie `sedno-model-benchmark`; ma on pierwszeństwo przed `sedno-backend-dev`,
+a zmienne środowiskowe przed oboma. Potwierdź zgodność promptu i modelu w Platform.
+Kod agenta jest używany wyłącznie przez to narzędzie.
 
-Responses używa `Sedno.Infrastructure.ResponsesClient`, tego samego transportu,
-walidacji i diagnostyki co aplikacja. Wspólny prompt jest osadzony w Infrastructure.
-Opcje `--model`, `--effort`, `--prompt` nadal pozwalają eksperymentować bez zmiany
-produkcyjnej listy dopuszczonych ustawień. Testy agenta są w `Sedno.ModelBenchmark.Tests`.
-
-Samo sprzątanie bez generowania tekstów:
+Przed wyłączeniem starego wdrożenia agenta zatrzymaj nowe żądania, poczekaj na
+zakończenie trwających i uruchom z tym samym kluczem oraz identyfikatorem agenta:
 
 ```sh
 dotnet run --project backend/tools/Sedno.ModelBenchmark -- --live --cleanup-agent
 ```
 
-Zatrzymaj wcześniej ruch starego backendu agenta. Polecenie czeka do 55 sekund
-na odzyskanie i usunięcie oznaczonych sesji skonfigurowanego agenta; wynik 0
-potwierdza opróżnienie kolejki i zakończenie odzyskiwania. Młode sesje mogą wymagać
-kolejnego uruchomienia. Stare sesje bez oznaczenia Sedno wymagają osobnej kontroli.
+Wymagany wynik: kod 0. Przy błędzie ponów sprzątanie; młode sesje mogą wymagać
+odczekania. Stare sesje bez oznaczenia Sedno sprawdź osobno u dostawcy.
+Kod 1 oznacza błąd pomiaru lub sprzątania, 2 — konfiguracji, 130 — przerwanie.
+
+## Zachowane pomiary
+
+- [Porównanie z 16.10.2026](results/2026-10-16.md).
+- [Koszt porównania](results/2026-10-16-costs.md).
+- [Dodatkowy pomiar przed Firebase](results/2026-10-16-firebase-costs.md).
+
+Stawki i wyniki dotyczą daty pomiaru; nie są bieżącym rachunkiem.
+[Sprawdzenie jakości uproszczeń](../../../docs/model-acceptance.pl.md).

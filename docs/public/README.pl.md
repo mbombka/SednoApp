@@ -1,32 +1,29 @@
-# Dokumenty do publikacji na sedno.xyz
+# Dokumenty na stronie Sedno
 
-Działający adres informacji o prywatności podany przez właściciela:
-`https://sedno.xyz/#prywatnosc`. Fragment `#prywatnosc` wskazuje sekcję strony
-głównej, nie oddzielną trasę HTTP. Odczyt 16.10.2026 potwierdził krótkie
-podsumowanie o zdjęciach, AI i historii; nie obejmuje pełnej polityki.
+Publiczne adresy:
 
-Kontrola z zadania 14 (16.10.2026) potwierdziła również odpowiedź HTTPS 200
-pod `https://sedno.xyz/prywatnosc/` i `https://sedno.xyz/usun-konto/`, po przekierowaniu
-z adresów bez końcowego ukośnika. Strony zawierają pełną politykę i instrukcję
-usuwania; ich HTML różni się od lokalnych plików. To kontrola opublikowanej strony,
-nie potwierdzenie wdrożenia API ani zgodności każdego punktu dokumentu.
+- [Pełna polityka prywatności](https://sedno.xyz/prywatnosc/).
+- [Instrukcja usunięcia konta](https://sedno.xyz/usun-konto/).
+- [Podsumowanie na stronie głównej](https://sedno.xyz/#prywatnosc).
 
-Gotowe pliki:
+Obie podstrony odpowiadały przez HTTPS podczas kontroli 16.10.2026.
+Przed publikacją aplikacji porównaj ich treść z bieżącymi plikami i sprawdź dostęp bez logowania.
 
-- `prywatnosc/index.html`: pełna polityka. Włącz jej treść do istniejącej sekcji
-  albo opublikuj dokument i dodaj do niego link w tej sekcji. Samo skopiowanie
-  katalogu nie aktualizuje fragmentu istniejącej strony głównej.
-- `usun-konto/index.html`: adres `https://sedno.xyz/usun-konto` odpowiada przez HTTPS.
-  Przy aktualizacji zachowaj obsługę `index.html` i sprawdź kontakt mailowy.
+## Aktualizacja treści
 
-Przed zgłoszeniem w Play Console sprawdź pełną politykę i usuwanie przez HTTPS
-bez logowania. Ta zmiana nie publikuje plików ani nie zmienia hostingu i DNS.
+Edytuj tylko [wspólne źródło JSON](../privacy-policy.pl.json), a następnie z katalogu
+głównego projektu uruchom (potrzebne Python 3 i `dart`):
 
-Pliki nie wymagają JavaScript, plików cookie, zewnętrznych fontów ani analityki.
-Logi hostingu i konfigurację retencji opisuje `../privacy-operations-plan.pl.md`.
-Nie edytuj wygenerowanych plików osobno: źródło to `../privacy-policy.pl.json`.
-Z katalogu repozytorium uruchom `python3 tools/generate_privacy_policy.py`,
-a następnie ten sam program z `--check`.
+```sh
+python3 tools/generate_privacy_policy.py
+python3 tools/generate_privacy_policy.py --check
+```
 
-Backend również udostępnia `/prywatnosc` i `/usun-konto`; jego uruchomienie
-nie zmienia automatycznie treści publicznej domeny.
+Generator aktualizuje politykę Markdown, treść w aplikacji oraz
+[prywatnosc/index.html](prywatnosc/index.html) i [usun-konto/index.html](usun-konto/index.html).
+Pełnej polityki nie skracaj przez usuwanie informacji o danych, prawach i dostawcach.
+
+Opublikuj HTML w hostingu domeny `sedno.xyz`; osobno zaktualizuj odnośnik w sekcji
+`#prywatnosc`. Generowanie plików i wdrożenie API nie aktualizują tej domeny.
+Backend osadza te dokumenty przy budowie, więc jego kopia wymaga przebudowania
+oraz wdrożenia. Strona usuwania otwiera e-mail — nie usuwa konta automatycznie.

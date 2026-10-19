@@ -1,3 +1,5 @@
+> Dokument archiwalny. Opisuje stan z czasu zadania. [Bieżąca dokumentacja](../README.md).
+
 # Sedno — raport integracji modelu
 
 15 października 2026 r. Wykonano adapter i automatyczną weryfikację. Pełny odbiór

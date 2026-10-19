@@ -1,3 +1,5 @@
+> Dokument archiwalny. Opisuje stan z czasu zadania. [Bieżąca dokumentacja](../README.md).
+
 # Migracja na Responses default — 16.10.2026
 
 Aplikacja korzysta z `OpenAiModelProvider` → `ResponsesClient`: `gpt-6-luna`,

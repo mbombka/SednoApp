@@ -1,3 +1,5 @@
+> Dokument archiwalny. Opisuje stan z czasu zadania. [Bieżąca dokumentacja](../README.md).
+
 # Sedno — polityka prywatności, informacje o aplikacji i strona
 
 16 października 2026 r. Właściciel potwierdził dane administratora i odbiorców 16+
@@ -22,7 +24,7 @@ retencji w zewnętrznych usługach. Dokument odróżnia te prace od działające
   weryfikacji zgłoszeń bez aplikacji oraz sposób komunikowania zmian.
 
 Szczegóły i obowiązki wdrożeniowe są w
-[przyjętym planie](privacy-operations-plan.pl.md). Ustawienia kont dostawców,
+[przyjętym planie](../privacy-operations-plan.pl.md). Ustawienia kont dostawców,
 umowy, zabezpieczenia transferów, diagnostyka SDK i operacyjna obsługa żądań
 wymagają zastosowania przed produkcją. Same dokumenty nie dowodzą zgodności prawnej.
 
@@ -83,7 +85,7 @@ OpenAI Docs posłużyło do sprawdzenia oficjalnych stawek. Analiza istniejąceg
 wyjścia. Bazowo 0,00262050 USD łącznie, średnio 0,00017470 USD. Nie wykonano nowych
 płatnych wywołań. Brak rozbicia cache i opłat projektu uniemożliwia ustalenie
 kwoty faktury; krótkie odpowiedzi syntetycznych próbek nie reprezentują całego
-przyszłego ruchu. [Szczegółowy raport](../backend/tools/Sedno.ModelBenchmark/results/2026-10-16-costs.md).
+przyszłego ruchu. [Szczegółowy raport](../../backend/tools/Sedno.ModelBenchmark/results/2026-10-16-costs.md).
 
 ## Dostępność i emulator
 

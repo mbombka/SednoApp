@@ -1,4 +1,6 @@
-> ARCHIWUM — zastąpione przez [aktualną politykę](privacy-policy.pl.md).
+> Dokument archiwalny. Opisuje stan z czasu zadania. [Bieżąca dokumentacja](../README.md).
+
+> ARCHIWUM — zastąpione przez [aktualną politykę](../privacy-policy.pl.md).
 > Poniższe dawne pytania nie są aktualną listą decyzji do podjęcia.
 
 # Polityka prywatności Sedno
@@ -265,6 +267,6 @@ oraz, jeśli będzie wymagana, podstawę lub zgodę.
 ## Notatka wdrożeniowa — nie publikować jako części polityki
 
 Propozycje retencji i obsługi zgłoszeń znajdują się w
-[planie retencji i publikacji](privacy-operations-plan.pl.md). Są propozycjami,
+[planie retencji i publikacji](../privacy-operations-plan.pl.md). Są propozycjami,
 a nie opisem już wdrożonego usuwania. Nie należy zastępować nimi tabeli obecnej
 retencji bez wykonania odpowiednich zmian konfiguracji, procesów i kodu.

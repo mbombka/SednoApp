@@ -1,3 +1,5 @@
+> Dokument archiwalny. Opisuje stan z czasu zadania. [Bieżąca dokumentacja](../README.md).
+
 # Zadanie 14 — wdrożenie backendu, 19.10.2026
 
 API działa pod **https://sednoapp-79241-api.web.app**.
@@ -110,7 +112,7 @@ Nie wykonano ręcznego audytu TalkBack ani testu kamery/OCR na fizycznym urządz
 
 ## Koszty modelu i pozostałe ograniczenia
 
-Zachowano [pomiar z 16.10](../backend/tools/Sedno.ModelBenchmark/results/2026-10-16-firebase-costs.md):
+Zachowano [pomiar z 16.10](../../backend/tools/Sedno.ModelBenchmark/results/2026-10-16-firebase-costs.md):
 trzy syntetyczne próbki produkcyjnego default zużyły 4369 tokenów wejścia i 178
 wyjścia, bazowo 0,00052590 USD razem, średnio 0,00017530 USD na wywołanie.
 To kalkulacja według stawek z dnia pomiaru, bez podatków, cache i hostingu;
@@ -151,4 +153,4 @@ przeszły, lecz nie potwierdzono aktualnego statusu podatności zależności.
 - Poza Git: plik Google Services, konfiguracja Fluttera, manifesty z odwołaniami
   do sekretów i lokalne narzędzia. Klucze i hasła serwera nie są plikami aplikacji.
 
-Instrukcja: [Firebase / Cloud Run](../backend/deploy/firebase/README.pl.md).
+Instrukcja: [Firebase / Cloud Run](../../backend/deploy/firebase/README.pl.md).

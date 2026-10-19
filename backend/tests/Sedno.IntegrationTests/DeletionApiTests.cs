@@ -99,7 +99,9 @@ public sealed class DeletionApiTests(BackendFixture fixture)
         Assert.Contains("Administrator: Mariusz Bąbka", html);
         Assert.Contains("Cele i podstawy przetwarzania", html);
         Assert.Contains("Twoje prawa i kontakt", html);
-        Assert.Contains("Planowana infrastruktura produkcyjna", html);
+        Assert.Contains("Infrastruktura Sedno", html);
+        Assert.Contains("płatności Google Play pozostają wyłączone", html);
+        Assert.DoesNotContain("Planowana infrastruktura produkcyjna", html);
         Assert.Contains("https://sedno.xyz/#prywatnosc", html);
         Assert.Contains("https://sedno.xyz/usun-konto", html);
         Assert.DoesNotContain("DO UZUPEŁNIENIA", html);
