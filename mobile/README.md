@@ -68,3 +68,19 @@ ani wyboru proporcji. Zdjęcia i wycinanie fragmentów pozostają na urządzeniu
 
 Kod jest w `lib/app/` i `lib/features/`; testy mają odpowiadający układ w `test/`.
 Aktualny opis komunikacji z serwerem: [kontrakt API](../contracts/openapi.yaml).
+
+## Ikona i ekran uruchamiania
+
+Źródło logo: [sedno-app-icon.svg](../docs/Content/sedno-app-icon.svg).
+Znak jest zapisany jako ścieżki, bez zależności od czcionek.
+Zasoby w `android/app/src/main/res/` zawierają ikony PNG dla starszych Androidów,
+ikonę adaptacyjną od Androida 8 oraz wariant jednokolorowy od Androida 13.
+Kolor ikon tematycznych wybiera system. Ekran uruchamiania pokazuje biały znak
+na niebieskim kole i jasnym tle, również w trybie ciemnym.
+
+Po zmianie logo sprawdź na telefonie ikonę w menu i na ekranie głównym,
+maskę okrągłą i zaokrągloną oraz ikony tematyczne, jeżeli program uruchamiający
+je obsługuje. Sprawdź też ekran startowy po pełnym zamknięciu aplikacji,
+w jasnym i ciemnym trybie systemu, na Androidzie 12+ i starszym.
+Zmiana ikony wymaga nowej instalacji lub aktualizacji aplikacji;
+przeładowanie kodu Fluttera jej nie zmienia.
