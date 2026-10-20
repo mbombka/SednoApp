@@ -69,7 +69,8 @@ Lokalna weryfikacja istnienia i usuwanie kont wymaga także
   dzierżawa instalacji kolejkuje zapisy również między instancjami. Transakcje
   dodatkowo sprawdzają ważność dzierżawy i aktualne powiązania kont.
 - Metadane żądań chronią przed podwójnym wywołaniem AI. Zakończony duplikat zwraca
-  `409 result_unavailable`, gdyż wynik nie jest przechowywany na serwerze.
+  `409 result_unavailable`, gdyż wynik nie jest przechowywany na serwerze. Aplikacja
+  wysyła wtedy nowe żądanie z nowym identyfikatorem, co zużywa kolejne uproszczenie.
 - Błąd modelu zwalnia rezerwację; porzucona rezerwacja przestaje obciążać limit po
   5 minutach, niezależnie od działania zadania sprzątającego.
 - `daily_usage`: liczniki i rezerwacje do 8 dni. Pozostałe terminy:

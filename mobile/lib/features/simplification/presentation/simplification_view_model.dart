@@ -5,12 +5,13 @@ import 'package:sedno_app/features/simplification/domain/input_text.dart';
 import 'package:sedno_app/features/simplification/domain/simplification_repository.dart';
 import 'package:sedno_app/features/simplification/domain/simplification_result.dart';
 
-/// Keeps the request identifier across retries so a timed-out response cannot
-/// consume a second allowance if the backend already processed it.
+/// Keeps the request identifier across retries, so a request still processing
+/// is not started twice. If the backend reports the old request as closed, the
+/// same tap sends a new one; a lost successful result then uses one more allowance.
 class SimplificationViewModel {
   SimplificationViewModel({
     required this.repository,
-    this.timeout = const Duration(seconds: 10),
+    this.timeout = const Duration(seconds: 20),
     String Function()? newRequestId,
   }) : _newRequestId = newRequestId ?? _randomRequestId;
 
@@ -25,7 +26,7 @@ class SimplificationViewModel {
       _pendingText = input.value;
       _pendingRequestId = _newRequestId();
     }
-    final response = await _attempt(input).timeout(timeout);
+    final response = await _attempt(input);
     _pendingText = null;
     _pendingRequestId = null;
     return response.result;
@@ -33,17 +34,22 @@ class SimplificationViewModel {
 
   Future<SimplificationResponse> _attempt(InputText input) async {
     try {
-      return await repository.simplify(
-        SimplificationRequest(input: input, requestId: _pendingRequestId!),
-      );
+      return await _send(input);
     } on SimplificationRequestClosedException {
       // A timeout alone is ambiguous. Replace the id only after the backend
-      // confirms the earlier attempt cannot have succeeded. Retry at most once.
+      // confirms the earlier attempt is closed. Retry at most once.
       _pendingRequestId = _newRequestId();
-      return repository.simplify(
-        SimplificationRequest(input: input, requestId: _pendingRequestId!),
-      );
+      return _send(input);
     }
+  }
+
+  // Each attempt has its own deadline, so a retry is not cut short.
+  Future<SimplificationResponse> _send(InputText input) {
+    return repository
+        .simplify(
+          SimplificationRequest(input: input, requestId: _pendingRequestId!),
+        )
+        .timeout(timeout);
   }
 
   static String _randomRequestId() {

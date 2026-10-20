@@ -81,7 +81,6 @@ class TextInputViewModel extends ChangeNotifier {
           'Sesja wygasła. Sprawdź konto i spróbuj ponownie.',
         SimplificationFailure.rateLimited =>
           'Dzisiejszy limit został wykorzystany. Sprawdź czas odnowienia.',
-        SimplificationFailure.resultUnavailable => 'Wynik tej próby nie jest już dostępny. Zmień tekst, aby wysłać nowe żądanie.',
         SimplificationFailure.unavailable =>
           'Usługa jest chwilowo niedostępna. Spróbuj ponownie.',
         SimplificationFailure.rejected =>

@@ -120,10 +120,41 @@ void main() {
     final signIn = tester.getTopLeft(find.text('Zaloguj przez Google')).dy;
     final subscription = tester.getTopLeft(find.text('Subskrypcja')).dy;
     expect(subscription, greaterThan(signIn));
-    expect(
-      find.text('Zarządzaj subskrypcją w Google Play', skipOffstage: false),
-      findsOneWidget,
-    );
+    expect(find.text('Kup subskrypcję', skipOffstage: false), findsOneWidget);
+  });
+
+  testWidgets('active subscription shows only the Google Play manage action', (
+    tester,
+  ) async {
+    Future<void> show() async {
+      await model.refresh();
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(child: SubscriptionPanel(model: model)),
+          ),
+        ),
+      );
+    }
+
+    const purchaseActions = [
+      'Kup subskrypcję',
+      'Przywróć zakupy',
+      'Odśwież subskrypcję',
+    ];
+    await show();
+    for (final label in purchaseActions) {
+      expect(find.text(label), findsOneWidget);
+    }
+    expect(find.text('Zarządzaj subskrypcją w Google Play'), findsNothing);
+
+    backend.active = true;
+    await show();
+    for (final label in purchaseActions) {
+      expect(find.text(label), findsNothing);
+    }
+    await tester.tap(find.text('Zarządzaj subskrypcją w Google Play'));
+    expect(store.manages, 1);
   });
 
   test('server verification starts before the store offer resolves', () async {

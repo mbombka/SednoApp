@@ -74,6 +74,26 @@ Właściciel potwierdził, że konto serwera istnieje w Play Console i zlecił z
 jego uprawnień; do wykonania tego kroku potrzebna jest autoryzacja Play API
 albo zapis ustawień w panelu.
 
+## Aktualizacja — poprawka subskrypcji, 20.10.2026
+
+Wdrożono commit `19e09f7`: subskrypcja jest ważna do daty wygaśnięcia z Google Play
+(bez 15-minutowego okna świeżości), a status subskrypcji sprawdzany jest raz na żądanie.
+
+| Element | Wartość |
+| --- | --- |
+| Rewizja Cloud Run | `sedno-api-00008-6vj`, 100% ruchu, przypięta w Hosting |
+| Obraz | `europe-central2-docker.pkg.dev/sednoapp-79241/backend/api@sha256:576bfe2fe34dd8923b13356531a04da3e39c049de3e268898aaa2cfdc76c371c` (tag `20261020-19e09f7`) |
+| Cloud Build | `57ed0233-2965-413e-a95c-9b23e1b7acc2` — sukces |
+| Poprzednia rewizja | `sedno-api-00007-dwm` |
+
+Przed wdrożeniem sprawdzono, że działająca usługa była zgodna z `service.json`;
+zmieniono tylko digest obrazu. Poprzedni manifest:
+`backend/deploy/generated/service-before-subscription-fix.json`. Reguł, indeksów
+i zadania cleanup nie zmieniano.
+
+Weryfikacja: `/health/ready` HTTP 200 przez publiczny adres (obsłużone przez nową
+rewizję), `/v1/quota` bez sesji HTTP 401, odbiornik RTDN bez tokenu HTTP 401.
+
 ## Kolejne wdrożenie i wycofanie
 
 Przy generowaniu konfiguracji dotychczasowej usługi użyj

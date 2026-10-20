@@ -230,7 +230,7 @@ app.Use(async (context, next) =>
     }
 });
 // Covers authentication, database work and model I/O. Leave a network margin
-// before the mobile client's single 10-second end-to-end deadline.
+// before the mobile client's 20-second per-attempt deadline.
 app.Use(async (context, next) =>
 {
     if (context.Request.Path != "/v1/simplifications") { await next(context); return; }

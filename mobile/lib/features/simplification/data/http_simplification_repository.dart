@@ -16,7 +16,6 @@ enum SimplificationFailure {
   unauthorized,
   rateLimited,
   unavailable,
-  resultUnavailable,
   rejected,
 }
 
@@ -26,14 +25,16 @@ class SimplificationApiException implements Exception {
 }
 
 /// All quota values come from the backend. Retries reuse the request's key;
-/// a completed response that was lost cannot be recovered by this API.
+/// a completed response that was lost cannot be recovered by this API, so it
+/// is reported as a closed request and the caller may send a new one.
 class HttpSimplificationRepository
     implements SimplificationRepository, QuotaStateSource {
   HttpSimplificationRepository({
     required this.baseUrl,
     required this.client,
     required this.sessions,
-    this.requestTimeout = const Duration(seconds: 10),
+    // Covers a Cloud Run cold start (~7 s) plus the server's 9 s deadline.
+    this.requestTimeout = const Duration(seconds: 20),
     this.retryDelay = const Duration(milliseconds: 250),
     this.maxAttempts = 3,
     Future<void> Function(Duration)? wait,
@@ -229,13 +230,10 @@ class HttpSimplificationRepository
     if (response.statusCode == 409) {
       try {
         final code = _object(response.body)['code'];
-        if (code == 'request_failed' || code == 'reservation_expired') {
+        if (code == 'request_failed' ||
+            code == 'reservation_expired' ||
+            code == 'result_unavailable') {
           return const SimplificationRequestClosedException();
-        }
-        if (code == 'result_unavailable') {
-          return const SimplificationApiException(
-            SimplificationFailure.resultUnavailable,
-          );
         }
       } on FormatException {
         // A malformed error is still a terminal response.

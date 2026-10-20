@@ -71,4 +71,29 @@ void main() {
     expect((await model.simplify(InputText('Tekst'))).text, 'Prosty tekst');
     expect(ids, ['same-id', 'same-id', 'same-id']);
   });
+
+  test('same text after a lost result sends a new request once', () async {
+    final ids = <String>[];
+    var serial = 0;
+    var calls = 0;
+    final model = SimplificationViewModel(
+      repository: FakeSimplificationRepository((request) {
+        ids.add(request.requestId);
+        calls++;
+        // 1: app stops waiting; 2: backend finished it but kept no result.
+        if (calls == 1) return Completer<SimplificationResponse>().future;
+        if (calls == 2) throw const SimplificationRequestClosedException();
+        return Future.value(response(request.requestId));
+      }),
+      timeout: const Duration(milliseconds: 1),
+      newRequestId: () => 'request-${++serial}',
+    );
+
+    await expectLater(
+      model.simplify(InputText('Tekst')),
+      throwsA(isA<TimeoutException>()),
+    );
+    expect((await model.simplify(InputText('Tekst'))).text, 'Prosty tekst');
+    expect(ids, ['request-1', 'request-1', 'request-2']);
+  });
 }

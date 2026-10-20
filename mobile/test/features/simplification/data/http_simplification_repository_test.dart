@@ -8,6 +8,7 @@ import 'package:http/testing.dart';
 import 'package:sedno_app/features/account/data/backend_session_gateway.dart';
 import 'package:sedno_app/features/simplification/data/http_simplification_repository.dart';
 import 'package:sedno_app/features/simplification/domain/input_text.dart';
+import 'package:sedno_app/features/simplification/domain/simplification_repository.dart';
 import 'package:sedno_app/features/simplification/domain/simplification_result.dart';
 
 class _MemoryStorage implements SessionStorage {
@@ -362,7 +363,7 @@ void main() {
   });
 
   test(
-    'lost successful result is terminal and never starts a new request',
+    'lost successful result is reported as closed without a new request',
     () async {
       var charges = 0;
       final repo = _repository(
@@ -377,13 +378,7 @@ void main() {
       );
       await expectLater(
         repo.simplify(_request('lost')),
-        throwsA(
-          isA<SimplificationApiException>().having(
-            (e) => e.kind,
-            'kind',
-            SimplificationFailure.resultUnavailable,
-          ),
-        ),
+        throwsA(isA<SimplificationRequestClosedException>()),
       );
       expect(charges, 2);
     },
