@@ -28,6 +28,7 @@ abstract interface class SubscriptionStore {
   Future<SubscriptionOffer> offer();
   Future<void> buy(String accountBinding);
   Future<void> restore();
+  Future<void> manage();
 }
 
 abstract interface class SubscriptionRepository {

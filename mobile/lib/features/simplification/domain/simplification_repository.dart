@@ -28,3 +28,9 @@ class SimplificationResponse {
 abstract interface class SimplificationRepository {
   Future<SimplificationResponse> simplify(SimplificationRequest request);
 }
+
+/// The backend confirms the old request failed or expired without a saved result.
+/// Only this explicit state permits retrying the same text with a new identifier.
+class SimplificationRequestClosedException implements Exception {
+  const SimplificationRequestClosedException();
+}

@@ -62,7 +62,9 @@ próby zakupów na telefonie i kontrole przed publikacją.
 ## Pozostałe poprawki i uruchomienie płatności
 
 - [ ] Dopasować komunikat po wyczerpaniu limitu do dostępności płatności;
-  obecnie odsyła do subskrypcji także wtedy, gdy oferta jest wyłączona.
+  odsyłać do subskrypcji tylko wtedy, gdy panel zakupów jest dostępny.
+  Przy wyłączonym panelu pokazać informację o wykorzystanym limicie i terminie
+  jego odnowienia, bez odsyłania do niedostępnej subskrypcji.
 - [x] Utworzyć produkt Google Play `subscription_full`, miesięczny plan `monthly`,
   cena 9,99 PLN — konfiguracja potwierdzona przez właściciela 20.10.2026.
 - [x] Zapisać produkt w konfiguracji aplikacji i backendu oraz wybierać w aplikacji

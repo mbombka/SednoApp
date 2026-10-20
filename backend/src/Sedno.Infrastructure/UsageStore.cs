@@ -13,10 +13,21 @@ public sealed class UsageStore(FirestoreStore db, IEntitlementResolver entitleme
     private static readonly TransactionOptions QuotaTransactions = TransactionOptions.ForRetrySettings(
         RetrySettings.FromExponentialBackoff(10, TimeSpan.FromMilliseconds(25),
             TimeSpan.FromMilliseconds(250), 1.5, _ => true));
+    // UsageStore is request-scoped. A simplification reads quota at reservation and
+    // again after completion; one entitlement lookup per request is sufficient.
+    private (Guid IdentityId, bool Paid)? _entitlement;
+
+    private async Task<bool> PaidAsync(Guid identityId, CancellationToken ct)
+    {
+        if (_entitlement is { } cached && cached.IdentityId == identityId) return cached.Paid;
+        var paid = await entitlements.HasSubscriptionAsync(identityId, ct);
+        _entitlement = (identityId, paid);
+        return paid;
+    }
 
     public async Task<QuotaDto> GetQuotaAsync(Guid identityId, CancellationToken ct)
     {
-        var paid = await entitlements.HasSubscriptionAsync(identityId, ct);
+        var paid = await PaidAsync(identityId, ct);
         await using var gate = await db.LockUsageAsync(identityId, clock, ct);
         return await db.Database.RunTransactionAsync(async transaction =>
             (await SnapshotAsync(transaction, identityId, paid, clock.GetUtcNow(), ct)).Quota, QuotaTransactions, ct);
@@ -26,7 +37,7 @@ public sealed class UsageStore(FirestoreStore db, IEntitlementResolver entitleme
     {
         // Entitlement lookup has no Google HTTP side effects. All quota data is read
         // in the transaction; SDK retries can never repeat a model invocation.
-        var paid = await entitlements.HasSubscriptionAsync(identityId, ct);
+        var paid = await PaidAsync(identityId, ct);
         await using var gate = await db.LockUsageAsync(identityId, clock, ct, write: true);
         return await db.Database.RunTransactionAsync(async transaction =>
         {
@@ -104,7 +115,7 @@ public sealed class UsageStore(FirestoreStore db, IEntitlementResolver entitleme
 
     public async Task<RequestStatusDto?> GetStatusAsync(Guid identityId, string requestId, CancellationToken ct)
     {
-        var paid = await entitlements.HasSubscriptionAsync(identityId, ct);
+        var paid = await PaidAsync(identityId, ct);
         await using var gate = await db.LockUsageAsync(identityId, clock, ct);
         return await db.Database.RunTransactionAsync(async transaction =>
         {

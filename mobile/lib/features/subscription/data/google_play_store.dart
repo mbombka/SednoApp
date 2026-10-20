@@ -2,16 +2,34 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_android/billing_client_wrappers.dart';
 import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:sedno_app/features/subscription/domain/subscription_repository.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class GooglePlayStore implements SubscriptionStore {
   GooglePlayStore({
     required this.productId,
     required this.basePlanId,
     InAppPurchase? billing,
-  }) : _billing = billing ?? InAppPurchase.instance;
+    Future<bool> Function(Uri)? openUrl,
+  }) : _billing = billing ?? InAppPurchase.instance,
+       _openUrl = openUrl ?? _openExternal;
   final String productId;
   final String basePlanId;
   final InAppPurchase _billing;
+  final Future<bool> Function(Uri) _openUrl;
+
+  static Future<bool> _openExternal(Uri uri) =>
+      launchUrl(uri, mode: LaunchMode.externalApplication);
+
+  @override
+  Future<void> manage() async {
+    final uri = Uri.https('play.google.com', '/store/account/subscriptions', {
+      'sku': productId,
+      'package': 'xyz.sedno.app',
+    });
+    if (!await _openUrl(uri)) {
+      throw StateError('Nie można otworzyć subskrypcji Google Play.');
+    }
+  }
 
   @override
   Stream<List<StorePurchase>> get purchases => _billing.purchaseStream.map(

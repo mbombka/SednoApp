@@ -352,8 +352,6 @@ class _AccountScreenState extends State<AccountScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (widget.subscriptionModel case final model?)
-            SubscriptionPanel(model: model),
           Text('Konto', style: Theme.of(context).textTheme.headlineSmall),
           const SizedBox(height: 16),
           if (_message case final message?) ...[
@@ -557,6 +555,8 @@ class _AccountScreenState extends State<AccountScreen>
               ),
           ],
           if (_busy) const Center(child: CircularProgressIndicator()),
+          if (widget.subscriptionModel case final model?)
+            SubscriptionPanel(model: model),
         ],
       ),
     );

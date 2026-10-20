@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sedno_app/app/app.dart';
+import 'package:sedno_app/features/account/presentation/account_screen.dart';
+import 'package:sedno_app/features/shared/data/development_mocks.dart';
 import 'package:sedno_app/features/subscription/domain/subscription_repository.dart';
 import 'package:sedno_app/features/subscription/presentation/subscription_view_model.dart';
 import 'package:sedno_app/features/subscription/presentation/subscription_panel.dart';
@@ -26,6 +28,14 @@ class Store implements SubscriptionStore {
   @override
   Future<void> restore() async {
     restored = true;
+  }
+
+  int manages = 0;
+  bool manageFails = false;
+  @override
+  Future<void> manage() async {
+    manages++;
+    if (manageFails) throw StateError('no store');
   }
 }
 
@@ -79,6 +89,43 @@ void main() {
     await Future<void>.delayed(Duration.zero);
   }
 
+  test(
+    'manage opens Google Play and explains the manual path on failure',
+    () async {
+      await model.manage();
+      expect(store.manages, 1);
+      expect(model.message, isNull);
+      store.manageFails = true;
+      await model.manage();
+      expect(model.message, contains('Płatności i subskrypcje'));
+    },
+  );
+
+  testWidgets('account screen shows subscription below sign-in controls', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: AccountScreen(
+            repository: MockAccountRepository(
+              history: MockHistoryRepository(clock: DateTime.now),
+            ),
+            subscriptionModel: model,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final signIn = tester.getTopLeft(find.text('Zaloguj przez Google')).dy;
+    final subscription = tester.getTopLeft(find.text('Subskrypcja')).dy;
+    expect(subscription, greaterThan(signIn));
+    expect(
+      find.text('Zarządzaj subskrypcją w Google Play', skipOffstage: false),
+      findsOneWidget,
+    );
+  });
+
   test('server verification starts before the store offer resolves', () async {
     store.delayedOffer = Completer<SubscriptionOffer>();
     final starting = model.start();
@@ -89,25 +136,25 @@ void main() {
     await starting;
   });
 
-  testWidgets(
-    'refreshes at startup while input remains usable and periodically',
-    (tester) async {
-      await tester.pumpWidget(SednoApp(subscriptionModel: model));
-      await tester.pump();
-      expect(backend.reads, 1);
-      await tester.enterText(find.byType(TextField), 'Tekst do uproszczenia');
-      expect(find.text('Tekst do uproszczenia'), findsOneWidget);
-      await tester.pump(const Duration(minutes: 5));
-      expect(backend.reads, 2);
-      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
-      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
-      await tester.pump();
-      expect(backend.reads, 3);
-      model.dispose();
-      modelDisposed = true;
-      await tester.pumpWidget(const SizedBox());
-    },
-  );
+  testWidgets('refreshes at startup and on resume without periodic polling', (
+    tester,
+  ) async {
+    await tester.pumpWidget(SednoApp(subscriptionModel: model));
+    await tester.pump();
+    expect(backend.reads, 1);
+    await tester.enterText(find.byType(TextField), 'Tekst do uproszczenia');
+    expect(find.text('Tekst do uproszczenia'), findsOneWidget);
+    // No periodic polling: refresh happens only at startup and on resume.
+    await tester.pump(const Duration(minutes: 30));
+    expect(backend.reads, 1);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pump();
+    expect(backend.reads, 2);
+    model.dispose();
+    modelDisposed = true;
+    await tester.pumpWidget(const SizedBox());
+  });
 
   test(
     'purchase uses server account binding and pending never grants access',

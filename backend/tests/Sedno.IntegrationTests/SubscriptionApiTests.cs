@@ -51,15 +51,40 @@ public sealed class SubscriptionApiTests(BackendFixture fixture)
         var resolver = new SubscriptionService(db, new NoNetworkBilling(),
             scope.ServiceProvider.GetRequiredService<Microsoft.AspNetCore.DataProtection.IDataProtectionProvider>(), fixture.Clock);
         Assert.True(await resolver.HasSubscriptionAsync(identity, default));
-        fixture.Clock.Set(now + SubscriptionService.VerificationLifetime);
-        Assert.False(await resolver.HasSubscriptionAsync(identity, default));
-        // The app's background GET refreshes the persisted verification.
+        // A subscriber stays entitled without a fresh app refresh, e.g. after signing
+        // out and back in hours later. Only the verified paid-through time limits it.
+        fixture.Clock.Set(now.AddHours(6));
+        Assert.True(await resolver.HasSubscriptionAsync(identity, default));
         Assert.True((await client.GetFromJsonAsync<SubscriptionDto>("/v1/subscription"))!.Active);
         Assert.True(await resolver.HasSubscriptionAsync(identity, default));
         fixture.Billing.Purchases[token] = fixture.Billing.Purchases[token] with { State = "SUBSCRIPTION_STATE_EXPIRED" };
         Assert.Equal(HttpStatusCode.NoContent, (await NotifyAsync(token, Guid.NewGuid().ToString())).StatusCode);
         Assert.False(await resolver.HasSubscriptionAsync(identity, default));
         fixture.Clock.Set(now);
+    }
+
+    private sealed class CountingEntitlements : IEntitlementResolver
+    {
+        public int Calls;
+        public Task<bool> HasSubscriptionAsync(Guid id, CancellationToken ct)
+        {
+            Interlocked.Increment(ref Calls);
+            return Task.FromResult(true);
+        }
+    }
+
+    [Fact]
+    public async Task RequestScopedUsageLooksUpEntitlementOnce()
+    {
+        var client = fixture.Factory.CreateClient();
+        var guest = await (await client.PostAsJsonAsync("/v1/guest-sessions", new { installationId = Guid.NewGuid().ToString() })).Content.ReadFromJsonAsync<GuestSessionDto>();
+        var identity = Guid.Parse(guest!.Account.Id);
+        using var scope = fixture.Factory.Services.CreateScope();
+        var entitlements = new CountingEntitlements();
+        var usage = new UsageStore(scope.ServiceProvider.GetRequiredService<FirestoreStore>(), entitlements, fixture.Clock);
+        Assert.Equal("reserved", (await usage.ReserveAsync(identity, "once-" + Guid.NewGuid().ToString("N"), "fingerprint", default)).Kind);
+        Assert.Equal(400, (await usage.GetQuotaAsync(identity, default)).Limit);
+        Assert.Equal(1, entitlements.Calls);
     }
 
     [Fact]

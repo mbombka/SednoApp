@@ -212,7 +212,7 @@ class HttpSimplificationRepository
     }
   }
 
-  SimplificationApiException _failure(http.Response response) {
+  Exception _failure(http.Response response) {
     if (response.statusCode == 504) {
       return const SimplificationApiException(SimplificationFailure.timeout);
     }
@@ -228,7 +228,11 @@ class HttpSimplificationRepository
     }
     if (response.statusCode == 409) {
       try {
-        if (_object(response.body)['code'] == 'result_unavailable') {
+        final code = _object(response.body)['code'];
+        if (code == 'request_failed' || code == 'reservation_expired') {
+          return const SimplificationRequestClosedException();
+        }
+        if (code == 'result_unavailable') {
           return const SimplificationApiException(
             SimplificationFailure.resultUnavailable,
           );

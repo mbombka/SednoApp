@@ -14,7 +14,6 @@ class SubscriptionViewModel extends ChangeNotifier {
   final String productId;
   StreamSubscription<List<StorePurchase>>? _listener;
   Future<void> _queue = Future.value();
-  Timer? _refreshTimer;
   bool _disposed = false;
   bool busy = false;
   SubscriptionOffer? offer;
@@ -31,9 +30,8 @@ class SubscriptionViewModel extends ChangeNotifier {
         _notify();
       },
     );
-    _refreshTimer ??= Timer.periodic(const Duration(minutes: 5), (_) {
-      unawaited(refresh());
-    });
+    // The backend enforces entitlement from its stored verification and Google
+    // Play notifications. The app refreshes only at start, resume and sign-in.
     await refresh();
   }
 
@@ -77,6 +75,16 @@ class SubscriptionViewModel extends ChangeNotifier {
     status = await repository.current();
     message = 'Sprawdzono zakupy. Potwierdzenie może potrwać chwilę.';
   });
+
+  Future<void> manage() async {
+    try {
+      await store.manage();
+    } catch (_) {
+      message = 'Nie można otworzyć Google Play. Otwórz sklep i wybierz Płatności i subskrypcje → Subskrypcje.';
+      _notify();
+    }
+  }
+
   Future<void> _purchases(List<StorePurchase> items) async {
     for (final item in items.where((item) => item.productId == productId)) {
       if (_disposed) return;
@@ -124,7 +132,6 @@ class SubscriptionViewModel extends ChangeNotifier {
   @override
   void dispose() {
     _disposed = true;
-    _refreshTimer?.cancel();
     unawaited(_listener?.cancel());
     super.dispose();
   }

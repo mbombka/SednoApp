@@ -34,6 +34,11 @@ class SubscriptionPanel extends StatelessWidget {
           child: const Text('Przywróć zakupy'),
         ),
         TextButton(
+          onPressed: model.busy ? null : model.manage,
+          child: const Text('Zarządzaj subskrypcją w Google Play'),
+        ),
+        const Text('W Google Play możesz też anulować odnawianie subskrypcji.'),
+        TextButton(
           onPressed: model.busy ? null : model.refresh,
           child: const Text('Odśwież subskrypcję'),
         ),

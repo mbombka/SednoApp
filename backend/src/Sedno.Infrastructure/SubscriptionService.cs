@@ -8,7 +8,6 @@ public sealed class SubscriptionService(FirestoreStore db, IPlayBillingClient pl
 {
     private readonly IDataProtector _protector = protection.CreateProtector("Sedno.PlayPurchase.v1");
     public static string Binding(Guid accountId) => FirestoreStore.Hash("sedno-account:" + accountId.ToString("N"));
-    public static readonly TimeSpan VerificationLifetime = TimeSpan.FromMinutes(15);
 
     public async Task<SubscriptionDto> CurrentAsync(Guid accountId, CancellationToken ct)
     {
@@ -29,7 +28,10 @@ public sealed class SubscriptionService(FirestoreStore db, IPlayBillingClient pl
         if (identity?.AccountId is not Guid accountId) return false;
         var rows = await db.ListAsync<PlayPurchase>(db.Purchases.WhereEqualTo("AccountId", accountId.ToString()).WhereEqualTo("Revoked", false), ct);
         var now = clock.GetUtcNow();
-        return rows.Any(x => x.VerifiedAt > now - VerificationLifetime && x.VerifiedAt <= now && x.ExpiresAt > now &&
+        // ExpiresAt is Google's paid-through time from the last server verification.
+        // Renewals, cancellations and refunds update it through RTDN and the app's refresh;
+        // an old verification alone must not downgrade an active subscriber to the free tier.
+        return rows.Any(x => x.VerifiedAt <= now && x.ExpiresAt > now &&
             x.State is "SUBSCRIPTION_STATE_ACTIVE" or "SUBSCRIPTION_STATE_IN_GRACE_PERIOD" or "SUBSCRIPTION_STATE_CANCELED");
     }
 

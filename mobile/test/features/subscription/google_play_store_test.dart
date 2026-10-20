@@ -113,4 +113,31 @@ void main() {
       expect(billing.purchase, isNull);
     });
   }
+
+  test('manage opens this app subscription in Google Play', () async {
+    Uri? opened;
+    final store = GooglePlayStore(
+      productId: PlaySubscriptionConfiguration.productId,
+      basePlanId: PlaySubscriptionConfiguration.basePlanId,
+      billing: billing,
+      openUrl: (uri) async {
+        opened = uri;
+        return true;
+      },
+    );
+    await store.manage();
+    expect(opened!.host, 'play.google.com');
+    expect(opened!.path, '/store/account/subscriptions');
+    expect(opened!.queryParameters, {
+      'sku': PlaySubscriptionConfiguration.productId,
+      'package': 'xyz.sedno.app',
+    });
+    final failing = GooglePlayStore(
+      productId: PlaySubscriptionConfiguration.productId,
+      basePlanId: PlaySubscriptionConfiguration.basePlanId,
+      billing: billing,
+      openUrl: (_) async => false,
+    );
+    await expectLater(failing.manage(), throwsStateError);
+  });
 }

@@ -25,14 +25,25 @@ class SimplificationViewModel {
       _pendingText = input.value;
       _pendingRequestId = _newRequestId();
     }
-    final response = await repository
-        .simplify(
-          SimplificationRequest(input: input, requestId: _pendingRequestId!),
-        )
-        .timeout(timeout);
+    final response = await _attempt(input).timeout(timeout);
     _pendingText = null;
     _pendingRequestId = null;
     return response.result;
+  }
+
+  Future<SimplificationResponse> _attempt(InputText input) async {
+    try {
+      return await repository.simplify(
+        SimplificationRequest(input: input, requestId: _pendingRequestId!),
+      );
+    } on SimplificationRequestClosedException {
+      // A timeout alone is ambiguous. Replace the id only after the backend
+      // confirms the earlier attempt cannot have succeeded. Retry at most once.
+      _pendingRequestId = _newRequestId();
+      return repository.simplify(
+        SimplificationRequest(input: input, requestId: _pendingRequestId!),
+      );
+    }
   }
 
   static String _randomRequestId() {
