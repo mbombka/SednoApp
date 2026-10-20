@@ -1,7 +1,9 @@
 # Serwer w Firebase i Google Cloud — Firestore
 
 API: **https://sednoapp-79241-api.web.app**, projekt `sednoapp-79241`, numer
-`1003558402460`. Płatności Google Play wyłączone. Strona `sedno.xyz` jest oddzielna.
+`1003558402460`. Obsługę płatności Google Play włączono do testów 20.10.2026
+na istniejącym `sedno-api`; [stan i pozostałe ustawienia](../../../docs/billing-deployment-2026-10-20.pl.md).
+Strona `sedno.xyz` jest oddzielna.
 
 **Wdrożono 19.10.2026:** API korzysta z Firestore. Przeniesiono i zweryfikowano
 7 dokumentów testowych; kont i zakupów w źródle było 0. Indeksy są gotowe,
@@ -115,7 +117,8 @@ gcloud builds submit --project sednoapp-79241 --billing-project sednoapp-79241 \
 python3 tools/prepare_firebase.py \
   --project sednoapp-79241 --region europe-central2 --site sednoapp-79241-api \
   --image europe-central2-docker.pkg.dev/sednoapp-79241/backend/api@sha256:DIGEST_OBRAZU \
-  --google-credentials cloud-run --without-billing \
+  --google-credentials cloud-run --billing-product subscription_full \
+  --push-email sedno-billing-push@sednoapp-79241.iam.gserviceaccount.com \
   --output backend/deploy/generated
 ```
 

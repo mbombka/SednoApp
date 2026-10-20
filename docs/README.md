@@ -16,6 +16,8 @@ Na początek przeczytaj [opis projektu](../README.md) i [listę prac przed publi
 | Pomiar czasu i kosztów AI | [Narzędzie pomiarowe](../backend/tools/Sedno.ModelBenchmark/README.md) |
 | Aparat i odczyt tekstu ze zdjęcia | [Test na telefonie](../mobile/docs/android_camera_ocr_manual_check.md) |
 | Zakupy testowe | [Testy subskrypcji](../mobile/docs/google_play_subscription_sandbox.md) |
+| Wdrożone płatności i ustawienia Play Console | [Płatności na istniejącym API](billing-deployment-2026-10-20.pl.md) |
+| Pakiet z panelem zakupów | [Podpisane wydanie 8](../mobile/docs/google_play_release_8.md) |
 
 [Archiwum](archiwum/README.md) zawiera opisy zakończonych prac i dawny szkic polityki.
 Nie służy do bieżącej konfiguracji. Historyczne pomiary pozostają przy narzędziu pomiarowym.

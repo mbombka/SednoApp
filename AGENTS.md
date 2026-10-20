@@ -31,6 +31,12 @@ Read README, existing code, and current dependencies before making changes.
   Display the retention notice in Historia. Exclude history from backups.
 - Free tier: 5 simplifications per day, including guest users.
 - Subscription: PLN 9.99/month, 400 total simplifications per day.
+  Google Play product ID: `subscription_full`; base plan ID: `monthly`.
+  The app selects the regular auto-renewing monthly base plan and displays the
+  price returned by Google Play. Enable billing explicitly for tests; complete
+  purchase testing before public rollout. Use the existing `sedno-api` service,
+  its existing service account and `(default)` database for Google Play tests.
+  Do not provision a separate billing backend or database.
 - Limits reset at 00:00 UTC according to server time.
 - Free-tier counter: hidden at 2–5 remaining; at 1, show the remaining
   allowance and time until reset; at 0, block submission and show

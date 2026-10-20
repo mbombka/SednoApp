@@ -7,7 +7,8 @@ Zdjęcia, teksty i wyniki nie są zapisywane w bazie backendu.
 
 Serwer `https://sednoapp-79241-api.web.app` działa z Firestore od 19.10.2026.
 Przeniesiono metadane testowe; starą instancję Cloud SQL i cztery kopie zapasowe
-usunięto 19.10.2026. Płatności pozostają wyłączone.
+usunięto 19.10.2026. Obsługę płatności na istniejącym serwerze włączono
+20.10.2026 do testów przez Google Play; odbiór zakupów pozostaje do wykonania.
 [Wdrożenie, migracja i pozostałe porządki](deploy/firebase/README.pl.md).
 
 ## Uruchomienie lokalne
@@ -89,7 +90,18 @@ API może skalować się do zera; retencja nie zależy od ruchu. Nie używamy Fi
 
 ## Subskrypcje Google Play
 
-Płatności są wyłączone do zakończenia [testów zakupów](../mobile/docs/google_play_subscription_sandbox.md).
+Płatności skonfigurowano na istniejącym `sedno-api`, z kontem
+`sedno-api@sednoapp-79241.iam.gserviceaccount.com` i bazą `(default)`.
+[Stan wdrożenia i ustawienia Play Console](../docs/billing-deployment-2026-10-20.pl.md).
+Przed publicznym udostępnieniem wykonaj [testy zakupów](../mobile/docs/google_play_subscription_sandbox.md).
+Skonfigurowany produkt to `subscription_full`, plan bazowy `monthly`, cena
+9,99 PLN miesięcznie w Polsce. `Billing:ProductId` ma domyślną wartość
+`subscription_full` w `appsettings.json`; `Billing:Enabled` w pliku pozostaje `false`,
+a jawna konfiguracja wdrożonego serwera ustawia `Billing__Enabled=true`.
+Przy nadpisaniu konfiguracji użyj `Billing__ProductId=subscription_full`.
+Plan `monthly` wybiera aplikacja; nie wpisuj go zamiast identyfikatora produktu.
+Generator manifestów przy włączonych płatnościach wymaga
+`--billing-product subscription_full` oraz konta Pub/Sub w `--push-email`.
 Przy włączeniu wymagane są `Billing__Enabled=true`, `Billing__ProductId`,
 `Billing__NotificationAudience`, `Billing__PushServiceAccountEmail` oraz trwały
 `Billing__DataProtectionKeyPath`. Konto serwera wymaga uprawnień Android Publisher.

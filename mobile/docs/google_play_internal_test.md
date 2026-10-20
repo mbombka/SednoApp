@@ -1,7 +1,8 @@
 # Pierwszy test Sedno przez Google Play
 
 Projekt: `sednoapp-79241` (numer `1003558402460`), pakiet: `xyz.sedno.app`.
-API: `https://sednoapp-79241-api.web.app`. Płatności pozostają wyłączone.
+API: `https://sednoapp-79241-api.web.app`. Obsługę płatności przygotowano na tym
+samym serwerze do testów; [stan wdrożenia](../../docs/billing-deployment-2026-10-20.pl.md).
 
 Serwer przełączono na Firestore 19.10.2026. Zachowano testowe sesje i metadane limitów.
 Przed kolejnym testem sprawdź [aktualny stan wdrożenia](../../backend/deploy/firebase/README.pl.md).
@@ -15,14 +16,15 @@ zainstalowanej z Google Play pozostaje do wykonania.
 Z katalogu `mobile/`, z lokalną konfiguracją Firebase i kluczem przesyłania:
 
 ```sh
-flutter build appbundle --release --build-number=7 --dart-define-from-file=config/firebase.local.json
+flutter build appbundle --release --build-number=8 --dart-define-from-file=config/billing.local.json
 ```
 
 Plik: `mobile/build/app/outputs/bundle/release/app-release.aab`.
-Ostatni przygotowany pakiet to **6** (`0.1.0+6`), po wcześniej przygotowanym wydaniu 5.
-Powstał przed ujednoliceniem polityki dla odbiorców 13+ z 20.10.2026.
-Kolejny pakiet z aktualną treścią zbuduj z numerem co najmniej 7;
-jeśli ten numer został już użyty w Play Console, wybierz wyższy.
+Ostatni przygotowany pakiet to **8** (`0.1.0+8`), z polityką 13+ i panelem
+zakupów na istniejącym serwerze. [Raport i gotowy plik](google_play_release_8.md).
+Lokalny `billing.local.json` używa dotychczasowego API i włącza panel zakupów.
+Przy kolejnym wydaniu zwiększ numer do co najmniej 9; jeśli numer został już
+użyty w Play Console, wybierz wyższy.
 Zachowaj zabezpieczoną kopię `mobile/android/key.properties` oraz
 `mobile/android/keystore/sedno-upload.jks` poza projektem. Zawierają hasła i klucz
 potrzebne do kolejnych wydań. Nie przesyłaj ich do Play Console ani do rozmowy.

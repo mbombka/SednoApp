@@ -1,12 +1,17 @@
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:in_app_purchase_android/billing_client_wrappers.dart';
+import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:sedno_app/features/subscription/domain/subscription_repository.dart';
 
 class GooglePlayStore implements SubscriptionStore {
-  GooglePlayStore({required this.productId, InAppPurchase? billing})
-    : _billing = billing ?? InAppPurchase.instance;
+  GooglePlayStore({
+    required this.productId,
+    required this.basePlanId,
+    InAppPurchase? billing,
+  }) : _billing = billing ?? InAppPurchase.instance;
   final String productId;
+  final String basePlanId;
   final InAppPurchase _billing;
-  ProductDetails? _product;
 
   @override
   Stream<List<StorePurchase>> get purchases => _billing.purchaseStream.map(
@@ -30,6 +35,11 @@ class GooglePlayStore implements SubscriptionStore {
 
   @override
   Future<SubscriptionOffer> offer() async {
+    final product = await _loadProduct();
+    return SubscriptionOffer(product.price);
+  }
+
+  Future<GooglePlayProductDetails> _loadProduct() async {
     if (!await _billing.isAvailable()) {
       throw StateError('Sklep jest niedostępny.');
     }
@@ -37,18 +47,37 @@ class GooglePlayStore implements SubscriptionStore {
     if (response.error != null || response.productDetails.isEmpty) {
       throw StateError('Brak oferty.');
     }
-    // Configure one monthly base plan, without introductory offers, in Play Console.
-    _product = response.productDetails.first;
-    return SubscriptionOffer(_product!.price);
+    final matching = response.productDetails
+        .whereType<GooglePlayProductDetails>()
+        .where((product) {
+          final index = product.subscriptionIndex;
+          final offers = product.productDetails.subscriptionOfferDetails;
+          if (product.id != productId || index == null || offers == null) {
+            return false;
+          }
+          final offer = offers[index];
+          return offer.basePlanId == basePlanId &&
+              offer.offerId == null &&
+              offer.pricingPhases.length == 1 &&
+              offer.pricingPhases.single.billingPeriod == 'P1M' &&
+              offer.pricingPhases.single.recurrenceMode ==
+                  RecurrenceMode.infiniteRecurring;
+        })
+        .toList();
+    if (matching.length != 1) {
+      throw StateError('Brak miesięcznej oferty subskrypcji.');
+    }
+    return matching.single;
   }
 
   @override
   Future<void> buy(String accountBinding) async {
-    await offer();
+    final product = await _loadProduct();
     if (!await _billing.buyNonConsumable(
-      purchaseParam: PurchaseParam(
-        productDetails: _product!,
+      purchaseParam: GooglePlayPurchaseParam(
+        productDetails: product,
         applicationUserName: accountBinding,
+        offerToken: product.offerToken,
       ),
     )) {
       throw StateError('Nie udało się rozpocząć zakupu.');

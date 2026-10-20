@@ -7,9 +7,10 @@ Uproszczenie przygotowuje AI, dlatego wynik trzeba sprawdzić.
 ## Obecny stan
 
 Serwer uruchomiono 19.10.2026. Przed udostępnieniem aplikacji pozostają
-[testy na telefonie i przygotowanie Google Play](Tasks.md). Płatności są wyłączone.
-Podpisany AAB wydania 6 jest przygotowany; [raport wydania](mobile/docs/google_play_release_6.md).
-Aktualna polityka 13+ wymaga kolejnego wydania aplikacji i publikacji dokumentów.
+[pozostałe kontrole i przygotowanie Google Play](Tasks.md).
+Obsługę płatności włączono na istniejącym serwerze do testów; zakupów nie odebrano
+jeszcze na telefonie. Przygotowano [podpisany AAB 8](mobile/docs/google_play_release_8.md)
+z polityką 13+ i panelem zakupów.
 Obsługę usuwania konta przez e-mail właściciel potwierdził 20.10.2026.
 
 Backend przełączono na Firestore 19.10.2026. API i godzinowe sprzątanie działają.
@@ -32,7 +33,8 @@ Starą instancję Cloud SQL i wszystkie cztery kopie zapasowe usunięto 19.10.20
 - Tekst: maksymalnie 4000 znaków; pustego tekstu nie można wysłać.
 - Wersja darmowa: 5 uproszczeń dziennie, również bez konta. Reset o północy UTC.
 - Przygotowana subskrypcja: 9,99 zł miesięcznie, 400 uproszczeń dziennie łącznie.
-  Wymaga jeszcze uruchomienia i testów w Google Play.
+  Produkt Google Play `subscription_full`, plan `monthly` są skonfigurowane.
+  Serwer jest skonfigurowany; pozostają ustawienia Play Console i testy zakupów.
 - Historia: szyfrowana, tylko na telefonie, do 7 dni; wylogowanie ją usuwa.
 - Tekst trafia przez serwer do OpenAI. Serwer Sedno nie zapisuje tekstu ani wyniku.
 

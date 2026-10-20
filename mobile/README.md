@@ -96,6 +96,24 @@ Próby na urządzeniu: [aparat i OCR](docs/android_camera_ocr_manual_check.md),
 [subskrypcje](docs/google_play_subscription_sandbox.md) i
 [dostępność](../docs/model-acceptance.pl.md#dostępność).
 
+## Konfiguracja subskrypcji
+
+Produkt Google Play: `subscription_full`, plan bazowy: `monthly`, miesiąc,
+9,99 PLN w Polsce i 400 uproszczeń dziennie łącznie. Identyfikatory są domyślnie
+zapisane w [PlaySubscriptionConfiguration](lib/features/subscription/domain/play_subscription_configuration.dart).
+Cena w interfejsie pochodzi z Google Play. Aplikacja wybiera zwykły miesięczny
+plan z automatycznym odnawianiem, bez promocji.
+
+Panel zakupów jest domyślnie wyłączony (`PLAY_BILLING_ENABLED=false`). Do prób
+na istniejącym `https://sednoapp-79241-api.web.app` dodaj
+`--dart-define=PLAY_BILLING_ENABLED=true` lub użyj lokalnego pliku
+`config/billing.local.json`. Serwer `sedno-api` ma już włączoną obsługę płatności.
+Identyfikatory można nadpisać przez `PLAY_SUBSCRIPTION_PRODUCT_ID` i
+`PLAY_SUBSCRIPTION_BASE_PLAN_ID` w argumentach budowy. Samo włączenie panelu
+nie uruchamia płatności na serwerze. [Pełne przygotowanie i testy](docs/google_play_subscription_sandbox.md).
+
+Gotowy podpisany pakiet do testów: [wydanie 8](docs/google_play_release_8.md).
+
 Aparat działa wewnątrz Sedna: **Zrób zdjęcie → Zaznacz tekst → Uprość**.
 Ramka początkowo obejmuje całe zdjęcie. Można przesunąć jej rogi, aby wybrać
 fragment. Odczytany tekst trafia do pola i od razu do uproszczenia. Po błędzie

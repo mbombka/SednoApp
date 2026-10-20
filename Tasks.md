@@ -1,7 +1,8 @@
 # Co pozostało przed publikacją
 
-Stan na 20.10.2026: backend działa w chmurze, podpisany AAB wydania 6 jest gotowy.
-Pozostają odbiór aplikacji z Google Play, kontrole przed publikacją i uruchomienie płatności.
+Stan na 20.10.2026: obsługę płatności wdrożono na istniejącym `sedno-api`;
+podpisany AAB 8 z panelem zakupów jest gotowy. Pozostają ustawienia Play Console,
+próby zakupów na telefonie i kontrole przed publikacją.
 
 ## Zakończone i zaakceptowane
 
@@ -26,7 +27,7 @@ Pozostają odbiór aplikacji z Google Play, kontrole przed publikacją i uruchom
   e-mail — działanie potwierdzone przez właściciela 20.10.2026.
 - [x] Uszczelnić walidację ustawień modelu: dokładnie 4096 tokenów wyjściowych
   i timeout 8 sekund. Inne wartości blokują uruchomienie backendu.
-  Zmiana w kodzie; wymaga wdrożenia serwera.
+  Wdrożono 20.10.2026 z obsługą płatności.
 
 ## Odbiór i publikacja
 
@@ -36,9 +37,10 @@ Pozostają odbiór aplikacji z Google Play, kontrole przed publikacją i uruchom
   plikach polityki i strony usuwania konta w repozytorium `SednoWebsite/SednoWebsite/public/`.
 - [ ] Przesłać dwa poprawione pliki HTML na hosting OVH przez SFTP i potwierdzić
   opublikowaną wersję z 20.10.2026. Właściciel prześle pliki samodzielnie.
-- [ ] Wdrożyć aktualną kopię polityki osadzoną w API.
-- [ ] Przygotować kolejne wydanie aplikacji z aktualną polityką 13+.
-  Gotowy AAB 6 powstał przed tą zmianą; kolejny numer wydania musi wynosić co najmniej 7.
+- [x] Wdrożyć aktualną kopię polityki osadzoną w API — publiczna kontrola
+  20.10.2026 potwierdziła wiek 13+ i wersję 20.10.2026.
+- [x] Przygotować wydanie aplikacji z polityką 13+ i panelem zakupów.
+  [Podpisany AAB 8](mobile/docs/google_play_release_8.md) wskazuje dotychczasowy serwer.
 - [x] Sprawdzić certyfikaty klucza podpisywania Google Play (SHA-1 i SHA-256)
   w Firebase; certyfikat przesyłania jest osobnym certyfikatem.
 - [x] Przesłać aktualny AAB do Google Play i sprawdzić instalację z kanału testowego:
@@ -61,8 +63,27 @@ Pozostają odbiór aplikacji z Google Play, kontrole przed publikacją i uruchom
 
 - [ ] Dopasować komunikat po wyczerpaniu limitu do dostępności płatności;
   obecnie odsyła do subskrypcji także wtedy, gdy oferta jest wyłączona.
-- [ ] Przed włączeniem płatności utworzyć produkt w Google Play, skonfigurować
-  serwer i wykonać testy zakupów oraz powiadomień.
+- [x] Utworzyć produkt Google Play `subscription_full`, miesięczny plan `monthly`,
+  cena 9,99 PLN — konfiguracja potwierdzona przez właściciela 20.10.2026.
+- [x] Zapisać produkt w konfiguracji aplikacji i backendu oraz wybierać w aplikacji
+  plan `monthly` bez promocji. Płatności pozostają domyślnie wyłączone.
+- [x] Skonfigurować płatności na istniejącym `sedno-api`, z istniejącym kontem
+  serwera i bazą `(default)`. Wdrożono trwały pierścień kluczy i uwierzytelnione RTDN
+  z ponowieniami i dead-letter. Syntetyczne powiadomienie przez Pub/Sub: HTTP 204.
+  [Raport wdrożenia](docs/billing-deployment-2026-10-20.pl.md).
+- [x] Wskazać konto testera `mbombka@gmail.com` — właściciel potwierdził, że jest
+  już dodane jako konto testowe.
+- [ ] Potwierdzić lub uzupełnić w Play Console uprawnienia istniejącego konta
+  `sedno-api@sednoapp-79241.iam.gserviceaccount.com`: dane finansowe i zarządzanie
+  zamówieniami/subskrypcjami. Obecna autoryzacja operatora do Play API zwraca
+  `ACCESS_TOKEN_SCOPE_INSUFFICIENT`; nie potwierdzono zmiany tych uprawnień.
+- [ ] W Play Console ustawić temat RTDN
+  `projects/sednoapp-79241/topics/sedno-billing-rtdn-test` i wysłać test z panelu.
+- [ ] Przesłać AAB 8 do kanału wewnętrznego, zainstalować go na koncie testera
+  i wykonać rzeczywiste testy zakupów, przywracania, wygaśnięcia i limitu 400.
+  [Konfiguracja i lista prób](mobile/docs/google_play_subscription_sandbox.md).
+- [ ] Uporządkować nieużywane zasoby odrzuconego osobnego środowiska opisane
+  w raporcie wdrożenia. Nie są podłączone do istniejącego backendu.
 - [ ] Przed większym ruchem sprawdzić wydajność, koszty chmury i ograniczanie żądań
   za pośrednictwem Firebase Hosting.
 

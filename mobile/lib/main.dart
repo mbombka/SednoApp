@@ -12,6 +12,7 @@ import 'package:sedno_app/features/history/data/encrypted_history_repository.dar
 import 'package:sedno_app/features/simplification/data/http_simplification_repository.dart';
 import 'package:sedno_app/features/subscription/data/backend_subscription_repository.dart';
 import 'package:sedno_app/features/subscription/data/google_play_store.dart';
+import 'package:sedno_app/features/subscription/domain/play_subscription_configuration.dart';
 import 'package:sedno_app/features/subscription/presentation/subscription_view_model.dart';
 
 Future<void> main() async {
@@ -59,11 +60,18 @@ Future<void> main() async {
       clearHistory: history.clear,
     );
   }
-  const productId = String.fromEnvironment('PLAY_SUBSCRIPTION_PRODUCT_ID');
-  final subscription = sessions == null || productId.isEmpty
+  const productId = PlaySubscriptionConfiguration.productId;
+  final subscription =
+      sessions == null ||
+          !PlaySubscriptionConfiguration.enabled ||
+          productId.isEmpty ||
+          PlaySubscriptionConfiguration.basePlanId.isEmpty
       ? null
       : SubscriptionViewModel(
-          store: GooglePlayStore(productId: productId),
+          store: GooglePlayStore(
+            productId: productId,
+            basePlanId: PlaySubscriptionConfiguration.basePlanId,
+          ),
           repository: BackendSubscriptionRepository(sessions),
           productId: productId,
         );

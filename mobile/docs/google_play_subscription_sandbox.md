@@ -1,25 +1,58 @@
 # Testy subskrypcji Google Play
 
-Płatności są obecnie wyłączone. Wykonaj te próby przed ich włączeniem,
-na oddzielnym backendzie testowym i telefonie z Google Play.
+Obsługę płatności włączono 20.10.2026 na istniejącym serwerze `sedno-api`
+pod adresem `https://sednoapp-79241-api.web.app`, z dotychczasowym kontem
+usługi i bazą `(default)`. Próby wykonuj na kontach testerów licencji i telefonie
+z Google Play, przed udostępnieniem zakupów wszystkim użytkownikom.
 Testy automatyczne z atrapami nie zastępują zakupów w sklepie.
+
+[Stan wdrożenia i pozostałe ustawienia Play Console](../../docs/billing-deployment-2026-10-20.pl.md).
+[Gotowy AAB 8](google_play_release_8.md) używa istniejącego serwera.
+
+## Produkt skonfigurowany w Google Play
+
+Właściciel potwierdził konfigurację 20.10.2026:
+
+| Ustawienie | Wartość |
+| --- | --- |
+| Pakiet | `xyz.sedno.app` |
+| Product ID | `subscription_full` |
+| Base plan ID | `monthly` |
+| Okres | miesiąc |
+| Cena w Polsce | 9,99 PLN |
+| Limit | 400 uproszczeń dziennie łącznie |
+
+Domyślne identyfikatory aplikacji zapisano w
+[`PlaySubscriptionConfiguration`](../lib/features/subscription/domain/play_subscription_configuration.dart).
+Aplikacja wybiera plan `monthly` bez promocji, z miesięcznym okresem i automatycznym
+odnawianiem. Cenę wyświetla z odpowiedzi Google Play, aby zgadzała się z oknem zakupu.
+Przed testami potwierdź aktywność produktu i planu, dostępność w Polsce oraz brak
+okresu próbnego i promocji. Utworzenie produktu nie oznacza włączenia płatności w Sedno.
 
 ## Przygotowanie
 
 1. Sprawdź pakiet `xyz.sedno.app` w Google Play i Firebase `sednoapp-79241`,
    certyfikaty podpisu oraz Play Integrity. Wgraj podpisany AAB do testów wewnętrznych.
-2. Utwórz subskrypcję z jednym miesięcznym planem odnawianym automatycznie,
-   bez okresu próbnego i promocji. Docelowa cena w Polsce: 9,99 zł.
+2. Użyj istniejącej subskrypcji `subscription_full` i planu `monthly`.
+   Sprawdź automatyczne odnawianie, brak okresu próbnego i promocji oraz cenę 9,99 PLN.
 3. Dodaj konto do testerów licencji i testów wewnętrznych, zaakceptuj zaproszenie
    i zainstaluj aplikację z Play. W oknie zakupu musi być widoczna metoda testowa.
-4. Zastosuj migracje i [konfigurację płatności backendu](../../backend/README.md#subskrypcje-google-play).
+4. Sprawdź [konfigurację istniejącego backendu](../../backend/README.md#subskrypcje-google-play).
    Klucze szyfrujące zakupy muszą przetrwać restart serwera.
 5. Skonfiguruj powiadomienia Google Play (RTDN) przez uwierzytelniony Pub/Sub do
    `/notifications/google-play`, ponowienia i obsługę niedostarczonych wiadomości.
    Test z Play Console powinien otrzymać HTTP 204.
-6. Ustaw w aplikacji `PLAY_SUBSCRIPTION_PRODUCT_ID` taki sam jak serwerowy
-   `Billing__ProductId`, wraz z adresem backendu i konfiguracją Firebase/Integrity.
-   Zaloguj się do Sedno — zakup i przywrócenie wymagają konta.
+6. Na istniejącym `sedno-api` ustawiono `Billing__ProductId=subscription_full`
+   i `Billing__Enabled=true`. Przy generowaniu kolejnych manifestów przekaż
+   `--billing-product subscription_full`; `monthly` jest identyfikatorem planu, nie produktu.
+7. Zbuduj aplikację z konfiguracją Firebase/Integrity i dotychczasowym adresem API
+   oraz `--dart-define=PLAY_BILLING_ENABLED=true`. Domyślne identyfikatory to
+   `PLAY_SUBSCRIPTION_PRODUCT_ID=subscription_full` i `PLAY_SUBSCRIPTION_BASE_PLAN_ID=monthly`;
+   można je jawnie podać przez `--dart-define`. Bez flagi włączającej panel zakupów
+   pozostaje wyłączony. Zaloguj się do Sedno — zakup i przywrócenie wymagają konta.
+
+Do obecnych prób użyj przygotowanego `config/billing.local.json` i AAB 8.
+Nie używaj odrzuconego pakietu 7, który wskazywał niewdrożony adres.
 
 ## Co sprawdzić
 
