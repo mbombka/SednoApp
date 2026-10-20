@@ -20,46 +20,187 @@ class FirebaseAccountRepository implements AccountRepository {
   @override
   Future<Account> current() async {
     if (await sessions.deletionPending) await deleteAccount();
-    return auth.currentUser == null
+    final user = auth.currentUser;
+    if (user != null && _requiresVerification(user)) {
+      return _pendingAccount(user);
+    }
+    return user == null
         ? Account(id: 'guest', provider: IdentityProvider.guest)
         : (await sessions.savedAccount() ??
-              Account(id: 'guest', provider: IdentityProvider.guest));
+              (_usesPassword(user)
+                  ? _awaitingSession(user)
+                  : Account(id: 'guest', provider: IdentityProvider.guest)));
   }
 
   @override
-  Future<Account> signInWithGoogle() async {
+  Future<Account> signInWithGoogle() => _firebaseOperation(() async {
     final googleUser = await google.authenticate();
     final credential = firebase.GoogleAuthProvider.credential(
       idToken: googleUser.authentication.idToken,
     );
     await auth.signInWithCredential(credential);
     return _linkCurrentUser();
-  }
+  });
 
   @override
-  Future<Account> signInWithEmail(String email, String password) async {
-    await auth.signInWithEmailAndPassword(
-      email: email.trim(),
-      password: password,
-    );
-    return _linkCurrentUser();
-  }
+  Future<Account> signInWithEmail(String email, String password) =>
+      _firebaseOperation(() async {
+        await auth.signInWithEmailAndPassword(
+          email: email.trim(),
+          password: password,
+        );
+        return _linkCurrentUser();
+      });
 
   @override
-  Future<Account> registerWithEmail(String email, String password) async {
-    await auth.createUserWithEmailAndPassword(
-      email: email.trim(),
-      password: password,
-    );
+  Future<Account> registerWithEmail(String email, String password) =>
+      _firebaseOperation(() async {
+        await auth.createUserWithEmailAndPassword(
+          email: email.trim(),
+          password: password,
+        );
+        final pending = _pending(auth.currentUser!);
+        try {
+          await resendVerificationEmail();
+        } on AccountActionException catch (error) {
+          // The Firebase account already exists. Keep the verification screen
+          // available so a delivery failure can be retried without registering again.
+          throw AccountActionException(error.message, account: pending);
+        } catch (_) {
+          throw AccountActionException(
+            'Konto zostało utworzone, ale nie udało się wysłać wiadomości. Spróbuj wysłać ją ponownie.',
+            account: pending,
+          );
+        }
+        return pending;
+      });
+
+  bool _requiresVerification(firebase.User user) =>
+      !user.emailVerified && _usesPassword(user);
+
+  bool _usesPassword(firebase.User user) =>
+      user.providerData.any((provider) => provider.providerId == 'password');
+
+  Account _awaitingSession(firebase.User user) => Account(
+    id: user.uid,
+    provider: IdentityProvider.email,
+    email: user.email,
+    sessionLinkRequired: true,
+  );
+
+  Future<Account> _pendingAccount(firebase.User user) async {
+    // Existing clients may have saved an account session before verification
+    // was required. Revoke it locally and remotely before returning to guest use.
+    if (await sessions.savedAccount() != null) await sessions.signOut();
+    return _pending(user);
+  }
+
+  Account _pending(firebase.User user) => Account(
+    id: user.uid,
+    provider: IdentityProvider.email,
+    email: user.email,
+    emailVerificationRequired: true,
+  );
+
+  @override
+  Future<void> resendVerificationEmail() => _firebaseOperation(() async {
+    final user = auth.currentUser;
+    if (user == null || !_requiresVerification(user)) {
+      throw const AccountActionException(
+        'Zaloguj się przez e-mail, aby potwierdzić adres.',
+      );
+    }
+    await auth.setLanguageCode('pl');
+    await user.sendEmailVerification();
+  });
+
+  @override
+  Future<void> sendPasswordResetEmail(String email) =>
+      _firebaseOperation(() async {
+        await auth.setLanguageCode('pl');
+        try {
+          await auth.sendPasswordResetEmail(email: email.trim());
+        } on firebase.FirebaseAuthException catch (error) {
+          // Do not disclose whether the address has an account.
+          if (error.code != 'user-not-found') rethrow;
+        }
+      });
+
+  @override
+  Future<Account> checkEmailVerification() => _firebaseOperation(() async {
+    final user = auth.currentUser;
+    if (user == null) {
+      throw AccountActionException(
+        'Zaloguj się ponownie, aby sprawdzić stan konta.',
+        account: Account(id: 'guest', provider: IdentityProvider.guest),
+      );
+    }
+    await user.reload();
     return _linkCurrentUser();
+  });
+
+  Future<T> _firebaseOperation<T>(Future<T> Function() action) async {
+    try {
+      return await action();
+    } on firebase.FirebaseAuthException catch (error) {
+      final message = switch (error.code) {
+        'weak-password' => 'Hasło jest za słabe. Użyj co najmniej 6 znaków.',
+        'invalid-email' => 'Sprawdź, czy adres e-mail jest wpisany poprawnie.',
+        'email-already-in-use' =>
+          'Ten adres jest już używany. Zaloguj się do istniejącego konta.',
+        'too-many-requests' =>
+          'Za dużo prób. Odczekaj chwilę i spróbuj ponownie.',
+        'network-request-failed' =>
+          'Brak połączenia. Sprawdź internet i spróbuj ponownie.',
+        'invalid-credential' || 'wrong-password' || 'user-not-found' =>
+          'Nie udało się zalogować. Sprawdź adres e-mail i hasło.',
+        'user-token-expired' ||
+        'invalid-user-token' ||
+        'user-disabled' => 'Zaloguj się ponownie, aby sprawdzić stan konta.',
+        _ => 'Nie udało się wykonać tej czynności. Spróbuj ponownie.',
+      };
+      final user = auth.currentUser;
+      final sessionExpired = {
+        'user-token-expired',
+        'invalid-user-token',
+        'user-disabled',
+      }.contains(error.code);
+      if (sessionExpired) await auth.signOut();
+      throw AccountActionException(
+        message,
+        account: sessionExpired
+            ? Account(id: 'guest', provider: IdentityProvider.guest)
+            : user != null && _usesPassword(user) && user.emailVerified
+            ? _awaitingSession(user)
+            : null,
+      );
+    }
   }
 
   Future<Account> _linkCurrentUser() async {
+    final user = auth.currentUser;
+    if (user == null) {
+      throw AccountActionException(
+        'Zaloguj się ponownie, aby sprawdzić stan konta.',
+        account: Account(id: 'guest', provider: IdentityProvider.guest),
+      );
+    }
+    if (_requiresVerification(user)) return _pendingAccount(user);
     try {
       final token = await auth.currentUser!.getIdToken(true);
       if (token == null) throw StateError('Brak tokenu tożsamości.');
       return await sessions.link(token);
-    } catch (_) {
+    } on firebase.FirebaseAuthException {
+      rethrow;
+    } catch (error) {
+      if (_usesPassword(user)) {
+        // Verification and backend admission are separate steps. A rejected
+        // installation or network failure must not discard Firebase identity.
+        throw AccountActionException(
+          error is AccountActionException ? error.message : 'Nie udało się połączyć z kontem Sedna. Sprawdź połączenie i spróbuj ponownie.',
+          account: _awaitingSession(user),
+        );
+      }
       await auth.signOut();
       rethrow;
     }

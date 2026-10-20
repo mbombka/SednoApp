@@ -69,6 +69,28 @@ public sealed class ApiTests(BackendFixture fixture)
     }
 
     [Fact]
+    public async Task UnverifiedEmailCannotLinkAndGuestUsageSurvivesVerification()
+    {
+        fixture.Clock.Set(new(2026, 10, 14, 12, 0, 0, TimeSpan.Zero));
+        var guest = await GuestAsync();
+        Assert.Equal(HttpStatusCode.OK, (await Submit(guest.Client, "before-email-verification", "Tekst")).StatusCode);
+        var denied = await guest.Client.PostAsJsonAsync("/v1/auth/sessions", new { idToken = "email-verification-pending" });
+        Assert.Equal(HttpStatusCode.Forbidden, denied.StatusCode);
+        Assert.Equal("email_not_verified", await Code(denied));
+        Assert.Equal(4, await Remaining(guest.Client));
+        // The store also refuses an unverified identity if called outside the endpoint.
+        using var scope = fixture.Factory.Services.CreateScope();
+        var store = scope.ServiceProvider.GetRequiredService<IGuestStore>();
+        var identity = await store.AuthenticateAsync(guest.Token, default);
+        Assert.NotNull(identity);
+        Assert.Null(await store.LinkAsync(identity, new("verification-user", "email"), default));
+        var linked = await guest.Client.PostAsJsonAsync("/v1/auth/sessions", new { idToken = "email-verification-complete" });
+        linked.EnsureSuccessStatusCode();
+        using var doc = JsonDocument.Parse(await linked.Content.ReadAsStringAsync());
+        Assert.Equal(4, doc.RootElement.GetProperty("quota").GetProperty("remaining").GetInt32());
+    }
+
+    [Fact]
     public async Task IntegrityFailureDoesNotCreateGuest()
     {
         fixture.Integrity.Allow = false;

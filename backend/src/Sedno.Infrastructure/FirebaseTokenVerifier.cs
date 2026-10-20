@@ -43,7 +43,8 @@ public sealed class FirebaseTokenVerifier(HttpClient client, string projectId, T
             {
                 "google.com" => "google", "password" => "email", _ => null
             };
-            return provider is null ? null : new(uid, provider);
+            return provider is null ? null : new(uid, provider,
+                p.TryGetProperty("email_verified", out var emailVerified) && emailVerified.ValueKind == JsonValueKind.True);
         }
         catch (Exception ex) when (ex is JsonException or KeyNotFoundException or FormatException or
             InvalidOperationException or ArgumentException or CryptographicException or HttpRequestException)

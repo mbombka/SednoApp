@@ -6,7 +6,7 @@ public record QuotaDto(string Tier, int Limit, int Used, int Remaining, DateTime
 public record GuestSessionDto(string AccessToken, AccountDto Account, QuotaDto Quota);
 public record AccountDto(string Id, string Provider);
 public record AuthenticatedSessionDto(string AccessToken, AccountDto Account, QuotaDto Quota);
-public record VerifiedIdentity(string Uid, string Provider);
+public record VerifiedIdentity(string Uid, string Provider, bool EmailVerified = false);
 public record SessionIdentity(Guid IdentityId, Guid? AccountId, Guid SessionId);
 public record SimplificationResultDto(string Id, string Text, DateTimeOffset CreatedAt);
 public record SimplificationResponseDto(SimplificationResultDto Result, QuotaDto Quota);

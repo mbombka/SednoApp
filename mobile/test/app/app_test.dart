@@ -1,11 +1,112 @@
 import '../helpers.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sedno_app/app/app.dart';
 import 'package:sedno_app/app/app_theme.dart';
 
 void main() {
+  final systemCalls = <MethodCall>[];
+
+  setUp(() {
+    systemCalls.clear();
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(SystemChannels.platform, (call) async {
+          systemCalls.add(call);
+          return null;
+        });
+  });
+
+  tearDown(() {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(SystemChannels.platform, null);
+  });
+
+  testWidgets('system back retraces screens and exits only from Start', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const SednoApp());
+    await tester.enterText(find.byType(TextField), 'Mój tekst');
+    await navigateTo(tester, 'Historia');
+    await navigateTo(tester, 'Konto');
+
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(
+      find.text('Tutaj pojawi się historia uproszczonych tekstów.'),
+      findsOneWidget,
+    );
+
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<TextField>(find.byType(TextField)).controller!.text,
+      'Mój tekst',
+    );
+    expect(
+      systemCalls.where((call) => call.method == 'SystemNavigator.pop'),
+      isEmpty,
+    );
+
+    await tester.binding.handlePopRoute();
+    expect(
+      systemCalls.where((call) => call.method == 'SystemNavigator.pop'),
+      hasLength(1),
+    );
+  });
+
+  testWidgets('selecting the same screen does not add a back step', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const SednoApp());
+    await navigateTo(tester, 'Konto');
+    await navigateTo(tester, 'Konto');
+
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.byType(TextField), findsOneWidget);
+  });
+
+  testWidgets('selecting Start clears the previous screens', (tester) async {
+    await tester.pumpWidget(const SednoApp());
+    await navigateTo(tester, 'Historia');
+    await navigateTo(tester, 'Start');
+    await navigateTo(tester, 'Konto');
+
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.byType(TextField), findsOneWidget);
+
+    await tester.binding.handlePopRoute();
+    expect(
+      systemCalls.where((call) => call.method == 'SystemNavigator.pop'),
+      hasLength(1),
+    );
+  });
+
+  testWidgets('system back closes the menu before returning from Konto', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const SednoApp());
+    await navigateTo(tester, 'Konto');
+    await tester.tap(find.byTooltip('Menu użytkownika'));
+    await tester.pumpAndSettle();
+
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.byTooltip('Zamknij menu'), findsNothing);
+    expect(find.text('Tutaj pojawią się opcje konta.'), findsOneWidget);
+
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.byType(TextField), findsOneWidget);
+    expect(
+      systemCalls.where((call) => call.method == 'SystemNavigator.pop'),
+      isEmpty,
+    );
+  });
+
   testWidgets('opens Start with the Polish application name', (tester) async {
     await tester.pumpWidget(const SednoApp());
 

@@ -47,6 +47,26 @@ public sealed class AuthenticationTests
         Assert.Null(await verifier.VerifyAsync(valid + "x", default));
     }
 
+    [Theory]
+    [InlineData(true, true)]
+    [InlineData(false, false)]
+    [InlineData(null, false)]
+    public async Task PasswordTokenVerificationUsesSignedEmailClaim(bool? claim, bool expected)
+    {
+        using var rsa = RSA.Create(2048);
+        var request = new CertificateRequest("CN=test", rsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+        using var certificate = request.CreateSelfSigned(DateTimeOffset.UtcNow.AddDays(-1), DateTimeOffset.UtcNow.AddDays(1));
+        using var client = new HttpClient(new Handler(_ => new(HttpStatusCode.OK)
+        {
+            Content = new StringContent(JsonSerializer.Serialize(new Dictionary<string, string> { ["test-key"] = certificate.ExportCertificatePem() }))
+        }));
+        var verifier = new FirebaseTokenVerifier(client, "test-project", new Clock());
+        var identity = await verifier.VerifyAsync(Token(rsa, 1791982800, "password", claim), default);
+        Assert.NotNull(identity);
+        Assert.Equal("email", identity.Provider);
+        Assert.Equal(expected, identity.EmailVerified);
+    }
+
     [Fact]
     public async Task IntegrityRejectsMissingStaleAndMismatchedVerdicts()
     {
@@ -88,7 +108,7 @@ public sealed class AuthenticationTests
         }
     });
 
-    private static string Token(RSA rsa, long expiry)
+    private static string Token(RSA rsa, long expiry, string provider = "google.com", bool? emailVerified = null)
     {
         static string Encode(byte[] bytes) => Convert.ToBase64String(bytes).TrimEnd('=').Replace('+', '-').Replace('/', '_');
         var header = Encode(JsonSerializer.SerializeToUtf8Bytes(new { alg = "RS256", kid = "test-key" }));
@@ -96,7 +116,8 @@ public sealed class AuthenticationTests
         {
             aud = "test-project", iss = "https://securetoken.google.com/test-project", sub = "user-1",
             exp = expiry, iat = 1791975600, auth_time = 1791975600,
-            firebase = new { sign_in_provider = "google.com" }
+            email_verified = emailVerified,
+            firebase = new { sign_in_provider = provider }
         }));
         var value = header + "." + payload;
         return value + "." + Encode(rsa.SignData(Encoding.ASCII.GetBytes(value), HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1));

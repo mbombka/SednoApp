@@ -153,8 +153,26 @@ class MockAccountRepository implements AccountRepository {
       );
 
   @override
-  Future<Account> registerWithEmail(String email, String password) =>
-      signInWithEmail(email, password);
+  Future<Account> registerWithEmail(String email, String password) async =>
+      _account = Account(
+        id: 'dev-email',
+        provider: IdentityProvider.email,
+        email: email.trim(),
+        emailVerificationRequired: true,
+      );
+
+  @override
+  Future<void> resendVerificationEmail() async {}
+
+  @override
+  Future<void> sendPasswordResetEmail(String email) async {}
+
+  @override
+  Future<Account> checkEmailVerification() async => _account = Account(
+    id: _account.id,
+    provider: _account.provider,
+    email: _account.email,
+  );
 
   @override
   Future<void> signOut() async {

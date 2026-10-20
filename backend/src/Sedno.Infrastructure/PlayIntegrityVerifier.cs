@@ -4,6 +4,8 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using Sedno.Application;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Sedno.Infrastructure;
 
@@ -67,11 +69,27 @@ public sealed class ServiceAccountAccessTokenSource(HttpClient client, string cr
 }
 
 public sealed class PlayIntegrityVerifier(HttpClient client, IPlayAccessTokenSource accessTokens,
-    string packageName, TimeProvider clock) : IIntegrityVerifier
+    string packageName, TimeProvider clock, ILogger<PlayIntegrityVerifier>? logger = null) : IIntegrityVerifier
 {
+    // Google and the API host can disagree by fractions of a second. Keep the
+    // future allowance small; the five-minute maximum age is not extended.
+    private static readonly TimeSpan FutureClockTolerance = TimeSpan.FromSeconds(5);
+    private readonly ILogger<PlayIntegrityVerifier> _logger = logger ?? NullLogger<PlayIntegrityVerifier>.Instance;
+
+    // Only fixed reason codes and numeric metadata may enter these logs. Never
+    // log tokens, hashes, installation IDs, response bodies or exception messages.
+    private bool Reject(string reason, int? statusCode = null, double? tokenAgeSeconds = null)
+    {
+        _logger.LogWarning(new EventId(4101, "PlayIntegrityRejected"),
+            "Play Integrity rejected. Reason={Reason} HttpStatus={HttpStatus} TokenAgeSeconds={TokenAgeSeconds}",
+            reason, statusCode, tokenAgeSeconds);
+        return false;
+    }
+
     public async Task<bool> VerifyAsync(string? token, string requestHash, CancellationToken ct)
     {
-        if (string.IsNullOrWhiteSpace(token) || token.Length > 8192) return false;
+        if (string.IsNullOrWhiteSpace(token)) return Reject("missing_token");
+        if (token.Length > 8192) return Reject("token_too_long");
         try
         {
             using var request = new HttpRequestMessage(HttpMethod.Post,
@@ -79,23 +97,30 @@ public sealed class PlayIntegrityVerifier(HttpClient client, IPlayAccessTokenSou
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", await accessTokens.GetAsync(ct));
             request.Content = JsonContent.Create(new { integrityToken = token });
             using var response = await client.SendAsync(request, ct);
-            if (!response.IsSuccessStatusCode) return false;
+            if (!response.IsSuccessStatusCode) return Reject("decode_http_error", (int)response.StatusCode);
             using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync(ct));
             var verdict = doc.RootElement.GetProperty("tokenPayloadExternal");
             var details = verdict.GetProperty("requestDetails");
             var issued = DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(details.GetProperty("timestampMillis").GetString()!));
             var age = clock.GetUtcNow() - issued;
-            if (age < TimeSpan.Zero || age > TimeSpan.FromMinutes(5) ||
-                details.GetProperty("requestPackageName").GetString() != packageName ||
-                details.GetProperty("requestHash").GetString() != requestHash ||
-                verdict.GetProperty("appIntegrity").GetProperty("appRecognitionVerdict").GetString() != "PLAY_RECOGNIZED")
-                return false;
-            return verdict.GetProperty("deviceIntegrity").GetProperty("deviceRecognitionVerdict")
-                .EnumerateArray().Any(x => x.GetString() == "MEETS_DEVICE_INTEGRITY");
+            if (age < -FutureClockTolerance) return Reject("token_from_future", tokenAgeSeconds: age.TotalSeconds);
+            if (age > TimeSpan.FromMinutes(5)) return Reject("token_expired", tokenAgeSeconds: age.TotalSeconds);
+            if (details.GetProperty("requestPackageName").GetString() != packageName)
+                return Reject("package_mismatch");
+            if (details.GetProperty("requestHash").GetString() != requestHash)
+                return Reject("request_hash_mismatch");
+            if (verdict.GetProperty("appIntegrity").GetProperty("appRecognitionVerdict").GetString() != "PLAY_RECOGNIZED")
+                return Reject("app_not_recognized");
+            if (!verdict.GetProperty("deviceIntegrity").GetProperty("deviceRecognitionVerdict")
+                .EnumerateArray().Any(x => x.GetString() == "MEETS_DEVICE_INTEGRITY"))
+                return Reject("device_not_trusted");
+            return true;
         }
-        catch (Exception ex) when (ex is HttpRequestException or JsonException or KeyNotFoundException or
-            InvalidOperationException or FormatException or ArgumentException or IOException)
-        { return false; }
+        catch (HttpRequestException) { return Reject("transport_error"); }
+        catch (IOException) { return Reject("io_error"); }
+        catch (Exception ex) when (ex is JsonException or KeyNotFoundException or
+            InvalidOperationException or FormatException or ArgumentException)
+        { return Reject("invalid_response"); }
     }
 
     public static string RequestHash(string installationId)

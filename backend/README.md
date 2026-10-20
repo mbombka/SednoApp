@@ -118,3 +118,64 @@ Schemat dokumentów jest w `FirestoreStore`, indeksy i zakaz dostępu klientów 
 starsze rekordy; brak EF nie usuwa potrzeby planowania migracji danych.
 Historyczne migracje SQL pozostają w Git, wyłączone z kompilacji aplikacji.
 Npgsql występuje wyłącznie w oddzielnym narzędziu jednorazowej migracji.
+
+## Diagnostyka odrzucenia Play Integrity
+
+Wdrożona 19.10.2026; poprawka tolerancji zegarów: rewizja `sedno-api-00005-5g5`.
+[Raport wdrożenia i weryfikacji](../docs/archiwum/integrity-diagnostics-deployment-2026-10-19.pl.md).
+
+Backend zapisuje ostrzeżenie `PlayIntegrityRejected` (EventId 4101) z polem
+`Reason`. Nie zapisuje tokenów, hashy, identyfikatorów instalacji, pełnych
+odpowiedzi Google ani treści wyjątków. Dopuszcza różnicę zegarów do 5 sekund dla tokenu z przyszłości; maksymalny wiek
+tokenu nadal wynosi 5 minut. Pozostałe kontrole Integrity pozostają bez zmian.
+
+| Reason | Znaczenie |
+| --- | --- |
+| `missing_token`, `token_too_long` | Brak tokenu lub przekroczona długość |
+| `decode_http_error` | Google odrzuciło odkodowanie; `HttpStatus` zawiera kod odpowiedzi |
+| `token_from_future`, `token_expired` | Niedopuszczalny czas tokenu; `TokenAgeSeconds` zawiera wiek w sekundach (ujemny oznacza przyszłość) |
+| `package_mismatch`, `request_hash_mismatch` | Niezgodny pakiet lub hash żądania |
+| `app_not_recognized` | Brak `PLAY_RECOGNIZED` |
+| `device_not_trusted` | Brak `MEETS_DEVICE_INTEGRITY` w tablicy werdyktów urządzenia |
+| `invalid_response` | Nieprawidłowa struktura, brak wymaganego pola lub nieprawidłowa wartość; nie oznacza automatycznie odrzucenia urządzenia |
+| `transport_error`, `io_error` | Błąd komunikacji lub odczytu danych |
+
+Po wdrożeniu backendu powtórz logowanie → wylogowanie → logowanie na telefonie.
+Zanotuj czas próby i odczytaj ostrzeżenia:
+
+```sh
+gcloud logging read \
+  'resource.type="cloud_run_revision" AND resource.labels.service_name="sedno-api" AND (textPayload:"Play Integrity rejected." OR jsonPayload.EventId.Name="PlayIntegrityRejected")' \
+  --project=sednoapp-79241 --freshness=30m --limit=50
+```
+
+Sama odpowiedź 403 z `/v1/guest-sessions` wskazuje etap awarii; dopiero `Reason`
+pozwala ustalić, który warunek zawiódł. Diagnostyka nie odtworzy powodu dla
+starszych żądań. Nie wymaga nowej wersji aplikacji Android.
+
+## Potwierdzenie e-maila przy logowaniu
+
+Wdrożone 19.10.2026, rewizja `sedno-api-00006-j9x`.
+[Raport, testy i APK](../docs/archiwum/email-verification-2026-10-19.pl.md).
+
+`/v1/auth/sessions` wymaga `email_verified=true` w podpisanym tokenie Firebase
+przy logowaniu przez hasło (`password`). W przeciwnym razie zwraca HTTP 403,
+`email_not_verified`, bez zużycia sesji gościa i bez tworzenia powiązania konta.
+Warunek sprawdza także `GuestStore`. Logowanie Google zachowuje dotychczasowy
+przebieg. Po potwierdzeniu adresu aplikacja odświeża token i łączy tę samą sesję
+gościa; limit nie jest zerowany.
+
+To kontrola wystawiania nowych sesji. Wcześniej wystawione sesje kont zachowują
+ważność do wylogowania lub wygaśnięcia. Nowa aplikacja przy odczycie oczekującego
+konta unieważnia lokalną sesję backendu, jeśli zachowała ją starsza wersja.
+Wdrożenie serwera trzeba połączyć z udostępnieniem nowej aplikacji Android,
+która obsługuje potwierdzanie i ponowne wysłanie wiadomości.
+
+Język Firebase Authentication ustawiono na `pl` 19.10.2026; aplikacja jawnie
+ustawia go również przed wysłaniem. Wersjonowana konfiguracja:
+[auth/email-verification.pl.json](deploy/firebase/auth/email-verification.pl.json).
+Maska aktualizacji to wyłącznie `notification.defaultLocale`.
+Projekt odrzucił próbę zmiany treści, tematu i nadawcy przez API błędem
+`EMAIL_TEMPLATE_UPDATE_NOT_ALLOWED`. Używana jest polska wiadomość systemowa
+Firebase; własny tekst instrukcji jest w aplikacji. Nie skonfigurowano dodatkowego
+operatora poczty i nie wysyłano wiadomości do użytkowników podczas konfiguracji.

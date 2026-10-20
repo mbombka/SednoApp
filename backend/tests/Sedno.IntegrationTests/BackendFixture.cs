@@ -53,7 +53,9 @@ public sealed class TestIdentityVerifier : IIdentityTokenVerifier
             "deletion-user" => new("user-delete", "google"),
             "deletion-other" => new("user-delete-other", "google"),
             "google-user-1" => new("user-1", "google"),
-            "email-user-1" => new("user-1", "email"),
+            "email-user-1" => new("user-1", "email", true),
+            "email-verification-pending" => new("verification-user", "email", false),
+            "email-verification-complete" => new("verification-user", "email", true),
             "google-user-2" => new("user-2", "google"),
             _ => null
         });

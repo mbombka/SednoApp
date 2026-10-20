@@ -25,6 +25,41 @@ Adres serwera: `https://sednoapp-79241-api.web.app`. Google i e-mail/hasło są
 włączone w Firebase. Test na telefonie wymaga również certyfikatów podpisu
 w Firebase i wersji rozpoznawanej przez Play Integrity.
 
+## Uruchomienie w Android Studio
+
+Otwórz katalog `mobile/`. W **Run → Edit Configurations → Flutter** wybierz
+`main.dart`, plik `lib/main.dart`, a w **Additional run args** ustaw:
+
+```text
+--dart-define-from-file=config/firebase.local.json
+```
+
+Ta konfiguracja korzysta z adresu API zapisanego w pliku. Po zmianie argumentów
+zatrzymaj aplikację przyciskiem Stop i uruchom ponownie; hot reload ich nie wczyta.
+Jeśli IDE nadal pokazuje stare argumenty, otwórz ponownie konfigurację uruchomienia.
+
+Do emulatora z lokalnym backendem użyj osobnej konfiguracji **Sedno — backend lokalny**:
+
+```text
+--dart-define-from-file=config/firebase.local.json --dart-define=BACKEND_BASE_URL=http://10.0.2.2:5000
+```
+
+Lokalny backend musi być uruchomiony zgodnie z instrukcją poniżej. Same argumenty
+nie uruchamiają serwera. Logowanie z rzeczywistym Firebase wymaga również jego
+konfiguracji w lokalnym backendzie; tryb demonstracyjny modelu nie zastępuje
+weryfikacji tożsamości Firebase.
+
+Komunikat „Tutaj pojawią się opcje konta” oznacza brak konfiguracji konta
+podczas uruchamiania, a nie numer ani wiek wersji aplikacji. Sam argument z adresem
+backendu nie wystarcza — trzeba wczytać także konfigurację Firebase i Google.
+Lokalne pliki `.idea` są pomijane przez Git; po nowym pobraniu projektu ustaw
+argumenty ponownie. Pliku `firebase.local.json` również nie dodawaj do Git.
+
+Produkcyjny backend wymaga Play Integrity. Pełna konfiguracja pokaże opcje konta
+na emulatorze, ale nie gwarantuje akceptacji jego instalacji przez produkcyjne API.
+Do testu całego przepływu użyj telefonu lub lokalnego backendu w Development;
+nie wyłączaj zabezpieczeń produkcyjnych, aby dopuścić emulator.
+
 ## Serwer lokalny
 
 Uruchom [backend w trybie demonstracyjnym](../backend/README.md), a następnie
@@ -72,7 +107,10 @@ Aktualny opis komunikacji z serwerem: [kontrakt API](../contracts/openapi.yaml).
 
 ## Ikona i ekran uruchamiania
 
-Źródło logo: [sedno-app-icon.svg](../docs/Content/sedno-app-icon.svg).
+Źródło logo: [sedno-icon.svg](../docs/Content/sedno-icon.svg).
+Wariant PNG: [sedno-icon-A-512.png](../docs/Content/sedno-icon-A-512.png).
+Zasoby Androida odtwarza `python3 tools/generate_android_icons.py` z katalogu
+głównego projektu (wymaga Pillow).
 Znak jest zapisany jako ścieżki, bez zależności od czcionek.
 Zasoby w `android/app/src/main/res/` zawierają ikony PNG dla starszych Androidów,
 ikonę adaptacyjną od Androida 8 oraz wariant jednokolorowy od Androida 13.
@@ -85,3 +123,40 @@ je obsługuje. Sprawdź też ekran startowy po pełnym zamknięciu aplikacji,
 w jasnym i ciemnym trybie systemu, na Androidzie 12+ i starszym.
 Zmiana ikony wymaga nowej instalacji lub aktualizacji aplikacji;
 przeładowanie kodu Fluttera jej nie zmienia.
+
+## Potwierdzanie adresu e-mail
+
+[Raport wdrożenia backendu i budowy APK — 19.10.2026](../docs/archiwum/email-verification-2026-10-19.pl.md).
+
+Po rejestracji aplikacja wysyła przez Firebase wiadomość w języku polskim.
+Konto czeka na potwierdzenie adresu. W tym czasie uproszczenia nadal działają
+w trybie gościa, z dotychczasowym limitem instalacji.
+
+Na ekranie Konto pojawia się instrukcja:
+
+> Aby dokończyć tworzenie konta, kliknij link w wiadomości od Sedna.
+> Sprawdź też folder Spam. Potem wróć tutaj i wybierz „Sprawdź potwierdzenie”.
+
+Aplikacja sprawdza potwierdzenie również po wznowieniu. Przed połączeniem konta
+odświeża użytkownika i token Firebase. Wiadomość można wysłać ponownie;
+przycisk ma 60-sekundową przerwę, a Firebase dodatkowo ogranicza częste próby.
+Błąd wysyłania nie powoduje ponownego tworzenia konta. Istniejące niepotwierdzone
+konto po zalogowaniu również otwiera ten ekran. Wylogowanie usuwa lokalną historię.
+
+Próba na telefonie wymaga nowej wersji aplikacji i backendu z obsługą
+`email_not_verified`. Zarejestruj nowy adres, sprawdź wiadomość (także Spam),
+kliknij link i wróć do Sedna. Sprawdź brak dostępu do konta przed potwierdzeniem,
+ponowne wysłanie, wylogowanie i powrót do oczekującego konta oraz zachowanie limitu.
+Dostarczania prawdziwej poczty nie zastępują testy z atrapami.
+
+## Logowanie, nowe konto i odzyskiwanie hasła
+
+Ekran Konto domyślnie pokazuje logowanie Google lub e-mail/hasło. Link
+„Nie masz konta? Utwórz konto” otwiera osobny formularz rejestracji. Hasło trzeba
+wpisać dwukrotnie; aplikacja sprawdza zgodność przed utworzeniem konta. Każde
+pole hasła ma opisany przycisk podglądu, niezależny od drugiego pola.
+Przełączenie formularza czyści hasła i ponownie je ukrywa.
+
+„Nie pamiętam hasła” prowadzi do formularza wysłania linku przez Firebase.
+Wiadomość jest po polsku. Komunikat po wysłaniu jest taki sam dla istniejącego
+i nieistniejącego konta. Prawdziwe dostarczenie poczty wymaga testu na telefonie.

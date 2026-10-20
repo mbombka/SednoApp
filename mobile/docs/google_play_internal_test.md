@@ -15,11 +15,12 @@ zainstalowanej z Google Play pozostaje do wykonania.
 Z katalogu `mobile/`, z lokalną konfiguracją Firebase i kluczem przesyłania:
 
 ```sh
-flutter build appbundle --release --dart-define-from-file=config/firebase.local.json
+flutter build appbundle --release --build-number=6 --dart-define-from-file=config/firebase.local.json
 ```
 
 Plik: `mobile/build/app/outputs/bundle/release/app-release.aab`.
-Przy następnym przesłaniu zwiększ numer wydania, np. dodając `--build-number=2`.
+Bieżący numer wydania to **6** (`0.1.0+6`), po wcześniej przygotowanym wydaniu 5.
+Przy następnym przesłaniu zwiększ numer, np. do `--build-number=7`.
 Zachowaj zabezpieczoną kopię `mobile/android/key.properties` oraz
 `mobile/android/keystore/sedno-upload.jks` poza projektem. Zawierają hasła i klucz
 potrzebne do kolejnych wydań. Nie przesyłaj ich do Play Console ani do rozmowy.

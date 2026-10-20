@@ -85,6 +85,7 @@ class _AppNavigationState extends State<_AppNavigation>
   bool _disposed = false;
   int _dataRevision = 0;
   int _selectedPage = 0;
+  final List<int> _previousPages = [];
 
   @override
   void initState() {
@@ -140,61 +141,76 @@ class _AppNavigationState extends State<_AppNavigation>
       ),
     );
     if (!mounted || destination == null) return;
+    final page = switch (destination) {
+      UserMenuDestination.start => 0,
+      UserMenuDestination.history => 1,
+      UserMenuDestination.account => 2,
+    };
+    if (page == _selectedPage) return;
     setState(() {
-      _selectedPage = switch (destination) {
-        UserMenuDestination.start => 0,
-        UserMenuDestination.history => 1,
-        UserMenuDestination.account => 2,
-      };
+      if (page == 0) {
+        _previousPages.clear();
+      } else {
+        _previousPages.add(_selectedPage);
+      }
+      _selectedPage = page;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(SednoApp.displayName),
-        centerTitle: false,
-        actions: [
-          IconButton(
-            tooltip: 'Menu użytkownika',
-            icon: const Icon(Icons.account_circle_outlined, size: 32),
-            color: AppTheme.blue,
-            onPressed: _openUserMenu,
-          ),
-          const SizedBox(width: 12),
-        ],
-      ),
-      body: IndexedStack(
-        index: _selectedPage,
-        children: [
-          HomeScreen(
-            key: ValueKey('home-$_dataRevision'),
-            appName: SednoApp.displayName,
-            textController: _inputController,
-            photoRepository: _photoRepository,
-            simplificationRepository: _simplificationRepository,
-            historyRepository: _historyRepository,
-            onHistorySaved: () => _historyRevision.value++,
-          ),
-          if (_selectedPage == 1)
-            HistoryScreen(
-              key: ValueKey('history-$_dataRevision'),
-              repository: _historyRepository,
-              revision: _historyRevision,
-            )
-          else
-            const SizedBox.shrink(),
-          AccountScreen(
-            onDataCleared: () {
-              _inputController.clear();
-              _historyRevision.value++;
-              setState(() => _dataRevision++);
-            },
-            repository: widget.accountRepository,
-            subscriptionModel: widget.subscriptionModel,
-          ),
-        ],
+    return PopScope<void>(
+      canPop: _selectedPage == 0,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop || _selectedPage == 0) return;
+        FocusManager.instance.primaryFocus?.unfocus();
+        setState(() => _selectedPage = _previousPages.removeLast());
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text(SednoApp.displayName),
+          centerTitle: false,
+          actions: [
+            IconButton(
+              tooltip: 'Menu użytkownika',
+              icon: const Icon(Icons.account_circle_outlined, size: 32),
+              color: AppTheme.blue,
+              onPressed: _openUserMenu,
+            ),
+            const SizedBox(width: 12),
+          ],
+        ),
+        body: IndexedStack(
+          index: _selectedPage,
+          children: [
+            HomeScreen(
+              key: ValueKey('home-$_dataRevision'),
+              appName: SednoApp.displayName,
+              textController: _inputController,
+              photoRepository: _photoRepository,
+              simplificationRepository: _simplificationRepository,
+              historyRepository: _historyRepository,
+              onHistorySaved: () => _historyRevision.value++,
+            ),
+            if (_selectedPage == 1)
+              HistoryScreen(
+                key: ValueKey('history-$_dataRevision'),
+                repository: _historyRepository,
+                revision: _historyRevision,
+              )
+            else
+              const SizedBox.shrink(),
+            AccountScreen(
+              onDataCleared: () {
+                _inputController.clear();
+                _historyRevision.value++;
+                setState(() => _dataRevision++);
+              },
+              repository: widget.accountRepository,
+              subscriptionModel: widget.subscriptionModel,
+            ),
+          ],
+        ),
       ),
     );
   }

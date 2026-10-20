@@ -163,7 +163,8 @@ else if (integrityProvider == "google")
         sp.GetRequiredService<IHttpClientFactory>().CreateClient(), credentialsPath, "https://www.googleapis.com/auth/playintegrity"));
     builder.Services.AddSingleton<IIntegrityVerifier>(sp => new PlayIntegrityVerifier(
         sp.GetRequiredService<IHttpClientFactory>().CreateClient(),
-        sp.GetRequiredService<IPlayAccessTokenSource>(), packageName, sp.GetRequiredService<TimeProvider>()));
+        sp.GetRequiredService<IPlayAccessTokenSource>(), packageName, sp.GetRequiredService<TimeProvider>(),
+        sp.GetRequiredService<ILogger<PlayIntegrityVerifier>>()));
 }
 else throw new InvalidOperationException("Unsupported Play Integrity provider.");
 
@@ -381,6 +382,8 @@ app.MapPost("/v1/auth/sessions", async (HttpContext context, IGuestStore guests,
         return Problem(context, 400, "invalid_id_token", "Nieprawidłowy token tożsamości.");
     var verified = await verifier.VerifyAsync(input.IdToken, context.RequestAborted);
     if (verified is null) return Problem(context, 401, "invalid_id_token", "Nie można potwierdzić tożsamości.");
+    if (verified.Provider == "email" && !verified.EmailVerified)
+        return Problem(context, 403, "email_not_verified", "Potwierdź adres e-mail, aby dokończyć logowanie.");
     var linked = await guests.LinkAsync((SessionIdentity)context.Items["session"]!, verified, context.RequestAborted);
     return linked is null ? Problem(context, 409, "account_conflict", "Nie można połączyć tego konta.") : Results.Ok(linked);
 });

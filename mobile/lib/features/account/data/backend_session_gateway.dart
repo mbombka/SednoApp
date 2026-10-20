@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:sedno_app/features/account/domain/account.dart';
+import 'package:sedno_app/features/account/domain/account_repository.dart';
 
 abstract interface class IntegrityTokenSource {
   Future<String?> tokenFor(String requestHash);
@@ -129,6 +130,11 @@ class BackendSessionGateway {
         'integrityToken': integrityToken,
       }),
     );
+    if (response.statusCode == 403) {
+      throw const AccountActionException(
+        'Serwer nie potwierdził instalacji aplikacji. Spróbuj ponownie lub zainstaluj Sedno z Google Play.',
+      );
+    }
     if (response.statusCode != 200) {
       throw StateError('Nie można rozpocząć sesji. Spróbuj ponownie.');
     }

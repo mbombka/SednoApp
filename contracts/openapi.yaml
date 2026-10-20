@@ -50,7 +50,9 @@ paths:
         Requires a guest bearer. Verifies a Firebase ID token for the configured
         project, links existing guest usage to that Firebase UID, revokes the
         guest bearer, and issues a new opaque account session. Repeated linking
-        to the same account does not copy or recount usage.
+        to the same account does not copy or recount usage. Password-based
+        accounts require email_verified=true in the signed Firebase ID token;
+        otherwise returns 403 email_not_verified without consuming the guest session.
       requestBody:
         required: true
         content:
@@ -68,6 +70,7 @@ paths:
               schema: { $ref: '#/components/schemas/Session' }
         '400': { $ref: '#/components/responses/Problem' }
         '401': { $ref: '#/components/responses/Problem' }
+        '403': { $ref: '#/components/responses/Problem' }
         '409': { $ref: '#/components/responses/Problem' }
   /v1/auth/sign-out:
     post:
