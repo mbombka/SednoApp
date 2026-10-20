@@ -8,6 +8,9 @@ Uproszczenie przygotowuje AI, dlatego wynik trzeba sprawdzić.
 
 Serwer uruchomiono 19.10.2026. Przed udostępnieniem aplikacji pozostają
 [testy na telefonie i przygotowanie Google Play](Tasks.md). Płatności są wyłączone.
+Podpisany AAB wydania 6 jest przygotowany; [raport wydania](mobile/docs/google_play_release_6.md).
+Aktualna polityka 13+ wymaga kolejnego wydania aplikacji i publikacji dokumentów.
+Obsługę usuwania konta przez e-mail właściciel potwierdził 20.10.2026.
 
 Backend przełączono na Firestore 19.10.2026. API i godzinowe sprzątanie działają.
 Starą instancję Cloud SQL i wszystkie cztery kopie zapasowe usunięto 19.10.2026.
@@ -22,6 +25,10 @@ Starą instancję Cloud SQL i wszystkie cztery kopie zapasowe usunięto 19.10.20
 
 ## Najważniejsze zasady
 
+- Aplikacja jest przeznaczona dla osób od 13 lat; osoby w wieku 13–17 lat
+  powinny korzystać z niej za zgodą rodzica lub opiekuna.
+- Menu użytkownika prowadzi do Start, Historii, Konta, informacji o aplikacji
+  i prywatności. Wynik można zaznaczyć i skopiować przez menu systemowe.
 - Tekst: maksymalnie 4000 znaków; pustego tekstu nie można wysłać.
 - Wersja darmowa: 5 uproszczeń dziennie, również bez konta. Reset o północy UTC.
 - Przygotowana subskrypcja: 9,99 zł miesięcznie, 400 uproszczeń dziennie łącznie.

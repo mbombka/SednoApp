@@ -1,7 +1,9 @@
 # Prywatność — obsługa i przechowywanie danych
 
 Pełne zasady i dane administratora: [polityka prywatności](privacy-policy.pl.md).
-Kontakt do zgłoszeń: **contact@sedno.xyz**. Pierwszy rynek: Polska, odbiorcy 16+.
+Kontakt do zgłoszeń: **contact@sedno.xyz**. Pierwszy rynek: Polska, odbiorcy 13+.
+Osoby w wieku 13–17 lat powinny korzystać z aplikacji za zgodą rodzica lub opiekuna.
+Usuwanie konta przez e-mail działa — potwierdzenie właściciela z 20.10.2026.
 
 Backend działa od 19.10.2026 w Warszawie; tego dnia produkcję przełączono na Firestore.
 Płatności są wyłączone. Właściciel zrezygnował z backupów nowej bazy na obecnym etapie.
@@ -29,7 +31,7 @@ Google i OpenAI mają własne zasady przetwarzania; region bazy nie oznacza,
 
 Ustawienia głównego magazynu logów potwierdzono przy poprzednim wdrożeniu.
 Usunięcie starego SQL i jego kopii potwierdzono 19.10.2026; nie wykonano nowej kopii.
-Obsługę poczty i rejestr usunięć trzeba wdrożyć organizacyjnie. Po odtworzeniu
+Do obsługi poczty i rejestru usunięć stosuj powyższe zasady retencji. Po odtworzeniu
 bazy ponownie zastosuj usunięcia przed przywróceniem dostępu użytkownikom.
 Nie wykonano jeszcze próby odtwarzania.
 
@@ -48,8 +50,8 @@ Nie wykonano jeszcze próby odtwarzania.
    haseł, kodów logowania, tokenów, zdjęć ani tekstów użytkownika.
 5. Po weryfikacji wykonaj usunięcie przez przygotowaną obsługę operatorską,
    korzystającą z `AccountDeletionService`. Obejmuje Firebase, sesje, instalacje,
-   metadane i rekordy zakupów. Obsługę operatora trzeba przygotować i przećwiczyć;
-   strona z e-mailem nie jest panelem usuwania kont.
+   metadane i rekordy zakupów. Strona z e-mailem służy do zgłoszenia sprawy;
+   wykonanie usunięcia następuje po weryfikacji właściciela konta.
 6. Sprawdź wynik, zapisz minimum potrzebne do wykazania wykonania i ponowienia
    usunięcia po odtworzeniu kopii. Przy błędzie ponów operację.
 7. Potwierdź zakończenie. Przypomnij o osobnym anulowaniu subskrypcji w Google Play

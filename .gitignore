@@ -47,6 +47,7 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+/output/previews/
 
 # Backend local configuration and build output
 **/bin/

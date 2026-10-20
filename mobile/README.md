@@ -105,6 +105,17 @@ ani wyboru proporcji. Zdjęcia i wycinanie fragmentów pozostają na urządzeniu
 Kod jest w `lib/app/` i `lib/features/`; testy mają odpowiadający układ w `test/`.
 Aktualny opis komunikacji z serwerem: [kontrakt API](../contracts/openapi.yaml).
 
+## Nawigacja i wynik
+
+Przycisk „Menu użytkownika” w górnym pasku otwiera Start, Historię, Konto,
+O aplikacji oraz Prywatność i dane. Start działa bez logowania.
+Ekran wyniku zawiera „Pokaż oryginał” / „Ukryj oryginał” i „Nowy tekst”.
+Tekst można zaznaczyć i skopiować przez menu systemowe; osobny przycisk
+„Kopiuj” został celowo usunięty.
+
+Aplikacja jest przeznaczona dla osób od 13 lat. Osoby w wieku 13–17 lat
+powinny korzystać z niej za zgodą rodzica lub opiekuna.
+
 ## Ikona i ekran uruchamiania
 
 Źródło logo: [sedno-icon.svg](../docs/Content/sedno-icon.svg).

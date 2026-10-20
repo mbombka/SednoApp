@@ -53,7 +53,7 @@ Dowolny tekst użytkownika może zawierać dane wrażliwe mimo braku takich form
 Metadane, sesje i zakupy są zapisywane, więc nie są przetwarzane tylko w pamięci.
 Brak Firebase Analytics nie oznacza braku diagnostyki innych SDK.
 
-Przed wysłaniem formularza sprawdź certyfikaty podpisu, kraj i grupę 16+,
+Przed wysłaniem formularza sprawdź certyfikaty podpisu, kraj i grupę 13+,
 ruch wersji release, dostępność obu stron, pełne usuwanie konta, konfigurację
 logów oraz zgodność z [polityką](privacy-policy.pl.md) i
 [procedurami przechowywania](privacy-operations-plan.pl.md).

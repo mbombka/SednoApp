@@ -13,7 +13,8 @@ Preserve the lib/app and lib/features structure and corresponding tests.
 Read README, existing code, and current dependencies before making changes.
 
 ## Features
-- Top navigation tabs: Start, Historia, Konto. No login required to start.
+- Navigation through the user menu: Start, Historia, Konto, O aplikacji,
+  Prywatność i dane. No login required to start.
 - Input: typing/pasting or camera → cropping → on-device OCR.
   The crop screen's Uprość button submits recognized text directly; after a
   validation error, failure or cancellation it stays in the editor for manual editing.
@@ -23,7 +24,8 @@ Read README, existing code, and current dependencies before making changes.
   Production settings: gpt-6-luna, reasoning.effort=none, service_tier=default,
   store=false, no conversation/previous_response_id, 4096 output tokens, 8 s timeout.
   Mock models require explicit Development configuration.
-- Full-screen result: Kopiuj, Pokaż oryginał, Nowy tekst.
+- Full-screen result: selectable text, Pokaż oryginał / Ukryj oryginał,
+  Nowy tekst. Copying uses the system text-selection menu; no separate Kopiuj button.
 - Encrypted, local-only history with manual deletion and 7-day expiration.
   Never display expired entries; delete them on reads, startup, and resume.
   Display the retention notice in Historia. Exclude history from backups.
@@ -35,6 +37,7 @@ Read README, existing code, and current dependencies before making changes.
   reset information and the subscription offer.
 - Google/email authentication; billing through Google Play.
 - Account and data deletion; signing out clears local history.
+  Account deletion by email is operational, confirmed by the owner on 20.10.2026.
 
 ## Architecture
 Flutter: feature-first, views → ViewModels → repositories → services.
@@ -62,6 +65,8 @@ Mocks must be explicit and unavailable in production configurations.
   `--live --cleanup-agent`. Review legacy untagged sessions separately.
 
 ## Security and Privacy
+The application is intended for ages 13+. Users aged 13–17 should use it
+with permission from a parent or guardian. It does not collect dates of birth.
 Use HTTPS. Never include the model API key in the application.
 Never log input texts, photos, tokens, or simplified results.
 The backend must not persist simplification content.

@@ -15,12 +15,14 @@ zainstalowanej z Google Play pozostaje do wykonania.
 Z katalogu `mobile/`, z lokalną konfiguracją Firebase i kluczem przesyłania:
 
 ```sh
-flutter build appbundle --release --build-number=6 --dart-define-from-file=config/firebase.local.json
+flutter build appbundle --release --build-number=7 --dart-define-from-file=config/firebase.local.json
 ```
 
 Plik: `mobile/build/app/outputs/bundle/release/app-release.aab`.
-Bieżący numer wydania to **6** (`0.1.0+6`), po wcześniej przygotowanym wydaniu 5.
-Przy następnym przesłaniu zwiększ numer, np. do `--build-number=7`.
+Ostatni przygotowany pakiet to **6** (`0.1.0+6`), po wcześniej przygotowanym wydaniu 5.
+Powstał przed ujednoliceniem polityki dla odbiorców 13+ z 20.10.2026.
+Kolejny pakiet z aktualną treścią zbuduj z numerem co najmniej 7;
+jeśli ten numer został już użyty w Play Console, wybierz wyższy.
 Zachowaj zabezpieczoną kopię `mobile/android/key.properties` oraz
 `mobile/android/keystore/sedno-upload.jks` poza projektem. Zawierają hasła i klucz
 potrzebne do kolejnych wydań. Nie przesyłaj ich do Play Console ani do rozmowy.
@@ -68,7 +70,8 @@ Jeśli Android odrzuca aktualizację wersji debug, usuń ją wcześniej — stra
 lokalną historię. Instalacja APK przez USB nie zastępuje tej próby.
 
 1. Bez logowania wpisz sztuczny tekst, np. „Spotkanie odbędzie się jutro o 12:00”.
-   Zaakceptuj informację o AI. Sprawdź wynik, kopiowanie i zapis w Historii.
+   Zaakceptuj informację o AI. Sprawdź wynik, kopiowanie przez zaznaczenie tekstu
+   i menu systemowe oraz zapis w Historii. Nie ma osobnego przycisku „Kopiuj”.
 2. Zaloguj się przez Google. Sprawdź Konto i kolejne uproszczenie.
    Wykorzystany limit gościa musi pozostać wykorzystany po zalogowaniu.
 3. Sprawdź logowanie e-mail/hasło na koncie testowym i ponowne uruchomienie aplikacji.
