@@ -96,3 +96,110 @@ Próbę odtwarzania zaplanować, jeśli zostaną włączone.
 
 Instrukcje poszczególnych kontroli: [spis dokumentów](docs/README.md).
 Dawne prompty zadań i raporty: [archiwum](docs/archiwum/README.md).
+
+## Zadania po audycie bezpieczeństwa — punkty 1–4
+
+Każde zadanie obejmuje naprawę, testy i opis wyniku. Przed pracą przeczytaj
+`AGENTS.md` oraz sprawdź aktualny kod i konfigurację. Korzystaj z istniejącego
+`sedno-api`, jego konta usługi i bazy `(default)`. Nie zapisuj tokenów ani treści
+użytkowników w logach. Nie oznaczaj kontroli produkcyjnej jako wykonanej na
+podstawie samych testów lokalnych.
+
+Uzgodniony wariant dla zadań 2–4: ogranicz dodatkowe opóźnienia i zużycie
+bezpłatnych pul Blaze. Nie dodawaj nowych usług (w szczególności Memorystore,
+Cloud Armor, Cloud Functions), bazy ani harmonogramu. Porównaj czas odpowiedzi
+i liczbę operacji Firestore przed i po zmianie; pozostanie w bezpłatnej puli
+wymaga sprawdzenia rzeczywistego zużycia, nie wynika z samego projektu rozwiązania.
+
+### 1. Zamknąć publiczny dostęp do starych wersji backendu
+
+- [x] **Wykonano 20.10.2026:** zamknięto pięć starych adresów, wdrożono
+  `sedno-api-00010-wj5` i odrzucanie dawnych sesji kont; API i Hosting działają.
+  [Rewizje, kontrole produkcyjne i testy](docs/backend-access-2026-10-20.pl.md).
+- **Problem:** stare rewizje Cloud Run mają własne publiczne adresy.
+  Rewizja `sedno-api-00005-5g5` nie wymaga potwierdzenia e-maila, a używa tej
+  samej bazy i klucza sesji co aktualna wersja.
+- **Zrób:** sprawdź obecne rewizje, tagi i przypięcie Firebase Hosting. Usuń
+  publiczne drogi dostępu do wersji bez aktualnych zabezpieczeń. Zachowaj
+  działanie aktualnego API i Hosting. Samo ustawienie 100% ruchu na nową
+  rewizję nie wystarcza. Zabezpiecz kolejne wdrożenia przed pozostawianiem
+  takich adresów. Uwzględnij wcześniej wystawione sesje niepotwierdzonych kont.
+- **Gotowe, gdy:** stare adresy nie obsługują API; aktualne API działa;
+  niepotwierdzony użytkownik e-mail nie uzyskuje dostępu do konta przez stare
+  ani nowe endpointy. Zapisz sprawdzone rewizje i wyniki kontroli.
+- **Gdzie zacząć:** `backend/deploy/firebase/deploy.sh`,
+  `backend/src/Sedno.Infrastructure/GuestStore.cs`, konfiguracja Cloud Run.
+
+### 2. Unieważniać sesje Sedna po odebraniu dostępu w Firebase
+
+- [ ] **Problem:** własny token Sedna działa do 7 dni także po resecie hasła,
+  blokadzie konta lub odwołaniu sesji Firebase. Pozwala również usunąć konto
+  bez ponownego potwierdzenia tożsamości.
+- **Zrób:** sprawdzaj status konta i odwołanie uwierzytelnienia Firebase przy
+  tworzeniu oraz używaniu sesji Sedna. Samo sprawdzenie podpisu i daty ważności
+  JWT nie wystarcza. Przy logowaniu wykonaj aktualną kontrolę. Przy używaniu
+  sesji przechowuj wynik kontroli konta w pamięci instancji maksymalnie 5 minut
+  od sprawdzenia, bez przedłużania tego czasu przy odczycie. Odświeżaj dopiero
+  przy kolejnym żądaniu; łącz równoczesne kontrole tego samego konta. Nie zapisuj
+  każdej kontroli w Firestore i nie odpytuj nieaktywnych kont. Po wygaśnięciu
+  cache błąd Firebase nie może przedłużać starej zgody na dostęp.
+  Akceptujemy do 5 minut opóźnienia odebrania dostępu i osobny cache każdej instancji.
+  Usunięcie konta ma wymagać kontroli bez cache i świeżego uwierzytelnienia Firebase
+  tego samego użytkownika; samo odświeżenie ID tokenu nie oznacza ponownego
+  logowania. Dostosuj aplikację do ponownego logowania i odrzucenia starej sesji.
+- **Gotowe, gdy:** testy obejmują reset hasła, blokadę/usunięcie użytkownika,
+  odwołanie sesji i próbę ponownego użycia starego tokenu. Usunięcie konta
+  odrzuca stary token oraz świeży token innego użytkownika. Testy z kontrolowanym
+  czasem potwierdzają granicę 5 minut, brak zbędnych wywołań przy trafieniu w cache
+  i brak dostępu po jego wygaśnięciu, gdy Firebase jest niedostępne.
+- **Gdzie zacząć:** `GuestStore.cs`, `FirebaseTokenVerifier.cs`,
+  `AccountDeletionService.cs`, endpoint `DELETE /v1/account`,
+  `mobile/lib/features/account/data/`.
+
+### 3. Ograniczyć ważność nieodświeżonej weryfikacji subskrypcji
+
+- [ ] **Problem:** backend przyznaje płatny limit do zapisanego `ExpiresAt`,
+  nawet gdy Google Play wcześniej odebrało zakup, a powiadomienie RTDN nie dotarło.
+- **Zrób:** wprowadź maksymalnie 15-minutową ważność weryfikacji, nie dłuższą
+  niż ważność zakupu. Wykorzystaj istniejący zapis zakupu. Starszą weryfikację
+  odświeżaj na serwerze przy najbliższym żądaniu wymagającym płatnego dostępu,
+  niezależnie od otwarcia panelu subskrypcji w aplikacji. Nie odpytuj okresowo
+  nieaktywnych użytkowników. Łącz równoczesne próby odświeżenia, również między
+  instancjami, wykorzystując istniejące mechanizmy; po uzyskaniu blokady ponownie
+  sprawdź świeżość zapisu. Ogranicz ponowienia po awarii Google, aby każde kolejne
+  żądanie nie uruchamiało nowej próby. Zachowaj RTDN jako główną drogę szybkiej
+  aktualizacji statusu. Nie wywołuj Google w ponawianej transakcji
+  Firestore. Jeśli weryfikacja jest przeterminowana i nie można jej odświeżyć,
+  stosuj limit darmowy bez zerowania wykorzystania. Sprawdź aktualne RTDN
+  i obsługę niedostarczonych wiadomości; nie zakładaj, że ustawienia z audytu
+  nadal są aktualne.
+- **Gotowe, gdy:** test z utraconym RTDN i odebranym zakupem nie utrzymuje
+  płatnego limitu po upływie okna weryfikacji. Aktywna subskrypcja odświeża się
+  poprawnie, a awaria Google nie zeruje liczników ani nie przedłuża starej zgody.
+  Świeży zapis nie powoduje dodatkowego wywołania Google ani zapisu w Firestore;
+  równoczesne żądania nie powielają odświeżenia.
+- **Gdzie zacząć:** `backend/src/Sedno.Infrastructure/SubscriptionService.cs`,
+  `PlayBillingClient.cs`, `backend/tests/Sedno.IntegrationTests/SubscriptionApiTests.cs`.
+
+### 4. Naprawić ograniczanie ruchu za Firebase Hosting i Cloud Run
+
+- [ ] **Problem:** limiter używa `RemoteIpAddress`, który za proxy może oznaczać
+  wspólny adres pośrednika. Jeden klient może wtedy wyczerpać limit innych
+  użytkowników.
+- **Zrób:** ustal rzeczywisty łańcuch proxy dla Hosting i bezpośredniego Cloud Run.
+  Zastosuj bezpieczny sposób identyfikacji klienta. Pozostaw limiter ruchu
+  w pamięci każdej instancji, bez liczników Firestore i zewnętrznego magazynu.
+  Akceptujemy przybliżony limit łączny: przy trzech instancjach może wynosić
+  około trzykrotności limitu jednej instancji. Dzienne limity uproszczeń 5/400
+  pozostają wspólne i transakcyjne — nie przenoś ich do pamięci.
+  Nie ufaj dowolnemu `X-Forwarded-For` podanemu przez klienta.
+  Uwzględnij ruch bez sesji i ruch uwierzytelniony. Oddziel ograniczenia RTDN
+  od publicznego API, zachowując weryfikację podpisu powiadomień.
+- **Gotowe, gdy:** testy potwierdzają izolację limitów różnych klientów,
+  brak obejścia przez podrobione nagłówki i działanie lokalnego limitu każdej instancji.
+  Opisz przybliżenie limitu łącznego i reset lokalnych liczników po restarcie.
+  Sam limiter nie wykonuje operacji Firestore ani dodatkowych wywołań sieciowych.
+  Wyczerpanie limitu publicznego API nie blokuje prawidłowych RTDN.
+  Potwierdź zachowanie obu dróg dostępu bez przeciążania produkcji.
+- **Gdzie zacząć:** `backend/src/Sedno.Api/Program.cs`,
+  `backend/src/Sedno.Api/CloudRunHosting.cs`, konfiguracja Hosting i Cloud Run.

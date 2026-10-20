@@ -180,9 +180,12 @@ Warunek sprawdza także `GuestStore`. Logowanie Google zachowuje dotychczasowy
 przebieg. Po potwierdzeniu adresu aplikacja odświeża token i łączy tę samą sesję
 gościa; limit nie jest zerowany.
 
-To kontrola wystawiania nowych sesji. Wcześniej wystawione sesje kont zachowują
-ważność do wylogowania lub wygaśnięcia. Nowa aplikacja przy odczycie oczekującego
-konta unieważnia lokalną sesję backendu, jeśli zachowała ją starsza wersja.
+Od 20.10.2026 (`sedno-api-00010-wj5`) serwer odrzuca także wcześniej wystawione
+sesje kont bez pola `AccountAccessVerified=true`. Pole zapisuje wyłącznie
+`GuestStore.LinkAsync` po sprawdzeniu tożsamości. Dotyczy to również dawnych
+sesji Google: użytkownik musi zalogować się ponownie. Sesje gości, powiązania
+instalacji, limity i zakupy pozostają zachowane. Ponowne logowanie nie przywraca
+ważności starego tokenu. [Raport kontroli](../docs/backend-access-2026-10-20.pl.md).
 Wdrożenie serwera trzeba połączyć z udostępnieniem nowej aplikacji Android,
 która obsługuje potwierdzanie i ponowne wysłanie wiadomości.
 

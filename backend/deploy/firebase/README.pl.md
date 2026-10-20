@@ -5,6 +5,9 @@ API: **https://sednoapp-79241-api.web.app**, projekt `sednoapp-79241`, numer
 na istniejącym `sedno-api`; [stan i pozostałe ustawienia](../../../docs/billing-deployment-2026-10-20.pl.md).
 Strona `sedno.xyz` jest oddzielna.
 
+20.10.2026 zamknięto stare tagowane adresy i wdrożono kontrolę dawnych sesji
+kont: `sedno-api-00010-wj5`. [Rewizje i wyniki kontroli](../../../docs/backend-access-2026-10-20.pl.md).
+
 **Wdrożono 19.10.2026:** API korzysta z Firestore. Przeniesiono i zweryfikowano
 7 dokumentów testowych; kont i zakupów w źródle było 0. Indeksy są gotowe,
 a godzinowe sprzątanie działa także przez Cloud Scheduler.
@@ -132,6 +135,18 @@ uprawnienia do jego uruchamiania. Po gotowości indeksów:
 cd backend/deploy/generated
 bash deploy.sh
 ```
+
+Skrypt ignoruje historyczne tagi z lokalnego `service.json`; przed zmianą obrazu
+zachowuje tylko tagi z bieżącej konfiguracji Cloud Run. Następnie kieruje 100%
+ruchu na gotową rewizję, publikuje Hosting i uruchamia `retire_routes.py`.
+Narzędzie sprawdza rzeczywiste przypięcie kanału `live` i gotowość Hosting,
+usuwając wszystkie pozostałe tagi. Weryfikuje odpowiedzi 404 starych adresów
+oraz 200 Hosting. Błąd kontroli kończy wdrożenie niepowodzeniem; wymaga sprawdzenia
+routingu przed kolejnym wdrożeniem. Nie uruchamiaj równoległych wdrożeń usługi.
+Stare wydania lub kanały podglądu Hosting tracą działanie przypiętych adresów API.
+Nie przywracaj starych tagów ani rewizji sprzed `00010`; ewentualne wycofanie
+zmiany musi zachować kontrolę `AccountAccessVerified` i ponownie przejść tę procedurę.
+Rewizje bez ruchu i tagów pozostają dostępne administracyjnie, bez publicznej drogi API.
 
 Skrypt wykonuje cleanup, zakłada/aktualizuje harmonogram `0 * * * *` UTC, wdraża
 API i Hosting oraz sprawdza publiczne `/health/ready`. Nie importuje danych SQL,

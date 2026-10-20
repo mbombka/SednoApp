@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Google.Cloud.Firestore;
 using Microsoft.Extensions.DependencyInjection;
 using Sedno.Infrastructure;
 using Sedno.Application;
@@ -88,6 +89,47 @@ public sealed class ApiTests(BackendFixture fixture)
         linked.EnsureSuccessStatusCode();
         using var doc = JsonDocument.Parse(await linked.Content.ReadAsStringAsync());
         Assert.Equal(4, doc.RootElement.GetProperty("quota").GetProperty("remaining").GetInt32());
+    }
+
+    [Theory]
+    [InlineData("verified-email-legacy", true)]
+    [InlineData("verified-email-legacy", false)]
+    [InlineData("billing-legacy-google", true)]
+    [InlineData("billing-legacy-google", false)]
+    public async Task LegacyAccountSessionsCannotAccessAnyProtectedEndpoint(string idToken, bool missingField)
+    {
+        idToken += Guid.NewGuid().ToString("N");
+        var installation = Guid.NewGuid().ToString();
+        var guest = await GuestAsync(installation);
+        Assert.Equal(HttpStatusCode.OK, (await Submit(guest.Client, "legacy-before", "Tekst")).StatusCode);
+        var linked = await guest.Client.PostAsJsonAsync("/v1/auth/sessions", new { idToken });
+        linked.EnsureSuccessStatusCode();
+        var session = (await linked.Content.ReadFromJsonAsync<AuthenticatedSessionDto>())!;
+        guest.Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", session.AccessToken);
+        Assert.Equal(4, await Remaining(guest.Client));
+        using var scope = fixture.Factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<FirestoreStore>();
+        // An absent field reproduces documents written before email verification.
+        var reference = db.Sessions.Document(session.AccessToken.Split('.')[0]);
+        await reference.UpdateAsync(new Dictionary<string, object>
+        {
+            ["AccountAccessVerified"] = missingField ? FieldValue.Delete : false
+        });
+        Assert.Equal(HttpStatusCode.Unauthorized, (await guest.Client.GetAsync("/v1/quota")).StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await guest.Client.GetAsync("/v1/subscription")).StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await Submit(guest.Client, "legacy-denied", "Tekst")).StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await guest.Client.DeleteAsync("/v1/account")).StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await guest.Client.PostAsJsonAsync("/v1/auth/sessions", new { idToken })).StatusCode);
+        Assert.Null(await scope.ServiceProvider.GetRequiredService<IGuestStore>().AuthenticateAsync(session.AccessToken, default));
+        var recovery = await GuestAsync(installation);
+        Assert.Equal(4, await Remaining(recovery.Client));
+        var renewed = await recovery.Client.PostAsJsonAsync("/v1/auth/sessions", new { idToken });
+        renewed.EnsureSuccessStatusCode();
+        var renewedSession = (await renewed.Content.ReadFromJsonAsync<AuthenticatedSessionDto>())!;
+        recovery.Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", renewedSession.AccessToken);
+        Assert.Equal(4, await Remaining(recovery.Client));
+        // A later verified login must not re-enable an older credential.
+        Assert.Equal(HttpStatusCode.Unauthorized, (await guest.Client.GetAsync("/v1/quota")).StatusCode);
     }
 
     [Fact]

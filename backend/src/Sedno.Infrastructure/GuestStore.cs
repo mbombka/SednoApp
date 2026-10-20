@@ -39,6 +39,9 @@ public sealed class GuestStore(FirestoreStore db, IUsageStore usage, TimeProvide
         if (identity is null) return null;
         // Previously issued guest credentials never acquire account privileges.
         if (session.AccountId is null) return identity.AccountId is null ? new(identity.Id, null, session.Id) : null;
+        // Check the session, not the mutable account provider. Older servers could
+        // issue account credentials without verifying an email identity.
+        if (!session.AccountAccessVerified) return null;
         var account = await db.GetAsync<VerifiedAccount>(db.Accounts.Document(FirestoreStore.Id(session.AccountId.Value)), ct);
         return account is null ? null : new(account.PrimaryIdentityId, account.Id, session.Id);
     }
@@ -71,7 +74,7 @@ public sealed class GuestStore(FirestoreStore db, IUsageStore usage, TimeProvide
             identity.AccountId = account.Id;
             var now = clock.GetUtcNow();
             var session = new GuestSession { Id = sessionId, IdentityId = account.PrimaryIdentityId, AccountId = account.Id,
-                CredentialHash = Hash(secret), CreatedAt = now, ExpiresAt = now.AddDays(7) };
+                CredentialHash = Hash(secret), CreatedAt = now, ExpiresAt = now.AddDays(7), AccountAccessVerified = true };
             db.Put(transaction, identityReference, identity);
             db.Put(transaction, accountReference, account);
             db.Put(transaction, uidReference, new AccountPointer { AccountId = account.Id });

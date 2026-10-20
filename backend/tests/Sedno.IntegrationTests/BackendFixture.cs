@@ -50,6 +50,7 @@ public sealed class TestIdentityVerifier : IIdentityTokenVerifier
         Task.FromResult<VerifiedIdentity?>(token switch
         {
             _ when token.StartsWith("billing-") => new(token, "google"),
+            _ when token.StartsWith("verified-email-") => new(token, "email", true),
             "deletion-user" => new("user-delete", "google"),
             "deletion-other" => new("user-delete-other", "google"),
             "google-user-1" => new("user-1", "google"),

@@ -139,7 +139,7 @@ def main():
     (output / "empty").mkdir(exist_ok=True)
     for name, content in result.items():
         (output / name).write_text(json.dumps(content, indent=2) + "\n", encoding="utf-8")
-    for name in ("deploy.sh", "firestore.rules", "firestore.indexes.json"):
+    for name in ("deploy.sh", "retire_routes.py", "firestore.rules", "firestore.indexes.json"):
         shutil.copyfile(ROOT / "backend/deploy/firebase" / name, output / name)
     print(f"Przygotowano pliki w {output}. Nie wdrożono zasobów.")
 
