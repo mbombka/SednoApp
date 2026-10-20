@@ -73,19 +73,21 @@ próby zakupów na telefonie i kontrole przed publikacją.
   serwera i bazą `(default)`. Wdrożono trwały pierścień kluczy i uwierzytelnione RTDN
   z ponowieniami i dead-letter. Syntetyczne powiadomienie przez Pub/Sub: HTTP 204.
   [Raport wdrożenia](docs/billing-deployment-2026-10-20.pl.md).
-- [x] Wskazać konto testera `mbombka@gmail.com` — właściciel potwierdził, że jest
+- [x] Wskazać konto testera (konto Google właściciela) — właściciel potwierdził, że jest
   już dodane jako konto testowe.
-- [ ] Potwierdzić lub uzupełnić w Play Console uprawnienia istniejącego konta
+- [X] Potwierdzić lub uzupełnić w Play Console uprawnienia istniejącego konta
   `sedno-api@sednoapp-79241.iam.gserviceaccount.com`: dane finansowe i zarządzanie
   zamówieniami/subskrypcjami. Obecna autoryzacja operatora do Play API zwraca
   `ACCESS_TOKEN_SCOPE_INSUFFICIENT`; nie potwierdzono zmiany tych uprawnień.
-- [ ] W Play Console ustawić temat RTDN
+- [x] W Play Console ustawić temat RTDN
   `projects/sednoapp-79241/topics/sedno-billing-rtdn-test` i wysłać test z panelu.
-- [ ] Przesłać AAB 8 do kanału wewnętrznego, zainstalować go na koncie testera
+  Test z Play Console 20.10.2026: HTTP 204.
+- [X] Przesłać AAB 8 do kanału wewnętrznego, zainstalować go na koncie testera
   i wykonać rzeczywiste testy zakupów, przywracania, wygaśnięcia i limitu 400.
   [Konfiguracja i lista prób](mobile/docs/google_play_subscription_sandbox.md).
-- [ ] Uporządkować nieużywane zasoby odrzuconego osobnego środowiska opisane
-  w raporcie wdrożenia. Nie są podłączone do istniejącego backendu.
+- [x] Uporządkować nieużywane zasoby odrzuconego osobnego środowiska opisane
+  w raporcie wdrożenia. Usunięto je 20.10.2026 razem z sekretami `sedno-postgres*`.
+  Baza `(default)` ma włączoną ochronę przed usunięciem.
 - [ ] Przed większym ruchem sprawdzić wydajność, koszty chmury i ograniczanie żądań
   za pośrednictwem Firebase Hosting.
 

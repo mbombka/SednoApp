@@ -12,6 +12,8 @@ a godzinowe sprzątanie działa także przez Cloud Scheduler.
 Starą instancję `sedno-postgres` i wszystkie 4 stare kopie **trwale usunięto
 19.10.2026**, po jednoznacznej zgodzie właściciela. Przed usunięciem instancji
 potwierdzono pustą listę kopii, a po usunięciu — pustą listę instancji SQL projektu.
+Sekrety SQL `sedno-postgres` i `sedno-postgres-migration` usunięto 20.10.2026.
+Tego samego dnia usunięto konto `sedno-migrate` i jego rolę Cloud SQL Client.
 Nie utworzono nowej ani końcowej kopii.
 [Raport wdrożenia](../../../docs/archiwum/firestore-deployment-2026-10-19.pl.md).
 

@@ -58,7 +58,7 @@ Kopia polityki w API zawiera wersję 20.10.2026 i wiek od 13 lat.
    zakupów. Wpisz pełną nazwę tematu:
    `projects/sednoapp-79241/topics/sedno-billing-rtdn-test`.
    Wyślij wiadomość testową z Play Console i sprawdź odbiór HTTP 204.
-3. Konto Google telefonu: `mbombka@gmail.com`. Właściciel potwierdził, że jest
+3. Konto Google telefonu: konto właściciela. Właściciel potwierdził, że jest
    już dodane jako testowe; przy próbie zakupu sprawdź widoczność metody testowej.
 4. Prześlij [AAB 8](../mobile/docs/google_play_release_8.md), zainstaluj go z Google
    Play i przejdź [listę prób zakupów](../mobile/docs/google_play_subscription_sandbox.md).
@@ -130,8 +130,14 @@ Nie usuwaj sekretu po zapisaniu zakupów, również przy czasowym wyłączeniu p
 Przed korektą zakresu utworzono bazę `billing-test`, konto `sedno-billing-test`
 i sekrety `sedno-billing-test-credential-key`, `sedno-billing-test-fingerprint-key`,
 `sedno-billing-test-keyring`. Nie są używane przez istniejący serwer; nie wdrożono
-żadnej usługi testowej. Te zasoby pozostają do osobnego uporządkowania.
-Nie nadano temu kontu wcześniej proponowanych ról.
+żadnej usługi testowej. Nie nadano temu kontu wcześniej proponowanych ról.
+
+Uporządkowanie 20.10.2026: przed usunięciem sprawdzono, że baza była pusta,
+konto nie miało ról ani kluczy, a usługi Cloud Run nie używały tych zasobów.
+Usunięto bazę `billing-test`, konto `sedno-billing-test` i trzy sekrety
+`sedno-billing-test-*`. Usunięto też nieużywane sekrety `sedno-postgres`
+i `sedno-postgres-migration` po dawnej bazie PostgreSQL.
+Bazie `(default)` włączono ochronę przed usunięciem. `/health/ready`: HTTP 200.
 
 Odrzucony AAB 7 przeniesiono z katalogu wydań do `mobile/build/discarded/`;
 nie należy go publikować. Lokalną konfigurację z niewłaściwym adresem usunięto.
