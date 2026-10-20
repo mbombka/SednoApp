@@ -34,7 +34,7 @@ class AboutScreen extends StatelessWidget {
           const Text(
             'Sedno pomaga zrozumieć trudne polskie teksty. Powstało z myślą '
             'o osobach słabosłyszących i osobach, którym trudno zrozumieć złożony tekst. '
-            'Aplikacja jest przeznaczona dla osób od 16. roku życia.',
+            'Aplikacja jest przeznaczona dla osób od 13. roku życia.',
           ),
           const SizedBox(height: 16),
           const Text(

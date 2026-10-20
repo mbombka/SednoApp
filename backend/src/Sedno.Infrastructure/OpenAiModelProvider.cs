@@ -19,10 +19,10 @@ public sealed class OpenAiModelOptions
             throw new InvalidOperationException("Model:OpenAI:Model must be gpt-6-luna; evaluate other models before enabling them.");
         if (ServiceTier != "default" || ReasoningEffort != "none")
             throw new InvalidOperationException("Production Responses requires default tier and none reasoning; use benchmarks for experiments.");
-        if (MaxOutputTokens is < 256 or > 8192)
-            throw new InvalidOperationException("Model:OpenAI:MaxOutputTokens must be between 256 and 8192.");
-        if (TimeoutSeconds is < 1 or > 8)
-            throw new InvalidOperationException("Model:OpenAI:TimeoutSeconds must be between 1 and 8.");
+        if (MaxOutputTokens != 4096)
+            throw new InvalidOperationException("Model:OpenAI:MaxOutputTokens must be 4096.");
+        if (TimeoutSeconds != 8)
+            throw new InvalidOperationException("Model:OpenAI:TimeoutSeconds must be 8.");
     }
 }
 

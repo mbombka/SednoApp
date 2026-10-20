@@ -49,6 +49,8 @@ dotnet run --project src/Sedno.Api --launch-profile Development
 
 OpenAI Responses API: `gpt-6-luna`, `reasoning.effort=none`, `service_tier=default`,
 `store=false`, 4096 tokenów wyjścia, limit 8 sekund. Brak rozmów.
+Walidacja przy uruchomieniu odrzuca inne wartości limitu tokenów i czasu;
+eksperymenty z ustawieniami wykonuj w narzędziu pomiarowym.
 [Prompt](src/Sedno.Infrastructure/Prompts/simplify.pl.txt) i
 [narzędzia pomiarowe](tools/Sedno.ModelBenchmark/README.md) pozostają wspólne.
 

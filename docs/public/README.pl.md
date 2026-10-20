@@ -9,6 +9,13 @@ Publiczne adresy:
 Obie podstrony odpowiadały przez HTTPS podczas kontroli 16.10.2026.
 Przed publikacją aplikacji porównaj ich treść z bieżącymi plikami i sprawdź dostęp bez logowania.
 
+20.10.2026 sprawdzono publiczną politykę: zawiera zapis o osobach 13–17 lat,
+z datą wersji 19.10.2026. Lokalne pliki strony w osobnym repozytorium
+`/home/user/workspace/SednoWebsite/SednoWebsite/public/` ujednolicono z wersją
+20.10.2026 i jawnym zapisem „od 13. roku życia”. Dotyczy to polityki i instrukcji
+usuwania konta. Te dwa pliki wymagają jeszcze przesłania przez SFTP na hosting OVH;
+ich edycja lokalna nie aktualizuje domeny.
+
 ## Aktualizacja treści
 
 Edytuj tylko [wspólne źródło JSON](../privacy-policy.pl.json), a następnie z katalogu

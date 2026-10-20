@@ -183,4 +183,29 @@ public sealed class OpenAiModelTests
         using var scope = provider.CreateScope();
         Assert.IsType<OpenAiModelProvider>(scope.ServiceProvider.GetRequiredService<IModelProvider>());
     }
+
+    [Theory]
+    [InlineData("MaxOutputTokens", "256")]
+    [InlineData("MaxOutputTokens", "4095")]
+    [InlineData("MaxOutputTokens", "4097")]
+    [InlineData("MaxOutputTokens", "8192")]
+    [InlineData("TimeoutSeconds", "0")]
+    [InlineData("TimeoutSeconds", "1")]
+    [InlineData("TimeoutSeconds", "7")]
+    [InlineData("TimeoutSeconds", "9")]
+    public void RegistrationRejectsOverridesOfFixedModelSettings(string setting, string value)
+    {
+        var key = "Model:OpenAI:" + setting;
+        var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["Model:Provider"] = "openai",
+            ["OpenAI:ApiKey"] = "test",
+            [key] = value
+        }).Build();
+
+        var error = Assert.Throws<InvalidOperationException>(() =>
+            new ServiceCollection().AddSednoModel(configuration, false));
+
+        Assert.Contains(key, error.Message);
+    }
 }

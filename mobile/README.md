@@ -109,6 +109,9 @@ Aktualny opis komunikacji z serwerem: [kontrakt API](../contracts/openapi.yaml).
 
 Przycisk „Menu użytkownika” w górnym pasku otwiera Start, Historię, Konto,
 O aplikacji oraz Prywatność i dane. Start działa bez logowania.
+Odnośnik do prywatności jest dostępny w menu użytkownika oraz w informacji
+przed pierwszym wysłaniem tekstu. Ekrany konta, logowania i rejestracji
+nie powtarzają tego odnośnika.
 Ekran wyniku zawiera „Pokaż oryginał” / „Ukryj oryginał” i „Nowy tekst”.
 Tekst można zaznaczyć i skopiować przez menu systemowe; osobny przycisk
 „Kopiuj” został celowo usunięty.

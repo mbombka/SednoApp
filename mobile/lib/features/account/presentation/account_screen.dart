@@ -354,12 +354,6 @@ class _AccountScreenState extends State<AccountScreen>
         children: [
           if (widget.subscriptionModel case final model?)
             SubscriptionPanel(model: model),
-          TextButton(
-            onPressed: () => Navigator.of(context).push<void>(
-              MaterialPageRoute(builder: (_) => const PrivacyScreen()),
-            ),
-            child: const Text('Prywatność i dane'),
-          ),
           Text('Konto', style: Theme.of(context).textTheme.headlineSmall),
           const SizedBox(height: 16),
           if (_message case final message?) ...[

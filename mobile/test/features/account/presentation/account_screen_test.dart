@@ -145,9 +145,17 @@ void main() {
     },
   );
 
-  testWidgets('privacy information is accessible to guests', (tester) async {
-    await tester.pumpWidget(
-      const MaterialApp(home: Scaffold(body: AccountScreen())),
+  testWidgets('guest can open privacy from the menu while viewing Konto', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const SednoApp());
+    await navigateTo(tester, 'Konto');
+    await tester.tap(find.byTooltip('Menu użytkownika'));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('Prywatność i dane'),
+      200,
+      scrollable: find.byType(Scrollable).last,
     );
     await tester.tap(find.text('Prywatność i dane'));
     await tester.pumpAndSettle();
