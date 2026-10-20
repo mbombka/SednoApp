@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:sedno_app/features/account/presentation/password_field.dart';
 
 import 'package:sedno_app/features/privacy/presentation/privacy_screen.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:sedno_app/features/quota/domain/quota_state.dart';
 import 'package:sedno_app/features/subscription/presentation/subscription_view_model.dart';
 import 'package:sedno_app/features/subscription/presentation/subscription_panel.dart';
 import 'package:sedno_app/features/account/domain/account.dart';
@@ -15,6 +17,7 @@ class AccountScreen extends StatefulWidget {
   const AccountScreen({
     this.repository,
     this.subscriptionModel,
+    this.quota,
     this.onDataCleared,
     super.key,
   });
@@ -22,6 +25,7 @@ class AccountScreen extends StatefulWidget {
   final AccountRepository? repository;
   final VoidCallback? onDataCleared;
   final SubscriptionViewModel? subscriptionModel;
+  final ValueListenable<QuotaState?>? quota;
 
   @override
   State<AccountScreen> createState() => _AccountScreenState();
@@ -338,6 +342,18 @@ class _AccountScreenState extends State<AccountScreen>
     super.dispose();
   }
 
+  // Subscriptions belong to the Sedno account, so show which one is active.
+  static String _signedInLabel(Account account) {
+    final email = account.email;
+    if (email == null) return 'Zalogowano.';
+    final method = switch (account.provider) {
+      IdentityProvider.google => ' (konto Google)',
+      IdentityProvider.email => ' (e-mail i hasło)',
+      IdentityProvider.guest => '',
+    };
+    return 'Zalogowano jako $email$method';
+  }
+
   @override
   Widget build(BuildContext context) {
     final repository = widget.repository;
@@ -372,7 +388,7 @@ class _AccountScreenState extends State<AccountScreen>
           ],
           if (repository == null) const Text('Tutaj pojawią się opcje konta.'),
           if (repository != null && signedIn) ...[
-            const Text('Zalogowano.'),
+            Text(_signedInLabel(_account!)),
             const SizedBox(height: 16),
             OutlinedButton(
               onPressed: _busy ? null : _signOut,
@@ -556,7 +572,11 @@ class _AccountScreenState extends State<AccountScreen>
           ],
           if (_busy) const Center(child: CircularProgressIndicator()),
           if (widget.subscriptionModel case final model?)
-            SubscriptionPanel(model: model),
+            SubscriptionPanel(
+              model: model,
+              signedIn: signedIn,
+              quota: widget.quota,
+            ),
         ],
       ),
     );

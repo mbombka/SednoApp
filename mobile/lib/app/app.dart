@@ -16,6 +16,7 @@ import 'package:sedno_app/features/home/presentation/home_screen.dart';
 import 'package:sedno_app/features/photo/data/local_photo_text_repository.dart';
 import 'package:sedno_app/features/photo/presentation/photo_navigation_service.dart';
 import 'package:sedno_app/features/shared/data/development_mocks.dart';
+import 'package:sedno_app/features/quota/domain/quota_repository.dart';
 import 'package:sedno_app/features/simplification/domain/simplification_repository.dart';
 
 class SednoApp extends StatelessWidget {
@@ -208,6 +209,10 @@ class _AppNavigationState extends State<_AppNavigation>
               },
               repository: widget.accountRepository,
               subscriptionModel: widget.subscriptionModel,
+              quota: switch (_simplificationRepository) {
+                final QuotaStateSource source => source.quotaListenable,
+                _ => null,
+              },
             ),
           ],
         ),

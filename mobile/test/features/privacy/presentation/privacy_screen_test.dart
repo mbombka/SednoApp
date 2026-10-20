@@ -18,7 +18,7 @@ void main() {
       expect(find.textContaining('Infrastruktura Sedno'), findsOneWidget);
       expect(
         find.textContaining('płatności Google Play pozostają wyłączone'),
-        findsOneWidget,
+        findsNothing,
       );
       expect(
         find.textContaining('Planowana infrastruktura produkcyjna'),
@@ -27,12 +27,19 @@ void main() {
       expect(find.text(PrivacyScreen.deletionNotice), findsOneWidget);
       expect(find.text('Cele i podstawy przetwarzania'), findsOneWidget);
       expect(find.text('Twoje prawa i kontakt'), findsOneWidget);
-      expect(find.text('https://sedno.xyz/#prywatnosc'), findsOneWidget);
+      // Policy and deletion addresses appear once, as links in the text.
+      expect(
+        find.textContaining('https://sedno.xyz/#prywatnosc'),
+        findsOneWidget,
+      );
       expect(
         find.textContaining('Strona zawiera krótkie podsumowanie'),
         findsOneWidget,
       );
-      expect(find.text('https://sedno.xyz/usun-konto'), findsOneWidget);
+      expect(
+        find.textContaining('https://sedno.xyz/usun-konto'),
+        findsOneWidget,
+      );
       expect(find.textContaining('DO UZUPEŁNIENIA'), findsNothing);
       expect(find.textContaining('DO POTWIERDZENIA'), findsNothing);
       expect(
@@ -41,6 +48,30 @@ void main() {
       );
     },
   );
+
+  testWidgets('web addresses inside the policy open in the browser', (
+    tester,
+  ) async {
+    final opened = <Uri>[];
+    await tester.pumpWidget(
+      MaterialApp(
+        home: PrivacyScreen(
+          openUrl: (uri) async {
+            opened.add(uri);
+            return true;
+          },
+        ),
+      ),
+    );
+    final regulator = find.textRange.ofSubstring('https://uodo.gov.pl');
+    await tester.ensureVisible(find.textContaining('https://uodo.gov.pl'));
+    await tester.pumpAndSettle();
+    await tester.tapOnText(regulator);
+    await tester.pumpAndSettle();
+    // Sentence punctuation after the address is not part of the link.
+    expect(opened, [Uri.parse('https://uodo.gov.pl')]);
+    expect(find.textContaining('Kopiuj'), findsNothing);
+  });
 
   testWidgets('provider and privacy notices remain readable with large text', (
     tester,

@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sedno_app/app/app.dart';
 import 'package:sedno_app/features/account/presentation/account_screen.dart';
+import 'package:sedno_app/features/quota/domain/quota_reset.dart';
+import 'package:sedno_app/features/quota/domain/quota_state.dart';
 import 'package:sedno_app/features/shared/data/development_mocks.dart';
 import 'package:sedno_app/features/subscription/domain/subscription_repository.dart';
 import 'package:sedno_app/features/subscription/presentation/subscription_view_model.dart';
@@ -123,6 +125,56 @@ void main() {
     expect(find.text('Kup subskrypcję', skipOffstage: false), findsOneWidget);
   });
 
+  testWidgets('reset time comes from the server quota as local time', (
+    tester,
+  ) async {
+    final resetAt = DateTime.utc(2026, 10, 21);
+    final quota = ValueNotifier<QuotaState?>(null);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SingleChildScrollView(
+            child: SubscriptionPanel(model: model, quota: quota),
+          ),
+        ),
+      ),
+    );
+    expect(find.textContaining('Nowy limit codziennie o '), findsOneWidget);
+    quota.value = QuotaState(
+      tier: QuotaTier.free,
+      limit: 5,
+      used: 0,
+      remaining: 5,
+      serverTime: DateTime.utc(2026, 10, 20, 12),
+      resetAt: resetAt,
+    );
+    await tester.pump();
+    expect(
+      find.text(
+        'Nowy limit codziennie o ${QuotaReset.localTime(resetAt: resetAt)}.',
+      ),
+      findsOneWidget,
+    );
+    expect(find.textContaining('UTC'), findsNothing);
+  });
+
+  testWidgets('sign-in hint is shown only to signed-out users', (tester) async {
+    const hint =
+        'Aby kupić lub przywrócić subskrypcję, zaloguj się na swoje konto Sedno.';
+    for (final signedIn in [false, true]) {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: SubscriptionPanel(model: model, signedIn: signedIn),
+            ),
+          ),
+        ),
+      );
+      expect(find.text(hint), signedIn ? findsNothing : findsOneWidget);
+    }
+  });
+
   testWidgets('active subscription shows only the Google Play manage action', (
     tester,
   ) async {
@@ -233,7 +285,7 @@ void main() {
         home: Scaffold(body: SubscriptionPanel(model: model)),
       ),
     );
-    expect(find.textContaining('12,34 zł miesięcznie'), findsOneWidget);
+    expect(find.text('12,34 zł miesięcznie'), findsOneWidget);
     expect(find.textContaining('9,99'), findsNothing);
     await tester.tap(find.text('Kup subskrypcję'));
     await tester.pumpAndSettle();

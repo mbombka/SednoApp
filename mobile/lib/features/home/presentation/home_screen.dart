@@ -9,6 +9,7 @@ import 'package:sedno_app/features/history/domain/history_repository.dart';
 import 'package:sedno_app/features/photo/domain/photo_text_repository.dart';
 import 'package:sedno_app/features/photo/presentation/photo_input_view_model.dart';
 import 'package:sedno_app/features/quota/domain/quota_repository.dart';
+import 'package:sedno_app/features/quota/domain/quota_reset.dart';
 import 'package:sedno_app/features/quota/domain/quota_state.dart';
 import 'package:sedno_app/features/simplification/domain/input_text.dart';
 import 'package:sedno_app/features/simplification/domain/simplification_repository.dart';
@@ -176,8 +177,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             title: const Text('Dzienny limit'),
             content: Text(
               quota.remaining == 1
-                  ? 'Pozostało 1 uproszczenie. Limit odnowi się o 00:00 UTC (${_timeUntilReset(quota)}).'
-                  : 'Wykorzystano dzienny limit. Odnowi się o 00:00 UTC (${_timeUntilReset(quota)}). Subskrypcję i jej cenę znajdziesz w menu Konto.',
+                  ? 'Pozostało 1 uproszczenie.\n'
+                        'Nowy limit o ${QuotaReset.localTime(resetAt: quota.resetAt)} (${_timeUntilReset(quota)}).'
+                  : 'Wykorzystano dzienny limit.\n'
+                        'Nowy limit o ${QuotaReset.localTime(resetAt: quota.resetAt)} (${_timeUntilReset(quota)}).\n'
+                        'Subskrypcję i jej cenę znajdziesz w menu Konto.',
               key: const Key('quotaMessage'),
             ),
             actions: [

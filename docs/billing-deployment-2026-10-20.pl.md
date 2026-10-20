@@ -94,6 +94,23 @@ i zadania cleanup nie zmieniano.
 Weryfikacja: `/health/ready` HTTP 200 przez publiczny adres (obsłużone przez nową
 rewizję), `/v1/quota` bez sesji HTTP 401, odbiornik RTDN bez tokenu HTTP 401.
 
+## Aktualizacja — polityka prywatności, 20.10.2026
+
+Usunięto nieaktualne zdanie o wyłączonych płatnościach Google Play z polityki
+wbudowanej w API (`/prywatnosc`); pozostałe zmiany backendu to komentarz i dokumentacja.
+
+| Element | Wartość |
+| --- | --- |
+| Rewizja Cloud Run | `sedno-api-00009-8jv`, 100% ruchu, przypięta w Hosting |
+| Obraz | `europe-central2-docker.pkg.dev/sednoapp-79241/backend/api@sha256:bf3d174749152d23917ac134234a0551a9d4451a2dd694a26b107cc40852133c` (tag `20261020-policy`) |
+| Cloud Build | `241a8dbf-6b67-448d-b063-7e06b8d9c875` — sukces |
+| Poprzednia rewizja | `sedno-api-00008-6vj`; manifest: `backend/deploy/generated/service-before-policy-update.json` |
+
+Przed wdrożeniem działająca usługa była zgodna z `service.json`; zmieniono tylko digest.
+Weryfikacja: `/health/ready` HTTP 200, `/v1/quota` bez sesji HTTP 401, odbiornik RTDN
+bez tokenu HTTP 401, `/prywatnosc` bez usuniętego zdania. Strona `sedno.xyz` jest
+hostowana osobno i wymaga ręcznej publikacji plików z `docs/public/`.
+
 ## Kolejne wdrożenie i wycofanie
 
 Przy generowaniu konfiguracji dotychczasowej usługi użyj

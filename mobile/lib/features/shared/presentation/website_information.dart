@@ -1,38 +1,42 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:sedno_app/app/app_information.dart';
+import 'package:sedno_app/features/shared/presentation/link_text.dart';
 
+/// A labelled web address that opens in the browser when tapped.
 class WebsiteInformation extends StatelessWidget {
   const WebsiteInformation({
     this.address = AppInformation.website,
     this.label = 'Strona internetowa Sedno',
-    this.copyLabel = 'Kopiuj adres strony',
+    this.opener = openExternalUrl,
     super.key,
   });
 
   final String address;
   final String label;
-  final String copyLabel;
+  final UrlOpener opener;
 
   @override
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
       Text(label),
-      const SizedBox(height: 8),
-      Text(address),
-      const SizedBox(height: 8),
-      OutlinedButton.icon(
-        style: OutlinedButton.styleFrom(minimumSize: const Size(48, 48)),
-        onPressed: () async {
-          await Clipboard.setData(ClipboardData(text: address));
-          if (!context.mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Skopiowano adres strony.')),
-          );
-        },
-        icon: const Icon(Icons.copy),
-        label: Text(copyLabel),
+      Align(
+        alignment: Alignment.centerLeft,
+        child: Semantics(
+          link: true,
+          child: TextButton(
+            onPressed: () => openLink(context, Uri.parse(address), opener),
+            style: TextButton.styleFrom(
+              minimumSize: const Size(48, 48),
+              padding: EdgeInsets.zero,
+              alignment: Alignment.centerLeft,
+            ),
+            child: Text(
+              address,
+              style: const TextStyle(decoration: TextDecoration.underline),
+            ),
+          ),
+        ),
       ),
     ],
   );

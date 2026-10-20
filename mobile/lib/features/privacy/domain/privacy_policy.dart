@@ -10,7 +10,7 @@ abstract final class PrivacyPolicy {
     PrivacySection("Administrator i kontakt", [
       "Administrator: Mariusz Bąbka, osoba fizyczna, ul. Słowiańska 91, Modlniczka, Polska. Kontakt w sprawach prywatności i usunięcia konta: contact@sedno.xyz. Administrator nie wyznaczył inspektora ochrony danych.",
       "Polityka dotyczy aplikacji Sedno i obsługi jej użytkowników. Pierwszym wybranym rynkiem jest Polska. Aplikacja jest przeznaczona dla osób od 13. roku życia. Osoby w wieku 13–17 lat powinny korzystać z niej za zgodą rodzica lub opiekuna. Aplikacja nie sprawdza wieku ani nie zbiera daty urodzenia.",
-      "Informacje o prywatności na stronie: https://sedno.xyz/#prywatnosc. Strona zawiera krótkie podsumowanie; pełna treść zasad jest dostępna na tym ekranie. Instrukcja usunięcia konta jest dostępna pod adresem https://sedno.xyz/usun-konto. Serwer działa od 19 października 2026 r.; płatności Google Play pozostają wyłączone do zakończenia konfiguracji i testów.",
+      "Informacje o prywatności na stronie: https://sedno.xyz/#prywatnosc. Strona zawiera krótkie podsumowanie; pełna treść zasad jest dostępna na tym ekranie. Instrukcja usunięcia konta jest dostępna pod adresem https://sedno.xyz/usun-konto. Serwer działa od 19 października 2026 r.",
     ]),
     PrivacySection("Tekst i sztuczna inteligencja", [
       "Twój tekst trafi przez serwer Sedno do dostawcy AI — OpenAI, aby go uprościć. Nie wpisuj danych, których nie chcesz przekazywać. Zdjęcia zostają na urządzeniu. AI może popełniać błędy. Sprawdź wynik.",

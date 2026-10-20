@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:characters/characters.dart';
 import 'package:flutter/foundation.dart';
+import 'package:sedno_app/features/quota/domain/quota_reset.dart';
 import 'package:sedno_app/features/shared/data/development_mocks.dart';
 import 'package:sedno_app/features/simplification/data/http_simplification_repository.dart';
 import 'package:sedno_app/features/simplification/domain/input_text.dart';
@@ -68,7 +69,8 @@ class TextInputViewModel extends ChangeNotifier {
       if (_disposed) return;
       _status = TextInputStatus.error;
       _errorMessage =
-          'Dzisiejszy limit został wykorzystany. Spróbuj po północy UTC.';
+          'Dzisiejszy limit został wykorzystany.\n'
+          'Nowy limit o ${QuotaReset.localTime()}.';
     } on SimplificationApiException catch (error) {
       if (_disposed) return;
       _status = TextInputStatus.error;

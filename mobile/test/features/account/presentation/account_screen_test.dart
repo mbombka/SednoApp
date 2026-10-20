@@ -62,6 +62,22 @@ class VerificationScreenRepository extends MockAccountRepository {
   }
 }
 
+class GoogleEmailRepository extends MockAccountRepository {
+  GoogleEmailRepository()
+    : super(history: MockHistoryRepository(clock: DateTime.now));
+  Account? _signedIn;
+
+  @override
+  Future<Account> current() async => _signedIn ?? super.current();
+
+  @override
+  Future<Account> signInWithGoogle() async => _signedIn = Account(
+    id: 'google-email',
+    provider: IdentityProvider.google,
+    email: 'jan@example.com',
+  );
+}
+
 void main() {
   testWidgets('app clears editor and history when an account is deleted', (
     tester,
@@ -188,6 +204,24 @@ void main() {
     expect(find.text('Zaloguj przez Google'), findsOneWidget);
   });
 
+  testWidgets('signed-in Google account shows its email address', (
+    tester,
+  ) async {
+    final repository = GoogleEmailRepository();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(body: AccountScreen(repository: repository)),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Zaloguj przez Google'));
+    await tester.pumpAndSettle();
+    expect(
+      find.text('Zalogowano jako jan@example.com (konto Google)'),
+      findsOneWidget,
+    );
+  });
+
   testWidgets('email registration uses the supplied address', (tester) async {
     final repository = VerificationScreenRepository();
     await tester.pumpWidget(
@@ -206,7 +240,7 @@ void main() {
     await tester.tap(find.text('Utwórz konto'));
     await tester.pumpAndSettle();
     expect((await repository.current()).email, 'test@example.com');
-    expect(find.text('Zalogowano.'), findsNothing);
+    expect(find.textContaining('Zalogowano'), findsNothing);
     expect(find.text('Sprawdź pocztę'), findsOneWidget);
     expect(
       find.textContaining('Do tego czasu możesz korzystać'),
@@ -230,7 +264,10 @@ void main() {
     await tester.ensureVisible(find.text('Sprawdź potwierdzenie'));
     await tester.tap(find.text('Sprawdź potwierdzenie'));
     await tester.pumpAndSettle();
-    expect(find.text('Zalogowano.'), findsOneWidget);
+    expect(
+      find.text('Zalogowano jako test@example.com (e-mail i hasło)'),
+      findsOneWidget,
+    );
     expect(find.text('Sprawdź pocztę'), findsNothing);
     await tester.pumpWidget(const SizedBox.shrink());
   });
@@ -286,7 +323,7 @@ void main() {
       );
       expect(find.text('Sprawdź pocztę'), findsNothing);
       expect(find.text('Wyślij wiadomość ponownie'), findsNothing);
-      expect(find.text('Zalogowano.'), findsNothing);
+      expect(find.textContaining('Zalogowano'), findsNothing);
       final errorRect = tester.getRect(
         find.text('Serwer nie potwierdził instalacji aplikacji.'),
       );
@@ -301,7 +338,10 @@ void main() {
       await tester.ensureVisible(find.text('Dokończ logowanie'));
       await tester.tap(find.text('Dokończ logowanie'));
       await tester.pumpAndSettle();
-      expect(find.text('Zalogowano.'), findsOneWidget);
+      expect(
+        find.text('Zalogowano jako test@example.com (e-mail i hasło)'),
+        findsOneWidget,
+      );
     },
   );
   testWidgets(

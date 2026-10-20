@@ -33,10 +33,7 @@ void main() {
 
     await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
-    expect(
-      find.text('Tutaj pojawi się historia uproszczonych tekstów.'),
-      findsOneWidget,
-    );
+    expect(find.text('Nie masz jeszcze zapisanych tekstów.'), findsOneWidget);
 
     await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
@@ -124,10 +121,7 @@ void main() {
 
     await navigateTo(tester, 'Historia');
     await tester.pumpAndSettle();
-    expect(
-      find.text('Tutaj pojawi się historia uproszczonych tekstów.'),
-      findsOneWidget,
-    );
+    expect(find.text('Nie masz jeszcze zapisanych tekstów.'), findsOneWidget);
 
     await navigateTo(tester, 'Konto');
     await tester.pumpAndSettle();

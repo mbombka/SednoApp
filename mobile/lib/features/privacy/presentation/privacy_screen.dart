@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:sedno_app/app/app_information.dart';
+import 'package:sedno_app/features/shared/presentation/link_text.dart';
 import 'package:sedno_app/features/shared/presentation/website_information.dart';
 import 'package:sedno_app/features/privacy/domain/privacy_policy.dart';
 
 class PrivacyScreen extends StatelessWidget {
-  const PrivacyScreen({super.key});
+  const PrivacyScreen({this.openUrl = openExternalUrl, super.key});
+
+  /// Opens web addresses from the policy in the browser.
+  final UrlOpener openUrl;
 
   static const aiNotice = PrivacyPolicy.aiNotice;
   static const deletionNotice = PrivacyPolicy.deletionNotice;
@@ -30,26 +33,15 @@ class PrivacyScreen extends StatelessWidget {
           children: [
             const Text('Wersja: ${PrivacyPolicy.versionLabel}'),
             const SizedBox(height: 16),
-            const WebsiteInformation(),
+            WebsiteInformation(opener: openUrl),
             for (final section in PrivacyPolicy.sections) ...[
               const SizedBox(height: 24),
               _Heading(section.title),
               for (final paragraph in section.paragraphs) ...[
-                Text(paragraph),
+                LinkText(paragraph, opener: openUrl),
                 const SizedBox(height: 16),
               ],
             ],
-            const WebsiteInformation(
-              address: AppInformation.privacyUrl,
-              label: 'Informacje o prywatności na stronie',
-              copyLabel: 'Kopiuj link do prywatności',
-            ),
-            const SizedBox(height: 16),
-            const WebsiteInformation(
-              address: AppInformation.deletionUrl,
-              label: 'Adres strony usuwania konta',
-              copyLabel: 'Kopiuj link do usuwania konta',
-            ),
           ],
         ),
       ),
