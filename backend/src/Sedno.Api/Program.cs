@@ -1,5 +1,4 @@
 using System.Text.Json;
-using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.DataProtection;
 using Google.Cloud.Firestore;
@@ -179,22 +178,7 @@ builder.Services.AddScoped<SimplificationService>(sp => new(sp.GetRequiredServic
     sp.GetRequiredService<IModelProvider>(), sp.GetRequiredService<TimeProvider>(), fingerprintKey, sp.GetRequiredService<SimplificationTimings>()));
 builder.Services.AddSednoModel(builder.Configuration, builder.Environment.IsDevelopment());
 
-builder.Services.AddRateLimiter(options =>
-{
-    var permitLimit = builder.Configuration.GetValue<int?>("RateLimiting:PermitLimit") ?? 60;
-    if (permitLimit < 1) throw new InvalidOperationException("RateLimiting:PermitLimit must be positive.");
-    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
-        RateLimitPartition.GetFixedWindowLimiter(
-            $"ip:{context.Connection.RemoteIpAddress}",
-            _ => new FixedWindowRateLimiterOptions { PermitLimit = permitLimit, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
-    options.OnRejected = async (context, _) =>
-    {
-        var details = new ProblemDetails { Status = 429, Title = "Zbyt wiele żądań." };
-        details.Extensions["code"] = "rate_limited";
-        await Results.Problem(details).ExecuteAsync(context.HttpContext);
-    };
-});
+builder.Services.AddTrafficLimiting(builder.Configuration, cloudRun);
 
 var app = builder.Build();
 if (cloudRun && billingEnabled)
@@ -265,7 +249,6 @@ app.Use(async (context, next) =>
         await Problem(context, 500, "server_error", "Wystąpił błąd serwera.").ExecuteAsync(context);
     }
 });
-app.UseRateLimiter();
 app.Use(async (context, next) =>
 {
     if (context.Request.ContentLength > 128 * 1024)
@@ -288,11 +271,24 @@ app.Use(async (context, next) =>
             await context.RequestServices.GetRequiredService<IGuestStore>()
                 .AuthenticateAsync(authorization[7..], context.RequestAborted) is not SessionIdentity session)
         {
-            await Problem(context, 401, "unauthorized", "Brak ważnej sesji.").ExecuteAsync(context);
-            return;
+            // Still pass through the network limiter before returning 401.
+            context.Items["session-required"] = true;
         }
-        context.Items["identity"] = session.IdentityId;
-        context.Items["session"] = session;
+        else
+        {
+            context.Items["identity"] = session.IdentityId;
+            context.Items["session"] = session;
+        }
+    }
+    await next(context);
+});
+app.UseRateLimiter();
+app.Use(async (context, next) =>
+{
+    if (context.Items.ContainsKey("session-required"))
+    {
+        await Problem(context, 401, "unauthorized", "Brak ważnej sesji.").ExecuteAsync(context);
+        return;
     }
     await next(context);
 });
@@ -364,7 +360,7 @@ app.MapPost("/notifications/google-play", async (PubSubEnvelope envelope, HttpCo
     }
     catch (Exception ex) when (ex is JsonException or FormatException or KeyNotFoundException)
     { return Results.BadRequest(); }
-});
+}).WithMetadata(new NotificationTraffic());
 
 app.MapHealthChecks("/health/live", new() { Predicate = _ => false });
 app.MapGet("/health/ready", async (FirestoreStore db, CancellationToken ct) =>

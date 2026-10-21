@@ -5,6 +5,11 @@ API: **https://sednoapp-79241-api.web.app**, projekt `sednoapp-79241`, numer
 na istniejącym `sedno-api`; [stan i pozostałe ustawienia](../../../docs/billing-deployment-2026-10-20.pl.md).
 Strona `sedno.xyz` jest oddzielna.
 
+Poprawka lokalnego limitera z 21.10.2026 czeka na wdrożenie. Zachowuje obie drogi
+dostępu, rozdziela ważne sesje i RTDN; przed sesją za Hosting pozostaje
+zaakceptowany wspólny limit proxy. Nie dodaje magazynu liczników ani zasobów.
+[Zasady, przybliżenie limitu i kontrola obu adresów](../../../docs/traffic-limiting-2026-10-21.pl.md).
+
 20.10.2026 zamknięto stare tagowane adresy i wdrożono kontrolę dawnych sesji
 kont: `sedno-api-00010-wj5`. [Rewizje i wyniki kontroli](../../../docs/backend-access-2026-10-20.pl.md).
 

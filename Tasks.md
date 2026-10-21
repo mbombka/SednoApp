@@ -194,6 +194,13 @@ wymaga sprawdzenia rzeczywistego zużycia, nie wynika z samego projektu rozwiąz
 
 ### 4. Naprawić ograniczanie ruchu za Firebase Hosting i Cloud Run
 
+- **Wykonane lokalnie 21.10.2026:** osobne liczniki ważnych sesji gości i kont,
+  niezależny limit RTDN, bez magazynu zewnętrznego. Właściciel zaakceptował
+  wspólny limit przed sesją za proxy Hosting przy zachowaniu bezpośredniego
+  Cloud Run. Osiem lekkich GET potwierdziło dostępność obu dróg; nowa rewizja
+  czeka na wdrożenie i odbiór. Wszystkie 235 testów backendu przeszły, w tym
+  12 nowych. [Zmiana, testy i ograniczenia kontroli produkcyjnej](docs/traffic-limiting-2026-10-21.pl.md).
+
 - [ ] **Problem:** limiter używa `RemoteIpAddress`, który za proxy może oznaczać
   wspólny adres pośrednika. Jeden klient może wtedy wyczerpać limit innych
   użytkowników.

@@ -61,6 +61,13 @@ Lokalna weryfikacja istnienia i usuwanie kont wymaga także
 
 ## Limity i dane
 
+- Limit ruchu API jest lokalny dla instancji: domyślnie 60 żądań/min na
+  zweryfikowane konto, tożsamość gościa lub adres wejścia bez sesji. Przed sesją
+  użytkownicy za proxy Hosting mogą dzielić licznik. RTDN ma osobne 600 żądań/min
+  i nadal wymaga weryfikacji tokenu Pub/Sub. Trzy instancje dają przybliżony
+  trzykrotny limit; restart usuwa te liczniki. Limiter nie wykonuje operacji
+  Firestore ani połączeń sieciowych; wcześniejsze uwierzytelnienie sesji może je
+  wykonywać. [Granica zaufania, konfiguracja i testy](../docs/traffic-limiting-2026-10-21.pl.md).
 - 5 udanych uproszczeń dziennie dla gościa, 400 łącznie dla subskrypcji. Reset o 00:00 UTC.
 - Transakcja rezerwuje miejsce w dziennym dokumencie instalacji. Powiązane konto
   odczytuje dokumenty swoich instalacji; logowanie nie zeruje liczników.

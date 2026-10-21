@@ -30,7 +30,8 @@ public static class CloudRunHosting
         {
             // Public Cloud Run ingress always terminates TLS. Internal HTTP is the
             // managed proxy/probe transport, not a public cleartext listener.
-            // Do not consume X-Forwarded-For: an untrusted prefix can be spoofed.
+            // Do not rewrite RemoteIpAddress from forwarding headers. TrafficLimiting
+            // consumes only the final platform-appended peer, never the untrusted prefix.
             context.Request.Scheme = "https";
             await next(context);
         });
