@@ -112,7 +112,7 @@ Identyfikatory można nadpisać przez `PLAY_SUBSCRIPTION_PRODUCT_ID` i
 `PLAY_SUBSCRIPTION_BASE_PLAN_ID` w argumentach budowy. Samo włączenie panelu
 nie uruchamia płatności na serwerze. [Pełne przygotowanie i testy](docs/google_play_subscription_sandbox.md).
 
-Gotowy podpisany pakiet do testów: [wydanie 8](docs/google_play_release_8.md).
+Gotowy podpisany pakiet do testów: [wydanie 11](docs/google_play_release_11.md).
 
 Aparat działa wewnątrz Sedna: **Zrób zdjęcie → Zaznacz tekst → Uprość**.
 Ramka początkowo obejmuje całe zdjęcie. Można przesunąć jej rogi, aby wybrać

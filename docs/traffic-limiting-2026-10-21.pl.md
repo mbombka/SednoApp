@@ -1,6 +1,8 @@
 # Ograniczanie ruchu przez Hosting i Cloud Run — 21.10.2026
 
-Poprawka jest przygotowana lokalnie, bez wdrożenia. Zachowuje Firebase Hosting,
+Poprawkę wdrożono jako `sedno-api-00011-bfh` 21.10.2026.
+[Raport wdrożenia i kontroli produkcyjnych](backend-deployment-2026-10-21.pl.md).
+Zachowuje Firebase Hosting,
 publiczny Cloud Run i istniejącą bazę. Właściciel zaakceptował wspólny limit
 ruchu **przed uzyskaniem sesji** za proxy Hosting. Ważne sesje gości i kont mają
 osobne liczniki, niezależnie od drogi dostępu.
@@ -132,7 +134,7 @@ Te logi pokazują adres widziany na wejściu platformy, **nie surowy XFF otrzyma
 przez Kestrel**. Nie uruchamiano endpointu wypisującego nagłówki i nie wdrażano
 rewizji diagnostycznej. Potwierdzono dostępność obu dróg oraz różnicę ich
 pośredników; zachowanie nowego limitera i dobór sufiksu sprawdzono lokalnie na
-symulowanych łańcuchach. Odbiór nowej rewizji po wdrożeniu pozostaje osobnym krokiem.
+symulowanych łańcuchach. Późniejszy odbiór nowej rewizji opisuje raport wdrożenia.
 Nie wysyłano tekstów, nie wywoływano AI, nie tworzono sesji i nie zapisywano
 danych aplikacji. Nie wyczerpywano limitów produkcyjnych.
 

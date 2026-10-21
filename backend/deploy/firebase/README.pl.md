@@ -5,10 +5,13 @@ API: **https://sednoapp-79241-api.web.app**, projekt `sednoapp-79241`, numer
 na istniejącym `sedno-api`; [stan i pozostałe ustawienia](../../../docs/billing-deployment-2026-10-20.pl.md).
 Strona `sedno.xyz` jest oddzielna.
 
-Poprawka lokalnego limitera z 21.10.2026 czeka na wdrożenie. Zachowuje obie drogi
+Poprawkę lokalnego limitera wdrożono 21.10.2026 jako `sedno-api-00011-bfh`.
+Ta sama rewizja zawiera kontrolę odwołania sesji i świeżości subskrypcji.
+Zachowuje obie drogi
 dostępu, rozdziela ważne sesje i RTDN; przed sesją za Hosting pozostaje
 zaakceptowany wspólny limit proxy. Nie dodaje magazynu liczników ani zasobów.
 [Zasady, przybliżenie limitu i kontrola obu adresów](../../../docs/traffic-limiting-2026-10-21.pl.md).
+[Raport wdrożenia i AAB 11](../../../docs/backend-deployment-2026-10-21.pl.md).
 
 20.10.2026 zamknięto stare tagowane adresy i wdrożono kontrolę dawnych sesji
 kont: `sedno-api-00010-wj5`. [Rewizje i wyniki kontroli](../../../docs/backend-access-2026-10-20.pl.md).
@@ -31,7 +34,7 @@ Nie utworzono nowej ani końcowej kopii.
 | --- | --- |
 | Region API i bazy | `europe-central2` — Warszawa |
 | Baza | Cloud Firestore Standard, Native mode, `(default)` |
-| Cloud Run | `sedno-api`, 1 CPU, 512 MiB, 0–3 instancje, współbieżność 20, CPU podczas żądań |
+| Cloud Run | `sedno-api`, 1 CPU, 512 MiB, 0–3 instancje rewizji, CPU podczas żądań, współbieżność 80 |
 | Sprzątanie | Cloud Run Job `sedno-cleanup`, uruchamiany co godzinę przez Cloud Scheduler |
 | Hosting API | `sednoapp-79241-api`, HTTPS przekazywane do przypiętej rewizji Cloud Run |
 | Obrazy | Artifact Registry `backend` |
@@ -40,6 +43,12 @@ Firestore ma darmowe pule, a Blaze rozlicza nadwyżki. Backupy/PITR i TTL są
 odrębnie płatne; te manifesty ich nie włączają. Nie zakładaj zerowego rachunku
 całego projektu: obrazy, sekrety, Cloud Build, zadania, transfer i AI mają własne
 zasady. Ustaw alerty rozliczeń; alert nie jest automatycznym limitem wydatków.
+
+21.10.2026 ustawiono w generatorze manifestów `containerConcurrency=80` na
+instancję jako wartość początkową do pomiarów i wdrożono ją w rewizji `00011`.
+Przy 3 instancjach
+daje to nominalnie do 240 równoczesnych żądań całego API. Nie jest to potwierdzona
+testem wydajność uproszczeń. Limity ruchu na minutę pozostają niezależne.
 
 ## Przygotowanie projektu
 

@@ -9,8 +9,10 @@ Uproszczenie przygotowuje AI, dlatego wynik trzeba sprawdzić.
 Serwer uruchomiono 19.10.2026. Przed udostępnieniem aplikacji pozostają
 [pozostałe kontrole i przygotowanie Google Play](Tasks.md).
 Obsługę płatności włączono na istniejącym serwerze do testów; zakupów nie odebrano
-jeszcze na telefonie. Przygotowano [podpisany AAB 8](mobile/docs/google_play_release_8.md)
-z polityką 13+ i panelem zakupów.
+jeszcze na telefonie. Przygotowano [podpisany AAB 11](mobile/docs/google_play_release_11.md)
+z aktualną obsługą sesji i ponownego uwierzytelnienia. Backend wdrożono jako
+`sedno-api-00011-bfh`, ze współbieżnością 80 żądań na instancję.
+[Raport wdrożenia](docs/backend-deployment-2026-10-21.pl.md).
 Obsługę usuwania konta przez e-mail właściciel potwierdził 20.10.2026.
 
 Backend przełączono na Firestore 19.10.2026. API i godzinowe sprzątanie działają.

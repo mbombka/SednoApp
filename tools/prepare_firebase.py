@@ -87,7 +87,7 @@ def manifests(project, region, site, image, billing_product, push_email, *, with
                 "run.googleapis.com/cpu-throttling": "true",
             }},
             "spec": {"serviceAccountName": f"sedno-api@{project}.iam.gserviceaccount.com",
-                     "containerConcurrency": 20, "timeoutSeconds": 30,
+                     "containerConcurrency": 80, "timeoutSeconds": 30,
                      "containers": [{"image": image, "ports": [{"containerPort": 8080}], "env": env,
                                      "resources": {"limits": {"cpu": "1", "memory": "512Mi"}},
                                      "volumeMounts": mounts,

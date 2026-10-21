@@ -158,7 +158,8 @@ wymaga sprawdzenia rzeczywistego zużycia, nie wynika z samego projektu rozwiąz
 
 - **Wykonane 20.10.2026:** kontrola Firebase, cache do 5 minut, ponowne
   uwierzytelnienie przy usuwaniu konta i obsługa odrzucenia sesji w aplikacji.
-  Testy lokalne przeszły; zmiana czeka na wdrożenie backendu i nową wersję aplikacji.
+  Testy przeszły; backend wdrożono 21.10.2026 jako `sedno-api-00011-bfh`,
+  a zmiany aplikacji są w podpisanym AAB 11. Pozostaje odbiór na telefonie.
   [Opis i wyniki testów](docs/firebase-session-revocation-2026-10-20.pl.md).
 
 ### 3. Ograniczyć ważność nieodświeżonej weryfikacji subskrypcji
@@ -189,19 +190,20 @@ wymaga sprawdzenia rzeczywistego zużycia, nie wynika z samego projektu rozwiąz
 - **Wykonane lokalnie 21.10.2026:** okno 15 minut, odświeżanie na żądanie
   z blokadą między instancjami, limit czasu 2 sekundy i minutowa przerwa po błędzie.
   Liczniki pozostają zachowane. Sprawdzono bieżące RTDN i dead-letter w chmurze.
-  Wszystkie 223 testy backendu przeszły; zmiana czeka na wdrożenie.
+  Wdrożono 21.10.2026 jako `sedno-api-00011-bfh`; końcowe 235 testów backendu
+  przeszło. Testowy RTDN przez istniejący Pub/Sub otrzymał 204.
   [Opis zmiany i kontroli RTDN](docs/subscription-verification-2026-10-21.pl.md).
 
 ### 4. Naprawić ograniczanie ruchu za Firebase Hosting i Cloud Run
 
-- **Wykonane lokalnie 21.10.2026:** osobne liczniki ważnych sesji gości i kont,
+- **Wdrożono 21.10.2026 — `sedno-api-00011-bfh`:** osobne liczniki ważnych sesji gości i kont,
   niezależny limit RTDN, bez magazynu zewnętrznego. Właściciel zaakceptował
   wspólny limit przed sesją za proxy Hosting przy zachowaniu bezpośredniego
-  Cloud Run. Osiem lekkich GET potwierdziło dostępność obu dróg; nowa rewizja
-  czeka na wdrożenie i odbiór. Wszystkie 235 testów backendu przeszły, w tym
+  Cloud Run. Kontrole nowej rewizji przez Hosting, Cloud Run i bieżący tag
+  przeszły. Współbieżność ustawiono na 80. Wszystkie 235 testów backendu przeszły, w tym
   12 nowych. [Zmiana, testy i ograniczenia kontroli produkcyjnej](docs/traffic-limiting-2026-10-21.pl.md).
 
-- [ ] **Problem:** limiter używa `RemoteIpAddress`, który za proxy może oznaczać
+- [x] **Problem:** limiter używa `RemoteIpAddress`, który za proxy może oznaczać
   wspólny adres pośrednika. Jeden klient może wtedy wyczerpać limit innych
   użytkowników.
 - **Zrób:** ustal rzeczywisty łańcuch proxy dla Hosting i bezpośredniego Cloud Run.

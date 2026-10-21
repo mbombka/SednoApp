@@ -1,6 +1,8 @@
 # Ważność weryfikacji subskrypcji — 21.10.2026
 
-Zmiana lokalna backendu, jeszcze niewdrożona. Korzysta z istniejącego zakupu,
+Zmianę wdrożono jako `sedno-api-00011-bfh` 21.10.2026.
+[Raport wdrożenia i potwierdzenie RTDN 204](backend-deployment-2026-10-21.pl.md).
+Korzysta z istniejącego zakupu,
 blokady konta, usługi `sedno-api` i bazy `(default)`. Nie zmienia aplikacji ani
 kontraktu API. Nie dodaje zadania okresowego.
 

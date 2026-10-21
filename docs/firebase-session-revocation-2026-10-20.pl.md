@@ -1,7 +1,9 @@
 # Odwoływanie sesji Sedna po zmianach w Firebase — 20.10.2026
 
-Implementacja i testy lokalne zadania 2 z `Tasks.md`. Zmiany nie zostały
-wdrożone na serwer ani sprawdzone na telefonie. Nie budowano APK.
+Implementacja zadania 2 z `Tasks.md`. Backend wdrożono 21.10.2026 jako
+`sedno-api-00011-bfh`; zmiany mobilne są w podpisanym AAB 11.
+[Wdrożenie i kontrole produkcyjne](backend-deployment-2026-10-21.pl.md).
+Odbiór na telefonie pozostaje do wykonania. Nie budowano APK.
 
 ## Zachowanie
 
