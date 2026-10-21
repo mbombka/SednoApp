@@ -35,8 +35,8 @@ public sealed class UsageStore(FirestoreStore db, IEntitlementResolver entitleme
 
     public async Task<ReservationOutcome> ReserveAsync(Guid identityId, string requestId, string fingerprint, CancellationToken ct)
     {
-        // Entitlement lookup has no Google HTTP side effects. All quota data is read
-        // in the transaction; SDK retries can never repeat a model invocation.
+        // Refresh stale entitlements before entering the retryable quota transaction.
+        // SDK retries can never repeat Google HTTP calls or a model invocation.
         var paid = await PaidAsync(identityId, ct);
         await using var gate = await db.LockUsageAsync(identityId, clock, ct, write: true);
         return await db.Database.RunTransactionAsync(async transaction =>

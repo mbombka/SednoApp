@@ -116,7 +116,16 @@ istniejących zakupów ani nie zweryfikujesz ich powiązania.
 RTDN: uwierzytelniony Pub/Sub do `/notifications/google-play`; identyfikator
 wiadomości zapewnia deduplikację. Oczekujący zakup nie daje dostępu. Weryfikacja
 jest ważna maksymalnie 15 minut i nie dłużej niż zakup. Po jej wygaśnięciu
-obowiązuje limit darmowy bez zerowania użycia. Usunięcie konta nie anuluje subskrypcji.
+backend odświeża istniejący zakup przy żądaniu ustalającym limit, także bez
+otwierania panelu subskrypcji. Świeży zapis nie powoduje połączenia z Google
+ani zapisu w Firestore. Blokada konta i ponowny odczyt łączą równoczesne próby
+między instancjami. Odświeżanie ma limit 2 sekund; po błędzie obowiązuje limit
+darmowy bez zerowania użycia oraz minutowa przerwa przed następną próbą,
+zapisana w zakupie jako opcjonalne `RefreshNotBefore`. Brak tego pola w starszych
+dokumentach oznacza brak przerwy. RTDN i jawne przywracanie zakupu omijają tę
+przerwę; poprawna weryfikacja ją usuwa. Nie odpytujemy nieaktywnych użytkowników.
+Usunięcie konta nie anuluje subskrypcji.
+[Aktualna kontrola RTDN i opis zmiany](../docs/subscription-verification-2026-10-21.pl.md).
 
 ## Testy i indeksy
 

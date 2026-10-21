@@ -6,6 +6,9 @@ namespace Sedno.Infrastructure;
 
 public sealed class SubscriptionService(FirestoreStore db, IPlayBillingClient play, IDataProtectionProvider protection, TimeProvider clock) : IEntitlementResolver
 {
+    private static readonly TimeSpan VerificationLife = TimeSpan.FromMinutes(15);
+    private static readonly TimeSpan RefreshRetryDelay = TimeSpan.FromMinutes(1);
+    private static readonly TimeSpan RefreshTimeout = TimeSpan.FromSeconds(2);
     private readonly IDataProtector _protector = protection.CreateProtector("Sedno.PlayPurchase.v1");
     public static string Binding(Guid accountId) => FirestoreStore.Hash("sedno-account:" + accountId.ToString("N"));
 
@@ -26,14 +29,62 @@ public sealed class SubscriptionService(FirestoreStore db, IPlayBillingClient pl
     {
         var identity = await db.GetAsync<GuestIdentity>(db.Identities.Document(FirestoreStore.Id(identityId)), ct);
         if (identity?.AccountId is not Guid accountId) return false;
-        var rows = await db.ListAsync<PlayPurchase>(db.Purchases.WhereEqualTo("AccountId", accountId.ToString()).WhereEqualTo("Revoked", false), ct);
-        var now = clock.GetUtcNow();
-        // ExpiresAt is Google's paid-through time from the last server verification.
-        // Renewals, cancellations and refunds update it through RTDN and the app's refresh;
-        // an old verification alone must not downgrade an active subscriber to the free tier.
-        return rows.Any(x => x.VerifiedAt <= now && x.ExpiresAt > now &&
-            x.State is "SUBSCRIPTION_STATE_ACTIVE" or "SUBSCRIPTION_STATE_IN_GRACE_PERIOD" or "SUBSCRIPTION_STATE_CANCELED");
+        var rows = await PurchasesAsync(accountId, ct);
+        if (rows.Any(Entitled)) return true;
+        // The common path is read-only: no lease, writes or Google calls.
+        if (!rows.Any(NeedsRefresh)) return false;
+
+        await using var lease = await FirestoreLease.AcquireAsync(db, "account:" + accountId.ToString("N"), clock, ct);
+        // Another replica, RTDN or the subscription screen may have refreshed while
+        // we waited. Re-read before deciding whether to contact Google.
+        rows = await PurchasesAsync(accountId, ct);
+        if (rows.Any(Entitled)) return true;
+        foreach (var row in rows.Where(NeedsRefresh))
+        {
+            var reference = db.Purchases.Document(row.TokenHash);
+            try
+            {
+                // Leave room in the simplification deadline for free-tier fallback.
+                using var timeout = new CancellationTokenSource(RefreshTimeout, clock);
+                using var refresh = CancellationTokenSource.CreateLinkedTokenSource(ct, timeout.Token);
+                if ((await UpdateAsync(accountId, _protector.Unprotect(row.ProtectedToken), lease, null, refresh.Token)).Active)
+                    return true;
+            }
+            catch (Exception ex) when (ex is
+                InvalidOperationException or HttpRequestException or IOException or OperationCanceledException or
+                System.Text.Json.JsonException or FormatException or KeyNotFoundException or
+                System.Security.Cryptography.CryptographicException)
+            {
+                // Fail closed. Persist a shared cooldown without extending the last
+                // successful verification. RTDN bypasses it and still retries errors.
+                // Also retain the cooldown if the requesting client disconnects.
+                using var failureTimeout = new CancellationTokenSource(RefreshTimeout);
+                var failureCt = failureTimeout.Token;
+                await db.Database.RunTransactionAsync(async transaction =>
+                {
+                    await lease.CheckAsync(transaction, failureCt);
+                    var current = await db.GetAsync<PlayPurchase>(transaction, reference, failureCt);
+                    if (current is null || current.AccountId != accountId || current.Revoked || Fresh(current)) return;
+                    current.RefreshNotBefore = clock.GetUtcNow().Add(RefreshRetryDelay);
+                    db.Put(transaction, reference, current);
+                }, cancellationToken: failureCt);
+                ct.ThrowIfCancellationRequested();
+            }
+        }
+        return false;
     }
+
+    private Task<List<PlayPurchase>> PurchasesAsync(Guid accountId, CancellationToken ct) =>
+        db.ListAsync<PlayPurchase>(db.Purchases.WhereEqualTo("AccountId", accountId.ToString()).WhereEqualTo("Revoked", false), ct);
+
+    private bool Fresh(PlayPurchase row) => row.VerifiedAt is { } verified &&
+        verified <= clock.GetUtcNow() && verified > clock.GetUtcNow().Subtract(VerificationLife);
+
+    private bool Entitled(PlayPurchase row) => !row.Revoked && Fresh(row) &&
+        new PlaySubscription(row.State, row.ExpiresAt, true, null).Entitled(clock.GetUtcNow());
+
+    private bool NeedsRefresh(PlayPurchase row) => !row.Revoked && !Fresh(row) &&
+        !(row.RefreshNotBefore > clock.GetUtcNow());
 
     public async Task<SubscriptionDto> VerifyAsync(Guid accountId, string token, CancellationToken ct)
     {
@@ -65,6 +116,7 @@ public sealed class SubscriptionService(FirestoreStore db, IPlayBillingClient pl
         var account = await db.GetAsync<VerifiedAccount>(accountReference, ct);
         if (account is null || account.Deleting) throw new InvalidOperationException("Account unavailable.");
         var status = await play.GetAsync(token, ct);
+        var verifiedAt = clock.GetUtcNow();
         var reference = db.Purchases.Document(FirestoreStore.Hash(token));
         var existing = await db.GetAsync<PlayPurchase>(reference, ct);
         ValidateOwner(existing);
@@ -84,7 +136,8 @@ public sealed class SubscriptionService(FirestoreStore db, IPlayBillingClient pl
             if (old is not null && status.Entitled(clock.GetUtcNow()) && old.AccountId != accountId)
                 throw new InvalidOperationException("Linked owner mismatch.");
             row ??= new() { TokenHash = reference.Id, ProtectedToken = _protector.Protect(token), AccountId = accountId };
-            row.State = status.State; row.ExpiresAt = status.ExpiresAt; row.VerifiedAt = clock.GetUtcNow();
+            row.State = status.State; row.ExpiresAt = status.ExpiresAt; row.VerifiedAt = verifiedAt;
+            row.RefreshNotBefore = null;
             if (old is not null && status.Entitled(clock.GetUtcNow())) { old.Revoked = true; db.Put(transaction, oldReference!, old); }
             db.Put(transaction, reference, row);
             if (messageId is not null) db.Put(transaction, db.PlayNotifications.Document(FirestoreStore.Hash(messageId)),

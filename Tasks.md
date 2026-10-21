@@ -163,7 +163,7 @@ wymaga sprawdzenia rzeczywistego zużycia, nie wynika z samego projektu rozwiąz
 
 ### 3. Ograniczyć ważność nieodświeżonej weryfikacji subskrypcji
 
-- [ ] **Problem:** backend przyznaje płatny limit do zapisanego `ExpiresAt`,
+- [x] **Problem:** backend przyznaje płatny limit do zapisanego `ExpiresAt`,
   nawet gdy Google Play wcześniej odebrało zakup, a powiadomienie RTDN nie dotarło.
 - **Zrób:** wprowadź maksymalnie 15-minutową ważność weryfikacji, nie dłuższą
   niż ważność zakupu. Wykorzystaj istniejący zapis zakupu. Starszą weryfikację
@@ -185,6 +185,12 @@ wymaga sprawdzenia rzeczywistego zużycia, nie wynika z samego projektu rozwiąz
   równoczesne żądania nie powielają odświeżenia.
 - **Gdzie zacząć:** `backend/src/Sedno.Infrastructure/SubscriptionService.cs`,
   `PlayBillingClient.cs`, `backend/tests/Sedno.IntegrationTests/SubscriptionApiTests.cs`.
+
+- **Wykonane lokalnie 21.10.2026:** okno 15 minut, odświeżanie na żądanie
+  z blokadą między instancjami, limit czasu 2 sekundy i minutowa przerwa po błędzie.
+  Liczniki pozostają zachowane. Sprawdzono bieżące RTDN i dead-letter w chmurze.
+  Wszystkie 223 testy backendu przeszły; zmiana czeka na wdrożenie.
+  [Opis zmiany i kontroli RTDN](docs/subscription-verification-2026-10-21.pl.md).
 
 ### 4. Naprawić ograniczanie ruchu za Firebase Hosting i Cloud Run
 

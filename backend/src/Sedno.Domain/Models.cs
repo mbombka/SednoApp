@@ -56,6 +56,7 @@ public sealed class PlayPurchase
     public DateTimeOffset? ExpiresAt { get; set; }
     public bool Revoked { get; set; }
     public DateTimeOffset? VerifiedAt { get; set; }
+    public DateTimeOffset? RefreshNotBefore { get; set; }
 }
 public sealed class PlayNotification
 {
