@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:sedno_app/features/account/domain/account.dart';
 
 abstract interface class AccountRepository {
@@ -9,7 +10,11 @@ abstract interface class AccountRepository {
   Future<void> resendVerificationEmail();
   Future<void> sendPasswordResetEmail(String email);
   Future<void> signOut();
-  Future<void> deleteAccount();
+  Future<void> deleteAccount({String? password});
+}
+
+abstract interface class AccountStateSource {
+  ValueListenable<int> get accountRevision;
 }
 
 class AccountActionException implements Exception {

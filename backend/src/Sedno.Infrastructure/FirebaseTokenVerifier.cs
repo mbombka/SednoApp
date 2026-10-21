@@ -33,7 +33,7 @@ public sealed class FirebaseTokenVerifier(HttpClient client, string projectId, T
                 return null;
             var now = clock.GetUtcNow().ToUnixTimeSeconds();
             if (p.GetProperty("exp").GetInt64() <= now || p.GetProperty("iat").GetInt64() > now ||
-                p.GetProperty("auth_time").GetInt64() > now) return null;
+                p.GetProperty("auth_time").GetInt64() <= 0 || p.GetProperty("auth_time").GetInt64() > now) return null;
             var certs = await GetCertificatesAsync(ct);
             if (!certs.TryGetValue(kid, out var certificate)) return null;
             using var rsa = certificate.GetRSAPublicKey();
@@ -44,7 +44,7 @@ public sealed class FirebaseTokenVerifier(HttpClient client, string projectId, T
                 "google.com" => "google", "password" => "email", _ => null
             };
             return provider is null ? null : new(uid, provider,
-                p.TryGetProperty("email_verified", out var emailVerified) && emailVerified.ValueKind == JsonValueKind.True);
+                p.TryGetProperty("email_verified", out var emailVerified) && emailVerified.ValueKind == JsonValueKind.True, p.GetProperty("auth_time").GetInt64());
         }
         catch (Exception ex) when (ex is JsonException or KeyNotFoundException or FormatException or
             InvalidOperationException or ArgumentException or CryptographicException or HttpRequestException)

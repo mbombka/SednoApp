@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sedno_app/features/account/domain/account_repository.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:sedno_app/features/account/data/backend_session_gateway.dart';
@@ -25,16 +26,18 @@ void main() {
           expect(request.method, 'DELETE');
           expect(request.url.path, '/v1/account');
           expect(request.headers['authorization'], 'Bearer owner');
-          expect(request.body, isEmpty);
+          expect(request.body, '{"idToken":"fresh-firebase"}');
           return http.Response('', 204);
         }),
         storage: storage,
         integrity: CapturingIntegrity(),
       );
-      await gateway.deleteAccount();
+      await gateway.deleteAccount(firebaseIdToken: 'fresh-firebase');
       expect(await gateway.deletionPending, isTrue);
       await expectLater(gateway.accessToken(), throwsStateError);
-      await gateway.deleteAccount(); // Retry does not need the revoked bearer.
+      await gateway.deleteAccount(
+        firebaseIdToken: 'fresh-firebase',
+      ); // Retry does not need the revoked bearer.
       expect(calls, 1);
       await gateway.clearDeletedSession();
       expect(storage.values, {'installation_id': 'installation'});
@@ -54,9 +57,17 @@ void main() {
           storage: storage,
           integrity: CapturingIntegrity(),
         );
-        await expectLater(gateway.deleteAccount(), throwsStateError);
+        await expectLater(
+          gateway.deleteAccount(firebaseIdToken: 'fresh-firebase'),
+          status == 403 || status == 401
+              ? throwsA(isA<AccountActionException>())
+              : throwsStateError,
+        );
         expect(await gateway.deletionPending, isFalse);
-        expect(storage.values['account_token'], 'owner');
+        expect(
+          storage.values['account_token'],
+          status == 401 ? isNull : 'owner',
+        );
       },
     );
   }

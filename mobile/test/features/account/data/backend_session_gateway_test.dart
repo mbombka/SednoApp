@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sedno_app/features/account/domain/account_repository.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:sedno_app/features/account/data/backend_session_gateway.dart';
@@ -87,7 +88,7 @@ void main() {
   });
 
   test(
-    'rejected identity leaves guest usage session available for retry',
+    'rejected identity removes stale credentials and requires sign in',
     () async {
       final storage = MemorySessionStorage();
       storage.values['guest_token'] = 'existing-guest';
@@ -97,8 +98,11 @@ void main() {
         storage: storage,
         integrity: CapturingIntegrity(),
       );
-      await expectLater(gateway.link('forged'), throwsStateError);
-      expect(storage.values['guest_token'], 'existing-guest');
+      await expectLater(
+        gateway.link('forged'),
+        throwsA(isA<AccountActionException>()),
+      );
+      expect(storage.values['guest_token'], isNull);
       expect(await gateway.savedAccount(), isNull);
     },
   );

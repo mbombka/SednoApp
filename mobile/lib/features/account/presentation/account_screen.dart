@@ -103,6 +103,11 @@ class _AccountScreenState extends State<AccountScreen>
     }
   }
 
+  ValueListenable<int>? _accountChanges;
+  void _accountChanged() {
+    if (!_busy) _load();
+  }
+
   Account? _account;
   bool _busy = false;
   String? _message;
@@ -128,6 +133,11 @@ class _AccountScreenState extends State<AccountScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    final repository = widget.repository;
+    if (repository is AccountStateSource) {
+      _accountChanges = (repository as AccountStateSource).accountRevision;
+      _accountChanges!.addListener(_accountChanged);
+    }
     _load();
   }
 
@@ -281,12 +291,25 @@ class _AccountScreenState extends State<AccountScreen>
   }
 
   Future<void> _deleteAccount() async {
+    var password = '';
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Usunąć konto?'),
-        content: const SingleChildScrollView(
-          child: Text(PrivacyScreen.deletionNotice),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(PrivacyScreen.deletionNotice),
+              const Text('Potwierdź swoją tożsamość, aby usunąć konto.'),
+              if (_account?.provider == IdentityProvider.email)
+                TextField(
+                  onChanged: (value) => password = value,
+                  obscureText: true,
+                  decoration: const InputDecoration(labelText: 'Hasło'),
+                ),
+            ],
+          ),
         ),
         actions: [
           TextButton(
@@ -307,7 +330,7 @@ class _AccountScreenState extends State<AccountScreen>
     });
     try {
       widget.onDataCleared?.call();
-      await widget.repository!.deleteAccount();
+      await widget.repository!.deleteAccount(password: password);
       _email.clear();
       _clearPasswords();
       _form = _AccountForm.signIn;
@@ -315,6 +338,13 @@ class _AccountScreenState extends State<AccountScreen>
         setState(() {
           _account = Account(id: 'guest', provider: IdentityProvider.guest);
           _message = 'Konto i dane zostały usunięte. Subskrypcję anuluj osobno w Google Play.';
+        });
+      }
+    } on AccountActionException catch (error) {
+      if (mounted) {
+        setState(() {
+          _account = error.account ?? _account;
+          _message = error.message;
         });
       }
     } catch (_) {
@@ -335,6 +365,7 @@ class _AccountScreenState extends State<AccountScreen>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _accountChanges?.removeListener(_accountChanged);
     _resendTimer?.cancel();
     _email.dispose();
     _password.dispose();

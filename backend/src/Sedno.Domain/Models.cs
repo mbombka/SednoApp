@@ -23,6 +23,7 @@ public sealed class GuestSession
 {
     // Missing on legacy documents: those account sessions must authenticate again.
     public bool AccountAccessVerified { get; set; }
+    public long? FirebaseAuthTime { get; set; }
     public Guid Id { get; set; }
     public Guid IdentityId { get; set; }
     public GuestIdentity Identity { get; set; } = null!;

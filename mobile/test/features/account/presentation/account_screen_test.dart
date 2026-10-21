@@ -12,6 +12,25 @@ import 'package:sedno_app/features/simplification/domain/simplification_result.d
 import 'package:sedno_app/features/account/presentation/account_screen.dart';
 import 'package:sedno_app/features/shared/data/development_mocks.dart';
 
+class RevocableAccountRepository extends MockAccountRepository
+    implements AccountStateSource {
+  RevocableAccountRepository()
+    : super(history: MockHistoryRepository(clock: DateTime.now));
+  @override
+  final ValueNotifier<int> accountRevision = ValueNotifier<int>(0);
+  String? deletionPassword;
+  @override
+  Future<void> deleteAccount({String? password}) async {
+    deletionPassword = password;
+    await super.deleteAccount(password: password);
+  }
+
+  Future<void> revoke() async {
+    await signOut();
+    accountRevision.value++;
+  }
+}
+
 class VerificationScreenRepository extends MockAccountRepository {
   VerificationScreenRepository()
     : super(history: MockHistoryRepository(clock: DateTime.now));
@@ -79,6 +98,48 @@ class GoogleEmailRepository extends MockAccountRepository {
 }
 
 void main() {
+  testWidgets(
+    'email deletion asks for the password and passes it for reauthentication',
+    (tester) async {
+      final repository = RevocableAccountRepository();
+      await repository.signInWithEmail('jan@example.com', 'original');
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(body: AccountScreen(repository: repository)),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Usuń konto'));
+      await tester.pumpAndSettle();
+      final password = find.widgetWithText(TextField, 'Hasło');
+      expect(password, findsOneWidget);
+      expect(tester.widget<TextField>(password).obscureText, isTrue);
+      await tester.enterText(password, 'confirmed-password');
+      await tester.tap(find.text('Usuń konto i dane'));
+      await tester.pumpAndSettle();
+      expect(repository.deletionPassword, 'confirmed-password');
+      expect(find.text('Zaloguj przez Google'), findsOneWidget);
+    },
+  );
+
+  testWidgets('rejected session returns an open account screen to sign in', (
+    tester,
+  ) async {
+    final repository = RevocableAccountRepository();
+    await repository.signInWithGoogle();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(body: AccountScreen(repository: repository)),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Usuń konto'), findsOneWidget);
+    await repository.revoke();
+    await tester.pumpAndSettle();
+    expect(find.text('Usuń konto'), findsNothing);
+    expect(find.text('Zaloguj przez Google'), findsOneWidget);
+  });
+
   testWidgets('app clears editor and history when an account is deleted', (
     tester,
   ) async {

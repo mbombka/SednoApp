@@ -30,6 +30,9 @@ public sealed class DeletionApiTests(BackendFixture fixture)
         return Guid.Parse(doc.RootElement.GetProperty("account").GetProperty("id").GetString()!);
     }
 
+    private static Task<HttpResponseMessage> DeleteAsync(HttpClient client, string token) =>
+        client.SendAsync(new HttpRequestMessage(HttpMethod.Delete, "/v1/account") { Content = JsonContent.Create(new { idToken = token }) });
+
     [Fact]
     public async Task DeletionRequiresAccountAndRemovesOnlyOwnersDataAcrossDevices()
     {
@@ -37,7 +40,7 @@ public sealed class DeletionApiTests(BackendFixture fixture)
         using var anonymous = fixture.Factory.CreateClient();
         Assert.Equal(HttpStatusCode.Unauthorized, (await anonymous.DeleteAsync("/v1/account")).StatusCode);
         var (first, firstId) = await GuestAsync();
-        Assert.Equal(HttpStatusCode.Forbidden, (await first.DeleteAsync("/v1/account")).StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, (await DeleteAsync(first, "deletion-user")).StatusCode);
         var sensitive = "PRYWATNY TEKST USUWANIA 9d3ed";
         (await first.PostAsJsonAsync("/v1/simplifications", new { requestId = "deletion", text = sensitive })).EnsureSuccessStatusCode();
         var accountId = await LinkAsync(first, "deletion-user");
@@ -53,7 +56,7 @@ public sealed class DeletionApiTests(BackendFixture fixture)
         fixture.IdentityAccounts.Fail = true;
         try
         {
-            Assert.Equal(HttpStatusCode.InternalServerError, (await first.DeleteAsync("/v1/account")).StatusCode);
+            Assert.Equal(HttpStatusCode.InternalServerError, (await DeleteAsync(first, "deletion-user")).StatusCode);
             using var scope = fixture.Factory.Services.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<FirestoreStore>();
             var pending = await db.GetAsync<VerifiedAccount>(db.Accounts.Document(FirestoreStore.Id(accountId)));
@@ -62,7 +65,11 @@ public sealed class DeletionApiTests(BackendFixture fixture)
         }
         finally { fixture.IdentityAccounts.Fail = false; }
         var bearer = first.DefaultRequestHeaders.Authorization!.Parameter!;
-        Assert.Equal(HttpStatusCode.NoContent, (await first.DeleteAsync("/v1/account")).StatusCode);
+        // A tombstoned account cannot use its bearer again; the scheduled job resumes deletion.
+        Assert.Equal(HttpStatusCode.Unauthorized, (await DeleteAsync(first, "deletion-user")).StatusCode);
+        using (var cleanupScope = fixture.Factory.Services.CreateScope())
+            await cleanupScope.ServiceProvider.GetRequiredService<AccountDeletionService>()
+                .DeleteAsync(new(firstId, accountId, Guid.Empty), default);
         Assert.Equal(HttpStatusCode.Unauthorized, (await first.GetAsync("/v1/quota")).StatusCode);
         Assert.Equal(HttpStatusCode.Unauthorized, (await second.GetAsync("/v1/quota")).StatusCode);
         Assert.Equal(HttpStatusCode.OK, (await other.GetAsync("/v1/quota")).StatusCode);

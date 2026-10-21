@@ -181,5 +181,5 @@ class MockAccountRepository implements AccountRepository {
   }
 
   @override
-  Future<void> deleteAccount() async => signOut();
+  Future<void> deleteAccount({String? password}) async => signOut();
 }

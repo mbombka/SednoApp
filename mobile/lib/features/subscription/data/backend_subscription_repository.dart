@@ -38,6 +38,7 @@ class BackendSubscriptionRepository implements SubscriptionRepository {
     if (revision != sessions.sessionRevision.value) {
       throw StateError('Sesja uległa zmianie.');
     }
+    if (response.statusCode == 401) await sessions.rejectSession(bearer);
     if (response.statusCode != 200) {
       throw StateError(
         'Nie można sprawdzić subskrypcji. Zaloguj się i spróbuj ponownie.',

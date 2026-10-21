@@ -21,6 +21,7 @@ public sealed class TestClock : TimeProvider
     private DateTimeOffset _now = new(2026, 10, 14, 12, 0, 0, TimeSpan.Zero);
     public override DateTimeOffset GetUtcNow() => _now;
     public void Set(DateTimeOffset now) => _now = now;
+    public void Advance(TimeSpan duration) => _now += duration;
 }
 
 public sealed class TestModel : IModelProvider
@@ -44,12 +45,13 @@ public sealed class TestEntitlements : IEntitlementResolver
     public Task<bool> HasSubscriptionAsync(Guid id, CancellationToken ct) => Task.FromResult(Paid.Contains(id));
 }
 
-public sealed class TestIdentityVerifier : IIdentityTokenVerifier
+public sealed class TestIdentityVerifier(TestClock clock) : IIdentityTokenVerifier
 {
+    public ConcurrentDictionary<string, VerifiedIdentity> Tokens { get; } = new();
     public Task<VerifiedIdentity?> VerifyAsync(string token, CancellationToken ct) =>
-        Task.FromResult<VerifiedIdentity?>(token switch
+        Task.FromResult<VerifiedIdentity?>(Tokens.TryGetValue(token, out var value) ? value : (token switch
         {
-            _ when token.StartsWith("billing-") => new(token, "google"),
+            _ when token.StartsWith("billing-") => new VerifiedIdentity(token, "google"),
             _ when token.StartsWith("verified-email-") => new(token, "email", true),
             "deletion-user" => new("user-delete", "google"),
             "deletion-other" => new("user-delete-other", "google"),
@@ -59,7 +61,7 @@ public sealed class TestIdentityVerifier : IIdentityTokenVerifier
             "email-verification-complete" => new("verification-user", "email", true),
             "google-user-2" => new("user-2", "google"),
             _ => null
-        });
+        } is { } identity ? identity with { AuthTime = clock.GetUtcNow().ToUnixTimeSeconds() } : null));
 }
 
 public sealed class TestIntegrityVerifier : IIntegrityVerifier
@@ -101,7 +103,8 @@ public sealed class BackendFixture : IAsyncLifetime
     public TestModel Model { get; } = new();
     public TestEntitlements Entitlements { get; } = new();
     public TestIdentityAccounts IdentityAccounts { get; } = new();
-    public TestIdentityVerifier Identities { get; } = new();
+    private TestIdentityVerifier? _identities;
+    public TestIdentityVerifier Identities => _identities ??= new(Clock);
     public TestIntegrityVerifier Integrity { get; } = new();
     public CaptureLogs Logs { get; } = new();
     public WebApplicationFactory<Program> Factory { get; private set; } = null!;
@@ -180,7 +183,15 @@ public sealed class TestIdentityAccounts : IIdentityAccountDeletion
 {
     public ConcurrentDictionary<string, bool> Deleted { get; } = new();
     public bool Fail { get; set; }
-    public Task<bool> ExistsAsync(string uid, CancellationToken ct) => Task.FromResult(!Deleted.ContainsKey(uid));
+    public ConcurrentDictionary<string, IdentityAccountStatus> Statuses { get; } = new();
+    public ConcurrentDictionary<string, int> Lookups { get; } = new();
+    public ConcurrentDictionary<string, bool> LookupFailures { get; } = new();
+    public Task<IdentityAccountStatus> GetStatusAsync(string uid, CancellationToken ct)
+    {
+        Lookups.AddOrUpdate(uid, 1, (_, count) => count + 1);
+        if (LookupFailures.ContainsKey(uid)) throw new HttpRequestException();
+        return Task.FromResult(Deleted.ContainsKey(uid) ? new IdentityAccountStatus(false, 0) : Statuses.GetValueOrDefault(uid, new(true, 0)));
+    }
     public Task DeleteAsync(string uid, CancellationToken ct)
     {
         if (Fail) throw new InvalidOperationException("provider failure");

@@ -5,7 +5,7 @@ using Sedno.Domain;
 
 namespace Sedno.Infrastructure;
 
-public sealed class GuestStore(FirestoreStore db, IUsageStore usage, TimeProvider clock, byte[] credentialKey, IIdentityAccountDeletion identityAccounts) : IGuestStore
+public sealed class GuestStore(FirestoreStore db, IUsageStore usage, TimeProvider clock, byte[] credentialKey, FirebaseAccountAccess accountAccess) : IGuestStore
 {
     public async Task<GuestSessionDto> CreateAsync(string installationId, CancellationToken ct)
     {
@@ -41,16 +41,18 @@ public sealed class GuestStore(FirestoreStore db, IUsageStore usage, TimeProvide
         if (session.AccountId is null) return identity.AccountId is null ? new(identity.Id, null, session.Id) : null;
         // Check the session, not the mutable account provider. Older servers could
         // issue account credentials without verifying an email identity.
-        if (!session.AccountAccessVerified) return null;
+        if (!session.AccountAccessVerified || session.FirebaseAuthTime is null) return null;
         var account = await db.GetAsync<VerifiedAccount>(db.Accounts.Document(FirestoreStore.Id(session.AccountId.Value)), ct);
-        return account is null ? null : new(account.PrimaryIdentityId, account.Id, session.Id);
+        if (account is null || account.Deleting ||
+            !(await accountAccess.GetAsync(account.FirebaseUid, ct)).Allows(session.FirebaseAuthTime.Value)) return null;
+        return new(account.PrimaryIdentityId, account.Id, session.Id);
     }
 
     public async Task<AuthenticatedSessionDto?> LinkAsync(SessionIdentity guest, VerifiedIdentity verified, CancellationToken ct)
     {
         if ((verified.Provider == "email" && !verified.EmailVerified) || guest.AccountId is not null || verified.Uid.Length is < 1 or > 128 || verified.Provider is not ("google" or "email")) return null;
         await using var lease = await FirestoreLease.AcquireAsync(db, "uid:" + verified.Uid, clock, ct);
-        if (!await identityAccounts.ExistsAsync(verified.Uid, ct)) return null;
+        if (!(await accountAccess.GetFreshAsync(verified.Uid, ct)).Allows(verified.AuthTime)) return null;
         var secret = Base64Url(RandomNumberGenerator.GetBytes(32));
         var accountId = Guid.NewGuid();
         var sessionId = Guid.NewGuid();
@@ -74,7 +76,7 @@ public sealed class GuestStore(FirestoreStore db, IUsageStore usage, TimeProvide
             identity.AccountId = account.Id;
             var now = clock.GetUtcNow();
             var session = new GuestSession { Id = sessionId, IdentityId = account.PrimaryIdentityId, AccountId = account.Id,
-                CredentialHash = Hash(secret), CreatedAt = now, ExpiresAt = now.AddDays(7), AccountAccessVerified = true };
+                CredentialHash = Hash(secret), CreatedAt = now, ExpiresAt = now.AddDays(7), AccountAccessVerified = true, FirebaseAuthTime = verified.AuthTime };
             db.Put(transaction, identityReference, identity);
             db.Put(transaction, accountReference, account);
             db.Put(transaction, uidReference, new AccountPointer { AccountId = account.Id });

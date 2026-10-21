@@ -73,6 +73,8 @@ class BackendSessionGateway {
   final http.Client client;
   final SessionStorage storage;
   final IntegrityTokenSource integrity;
+  Future<void> Function()? onSessionRejected;
+  bool sessionRejected = false;
   final ValueNotifier<int> sessionRevision = ValueNotifier(0);
   final ValueNotifier<int> quotaRevision = ValueNotifier(0);
 
@@ -155,6 +157,13 @@ class BackendSessionGateway {
       },
       body: jsonEncode({'idToken': firebaseIdToken}),
     );
+    if (response.statusCode == 401) {
+      await rejectSession(guest);
+      throw AccountActionException(
+        'Zaloguj się ponownie, aby połączyć konto.',
+        account: Account(id: 'guest', provider: IdentityProvider.guest),
+      );
+    }
     if (response.statusCode != 200) {
       throw StateError('Nie można połączyć konta. Spróbuj ponownie.');
     }
@@ -163,6 +172,7 @@ class BackendSessionGateway {
     await storage.write(_accountKey, data['accessToken'] as String);
     await storage.write(_accountJsonKey, jsonEncode(account.toJson()));
     await storage.delete(_guestKey);
+    sessionRejected = false;
     sessionRevision.value++;
     return account;
   }
@@ -170,14 +180,30 @@ class BackendSessionGateway {
   Future<bool> get deletionPending async =>
       await storage.read('deletion_confirmed') == 'true';
 
-  Future<void> deleteAccount() async {
+  Future<void> deleteAccount({String? firebaseIdToken}) async {
     if (await storage.read('deletion_confirmed') == 'true') return;
     final token = await storage.read(_accountKey);
     if (token == null) throw StateError('Zaloguj się ponownie.');
     final response = await client.delete(
       baseUrl.resolve('/v1/account'),
-      headers: {'Authorization': 'Bearer $token'},
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({'idToken': firebaseIdToken}),
     );
+    if (response.statusCode == 401) {
+      await rejectSession(token);
+      throw AccountActionException(
+        'Sesja wygasła. Zaloguj się ponownie.',
+        account: Account(id: 'guest', provider: IdentityProvider.guest),
+      );
+    }
+    if (response.statusCode == 403) {
+      throw const AccountActionException(
+        'Zaloguj się ponownie, aby usunąć konto.',
+      );
+    }
     if (response.statusCode != 204) {
       throw StateError('Nie można usunąć konta. Spróbuj ponownie.');
     }
@@ -194,6 +220,28 @@ class BackendSessionGateway {
     sessionRevision.value++;
   }
 
+  Future<void> rejectCurrentAccount() async {
+    final token = await storage.read(_accountKey);
+    if (token != null) await rejectSession(token);
+  }
+
+  Future<void> rejectSession(String bearer) async {
+    final account = await storage.read(_accountKey);
+    final guest = await storage.read(_guestKey);
+    if (bearer != account && bearer != guest) return;
+    if (bearer == account) {
+      await storage.delete(_accountKey);
+      await storage.delete(_accountJsonKey);
+    }
+    await storage.delete(_guestKey);
+    sessionRejected = true;
+    try {
+      if (bearer == account) await onSessionRejected?.call();
+    } finally {
+      sessionRevision.value++;
+    }
+  }
+
   Future<void> signOut() async {
     final token = await storage.read(_accountKey);
     if (token != null) {
@@ -207,6 +255,7 @@ class BackendSessionGateway {
     }
     await storage.delete(_accountKey);
     await storage.delete(_accountJsonKey);
+    sessionRejected = false;
     sessionRevision.value++;
   }
 }

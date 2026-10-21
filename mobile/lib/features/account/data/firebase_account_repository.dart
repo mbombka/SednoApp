@@ -1,16 +1,27 @@
 import 'package:firebase_auth/firebase_auth.dart' as firebase;
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sedno_app/features/account/data/backend_session_gateway.dart';
 import 'package:sedno_app/features/account/domain/account.dart';
 import 'package:sedno_app/features/account/domain/account_repository.dart';
 
-class FirebaseAccountRepository implements AccountRepository {
+class FirebaseAccountRepository
+    implements AccountRepository, AccountStateSource {
   FirebaseAccountRepository({
     required this.auth,
     required this.google,
     required this.sessions,
     required this.clearHistory,
-  });
+  }) {
+    sessions.onSessionRejected = () async {
+      await auth.signOut();
+      await google.signOut();
+      await clearHistory();
+    };
+  }
+
+  @override
+  ValueListenable<int> get accountRevision => sessions.sessionRevision;
 
   final firebase.FirebaseAuth auth;
   final GoogleSignIn google;
@@ -152,6 +163,8 @@ class FirebaseAccountRepository implements AccountRepository {
           'Za dużo prób. Odczekaj chwilę i spróbuj ponownie.',
         'network-request-failed' =>
           'Brak połączenia. Sprawdź internet i spróbuj ponownie.',
+        'user-mismatch' => 'Wybierz to samo konto, które chcesz usunąć.',
+        'requires-recent-login' => 'Zaloguj się ponownie, aby usunąć konto.',
         'invalid-credential' || 'wrong-password' || 'user-not-found' =>
           'Nie udało się zalogować. Sprawdź adres e-mail i hasło.',
         'user-token-expired' ||
@@ -165,7 +178,10 @@ class FirebaseAccountRepository implements AccountRepository {
         'invalid-user-token',
         'user-disabled',
       }.contains(error.code);
-      if (sessionExpired) await auth.signOut();
+      if (sessionExpired) {
+        await sessions.rejectCurrentAccount();
+        await auth.signOut();
+      }
       throw AccountActionException(
         message,
         account: sessionExpired
@@ -193,6 +209,12 @@ class FirebaseAccountRepository implements AccountRepository {
     } on firebase.FirebaseAuthException {
       rethrow;
     } catch (error) {
+      if (error is AccountActionException &&
+          error.account?.provider == IdentityProvider.guest) {
+        await sessions.rejectCurrentAccount();
+        await auth.signOut();
+        rethrow;
+      }
       if (_usesPassword(user)) {
         // Verification and backend admission are separate steps. A rejected
         // installation or network failure must not discard Firebase identity.
@@ -215,10 +237,42 @@ class FirebaseAccountRepository implements AccountRepository {
   }
 
   @override
-  Future<void> deleteAccount() async {
-    // The backend deletes Firebase identity and all server records first.
-    // Keep local credentials on failure so the user can retry.
-    await sessions.deleteAccount();
+  Future<void> deleteAccount({String? password}) async {
+    if (!await sessions.deletionPending) {
+      await _firebaseOperation(() async {
+        final user = auth.currentUser;
+        if (user == null) {
+          throw const AccountActionException(
+            'Zaloguj się ponownie, aby usunąć konto.',
+          );
+        }
+        final firebase.AuthCredential credential;
+        if (_usesPassword(user)) {
+          if (password == null || password.isEmpty) {
+            throw const AccountActionException(
+              'Wpisz hasło, aby potwierdzić usunięcie konta.',
+            );
+          }
+          credential = firebase.EmailAuthProvider.credential(
+            email: user.email!,
+            password: password,
+          );
+        } else {
+          final selected = await google.authenticate();
+          credential = firebase.GoogleAuthProvider.credential(
+            idToken: selected.authentication.idToken,
+          );
+        }
+        await user.reauthenticateWithCredential(credential);
+        final token = await user.getIdToken(true);
+        if (token == null) {
+          throw const AccountActionException(
+            'Zaloguj się ponownie, aby usunąć konto.',
+          );
+        }
+        await sessions.deleteAccount(firebaseIdToken: token);
+      });
+    }
     await clearHistory();
     await auth.signOut();
     await google.signOut();

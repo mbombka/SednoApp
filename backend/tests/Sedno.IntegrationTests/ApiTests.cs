@@ -367,11 +367,11 @@ public sealed class ApiTests(BackendFixture fixture)
     {
         public TaskCompletionSource Entered { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
         public TaskCompletionSource Release { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
-        public async Task<bool> ExistsAsync(string uid, CancellationToken ct)
+        public async Task<IdentityAccountStatus> GetStatusAsync(string uid, CancellationToken ct)
         {
             Entered.TrySetResult();
             await Release.Task.WaitAsync(ct);
-            return true;
+            return new(true, 0);
         }
         public Task DeleteAsync(string uid, CancellationToken ct) => Task.CompletedTask;
     }
@@ -385,9 +385,9 @@ public sealed class ApiTests(BackendFixture fixture)
         var gate = new GatedIdentity();
         var store = new GuestStore(scope.ServiceProvider.GetRequiredService<FirestoreStore>(),
             scope.ServiceProvider.GetRequiredService<IUsageStore>(), fixture.Clock,
-            Enumerable.Repeat((byte)1, 32).ToArray(), gate);
+            Enumerable.Repeat((byte)1, 32).ToArray(), new FirebaseAccountAccess(gate, fixture.Clock));
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-        var pending = store.LinkAsync(new(first.Id, null, Guid.ParseExact(first.Token.Split('.')[0], "N")), new("parallel-" + Guid.NewGuid(), "google"), timeout.Token);
+        var pending = store.LinkAsync(new(first.Id, null, Guid.ParseExact(first.Token.Split('.')[0], "N")), new("parallel-" + Guid.NewGuid(), "google", AuthTime: fixture.Clock.GetUtcNow().ToUnixTimeSeconds()), timeout.Token);
         try
         {
             await gate.Entered.Task.WaitAsync(timeout.Token);

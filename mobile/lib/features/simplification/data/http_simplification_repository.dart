@@ -61,7 +61,7 @@ class HttpSimplificationRepository
 
   void _refreshAfterSessionChange() {
     _quota.value = null;
-    _refreshQuota();
+    if (!sessions.sessionRejected) _refreshQuota();
   }
 
   void _refreshQuota() {
@@ -194,12 +194,19 @@ class HttpSimplificationRepository
       );
       request.headers.addAll(headers);
       if (body != null) request.body = body;
-      return http.Response.fromStream(await client.send(request));
+      final response = await http.Response.fromStream(
+        await client.send(request),
+      );
+      if (response.statusCode == 401) await sessions.rejectSession(token);
+      return response;
     }
-    return (method == 'GET'
-            ? client.get(url, headers: headers)
-            : client.post(url, headers: headers, body: body))
-        .timeout(requestTimeout);
+    final response =
+        await (method == 'GET'
+                ? client.get(url, headers: headers)
+                : client.post(url, headers: headers, body: body))
+            .timeout(requestTimeout);
+    if (response.statusCode == 401) await sessions.rejectSession(token);
+    return response;
   }
 
   void _readQuota(String body) {

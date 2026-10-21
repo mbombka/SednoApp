@@ -197,3 +197,12 @@ Projekt odrzucił próbę zmiany treści, tematu i nadawcy przez API błędem
 `EMAIL_TEMPLATE_UPDATE_NOT_ALLOWED`. Używana jest polska wiadomość systemowa
 Firebase; własny tekst instrukcji jest w aplikacji. Nie skonfigurowano dodatkowego
 operatora poczty i nie wysyłano wiadomości do użytkowników podczas konfiguracji.
+
+## Odwoływanie sesji Firebase
+
+Przygotowano kontrolę statusu i odwołania Firebase przy logowaniu oraz przy
+używaniu sesji Sedna (cache instancji do 5 minut). Usuwanie konta wymaga
+ponownego uwierzytelnienia tego samego użytkownika, z `auth_time` do 5 minut,
+oraz kontroli bez cache. Sesje kont bez `FirebaseAuthTime` wymagają ponownego
+logowania po wdrożeniu. Stare aplikacje nie mogą usuwać kont samym tokenem Sedna.
+[Zmiany, testy i uwagi do wdrożenia](../docs/firebase-session-revocation-2026-10-20.pl.md).

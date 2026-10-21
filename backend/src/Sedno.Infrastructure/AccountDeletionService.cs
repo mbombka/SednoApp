@@ -10,12 +10,12 @@ namespace Sedno.Infrastructure;
 public interface IIdentityAccountDeletion
 {
     Task DeleteAsync(string uid, CancellationToken ct);
-    Task<bool> ExistsAsync(string uid, CancellationToken ct);
+    Task<IdentityAccountStatus> GetStatusAsync(string uid, CancellationToken ct);
 }
 
 public sealed class FirebaseAccountDeletion(HttpClient client, IPlayAccessTokenSource tokens, string project) : IIdentityAccountDeletion
 {
-    public async Task<bool> ExistsAsync(string uid, CancellationToken ct)
+    public async Task<IdentityAccountStatus> GetStatusAsync(string uid, CancellationToken ct)
     {
         using var request = new HttpRequestMessage(HttpMethod.Post,
             $"https://identitytoolkit.googleapis.com/v1/projects/{Uri.EscapeDataString(project)}/accounts:lookup");
@@ -24,9 +24,13 @@ public sealed class FirebaseAccountDeletion(HttpClient client, IPlayAccessTokenS
         using var response = await client.SendAsync(request, ct);
         response.EnsureSuccessStatusCode();
         using var body = JsonDocument.Parse(await response.Content.ReadAsStringAsync(ct));
-        return body.RootElement.TryGetProperty("users", out var users) &&
-            users.EnumerateArray().Any(user => user.GetProperty("localId").GetString() == uid &&
-                (!user.TryGetProperty("disabled", out var disabled) || !disabled.GetBoolean()));
+        if (body.RootElement.TryGetProperty("users", out var users))
+            foreach (var user in users.EnumerateArray())
+                if (user.GetProperty("localId").GetString() == uid)
+                    return new(!user.TryGetProperty("disabled", out var disabled) || !disabled.GetBoolean(),
+                        user.TryGetProperty("validSince", out var since)
+                            ? long.Parse(since.GetString()!, System.Globalization.CultureInfo.InvariantCulture) : 0);
+        return new(false, 0);
     }
 
     public async Task DeleteAsync(string uid, CancellationToken ct)
@@ -50,13 +54,29 @@ public sealed class FirebaseAccountDeletion(HttpClient client, IPlayAccessTokenS
 
 public sealed class UnavailableAccountDeletion : IIdentityAccountDeletion
 {
-    public Task<bool> ExistsAsync(string uid, CancellationToken ct) => Task.FromResult(false);
+    public Task<IdentityAccountStatus> GetStatusAsync(string uid, CancellationToken ct) => Task.FromResult(new IdentityAccountStatus(false, 0));
     public Task DeleteAsync(string uid, CancellationToken ct) =>
         throw new InvalidOperationException("Identity deletion is not configured.");
 }
 
 public sealed class AccountDeletionService(FirestoreStore db, IIdentityAccountDeletion identity, TimeProvider clock)
 {
+    public async Task<bool> DeleteWithReauthenticationAsync(SessionIdentity session, VerifiedIdentity verified, CancellationToken ct)
+    {
+        if (session.AccountId is not Guid accountId) return false;
+        var account = await db.GetAsync<VerifiedAccount>(db.Accounts.Document(FirestoreStore.Id(accountId)), ct);
+        var credential = await db.GetAsync<GuestSession>(db.Sessions.Document(FirestoreStore.Id(session.SessionId)), ct);
+        var now = clock.GetUtcNow().ToUnixTimeSeconds();
+        if (account is null || credential?.FirebaseAuthTime is not long sessionAuthTime ||
+            verified.Uid != account.FirebaseUid || verified.AuthTime > now || verified.AuthTime < now - 300 ||
+            (verified.Provider == "email" && !verified.EmailVerified)) return false;
+        // Always bypass the instance cache, including for a still-valid Sedno bearer.
+        var status = await identity.GetStatusAsync(account.FirebaseUid, ct);
+        if (!status.Allows(sessionAuthTime) || !status.Allows(verified.AuthTime)) return false;
+        await DeleteAsync(session, ct);
+        return true;
+    }
+
     public async Task DeleteAsync(SessionIdentity session, CancellationToken ct)
     {
         if (session.AccountId is not Guid accountId) throw new InvalidOperationException("Account required.");
@@ -78,7 +98,7 @@ public sealed class AccountDeletionService(FirestoreStore db, IIdentityAccountDe
         }, cancellationToken: ct);
         // Even a timeout may mean Firebase already deleted the user. Keep the
         // tombstone on failure so the hourly job resumes instead of restoring access.
-        // Existing credentials can still retry DELETE, but quota/billing/linking refuse it.
+        // The scheduled cleanup resumes if Firebase deletion invalidated the bearer.
         await identity.DeleteAsync(account.FirebaseUid, ct);
         var identities = await db.ListAsync<GuestIdentity>(db.Identities.WhereEqualTo("AccountId", accountId.ToString()), ct);
         foreach (var linked in identities)

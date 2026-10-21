@@ -42,6 +42,20 @@ public sealed class AccountDeletionTests
     public async Task LinkingRejectsDeletedOrDisabledFirebaseIdentity(string body, bool exists)
     {
         using var client = new HttpClient(new Handler(_ => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(body) })));
-        Assert.Equal(exists, await new FirebaseAccountDeletion(client, new Tokens(), "project").ExistsAsync("owner", default));
+        Assert.Equal(exists, (await new FirebaseAccountDeletion(client, new Tokens(), "project").GetStatusAsync("owner", default)).Enabled);
     }
+    [Fact]
+    public async Task LookupReadsFirebaseRevocationBoundaryAndDoesNotUseOtherUsersStatus()
+    {
+        using var client = new HttpClient(new Handler(_ => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent("{\"users\":[{\"localId\":\"other\",\"validSince\":\"0\"},{\"localId\":\"owner\",\"validSince\":\"12345\"}]}")
+        })));
+        var status = await new FirebaseAccountDeletion(client, new Tokens(), "project").GetStatusAsync("owner", default);
+        Assert.True(status.Enabled);
+        Assert.Equal(12345, status.ValidSince);
+        Assert.False(status.Allows(12344));
+        Assert.True(status.Allows(12345));
+    }
+
 }

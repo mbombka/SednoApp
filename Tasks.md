@@ -132,7 +132,7 @@ wymaga sprawdzenia rzeczywistego zużycia, nie wynika z samego projektu rozwiąz
 
 ### 2. Unieważniać sesje Sedna po odebraniu dostępu w Firebase
 
-- [ ] **Problem:** własny token Sedna działa do 7 dni także po resecie hasła,
+- [x] **Problem:** własny token Sedna działa do 7 dni także po resecie hasła,
   blokadzie konta lub odwołaniu sesji Firebase. Pozwala również usunąć konto
   bez ponownego potwierdzenia tożsamości.
 - **Zrób:** sprawdzaj status konta i odwołanie uwierzytelnienia Firebase przy
@@ -155,6 +155,11 @@ wymaga sprawdzenia rzeczywistego zużycia, nie wynika z samego projektu rozwiąz
 - **Gdzie zacząć:** `GuestStore.cs`, `FirebaseTokenVerifier.cs`,
   `AccountDeletionService.cs`, endpoint `DELETE /v1/account`,
   `mobile/lib/features/account/data/`.
+
+- **Wykonane 20.10.2026:** kontrola Firebase, cache do 5 minut, ponowne
+  uwierzytelnienie przy usuwaniu konta i obsługa odrzucenia sesji w aplikacji.
+  Testy lokalne przeszły; zmiana czeka na wdrożenie backendu i nową wersję aplikacji.
+  [Opis i wyniki testów](docs/firebase-session-revocation-2026-10-20.pl.md).
 
 ### 3. Ograniczyć ważność nieodświeżonej weryfikacji subskrypcji
 

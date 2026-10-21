@@ -82,8 +82,20 @@ paths:
   /v1/account:
     delete:
       operationId: deleteOwnAccount
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [idToken]
+              properties:
+                idToken: { type: string, maxLength: 8192 }
       description: >-
-        Requires an account bearer. Deletes only that account: Firebase identity,
+        Requires an account bearer and a Firebase ID token for the same user with
+        auth_time at most 5 minutes old. Token refresh alone does not count as reauthentication.
+        Checks Firebase account status and revocation without cache.
+        Deletes only that account: Firebase identity,
         linked installations, all sessions, request metadata and stored purchases.
         Does not cancel Google Play subscriptions. Client clears local history
         and credentials after 204. Provider/database failure can be retried;

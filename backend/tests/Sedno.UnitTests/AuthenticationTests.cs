@@ -64,6 +64,7 @@ public sealed class AuthenticationTests
         var identity = await verifier.VerifyAsync(Token(rsa, 1791982800, "password", claim), default);
         Assert.NotNull(identity);
         Assert.Equal("email", identity.Provider);
+        Assert.Equal(1791975600, identity.AuthTime);
         Assert.Equal(expected, identity.EmailVerified);
     }
 

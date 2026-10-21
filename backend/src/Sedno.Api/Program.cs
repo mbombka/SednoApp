@@ -135,6 +135,7 @@ builder.Services.AddSingleton<IIdentityTokenVerifier>(sp => new FirebaseTokenVer
     sp.GetRequiredService<IHttpClientFactory>().CreateClient(), firebaseProject ?? "development",
     sp.GetRequiredService<TimeProvider>()));
 builder.Services.AddScoped<AccountDeletionService>();
+builder.Services.AddSingleton<FirebaseAccountAccess>();
 builder.Services.AddHttpClient("identity-deletion", client => client.Timeout = TimeSpan.FromSeconds(15)).RemoveAllLoggers();
 var deletionCredentials = builder.Configuration["Firebase:DeletionServiceAccountJsonPath"];
 if (!serviceIdentity && !builder.Environment.IsDevelopment() && string.IsNullOrWhiteSpace(deletionCredentials))
@@ -172,7 +173,7 @@ var credentialKey = ReadKey(builder.Configuration, "Security:CredentialKey");
 var fingerprintKey = ReadKey(builder.Configuration, "Security:FingerprintKey");
 builder.Services.AddScoped<GuestStore>(sp => new(sp.GetRequiredService<FirestoreStore>(),
     sp.GetRequiredService<IUsageStore>(), sp.GetRequiredService<TimeProvider>(), credentialKey,
-    sp.GetRequiredService<IIdentityAccountDeletion>()));
+    sp.GetRequiredService<FirebaseAccountAccess>()));
 builder.Services.AddScoped<IGuestStore>(sp => sp.GetRequiredService<GuestStore>());
 builder.Services.AddScoped<SimplificationService>(sp => new(sp.GetRequiredService<IUsageStore>(),
     sp.GetRequiredService<IModelProvider>(), sp.GetRequiredService<TimeProvider>(), fingerprintKey, sp.GetRequiredService<SimplificationTimings>()));
@@ -307,11 +308,19 @@ app.MapGet("/usun-konto", (HttpContext context) =>
     context.Response.Headers.ContentSecurityPolicy = "default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'";
     return Results.Content(DeletionPage.Render(deletionEmail), "text/html; charset=utf-8");
 });
-app.MapDelete("/v1/account", async (HttpContext context, AccountDeletionService deletion, CancellationToken ct) =>
+app.MapDelete("/v1/account", async (HttpContext context, AccountDeletionService deletion, IIdentityTokenVerifier verifier, CancellationToken ct) =>
 {
     var session = (SessionIdentity)context.Items["session"]!;
     if (session.AccountId is null) return Problem(context, 403, "account_required", "Zaloguj się, aby usunąć konto.");
-    await deletion.DeleteAsync(session, ct);
+    if (context.Request.ContentLength == 0 || !context.Request.HasJsonContentType())
+        return Problem(context, 403, "reauthentication_required", "Zaloguj się ponownie, aby usunąć konto.");
+    IdentityTokenInput? input;
+    try { input = await context.Request.ReadFromJsonAsync<IdentityTokenInput>(cancellationToken: ct); }
+    catch (JsonException) { return Problem(context, 400, "invalid_json", "Nieprawidłowe dane."); }
+    var verified = input is null || string.IsNullOrWhiteSpace(input.IdToken) || input.IdToken.Length > 8192
+        ? null : await verifier.VerifyAsync(input.IdToken, ct);
+    if (verified is null || !await deletion.DeleteWithReauthenticationAsync(session, verified, ct))
+        return Problem(context, 403, "reauthentication_required", "Zaloguj się ponownie, aby usunąć konto.");
     return Results.NoContent();
 });
 app.MapGet("/v1/subscription", async (HttpContext context, SubscriptionService subscriptions, CancellationToken ct) =>
