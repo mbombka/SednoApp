@@ -133,14 +133,22 @@ class _AppNavigationState extends State<_AppNavigation>
     super.dispose();
   }
 
+  bool _showingMenu = false;
+
   Future<void> _openUserMenu() async {
+    setState(() => _showingMenu = true);
     FocusManager.instance.primaryFocus?.unfocus();
-    final destination = await Navigator.of(context).push<UserMenuDestination>(
-      MaterialPageRoute(
-        fullscreenDialog: true,
-        builder: (_) => const UserMenuScreen(),
-      ),
-    );
+    UserMenuDestination? destination;
+    try {
+      destination = await Navigator.of(context).push<UserMenuDestination>(
+        MaterialPageRoute(
+          fullscreenDialog: true,
+          builder: (_) => const UserMenuScreen(),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _showingMenu = false);
+    }
     if (!mounted || destination == null) return;
     final page = switch (destination) {
       UserMenuDestination.start => 0,
@@ -187,6 +195,7 @@ class _AppNavigationState extends State<_AppNavigation>
             HomeScreen(
               key: ValueKey('home-$_dataRevision'),
               appName: SednoApp.displayName,
+              isActive: _selectedPage == 0 && !_showingMenu,
               textController: _inputController,
               photoRepository: _photoRepository,
               simplificationRepository: _simplificationRepository,

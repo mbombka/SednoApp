@@ -1,5 +1,3 @@
-import 'package:sedno_app/features/privacy/presentation/privacy_screen.dart';
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -8,6 +6,7 @@ import 'package:sedno_app/features/history/domain/history_entry.dart';
 import 'package:sedno_app/features/history/domain/history_repository.dart';
 import 'package:sedno_app/features/photo/domain/photo_text_repository.dart';
 import 'package:sedno_app/features/photo/presentation/photo_input_view_model.dart';
+import 'package:sedno_app/features/privacy/presentation/privacy_screen.dart';
 import 'package:sedno_app/features/quota/domain/quota_repository.dart';
 import 'package:sedno_app/features/quota/domain/quota_reset.dart';
 import 'package:sedno_app/features/quota/domain/quota_state.dart';
@@ -15,12 +14,17 @@ import 'package:sedno_app/features/simplification/domain/input_text.dart';
 import 'package:sedno_app/features/simplification/domain/simplification_repository.dart';
 import 'package:sedno_app/features/simplification/presentation/result_screen.dart';
 import 'package:sedno_app/features/simplification/presentation/simplification_view_model.dart';
+import 'package:sedno_app/features/speech/data/android_speech_service.dart';
+import 'package:sedno_app/features/speech/domain/speech_service.dart';
+import 'package:sedno_app/features/speech/presentation/speech_input_view_model.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
     required this.appName,
     required this.textController,
     this.onSubmit,
+    this.isActive = true,
+    this.speechService = const AndroidSpeechService(),
     this.onCameraPressed,
     this.photoRepository,
     this.simplificationRepository,
@@ -32,6 +36,8 @@ class HomeScreen extends StatefulWidget {
   final String appName;
   final TextEditingController textController;
   final SubmitText? onSubmit;
+  final bool isActive;
+  final SpeechService speechService;
   final VoidCallback? onCameraPressed;
   final PhotoTextRepository? photoRepository;
   final SimplificationRepository? simplificationRepository;
@@ -45,6 +51,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   late final TextInputViewModel _inputViewModel;
   PhotoInputViewModel? _photoViewModel;
+  late SpeechInputViewModel _speechViewModel;
   SimplificationViewModel? _simplificationViewModel;
   QuotaStateSource? _quotaSource;
   Timer? _resetTimer;
@@ -56,6 +63,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _speechViewModel = SpeechInputViewModel(widget.speechService);
     _inputViewModel = TextInputViewModel(onSubmit: _submit);
     _inputViewModel.setText(widget.textController.text);
     if (widget.photoRepository case final repository?) {
@@ -97,7 +105,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) _loadQuota();
+    if (state == AppLifecycleState.resumed) {
+      _loadQuota();
+    } else if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached) {
+      unawaited(_speechViewModel.cancel());
+    }
   }
 
   void _onQuotaChanged() {
@@ -273,10 +286,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   @override
   void didUpdateWidget(covariant HomeScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (!widget.isActive) unawaited(_speechViewModel.cancel());
     if (oldWidget.textController != widget.textController) {
       oldWidget.textController.removeListener(_onTextChanged);
       _inputViewModel.setText(widget.textController.text);
       widget.textController.addListener(_onTextChanged);
+    }
+    if (oldWidget.speechService != widget.speechService) {
+      _speechViewModel.dispose();
+      _speechViewModel = SpeechInputViewModel(widget.speechService);
     }
     if (oldWidget.photoRepository != widget.photoRepository) {
       _photoViewModel?.dispose();
@@ -301,12 +319,24 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     widget.textController.removeListener(_onTextChanged);
+    _speechViewModel.dispose();
     _inputViewModel.dispose();
     _photoViewModel?.dispose();
     _quotaSource?.quotaListenable.removeListener(_onQuotaChanged);
     _resetTimer?.cancel();
     _quotaAge.stop();
     super.dispose();
+  }
+
+  Future<void> _listen() async {
+    FocusScope.of(context).unfocus();
+    final text = await _speechViewModel.listen();
+    if (!mounted || !widget.isActive || text == null) return;
+    widget.textController.value = TextEditingValue(
+      text: text,
+      selection: TextSelection.collapsed(offset: text.length),
+    );
+    await _requestSubmission();
   }
 
   Future<void> _openCamera() async {
@@ -335,12 +365,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     return AnimatedBuilder(
       animation: Listenable.merge([
         _inputViewModel,
+        _speechViewModel,
         ?_photoViewModel,
         ?_quotaSource?.quotaListenable,
       ]),
       builder: (context, _) {
         final busy =
-            _inputViewModel.isLoading || (_photoViewModel?.isLoading ?? false);
+            _inputViewModel.isLoading ||
+            _speechViewModel.busy ||
+            (_photoViewModel?.isLoading ?? false);
         return LayoutBuilder(
           builder: (context, constraints) {
             // Match the compact bottom spacing in the reference, while
@@ -395,7 +428,34 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            const Expanded(child: SizedBox()),
+                            Expanded(
+                              child: Center(
+                                child: IconButton.filledTonal(
+                                  key: const Key('microphoneButton'),
+                                  tooltip: _speechViewModel.busy
+                                      ? 'Anuluj nagrywanie'
+                                      : 'Uprość mowę',
+                                  style: IconButton.styleFrom(
+                                    minimumSize: const Size(56, 56),
+                                    backgroundColor: const Color(0xFFC2E7FF),
+                                    foregroundColor: const Color(0xFF14243A),
+                                  ),
+                                  onPressed: _speechViewModel.busy
+                                      ? _speechViewModel.cancel
+                                      : busy ||
+                                            !widget.isActive ||
+                                            _confirmingSubmission
+                                      ? null
+                                      : _listen,
+                                  icon: Icon(
+                                    _speechViewModel.busy
+                                        ? Icons.stop_rounded
+                                        : Icons.mic_rounded,
+                                    size: 28,
+                                  ),
+                                ),
+                              ),
+                            ),
                             Expanded(
                               flex: 2,
                               child: Center(
@@ -452,6 +512,29 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           ],
                         ),
                       ),
+                      if (_speechViewModel.busy)
+                        Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Semantics(
+                            liveRegion: true,
+                            child: const Text(
+                              'Nasłuchiwanie… Mów po polsku. Koniec po 1,5 sekundy ciszy lub po 60 sekundach. Przycisk stop anuluje nagrywanie.',
+                              key: Key('speechStatus'),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                      if (_speechViewModel.message case final message?)
+                        Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Semantics(
+                            liveRegion: true,
+                            child: Text(
+                              message,
+                              key: const Key('speechMessage'),
+                            ),
+                          ),
+                        ),
                       if (_inputViewModel.errorMessage case final error?)
                         Padding(
                           padding: const EdgeInsets.all(20),

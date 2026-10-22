@@ -192,3 +192,16 @@ Przełączenie formularza czyści hasła i ponownie je ukrywa.
 „Nie pamiętam hasła” prowadzi do formularza wysłania linku przez Firebase.
 Wiadomość jest po polsku. Komunikat po wysłaniu jest taki sam dla istniejącego
 i nieistniejącego konta. Prawdziwe dostarczenie poczty wymaga testu na telefonie.
+
+## Upraszczanie mowy
+
+Przycisk mikrofonu po lewej stronie „Uprość” uruchamia lokalne rozpoznawanie
+polskiej mowy. Wymaga Androida 13 lub nowszego, lokalnego silnika i pobranego
+modelu języka polskiego. Audio nie jest zapisywane ani wysyłane na serwer.
+Po 1,5 s ciszy po wykryciu mowy lub po maksymalnie 60 s rejestracji aplikacja
+kończy nagrywanie i automatycznie przekazuje tekst do upraszczania, jak przy OCR.
+Przycisk stop anuluje sesję. Dotychczasowy tekst pozostaje do chwili poprawnego
+rozpoznania nowej wypowiedzi.
+
+[Zadania i stan weryfikacji](docs/speech_tasks.md).
+[Wymagania techniczne i próby na telefonie](docs/android_speech_manual_check.md).

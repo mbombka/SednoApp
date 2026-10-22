@@ -78,5 +78,6 @@ flutter {
 }
 
 dependencies {
+    testImplementation("junit:junit:4.13.2")
     implementation("com.google.android.play:integrity:1.6.0")
 }
