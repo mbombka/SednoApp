@@ -1,7 +1,8 @@
 # Sedno
 
 Sedno to aplikacja na Androida, która upraszcza polskie teksty. Można wpisać
-tekst, wkleić go lub odczytać ze zdjęcia. Zdjęcia pozostają na telefonie.
+tekst, wkleić go, odczytać ze zdjęcia lub podyktować (Android 13+ z lokalnym
+modelem języka polskiego). Zdjęcia i dźwięk pozostają na telefonie.
 Uproszczenie przygotowuje AI, dlatego wynik trzeba sprawdzić.
 
 ## Obecny stan

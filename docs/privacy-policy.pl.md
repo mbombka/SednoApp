@@ -1,6 +1,6 @@
 # Polityka prywatności Sedno
 
-Wersja: 20 października 2026 r.
+Wersja: 21 października 2026 r.
 
 ## Administrator i kontakt
 
@@ -12,7 +12,7 @@ Informacje o prywatności na stronie: https://sedno.xyz/#prywatnosc. Strona zawi
 
 ## Tekst i sztuczna inteligencja
 
-Twój tekst trafi przez serwer Sedno do dostawcy AI — OpenAI, aby go uprościć. Nie wpisuj danych, których nie chcesz przekazywać. Zdjęcia zostają na urządzeniu. AI może popełniać błędy. Sprawdź wynik.
+Twój tekst trafi przez serwer Sedno do dostawcy AI — OpenAI, aby go uprościć. Nie wpisuj danych, których nie chcesz przekazywać. Zdjęcia zostają na urządzeniu. Mowa jest rozpoznawana lokalnie; do uproszczenia trafia tylko tekst. AI może popełniać błędy. Sprawdź wynik.
 
 Po wybraniu „Uprość” tekst jest przesyłany przez serwer Sedno do OpenAI Responses API. Wynik wraca do aplikacji. Serwer Sedno używa treści do obsługi żądania, ale nie zapisuje oryginału ani wyniku w bazie ani w logach. Nie przekazujemy całej historii ani zdjęć.
 
@@ -33,6 +33,8 @@ Usunięcie konta przez e-mail lub na innym urządzeniu nie usuwa historii na poz
 ## Zdjęcia i historia na urządzeniu
 
 Zdjęcia, kadrowanie i rozpoznawanie tekstu odbywają się na urządzeniu. Sedno nie wysyła zdjęć do serwera ani dostawcy AI. Rozpoznany tekst trafia od razu do uproszczenia. Po błędzie lub anulowaniu możesz go poprawić. Po odczycie, anulowaniu lub błędzie aplikacja podejmuje próbę usunięcia kopii roboczych zdjęcia; nagłe zatrzymanie procesu może przerwać czyszczenie. Osobne kopie zapisane przez aplikację aparatu pozostają pod Twoją kontrolą.
+
+Mikrofon służy do lokalnego rozpoznawania polskiej mowy na obsługiwanych urządzeniach z Androidem 13 lub nowszym i pobranym modelem językowym. Dźwięk jest przetwarzany w pamięci urządzenia, bez zapisu nagrania i bez wysyłania go do serwera Sedno ani OpenAI. Po 1,5 sekundy ciszy po mowie lub po maksymalnie 60 sekundach nagrywanie się kończy, a rozpoznany tekst trafia do upraszczania przez serwer i OpenAI, tak jak tekst ze zdjęcia. Stop anuluje sesję. Możesz odmówić dostępu do mikrofonu i nadal wpisywać tekst lub używać aparatu.
 
 Historia zawiera oryginał, uproszczenie i datę. Jest szyfrowana, lokalna i wyłączona z kopii zapasowych Androida. Wpis wygasa po 7 dniach. Wygasłe wpisy nie są wyświetlane; czyszczenie następuje przy odczycie, uruchomieniu i wznowieniu aplikacji. Gdy aplikacja jest zamknięta, usunięcie następuje przy następnym takim zdarzeniu. Możesz usunąć wpisy wcześniej. Wylogowanie czyści lokalną historię.
 

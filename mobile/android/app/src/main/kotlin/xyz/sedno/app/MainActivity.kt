@@ -17,6 +17,8 @@ import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 
 class MainActivity : FlutterActivity() {
+    private val speech by lazy { LocalSpeechController(this) }
+
     private val channelName = "pl.sedno/history"
     // Keep this alias for history encrypted by earlier builds.
     private val alias = "simplyfi_history_v1"
@@ -24,6 +26,17 @@ class MainActivity : FlutterActivity() {
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "sedno/speech")
+            .setMethodCallHandler { call, result ->
+                when (call.method) {
+                    "listen" -> speech.listen(result)
+                    "cancel" -> {
+                        speech.cancel()
+                        result.success(null)
+                    }
+                    else -> result.notImplemented()
+                }
+            }
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, channelName)
             .setMethodCallHandler { call, result ->
                 try {
@@ -78,6 +91,23 @@ class MainActivity : FlutterActivity() {
                     result.error("integrity_failed", "Nie można potwierdzić instalacji.", null)
                 }
             }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == LocalSpeechController.PERMISSION_REQUEST) {
+            speech.onPermissionResult(grantResults.firstOrNull() == android.content.pm.PackageManager.PERMISSION_GRANTED)
+        }
+    }
+
+    override fun onStop() {
+        speech.cancel()
+        super.onStop()
+    }
+
+    override fun onDestroy() {
+        speech.cancel()
+        super.onDestroy()
     }
 
     private fun file() = File(noBackupFilesDir, "history.enc")
