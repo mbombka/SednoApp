@@ -127,6 +127,13 @@ class HttpSimplificationRepository
           final value = SimplificationResponse.fromJson(_object(response.body));
           _quotaRequest++;
           _quota.value = value.quota;
+          if (value.result.mode != request.mode) {
+            // An older backend may ignore the new request field. Never label
+            // its simplification as a correction.
+            throw const SimplificationApiException(
+              SimplificationFailure.rejected,
+            );
+          }
           return value;
         }
         if (response.statusCode == 202) {

@@ -10,6 +10,7 @@ public sealed class GuestIdentity
 
 public sealed class VerifiedAccount
 {
+    public DateTimeOffset? TesterAccessExpiresAt { get; set; }
     public List<string> InstallationHashes { get; set; } = [];
     public bool Deleting { get; set; }
     public Guid Id { get; set; }

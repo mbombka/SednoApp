@@ -11,6 +11,10 @@ usunięto 19.10.2026. Obsługę płatności na istniejącym serwerze włączono
 20.10.2026 do testów przez Google Play; odbiór zakupów pozostaje do wykonania.
 [Wdrożenie, migracja i pozostałe porządki](deploy/firebase/README.pl.md).
 
+Aktualizacja 22.10.2026: wdrożono `sedno-api-00012-9j4` z aktualnymi promptami,
+trybem Popraw i czasowym dostępem testerskim.
+[Raport wdrożenia](../docs/backend-deployment-2026-10-22.pl.md).
+
 ## Uruchomienie lokalne
 
 Potrzebujesz .NET 10 SDK i Dockera z Compose. Polecenia wykonuj w `backend/`.
@@ -222,3 +226,24 @@ ponownego uwierzytelnienia tego samego użytkownika, z `auth_time` do 5 minut,
 oraz kontroli bez cache. Sesje kont bez `FirebaseAuthTime` wymagają ponownego
 logowania po wdrożeniu. Stare aplikacje nie mogą usuwać kont samym tokenem Sedna.
 [Zmiany, testy i uwagi do wdrożenia](../docs/firebase-session-revocation-2026-10-20.pl.md).
+
+## Poprawianie tekstu
+
+`POST /v1/simplifications` przyjmuje opcjonalne `mode`: `simplify` (domyślnie)
+lub `correct`. Odpowiedź potwierdza tryb w `result.mode`. Inne wartości,
+w tym jawne `null`, są odrzucane przed rezerwacją limitu. Oba tryby korzystają
+z tych samych transakcyjnych limitów i procedur zwalniania rezerwacji po błędzie.
+Ponowienie tego samego identyfikatora z innym trybem zwraca `409 key_conflict`.
+
+Osobny prompt [correct.pl.txt](src/Sedno.Infrastructure/Prompts/correct.pl.txt)
+jest osadzony w Infrastructure jako `CorrectionPrompt`. Poprawia błędy językowe,
+zachowuje sens i pytania, nie udziela odpowiedzi. Dotychczasowy prompt
+upraszczania i parametry produkcyjnego modelu pozostają bez zmian.
+Backend należy wdrożyć przed aplikacją z przełącznikiem; stare aplikacje mogą
+dalej pomijać `mode`. Zmiana nie wymaga migracji Firestore ani nowych usług.
+
+## Dostęp testerski
+
+Pole `TesterAccessExpiresAt` konta w Firestore daje czasowy limit 400 operacji
+dziennie bez zakupu. Datę sprawdza transakcja limitu; użycie nie jest zerowane.
+[Skrypt administracyjny, ręczna edycja i wdrożenie](../docs/tester-access.pl.md).

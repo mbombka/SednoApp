@@ -18,6 +18,7 @@ import javax.crypto.spec.GCMParameterSpec
 
 class MainActivity : FlutterActivity() {
     private val speech by lazy { LocalSpeechController(this) }
+    private val playback by lazy { LocalTextPlaybackController(this) }
 
     private val channelName = "pl.sedno/history"
     // Keep this alias for history encrypted by earlier builds.
@@ -26,6 +27,14 @@ class MainActivity : FlutterActivity() {
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "sedno/text-playback")
+            .setMethodCallHandler { call, result ->
+                when (call.method) {
+                    "speak" -> playback.speak(call.arguments as? String, result)
+                    "stop" -> { playback.stop(); result.success(null) }
+                    else -> result.notImplemented()
+                }
+            }
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "sedno/speech")
             .setMethodCallHandler { call, result ->
                 when (call.method) {
@@ -102,11 +111,13 @@ class MainActivity : FlutterActivity() {
 
     override fun onStop() {
         speech.cancel()
+        playback.stop()
         super.onStop()
     }
 
     override fun onDestroy() {
         speech.cancel()
+        playback.stop()
         super.onDestroy()
     }
 

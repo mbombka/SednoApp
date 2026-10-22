@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:sedno_app/features/simplification/domain/text_mode.dart';
+
 import 'package:characters/characters.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sedno_app/features/quota/domain/quota_reset.dart';
@@ -15,6 +17,7 @@ class TextInputViewModel extends ChangeNotifier {
   TextInputViewModel({required this.onSubmit});
 
   final SubmitText onSubmit;
+  TextMode mode = TextMode.simplify;
   String _text = '';
   String? _errorMessage;
   TextInputStatus _status = TextInputStatus.idle;
@@ -27,6 +30,16 @@ class TextInputViewModel extends ChangeNotifier {
   bool get isLoading => _status == TextInputStatus.loading;
   bool get isOverLimit => characterCount > InputText.maxCharacters;
   bool get canSubmit => !isLoading && !isOverLimit;
+
+  void setMode(TextMode value) {
+    if (isLoading || mode == value) return;
+    mode = value;
+    _status = TextInputStatus.idle;
+    _errorMessage = isOverLimit
+        ? 'Tekst może mieć maksymalnie 4000 znaków.'
+        : null;
+    notifyListeners();
+  }
 
   void setText(String value) {
     if (isLoading || value == _text) return;
@@ -60,7 +73,9 @@ class TextInputViewModel extends ChangeNotifier {
     } on SubmissionUnavailableException {
       if (_disposed) return;
       _status = TextInputStatus.error;
-      _errorMessage = 'Upraszczanie tekstu nie jest jeszcze dostępne.';
+      _errorMessage = mode == TextMode.correct
+          ? 'Poprawianie tekstu nie jest jeszcze dostępne.'
+          : 'Upraszczanie tekstu nie jest jeszcze dostępne.';
     } on TimeoutException {
       if (_disposed) return;
       _status = TextInputStatus.error;
@@ -86,12 +101,16 @@ class TextInputViewModel extends ChangeNotifier {
         SimplificationFailure.unavailable =>
           'Usługa jest chwilowo niedostępna. Spróbuj ponownie.',
         SimplificationFailure.rejected =>
-          'Nie można uprościć tego tekstu. Sprawdź dane i spróbuj ponownie.',
+          mode == TextMode.correct
+              ? 'Nie można poprawić tego tekstu. Sprawdź dane i spróbuj ponownie.'
+              : 'Nie można uprościć tego tekstu. Sprawdź dane i spróbuj ponownie.',
       };
     } catch (_) {
       if (_disposed) return;
       _status = TextInputStatus.error;
-      _errorMessage = 'Nie udało się uprościć tekstu. Spróbuj ponownie.';
+      _errorMessage = mode == TextMode.correct
+          ? 'Nie udało się poprawić tekstu. Spróbuj ponownie.'
+          : 'Nie udało się uprościć tekstu. Spróbuj ponownie.';
     }
     notifyListeners();
   }

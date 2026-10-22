@@ -1,5 +1,10 @@
 import 'dart:async';
 
+import 'package:sedno_app/features/simplification/domain/text_mode.dart';
+import 'package:sedno_app/features/speech_output/domain/text_playback_service.dart';
+import 'package:sedno_app/features/speech_output/data/android_text_playback_service.dart';
+import 'package:sedno_app/features/speech_output/presentation/text_playback_view_model.dart';
+
 import 'package:flutter/material.dart';
 import 'package:sedno_app/features/home/presentation/text_input_view_model.dart';
 import 'package:sedno_app/features/history/domain/history_entry.dart';
@@ -23,6 +28,8 @@ class HomeScreen extends StatefulWidget {
     required this.appName,
     required this.textController,
     this.onSubmit,
+    this.onModeChanged,
+    this.playbackService = const AndroidTextPlaybackService(),
     this.isActive = true,
     this.speechService = const AndroidSpeechService(),
     this.onCameraPressed,
@@ -34,6 +41,8 @@ class HomeScreen extends StatefulWidget {
   });
 
   final String appName;
+  final ValueChanged<TextMode>? onModeChanged;
+  final TextPlaybackService playbackService;
   final TextEditingController textController;
   final SubmitText? onSubmit;
   final bool isActive;
@@ -50,6 +59,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   late final TextInputViewModel _inputViewModel;
+  TextMode _mode = TextMode.simplify;
+  late TextPlaybackViewModel _playbackViewModel;
   PhotoInputViewModel? _photoViewModel;
   late SpeechInputViewModel _speechViewModel;
   SimplificationViewModel? _simplificationViewModel;
@@ -63,6 +74,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _playbackViewModel = TextPlaybackViewModel(widget.playbackService);
     _speechViewModel = SpeechInputViewModel(widget.speechService);
     _inputViewModel = TextInputViewModel(onSubmit: _submit);
     _inputViewModel.setText(widget.textController.text);
@@ -95,8 +107,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     } catch (_) {
       final quota = _quotaSource?.quotaListenable.value;
       if (quota != null &&
-          quota.remaining == 0 &&
-          _remainingUntilReset(quota) == Duration.zero) {
+          (quota.remaining == 0 &&
+                  _remainingUntilReset(quota) == Duration.zero ||
+              quota.tier == QuotaTier.tester &&
+                  quota.testerAccessExpiresAt != null &&
+                  quota.testerAccessExpiresAt!.difference(quota.serverTime) <=
+                      _quotaAge.elapsed)) {
         _resetTimer?.cancel();
         _resetTimer = Timer(const Duration(seconds: 30), _loadQuota);
       }
@@ -110,6 +126,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     } else if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.detached) {
       unawaited(_speechViewModel.cancel());
+      unawaited(_playbackViewModel.stop());
     }
   }
 
@@ -120,10 +137,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       ..start();
     final quota = _quotaSource?.quotaListenable.value;
     if (quota == null) return;
-    _resetTimer = Timer(
-      _remainingUntilReset(quota) + const Duration(seconds: 1),
-      _loadQuota,
-    );
+    var refreshAfter = _remainingUntilReset(quota);
+    final testerExpiry = quota.testerAccessExpiresAt;
+    if (quota.tier == QuotaTier.tester && testerExpiry != null) {
+      final untilExpiry = testerExpiry.difference(quota.serverTime);
+      if (untilExpiry > Duration.zero && untilExpiry < refreshAfter) {
+        refreshAfter = untilExpiry;
+      }
+    }
+    _resetTimer = Timer(refreshAfter + const Duration(seconds: 1), _loadQuota);
   }
 
   Duration _remainingUntilReset(QuotaState quota) {
@@ -150,6 +172,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     if (_confirmingSubmission) return;
     _confirmingSubmission = true;
     try {
+      if (_playbackViewModel.isPlaying) await _playbackViewModel.stop();
       // Let the existing validator report empty or overlong input before asking.
       try {
         InputText(widget.textController.text);
@@ -190,7 +213,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             title: const Text('Dzienny limit'),
             content: Text(
               quota.remaining == 1
-                  ? 'Pozostało 1 uproszczenie.\n'
+                  ? '${_mode == TextMode.correct ? 'Pozostało 1 użycie AI.' : 'Pozostało 1 uproszczenie.'}\n'
                         'Nowy limit o ${QuotaReset.localTime(resetAt: quota.resetAt)} (${_timeUntilReset(quota)}).'
                   : 'Wykorzystano dzienny limit.\n'
                         'Nowy limit o ${QuotaReset.localTime(resetAt: quota.resetAt)} (${_timeUntilReset(quota)}).\n'
@@ -217,7 +240,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         final accepted = await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Zanim uprościsz tekst'),
+            title: Text(
+              _mode == TextMode.correct
+                  ? 'Zanim poprawisz tekst'
+                  : 'Zanim uprościsz tekst',
+            ),
             content: const SingleChildScrollView(
               child: Text(
                 PrivacyScreen.aiNotice,
@@ -256,7 +283,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Future<void> _submit(InputText input) async {
     if (widget.onSubmit case final callback?) return callback(input);
     if (_simplificationViewModel case final model?) {
-      final result = await model.simplify(input);
+      final result = await model.simplify(input, mode: _mode);
       if (!mounted) return;
       if (widget.historyRepository case final history?) {
         try {
@@ -286,7 +313,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   @override
   void didUpdateWidget(covariant HomeScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (!widget.isActive) unawaited(_speechViewModel.cancel());
+    if (!widget.isActive) {
+      unawaited(_speechViewModel.cancel());
+      unawaited(_playbackViewModel.stop());
+    }
+    if (oldWidget.playbackService != widget.playbackService) {
+      _playbackViewModel.dispose();
+      _playbackViewModel = TextPlaybackViewModel(widget.playbackService);
+    }
     if (oldWidget.textController != widget.textController) {
       oldWidget.textController.removeListener(_onTextChanged);
       _inputViewModel.setText(widget.textController.text);
@@ -321,11 +355,22 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     widget.textController.removeListener(_onTextChanged);
     _speechViewModel.dispose();
     _inputViewModel.dispose();
+    _playbackViewModel.dispose();
     _photoViewModel?.dispose();
     _quotaSource?.quotaListenable.removeListener(_onQuotaChanged);
     _resetTimer?.cancel();
     _quotaAge.stop();
     super.dispose();
+  }
+
+  void _toggleMode() {
+    unawaited(_speechViewModel.cancel());
+    unawaited(_playbackViewModel.stop());
+    setState(() {
+      _mode = _mode == TextMode.simplify ? TextMode.correct : TextMode.simplify;
+      _inputViewModel.setMode(_mode);
+    });
+    widget.onModeChanged?.call(_mode);
   }
 
   Future<void> _listen() async {
@@ -366,6 +411,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       animation: Listenable.merge([
         _inputViewModel,
         _speechViewModel,
+        _playbackViewModel,
         ?_photoViewModel,
         ?_quotaSource?.quotaListenable,
       ]),
@@ -380,7 +426,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             // leaving the Android navigation area outside the touch targets.
             final bottomSpacing = 32.0 + MediaQuery.paddingOf(context).bottom;
             final editorHeight =
-                (constraints.maxHeight - 112 - 28 - bottomSpacing).clamp(
+                (constraints.maxHeight - 112 - 48 - bottomSpacing).clamp(
                   160.0,
                   double.infinity,
                 );
@@ -402,7 +448,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           ),
                         ),
                         child: Semantics(
-                          label: 'Tekst do uproszczenia',
+                          label: _mode == TextMode.correct
+                              ? 'Tekst do poprawienia'
+                              : 'Tekst do uproszczenia',
                           child: TextField(
                             controller: widget.textController,
                             enabled: !busy,
@@ -422,7 +470,19 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 28),
+                      Center(
+                        child: IconButton(
+                          key: const Key('modeSwitch'),
+                          tooltip: _mode == TextMode.simplify
+                              ? 'Przełącz na poprawianie tekstu'
+                              : 'Przełącz na upraszczanie tekstu',
+                          onPressed:
+                              busy || !widget.isActive || _confirmingSubmission
+                              ? null
+                              : _toggleMode,
+                          icon: const Icon(Icons.swap_horiz, size: 32),
+                        ),
+                      ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 24),
                         child: Row(
@@ -431,8 +491,16 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                             Expanded(
                               child: Center(
                                 child: IconButton.filledTonal(
-                                  key: const Key('microphoneButton'),
-                                  tooltip: _speechViewModel.busy
+                                  key: Key(
+                                    _mode == TextMode.correct
+                                        ? 'speakerButton'
+                                        : 'microphoneButton',
+                                  ),
+                                  tooltip: _mode == TextMode.correct
+                                      ? (_playbackViewModel.isPlaying
+                                            ? 'Zatrzymaj odczyt'
+                                            : 'Odczytaj tekst')
+                                      : _speechViewModel.busy
                                       ? 'Anuluj nagrywanie'
                                       : 'Uprość mowę',
                                   style: IconButton.styleFrom(
@@ -440,7 +508,28 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                     backgroundColor: const Color(0xFFC2E7FF),
                                     foregroundColor: const Color(0xFF14243A),
                                   ),
-                                  onPressed: _speechViewModel.busy
+                                  onPressed: _mode == TextMode.correct
+                                      ? (busy ||
+                                                !widget.isActive ||
+                                                _confirmingSubmission
+                                            ? null
+                                            : () {
+                                                if (_playbackViewModel
+                                                    .isPlaying) {
+                                                  unawaited(
+                                                    _playbackViewModel.stop(),
+                                                  );
+                                                } else {
+                                                  unawaited(
+                                                    _playbackViewModel.play(
+                                                      widget
+                                                          .textController
+                                                          .text,
+                                                    ),
+                                                  );
+                                                }
+                                              })
+                                      : _speechViewModel.busy
                                       ? _speechViewModel.cancel
                                       : busy ||
                                             !widget.isActive ||
@@ -448,7 +537,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                       ? null
                                       : _listen,
                                   icon: Icon(
-                                    _speechViewModel.busy
+                                    _mode == TextMode.correct
+                                        ? (_playbackViewModel.isPlaying
+                                              ? Icons.stop_rounded
+                                              : Icons.volume_up_rounded)
+                                        : _speechViewModel.busy
                                         ? Icons.stop_rounded
                                         : Icons.mic_rounded,
                                     size: 28,
@@ -470,45 +563,52 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                       ? _requestSubmission
                                       : null,
                                   child: _inputViewModel.isLoading
-                                      ? const SizedBox(
+                                      ? SizedBox(
                                           width: 28,
                                           height: 28,
                                           child: CircularProgressIndicator(
                                             color: Colors.white,
-                                            semanticsLabel: 'Upraszczanie…',
+                                            semanticsLabel:
+                                                _mode == TextMode.correct
+                                                ? 'Poprawianie…'
+                                                : 'Upraszczanie…',
                                           ),
                                         )
-                                      : const Text('Uprość'),
+                                      : Text(_mode.action),
                                 ),
                               ),
                             ),
-                            Expanded(
-                              child: Center(
-                                child: OutlinedButton(
-                                  key: const Key('cameraButton'),
-                                  style: OutlinedButton.styleFrom(
-                                    shape: const CircleBorder(),
-                                    side: BorderSide.none,
-                                    backgroundColor: const Color(0xFFC2E7FF),
-                                    foregroundColor: const Color(0xFF14243A),
-                                    minimumSize: const Size(56, 56),
-                                    padding: const EdgeInsets.all(12),
-                                  ),
-                                  onPressed: busy ? null : _openCamera,
-                                  child: Semantics(
-                                    label: (_photoViewModel?.isLoading ?? false)
-                                        ? 'Odczytywanie…'
-                                        : 'Aparat',
-                                    child: const ExcludeSemantics(
-                                      child: Icon(
-                                        Icons.photo_camera_outlined,
-                                        size: 28,
+                            if (_mode == TextMode.correct)
+                              const Expanded(child: SizedBox())
+                            else
+                              Expanded(
+                                child: Center(
+                                  child: OutlinedButton(
+                                    key: const Key('cameraButton'),
+                                    style: OutlinedButton.styleFrom(
+                                      shape: const CircleBorder(),
+                                      side: BorderSide.none,
+                                      backgroundColor: const Color(0xFFC2E7FF),
+                                      foregroundColor: const Color(0xFF14243A),
+                                      minimumSize: const Size(56, 56),
+                                      padding: const EdgeInsets.all(12),
+                                    ),
+                                    onPressed: busy ? null : _openCamera,
+                                    child: Semantics(
+                                      label:
+                                          (_photoViewModel?.isLoading ?? false)
+                                          ? 'Odczytywanie…'
+                                          : 'Aparat',
+                                      child: const ExcludeSemantics(
+                                        child: Icon(
+                                          Icons.photo_camera_outlined,
+                                          size: 28,
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
                           ],
                         ),
                       ),
@@ -524,7 +624,20 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                             ),
                           ),
                         ),
-                      if (_speechViewModel.message case final message?)
+                      if (_playbackViewModel.message case final message?
+                          when _mode == TextMode.correct)
+                        Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Semantics(
+                            liveRegion: true,
+                            child: Text(
+                              message,
+                              key: const Key('playbackMessage'),
+                            ),
+                          ),
+                        ),
+                      if (_speechViewModel.message case final message?
+                          when _mode == TextMode.simplify)
                         Padding(
                           padding: const EdgeInsets.all(12),
                           child: Semantics(
@@ -540,7 +653,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           padding: const EdgeInsets.all(20),
                           child: Text(error, semanticsLabel: error),
                         ),
-                      if (_photoViewModel?.message case final message?) ...[
+                      if (_photoViewModel?.message case final message?
+                          when _mode == TextMode.simplify) ...[
                         const SizedBox(height: 12),
                         Text(message, key: const Key('photoMessage')),
                       ],
@@ -548,7 +662,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       if (_inputViewModel.status == TextInputStatus.success &&
                           widget.simplificationRepository == null) ...[
                         const SizedBox(height: 16),
-                        const Text('Tekst został przekazany do uproszczenia.'),
+                        Text(
+                          _mode == TextMode.correct
+                              ? 'Tekst został przekazany do poprawienia.'
+                              : 'Tekst został przekazany do uproszczenia.',
+                        ),
                       ],
                     ],
                   ),

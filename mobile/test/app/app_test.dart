@@ -109,7 +109,7 @@ void main() {
 
     expect(find.byType(MaterialApp), findsOneWidget);
     expect(find.byType(Scaffold), findsOneWidget);
-    expect(find.text(SednoApp.displayName), findsOneWidget);
+    expect(find.text('Sedno - uprość tekst:'), findsOneWidget);
     expect(find.text('Witaj w Sedno'), findsNothing);
     expect(find.byTooltip('Menu użytkownika'), findsOneWidget);
     expect(find.byType(TextField), findsOneWidget);

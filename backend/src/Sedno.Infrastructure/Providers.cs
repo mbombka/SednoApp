@@ -9,6 +9,8 @@ public sealed class FreeEntitlementResolver : IEntitlementResolver
 
 public sealed class DevelopmentMockProvider : IModelProvider
 {
+    public Task<string> CorrectAsync(string text, CancellationToken cancellationToken) =>
+        Task.FromResult("Demonstracja poprawiania: " + text.Trim());
     public Task<string> SimplifyAsync(string text, CancellationToken cancellationToken) =>
         Task.FromResult("Wersja demonstracyjna: " + text.Trim());
 }

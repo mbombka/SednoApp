@@ -160,6 +160,8 @@ void main() {
     await tester.pumpAndSettle();
     expect(service.cancellations, 1);
     expect(submitted, isEmpty);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
     tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
   });
 }

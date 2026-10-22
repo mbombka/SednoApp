@@ -48,7 +48,7 @@ public sealed class FirestoreStore(FirestoreDb database, bool requireMigration =
     {
         JsonValueKind.Object => value.EnumerateObject().ToDictionary(x => x.Name, x => Convert(x.Value, x.Name)!),
         JsonValueKind.Array => value.EnumerateArray().Select(x => Convert(x)).ToArray(),
-        JsonValueKind.String => (field is "CreatedAt" or "ExpiresAt" or "FinishedAt" or "ReservationExpiresAt" or "VerifiedAt" or "RefreshNotBefore" or "ProcessedAt") && value.TryGetDateTimeOffset(out var date) ? Timestamp.FromDateTimeOffset(date) : value.GetString(),
+        JsonValueKind.String => (field is "TesterAccessExpiresAt" or "CreatedAt" or "ExpiresAt" or "FinishedAt" or "ReservationExpiresAt" or "VerifiedAt" or "RefreshNotBefore" or "ProcessedAt") && value.TryGetDateTimeOffset(out var date) ? Timestamp.FromDateTimeOffset(date) : value.GetString(),
         JsonValueKind.Number => value.GetInt64(),
         JsonValueKind.True => true,
         JsonValueKind.False => false,

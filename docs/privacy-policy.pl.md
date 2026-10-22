@@ -1,6 +1,6 @@
 # Polityka prywatności Sedno
 
-Wersja: 21 października 2026 r.
+Wersja: 22 października 2026 r.
 
 ## Administrator i kontakt
 
@@ -12,9 +12,9 @@ Informacje o prywatności na stronie: https://sedno.xyz/#prywatnosc. Strona zawi
 
 ## Tekst i sztuczna inteligencja
 
-Twój tekst trafi przez serwer Sedno do dostawcy AI — OpenAI, aby go uprościć. Nie wpisuj danych, których nie chcesz przekazywać. Zdjęcia zostają na urządzeniu. Mowa jest rozpoznawana lokalnie; do uproszczenia trafia tylko tekst. AI może popełniać błędy. Sprawdź wynik.
+Twój tekst trafi przez serwer Sedno do dostawcy AI — OpenAI, aby go uprościć lub poprawić. Nie wpisuj danych, których nie chcesz przekazywać. Zdjęcia zostają na urządzeniu. Mowa jest rozpoznawana lokalnie; do AI trafia tylko tekst. Odczyt tekstu używa polskiego głosu na telefonie. AI może popełniać błędy. Sprawdź wynik.
 
-Po wybraniu „Uprość” tekst jest przesyłany przez serwer Sedno do OpenAI Responses API. Wynik wraca do aplikacji. Serwer Sedno używa treści do obsługi żądania, ale nie zapisuje oryginału ani wyniku w bazie ani w logach. Nie przekazujemy całej historii ani zdjęć.
+Po wybraniu „Uprość” lub „Popraw” tekst jest przesyłany przez serwer Sedno do OpenAI Responses API. Wynik wraca do aplikacji. Serwer Sedno używa treści do obsługi żądania, ale nie zapisuje oryginału ani wyniku w bazie ani w logach. Nie przekazujemy całej historii ani zdjęć.
 
 Wyłączenie zapisu odpowiedzi w API nie oznacza braku retencji u dostawcy. OpenAI domyślnie nie używa danych API do trenowania modeli. Logi bezpieczeństwa mogą zawierać treści do 30 dni, z wyjątkami określonymi przez dostawcę. Mechanizmy cache mogą przechowywać stan przejściowy. Nie deklarujemy zerowej retencji ani przetwarzania OpenAI wyłącznie w Unii Europejskiej.
 

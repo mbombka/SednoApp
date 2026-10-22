@@ -1,19 +1,22 @@
 # Sedno
 
-Sedno to aplikacja na Androida, która upraszcza polskie teksty. Można wpisać
+Sedno to aplikacja na Androida, która upraszcza i poprawia polskie teksty. Można wpisać
 tekst, wkleić go, odczytać ze zdjęcia lub podyktować (Android 13+ z lokalnym
 modelem języka polskiego). Zdjęcia i dźwięk pozostają na telefonie.
-Uproszczenie przygotowuje AI, dlatego wynik trzeba sprawdzić.
+Wynik przygotowuje AI, dlatego trzeba go sprawdzić. Przełącznik nad przyciskiem
+wybiera „Uprość” lub „Popraw”. Oba tryby korzystają ze wspólnego limitu dziennego.
+[Lista zadań i opis nowego trybu](docs/popraw-zadania.md).
 
 ## Obecny stan
 
 Serwer uruchomiono 19.10.2026. Przed udostępnieniem aplikacji pozostają
 [pozostałe kontrole i przygotowanie Google Play](Tasks.md).
 Obsługę płatności włączono na istniejącym serwerze do testów; zakupów nie odebrano
-jeszcze na telefonie. Przygotowano [podpisany AAB 11](mobile/docs/google_play_release_11.md)
-z aktualną obsługą sesji i ponownego uwierzytelnienia. Backend wdrożono jako
-`sedno-api-00011-bfh`, ze współbieżnością 80 żądań na instancję.
-[Raport wdrożenia](docs/backend-deployment-2026-10-21.pl.md).
+jeszcze na telefonie. Przygotowano [podpisany AAB 12](mobile/docs/google_play_release_12.md)
+z trybem Popraw, lokalnym odczytem tekstu i obsługą dostępu testerskiego.
+Backend z aktualnymi promptami wdrożono 22.10.2026 jako `sedno-api-00012-9j4`,
+ze współbieżnością 80 żądań na instancję.
+[Raport wdrożenia](docs/backend-deployment-2026-10-22.pl.md).
 Obsługę usuwania konta przez e-mail właściciel potwierdził 20.10.2026.
 
 Backend przełączono na Firestore 19.10.2026. API i godzinowe sprzątanie działają.
@@ -51,3 +54,7 @@ Starą instancję Cloud SQL i wszystkie cztery kopie zapasowe usunięto 19.10.20
 Kod aplikacji jest w `mobile/`, serwera w `backend/`, a opis API w
 [contracts/openapi.yaml](contracts/openapi.yaml). Narzędzia pomocnicze są w `tools/`.
 Zasady pracy nad kodem opisuje [AGENTS.md](AGENTS.md).
+
+## Dostęp dla testerów
+
+[Instrukcja czasowego dostępu testerskiego i skryptu administracyjnego](docs/tester-access.pl.md).

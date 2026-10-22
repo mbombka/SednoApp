@@ -223,3 +223,8 @@ wymaga sprawdzenia rzeczywistego zużycia, nie wynika z samego projektu rozwiąz
   Potwierdź zachowanie obu dróg dostępu bez przeciążania produkcji.
 - **Gdzie zacząć:** `backend/src/Sedno.Api/Program.cs`,
   `backend/src/Sedno.Api/CloudRunHosting.cs`, konfiguracja Hosting i Cloud Run.
+
+## Tryby „Uprość” i „Popraw” — 22.10.2026
+
+Lista implementacji, wyniki testów i próby na telefonie:
+[popraw-zadania.md](docs/popraw-zadania.md).

@@ -151,12 +151,14 @@ public sealed class UsageStore(FirestoreStore db, IEntitlementResolver entitleme
     {
         var identity = await db.GetAsync<GuestIdentity>(transaction, db.Identities.Document(FirestoreStore.Id(id)), ct)
             ?? throw new InvalidOperationException("Identity unavailable.");
+        DateTimeOffset? testerExpiresAt = null;
         var hashes = new List<string> { identity.InstallationHash };
         if (identity.AccountId is Guid accountId)
         {
             var account = await db.GetAsync<VerifiedAccount>(transaction, db.Accounts.Document(FirestoreStore.Id(accountId)), ct);
             if (account is null || account.Deleting) throw new InvalidOperationException("Account unavailable.");
             hashes.AddRange(account.InstallationHashes);
+            testerExpiresAt = account.TesterAccessExpiresAt;
         }
         var day = QuotaPolicy.Day(now);
         var days = new Dictionary<string, DailyUsage>();
@@ -172,8 +174,9 @@ public sealed class UsageStore(FirestoreStore db, IEntitlementResolver entitleme
         }
         var used = days.Values.Sum(x => x.Used.Values.Sum());
         var reserved = days.Values.Sum(x => x.Reservations.Count);
-        var limit = QuotaPolicy.Limit(paid);
-        return (identity, days, new(paid ? "subscription" : "free", limit, used,
-            Math.Max(0, limit - used - reserved), now, QuotaPolicy.ResetAt(now)));
+        var tester = testerExpiresAt > now;
+        var limit = QuotaPolicy.Limit(paid || tester);
+        return (identity, days, new(paid ? "subscription" : tester ? "tester" : "free", limit, used,
+            Math.Max(0, limit - used - reserved), now, QuotaPolicy.ResetAt(now), testerExpiresAt));
     }
 }

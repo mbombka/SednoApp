@@ -5,6 +5,11 @@ API: **https://sednoapp-79241-api.web.app**, projekt `sednoapp-79241`, numer
 na istniejącym `sedno-api`; [stan i pozostałe ustawienia](../../../docs/billing-deployment-2026-10-20.pl.md).
 Strona `sedno.xyz` jest oddzielna.
 
+22.10.2026 wdrożono **`sedno-api-00012-9j4`**: aktualne prompty, tryb Popraw
+i czasowy dostęp testerski. Hosting kieruje do nowej rewizji; cleanup działa
+na tym samym obrazie.
+[Raport wdrożenia](../../../docs/backend-deployment-2026-10-22.pl.md).
+
 Poprawkę lokalnego limitera wdrożono 21.10.2026 jako `sedno-api-00011-bfh`.
 Ta sama rewizja zawiera kontrolę odwołania sesji i świeżości subskrypcji.
 Zachowuje obie drogi

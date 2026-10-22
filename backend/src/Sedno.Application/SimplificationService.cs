@@ -16,8 +16,10 @@ public sealed class SimplificationService(IUsageStore usage, IModelProvider mode
         if (string.IsNullOrWhiteSpace(input.RequestId) || input.RequestId.Length > 100 ||
             input.RequestId.Any(c => !(char.IsAsciiLetterOrDigit(c) || c is '-' or '_')))
             throw new InputValidationException("invalid_request_id", "Nieprawidłowy identyfikator żądania.");
+        if (input.Mode is not ("simplify" or "correct"))
+            throw new InputValidationException("invalid_mode", "Nieprawidłowy tryb tekstu.");
         if (string.IsNullOrWhiteSpace(input.Text))
-            throw new InputValidationException("empty_text", "Wpisz tekst do uproszczenia.");
+            throw new InputValidationException("empty_text", "Wpisz tekst.");
         if (new StringInfo(input.Text).LengthInTextElements > 4000)
             throw new InputValidationException("text_too_long", "Tekst może mieć maksymalnie 4000 znaków.");
     }
@@ -26,7 +28,11 @@ public sealed class SimplificationService(IUsageStore usage, IModelProvider mode
         Guid identityId, SimplificationInput input, CancellationToken cancellationToken)
     {
         Validate(input);
-        var fingerprint = Convert.ToHexString(HMACSHA256.HashData(fingerprintKey, Encoding.UTF8.GetBytes(input.Text)));
+        // Preserve legacy simplify fingerprints; separate correction keys by purpose.
+        var modeKey = input.Mode == "correct"
+            ? HMACSHA256.HashData(fingerprintKey, "sedno.correct.v1"u8)
+            : fingerprintKey;
+        var fingerprint = Convert.ToHexString(HMACSHA256.HashData(modeKey, Encoding.UTF8.GetBytes(input.Text)));
         ReservationOutcome reservation;
         using (timings?.Measure(SimplificationStage.Reservation))
             reservation = await usage.ReserveAsync(identityId, input.RequestId, fingerprint, cancellationToken);
@@ -35,7 +41,9 @@ public sealed class SimplificationService(IUsageStore usage, IModelProvider mode
         try
         {
             using (timings?.Measure(SimplificationStage.Model))
-                output = await model.SimplifyAsync(input.Text, cancellationToken);
+                output = input.Mode == "correct"
+                    ? await model.CorrectAsync(input.Text, cancellationToken)
+                    : await model.SimplifyAsync(input.Text, cancellationToken);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
@@ -60,6 +68,6 @@ public sealed class SimplificationService(IUsageStore usage, IModelProvider mode
         QuotaDto quota;
         using (timings?.Measure(SimplificationStage.QuotaRead))
             quota = await usage.GetQuotaAsync(identityId, cancellationToken);
-        return ("succeeded", new(new(input.RequestId, output, clock.GetUtcNow()), quota), quota);
+        return ("succeeded", new(new(input.RequestId, output, clock.GetUtcNow(), input.Mode), quota), quota);
     }
 }

@@ -1,12 +1,12 @@
 {
   "title": "Polityka prywatności Sedno",
-  "version": "2026-10-21",
-  "versionLabel": "21 października 2026 r.",
+  "version": "2026-10-22",
+  "versionLabel": "22 października 2026 r.",
   "website": "https://sedno.xyz",
   "privacyUrl": "https://sedno.xyz/#prywatnosc",
   "deletionUrl": "https://sedno.xyz/usun-konto",
   "email": "contact@sedno.xyz",
-  "aiNotice": "Twój tekst trafi przez serwer Sedno do dostawcy AI — OpenAI, aby go uprościć. Nie wpisuj danych, których nie chcesz przekazywać. Zdjęcia zostają na urządzeniu. Mowa jest rozpoznawana lokalnie; do uproszczenia trafia tylko tekst. AI może popełniać błędy. Sprawdź wynik.",
+  "aiNotice": "Twój tekst trafi przez serwer Sedno do dostawcy AI — OpenAI, aby go uprościć lub poprawić. Nie wpisuj danych, których nie chcesz przekazywać. Zdjęcia zostają na urządzeniu. Mowa jest rozpoznawana lokalnie; do AI trafia tylko tekst. Odczyt tekstu używa polskiego głosu na telefonie. AI może popełniać błędy. Sprawdź wynik.",
   "deletionNotice": "Usuniemy konto Sedno, jego dane na serwerze i lokalną historię na tym urządzeniu. Tej czynności nie można cofnąć. Usunięcie konta nie anuluje subskrypcji. Aby zatrzymać opłaty, otwórz Google Play → Płatności i subskrypcje → Subskrypcje → Sedno → Anuluj subskrypcję.",
   "sections": [
     {
@@ -20,8 +20,8 @@
     {
       "title": "Tekst i sztuczna inteligencja",
       "paragraphs": [
-        "Twój tekst trafi przez serwer Sedno do dostawcy AI — OpenAI, aby go uprościć. Nie wpisuj danych, których nie chcesz przekazywać. Zdjęcia zostają na urządzeniu. Mowa jest rozpoznawana lokalnie; do uproszczenia trafia tylko tekst. AI może popełniać błędy. Sprawdź wynik.",
-        "Po wybraniu „Uprość” tekst jest przesyłany przez serwer Sedno do OpenAI Responses API. Wynik wraca do aplikacji. Serwer Sedno używa treści do obsługi żądania, ale nie zapisuje oryginału ani wyniku w bazie ani w logach. Nie przekazujemy całej historii ani zdjęć.",
+        "Twój tekst trafi przez serwer Sedno do dostawcy AI — OpenAI, aby go uprościć lub poprawić. Nie wpisuj danych, których nie chcesz przekazywać. Zdjęcia zostają na urządzeniu. Mowa jest rozpoznawana lokalnie; do AI trafia tylko tekst. Odczyt tekstu używa polskiego głosu na telefonie. AI może popełniać błędy. Sprawdź wynik.",
+        "Po wybraniu „Uprość” lub „Popraw” tekst jest przesyłany przez serwer Sedno do OpenAI Responses API. Wynik wraca do aplikacji. Serwer Sedno używa treści do obsługi żądania, ale nie zapisuje oryginału ani wyniku w bazie ani w logach. Nie przekazujemy całej historii ani zdjęć.",
         "Wyłączenie zapisu odpowiedzi w API nie oznacza braku retencji u dostawcy. OpenAI domyślnie nie używa danych API do trenowania modeli. Logi bezpieczeństwa mogą zawierać treści do 30 dni, z wyjątkami określonymi przez dostawcę. Mechanizmy cache mogą przechowywać stan przejściowy. Nie deklarujemy zerowej retencji ani przetwarzania OpenAI wyłącznie w Unii Europejskiej.",
         "Nie przesyłaj danych o zdrowiu, niepełnosprawności ani innych szczególnie chronionych informacji. Przed wysłaniem usuń zbędne dane osobowe i dane innych osób. Korzystanie z Sedno nie oznacza zgody na przetwarzanie wszystkich kategorii danych."
       ]

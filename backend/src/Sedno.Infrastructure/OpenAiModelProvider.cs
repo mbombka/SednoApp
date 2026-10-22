@@ -32,13 +32,18 @@ public sealed class ModelProviderException() : Exception("Usługa upraszczania j
 public sealed class OpenAiModelProvider : IModelProvider
 {
     private readonly ResponsesClient _responses;
+    private readonly ResponsesClient _corrections;
     public OpenAiModelProvider(HttpClient client, OpenAiModelOptions options, TimeProvider? clock = null,
         SimplificationTimings? timings = null)
     {
         options.Validate();
+        _corrections = new ResponsesClient(client, options.ApiKey, options.Model, CorrectionPrompt.Text,
+            options.ReasoningEffort, options.ServiceTier, clock, options.MaxOutputTokens, options.TimeoutSeconds, timings);
         _responses = new ResponsesClient(client, options.ApiKey, options.Model, SimplificationPrompt.Text,
             options.ReasoningEffort, options.ServiceTier, clock, options.MaxOutputTokens, options.TimeoutSeconds, timings);
     }
     public Task<string> SimplifyAsync(string text, CancellationToken cancellationToken) =>
         _responses.SimplifyAsync(text, cancellationToken);
+    public Task<string> CorrectAsync(string text, CancellationToken cancellationToken) =>
+        _corrections.SimplifyAsync(text, cancellationToken);
 }

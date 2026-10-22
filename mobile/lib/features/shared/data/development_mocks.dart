@@ -68,12 +68,14 @@ class MockSimplificationRepository implements SimplificationRepository {
   final Clock clock;
   final Map<String, SimplificationResponse> _responses = {};
   final Map<String, String> _requestTexts = {};
+  final Map<String, String> _requestModes = {};
 
   @override
   Future<SimplificationResponse> simplify(SimplificationRequest request) async {
     final previous = _responses[request.requestId];
     if (previous != null) {
-      if (_requestTexts[request.requestId] != request.input.value) {
+      if (_requestTexts[request.requestId] != request.input.value ||
+          _requestModes[request.requestId] != request.mode.name) {
         throw const FormatException('Identyfikator żądania jest już użyty.');
       }
       return previous;
@@ -82,13 +84,17 @@ class MockSimplificationRepository implements SimplificationRepository {
     final response = SimplificationResponse(
       result: SimplificationResult(
         id: request.requestId,
-        text: 'Przykładowe uproszczenie: ${request.input.value}',
+        text: request.mode.name == 'correct'
+            ? 'Przykładowa poprawa: ${request.input.value}'
+            : 'Przykładowe uproszczenie: ${request.input.value}',
+        mode: request.mode,
         createdAt: clock().toUtc(),
       ),
       quota: quotaState,
     );
     _responses[request.requestId] = response;
     _requestTexts[request.requestId] = request.input.value;
+    _requestModes[request.requestId] = request.mode.name;
     return response;
   }
 }

@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:sedno_app/features/speech/domain/speech_service.dart';
 
 class FakeSpeechService implements SpeechService {
-  Completer<String?> pending = Completer<String?>();
+  // Create the future inside the widget test clock, when listening starts.
+  late final Completer<String?> pending = Completer<String?>();
   int calls = 0;
   int cancellations = 0;
 

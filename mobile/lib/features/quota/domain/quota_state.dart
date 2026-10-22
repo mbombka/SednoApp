@@ -1,6 +1,6 @@
 import 'package:sedno_app/features/shared/domain/json_values.dart';
 
-enum QuotaTier { free, subscription }
+enum QuotaTier { free, subscription, tester }
 
 class QuotaState {
   QuotaState({
@@ -10,12 +10,16 @@ class QuotaState {
     required this.remaining,
     required this.serverTime,
     required this.resetAt,
+    this.testerAccessExpiresAt,
   }) {
     if (limit != (tier == QuotaTier.free ? 5 : 400) ||
         used < 0 ||
-        used > limit ||
         remaining < 0 ||
-        remaining > limit - used ||
+        remaining > (limit - used).clamp(0, limit) ||
+        (testerAccessExpiresAt != null && !testerAccessExpiresAt!.isUtc) ||
+        (tier == QuotaTier.tester &&
+            (testerAccessExpiresAt == null ||
+                !testerAccessExpiresAt!.isAfter(serverTime))) ||
         !serverTime.isUtc ||
         !resetAt.isUtc ||
         !resetAt.isAfter(serverTime) ||
@@ -35,6 +39,7 @@ class QuotaState {
   final int remaining;
   final DateTime serverTime;
   final DateTime resetAt;
+  final DateTime? testerAccessExpiresAt;
 
   Map<String, Object?> toJson() => {
     'tier': tier.name,
@@ -43,6 +48,7 @@ class QuotaState {
     'remaining': remaining,
     'serverTime': serverTime.toIso8601String(),
     'resetAt': resetAt.toIso8601String(),
+    'testerAccessExpiresAt': testerAccessExpiresAt?.toIso8601String(),
   };
 
   factory QuotaState.fromJson(Map<String, dynamic> json) {
@@ -56,6 +62,9 @@ class QuotaState {
       remaining: requiredInt(json, 'remaining'),
       serverTime: requiredUtcDate(json, 'serverTime'),
       resetAt: requiredUtcDate(json, 'resetAt'),
+      testerAccessExpiresAt: json['testerAccessExpiresAt'] == null
+          ? null
+          : requiredUtcDate(json, 'testerAccessExpiresAt'),
     );
   }
 }

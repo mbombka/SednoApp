@@ -342,18 +342,30 @@ components:
       required: [tier, limit, used, remaining, serverTime, resetAt]
       description: >-
         used counts successful requests on the current UTC reservation day;
-        remaining excludes active reservations. Paid limit includes free usage.
+        remaining excludes active reservations. Subscription and tester limits include free usage.
+        Subscription takes precedence over tester access. Tester access expires according to server time;
+        grants and expiry never reset usage, so used may exceed the current limit.
       properties:
-        tier: { type: string, enum: [free, subscription] }
+        tier: { type: string, enum: [free, subscription, tester] }
         limit: { type: integer, enum: [5, 400] }
         used: { type: integer, minimum: 0 }
         remaining: { type: integer, minimum: 0 }
         serverTime: { type: string, format: date-time }
         resetAt: { type: string, format: date-time }
+        testerAccessExpiresAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: UTC tester grant expiry, including expired grants; null or absent when not granted.
     SimplificationRequest:
       type: object
       required: [requestId, text]
       properties:
+        mode:
+          type: string
+          enum: [simplify, correct]
+          default: simplify
+          description: Both modes use the same daily quota. Missing mode means simplify.
         requestId: { type: string, minLength: 1, maxLength: 100, pattern: '^[A-Za-z0-9_-]+$' }
         text:
           type: string
@@ -373,6 +385,11 @@ components:
         id: { type: string }
         text: { type: string }
         createdAt: { type: string, format: date-time }
+        mode:
+          type: string
+          enum: [simplify, correct]
+          default: simplify
+          description: Mode used to produce this result; absent in older API versions.
     RequestStatus:
       type: object
       required: [requestId, status, reservationDay, quota]

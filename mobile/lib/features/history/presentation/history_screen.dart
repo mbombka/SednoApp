@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:sedno_app/features/simplification/domain/text_mode.dart';
 import 'package:flutter/material.dart';
 import 'package:sedno_app/features/history/domain/history_entry.dart';
 import 'package:sedno_app/features/history/domain/history_repository.dart';
@@ -128,7 +129,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
             ),
           ] else if (_model.entries.isEmpty) ...[
             const Text('Nie masz jeszcze zapisanych tekstów.'),
-            const Text('Każdy uproszczony tekst pojawi się tutaj.'),
+            const Text(
+              'Każdy uproszczony lub poprawiony tekst pojawi się tutaj.',
+            ),
           ] else
             ..._model.entries.map(_entry),
         ],
@@ -152,7 +155,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
             const SizedBox(height: 12),
             Semantics(
               header: true,
-              child: Text('Wersja prosta', style: textTheme.titleMedium),
+              child: Text(
+                entry.result.mode == TextMode.correct
+                    ? 'Wersja poprawiona'
+                    : 'Wersja prosta',
+                style: textTheme.titleMedium,
+              ),
             ),
             const SizedBox(height: 4),
             SelectableText(entry.result.text),

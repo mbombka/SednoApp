@@ -1,6 +1,9 @@
 import 'package:sedno_app/features/account/presentation/user_menu_screen.dart';
 
 import 'dart:io';
+
+import 'package:sedno_app/features/simplification/domain/text_mode.dart';
+
 import 'dart:async';
 
 import 'package:sedno_app/features/subscription/presentation/subscription_view_model.dart';
@@ -86,6 +89,7 @@ class _AppNavigationState extends State<_AppNavigation>
   bool _disposed = false;
   int _dataRevision = 0;
   int _selectedPage = 0;
+  TextMode _mode = TextMode.simplify;
   final List<int> _previousPages = [];
 
   @override
@@ -168,64 +172,95 @@ class _AppNavigationState extends State<_AppNavigation>
 
   @override
   Widget build(BuildContext context) {
-    return PopScope<void>(
-      canPop: _selectedPage == 0,
-      onPopInvokedWithResult: (didPop, _) {
-        if (didPop || _selectedPage == 0) return;
-        FocusManager.instance.primaryFocus?.unfocus();
-        setState(() => _selectedPage = _previousPages.removeLast());
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final title = _selectedPage == 0
+            ? '${SednoApp.displayName} - ${_mode.heading}:'
+            : SednoApp.displayName;
+        final titleLayout =
+            TextPainter(
+              text: TextSpan(
+                text: title,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              textDirection: Directionality.of(context),
+              textScaler: MediaQuery.textScalerOf(context),
+            )..layout(
+              maxWidth: (constraints.maxWidth - 100).clamp(
+                1.0,
+                double.infinity,
+              ),
+            );
+        final toolbarHeight = (titleLayout.height + 16).clamp(
+          kToolbarHeight,
+          double.infinity,
+        );
+        titleLayout.dispose();
+        return PopScope<void>(
+          canPop: _selectedPage == 0,
+          onPopInvokedWithResult: (didPop, _) {
+            if (didPop || _selectedPage == 0) return;
+            FocusManager.instance.primaryFocus?.unfocus();
+            setState(() => _selectedPage = _previousPages.removeLast());
+          },
+          child: Scaffold(
+            appBar: AppBar(
+              toolbarHeight: toolbarHeight,
+              title: Text(title, softWrap: true, maxLines: 10),
+              centerTitle: false,
+              actions: [
+                IconButton(
+                  tooltip: 'Menu użytkownika',
+                  icon: const Icon(Icons.account_circle_outlined, size: 32),
+                  color: AppTheme.blue,
+                  onPressed: _openUserMenu,
+                ),
+                const SizedBox(width: 12),
+              ],
+            ),
+            body: IndexedStack(
+              index: _selectedPage,
+              children: [
+                HomeScreen(
+                  key: ValueKey('home-$_dataRevision'),
+                  appName: SednoApp.displayName,
+                  onModeChanged: (mode) => setState(() => _mode = mode),
+                  isActive: _selectedPage == 0 && !_showingMenu,
+                  textController: _inputController,
+                  photoRepository: _photoRepository,
+                  simplificationRepository: _simplificationRepository,
+                  historyRepository: _historyRepository,
+                  onHistorySaved: () => _historyRevision.value++,
+                ),
+                if (_selectedPage == 1)
+                  HistoryScreen(
+                    key: ValueKey('history-$_dataRevision'),
+                    repository: _historyRepository,
+                    revision: _historyRevision,
+                  )
+                else
+                  const SizedBox.shrink(),
+                AccountScreen(
+                  onDataCleared: () {
+                    _inputController.clear();
+                    _historyRevision.value++;
+                    setState(() {
+                      _dataRevision++;
+                      _mode = TextMode.simplify;
+                    });
+                  },
+                  repository: widget.accountRepository,
+                  subscriptionModel: widget.subscriptionModel,
+                  quota: switch (_simplificationRepository) {
+                    final QuotaStateSource source => source.quotaListenable,
+                    _ => null,
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
       },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text(SednoApp.displayName),
-          centerTitle: false,
-          actions: [
-            IconButton(
-              tooltip: 'Menu użytkownika',
-              icon: const Icon(Icons.account_circle_outlined, size: 32),
-              color: AppTheme.blue,
-              onPressed: _openUserMenu,
-            ),
-            const SizedBox(width: 12),
-          ],
-        ),
-        body: IndexedStack(
-          index: _selectedPage,
-          children: [
-            HomeScreen(
-              key: ValueKey('home-$_dataRevision'),
-              appName: SednoApp.displayName,
-              isActive: _selectedPage == 0 && !_showingMenu,
-              textController: _inputController,
-              photoRepository: _photoRepository,
-              simplificationRepository: _simplificationRepository,
-              historyRepository: _historyRepository,
-              onHistorySaved: () => _historyRevision.value++,
-            ),
-            if (_selectedPage == 1)
-              HistoryScreen(
-                key: ValueKey('history-$_dataRevision'),
-                repository: _historyRepository,
-                revision: _historyRevision,
-              )
-            else
-              const SizedBox.shrink(),
-            AccountScreen(
-              onDataCleared: () {
-                _inputController.clear();
-                _historyRevision.value++;
-                setState(() => _dataRevision++);
-              },
-              repository: widget.accountRepository,
-              subscriptionModel: widget.subscriptionModel,
-              quota: switch (_simplificationRepository) {
-                final QuotaStateSource source => source.quotaListenable,
-                _ => null,
-              },
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

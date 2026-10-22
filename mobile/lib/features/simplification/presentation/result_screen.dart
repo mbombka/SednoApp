@@ -27,7 +27,7 @@ class _ResultScreenState extends State<ResultScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Uproszczony tekst')),
+    appBar: AppBar(title: Text(widget.result.mode.resultHeading)),
     body: SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(20),

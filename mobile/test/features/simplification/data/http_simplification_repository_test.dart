@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:sedno_app/features/simplification/domain/text_mode.dart';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -92,6 +94,46 @@ SimplificationRequest _request(String id) =>
     SimplificationRequest(input: InputText('Trudny tekst'), requestId: id);
 
 void main() {
+  for (final supportsCorrection in [true, false]) {
+    test(
+      'correction is sent and requires backend mode confirmation: $supportsCorrection',
+      () async {
+        final repo = _repository(
+          MockClient((request) async {
+            final body = jsonDecode(request.body) as Map<String, dynamic>;
+            expect(body['mode'], 'correct');
+            final result = jsonDecode(
+              _success('correct-id', 1).body,
+            ) as Map<String, dynamic>;
+            if (supportsCorrection) result['result']['mode'] = 'correct';
+            return http.Response(jsonEncode(result), 200);
+          }),
+        );
+        final future = repo.simplify(
+          SimplificationRequest(
+            input: InputText('Tekst'),
+            requestId: 'correct-id',
+            mode: TextMode.correct,
+          ),
+        );
+        if (supportsCorrection) {
+          expect((await future).result.mode, TextMode.correct);
+        } else {
+          await expectLater(
+            future,
+            throwsA(
+              isA<SimplificationApiException>().having(
+                (e) => e.kind,
+                'kind',
+                SimplificationFailure.rejected,
+              ),
+            ),
+          );
+        }
+      },
+    );
+  }
+
   test(
     'deadline aborts the HTTP request and does not launch another attempt',
     () async {

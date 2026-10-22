@@ -23,6 +23,7 @@ class SubscriptionPanel extends StatelessWidget {
     builder: (context, _) {
       final textTheme = Theme.of(context).textTheme;
       final active = model.status?.active == true;
+      final tester = signedIn && quota?.value?.tier == QuotaTier.tester;
       final resetTime =
           'Nowy limit codziennie o '
           '${QuotaReset.localTime(resetAt: quota?.value?.resetAt)}.';
@@ -48,6 +49,16 @@ class SubscriptionPanel extends StatelessWidget {
             TextButton(
               onPressed: model.busy ? null : model.manage,
               child: const Text('Zarządzaj subskrypcją w Google Play'),
+            ),
+          ] else if (tester) ...[
+            const Text('Korzystasz z bezpłatnego dostępu testerskiego.'),
+            OutlinedButton(
+              onPressed: model.busy ? null : model.restore,
+              child: const Text('Przywróć zakupy'),
+            ),
+            TextButton(
+              onPressed: model.busy ? null : model.refresh,
+              child: const Text('Odśwież dostęp'),
             ),
           ] else ...[
             if (model.offer != null) ...[

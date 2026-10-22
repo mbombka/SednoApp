@@ -297,4 +297,49 @@ void main() {
     model.dispose();
     modelDisposed = true;
   });
+  testWidgets(
+    'tester hides purchase until access expires but can restore purchases',
+    (tester) async {
+      final now = DateTime.utc(2026, 10, 22, 12);
+      final quota = ValueNotifier<QuotaState?>(
+        QuotaState(
+          tier: QuotaTier.tester,
+          limit: 400,
+          used: 30,
+          remaining: 370,
+          serverTime: now,
+          resetAt: DateTime.utc(2026, 10, 23),
+          testerAccessExpiresAt: now.add(const Duration(days: 1)),
+        ),
+      );
+      addTearDown(quota.dispose);
+      await model.refresh();
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: SubscriptionPanel(
+                model: model,
+                signedIn: true,
+                quota: quota,
+              ),
+            ),
+          ),
+        ),
+      );
+      expect(find.text('Kup subskrypcję'), findsNothing);
+      expect(find.text('Przywróć zakupy'), findsOneWidget);
+      expect(find.text('Zarządzaj subskrypcją w Google Play'), findsNothing);
+      quota.value = QuotaState(
+        tier: QuotaTier.free,
+        limit: 5,
+        used: 30,
+        remaining: 0,
+        serverTime: now,
+        resetAt: DateTime.utc(2026, 10, 23),
+      );
+      await tester.pump();
+      expect(find.text('Kup subskrypcję'), findsOneWidget);
+    },
+  );
 }

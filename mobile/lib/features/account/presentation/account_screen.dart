@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:sedno_app/features/account/presentation/tester_access_panel.dart';
+
 import 'package:sedno_app/features/account/presentation/password_field.dart';
 
 import 'package:sedno_app/features/privacy/presentation/privacy_screen.dart';
@@ -602,6 +604,8 @@ class _AccountScreenState extends State<AccountScreen>
               ),
           ],
           if (_busy) const Center(child: CircularProgressIndicator()),
+          if (signedIn && widget.quota != null)
+            TesterAccessPanel(quota: widget.quota!),
           if (widget.subscriptionModel case final model?)
             SubscriptionPanel(
               model: model,

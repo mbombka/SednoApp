@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:sedno_app/features/simplification/domain/text_mode.dart';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sedno_app/features/quota/domain/quota_state.dart';
 import 'package:sedno_app/features/simplification/domain/input_text.dart';
@@ -32,6 +34,44 @@ SimplificationResponse response(String id) => SimplificationResponse(
 );
 
 void main() {
+  test(
+    'mode change after failure creates a new id; same mode reuses it',
+    () async {
+      final sent = <SimplificationRequest>[];
+      var serial = 0;
+      final model = SimplificationViewModel(
+        newRequestId: () => 'request-${++serial}',
+        repository: FakeSimplificationRepository((request) async {
+          sent.add(request);
+          if (sent.length < 3) throw StateError('offline');
+          return response(request.requestId);
+        }),
+      );
+      final input = InputText('Tekst');
+      await expectLater(model.simplify(input), throwsStateError);
+      await expectLater(
+        model.simplify(input, mode: TextMode.correct),
+        throwsStateError,
+      );
+      final result = await model.simplify(input, mode: TextMode.correct);
+      expect(sent.map((r) => r.requestId), [
+        'request-1',
+        'request-2',
+        'request-2',
+      ]);
+      expect(sent.last.toJson()['mode'], 'correct');
+      expect(result.mode, TextMode.correct);
+      expect(
+        SimplificationResult.fromJson(result.toJson()).mode,
+        TextMode.correct,
+      );
+      expect(
+        SimplificationResult.fromJson(response('old').result.toJson()).mode,
+        TextMode.simplify,
+      );
+    },
+  );
+
   test('returns repository result and uses a new id after success', () async {
     final ids = <String>[];
     var serial = 0;

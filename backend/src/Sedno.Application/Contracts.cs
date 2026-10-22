@@ -2,16 +2,16 @@ using Sedno.Domain;
 
 namespace Sedno.Application;
 
-public record QuotaDto(string Tier, int Limit, int Used, int Remaining, DateTimeOffset ServerTime, DateTimeOffset ResetAt);
+public record QuotaDto(string Tier, int Limit, int Used, int Remaining, DateTimeOffset ServerTime, DateTimeOffset ResetAt, DateTimeOffset? TesterAccessExpiresAt = null);
 public record GuestSessionDto(string AccessToken, AccountDto Account, QuotaDto Quota);
 public record AccountDto(string Id, string Provider);
 public record AuthenticatedSessionDto(string AccessToken, AccountDto Account, QuotaDto Quota);
 public record VerifiedIdentity(string Uid, string Provider, bool EmailVerified = false, long AuthTime = 0);
 public record SessionIdentity(Guid IdentityId, Guid? AccountId, Guid SessionId);
-public record SimplificationResultDto(string Id, string Text, DateTimeOffset CreatedAt);
+public record SimplificationResultDto(string Id, string Text, DateTimeOffset CreatedAt, string Mode = "simplify");
 public record SimplificationResponseDto(SimplificationResultDto Result, QuotaDto Quota);
 public record RequestStatusDto(string RequestId, string Status, DateTimeOffset ReservationDay, DateTimeOffset? FinishedAt, QuotaDto Quota);
-public record SimplificationInput(string RequestId, string Text);
+public record SimplificationInput(string RequestId, string Text, string Mode = "simplify");
 public record ReservationOutcome(string Kind, QuotaDto Quota);
 
 public sealed class SimplificationTimeoutException() : Exception("Upraszczanie trwało zbyt długo. Spróbuj ponownie.");
@@ -19,6 +19,8 @@ public sealed class SimplificationTimeoutException() : Exception("Upraszczanie t
 public interface IModelProvider
 {
     Task<string> SimplifyAsync(string text, CancellationToken cancellationToken);
+    Task<string> CorrectAsync(string text, CancellationToken cancellationToken) =>
+        throw new NotSupportedException("Tryb poprawiania jest niedostępny.");
 }
 
 public interface IEntitlementResolver

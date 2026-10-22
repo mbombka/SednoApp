@@ -112,7 +112,7 @@ Identyfikatory można nadpisać przez `PLAY_SUBSCRIPTION_PRODUCT_ID` i
 `PLAY_SUBSCRIPTION_BASE_PLAN_ID` w argumentach budowy. Samo włączenie panelu
 nie uruchamia płatności na serwerze. [Pełne przygotowanie i testy](docs/google_play_subscription_sandbox.md).
 
-Gotowy podpisany pakiet do testów: [wydanie 11](docs/google_play_release_11.md).
+Gotowy podpisany pakiet do testów: [wydanie 12](docs/google_play_release_12.md).
 
 Aparat działa wewnątrz Sedna: **Zrób zdjęcie → Zaznacz tekst → Uprość**.
 Ramka początkowo obejmuje całe zdjęcie. Można przesunąć jej rogi, aby wybrać
@@ -205,3 +205,26 @@ rozpoznania nowej wypowiedzi.
 
 [Zadania i stan weryfikacji](docs/speech_tasks.md).
 [Wymagania techniczne i próby na telefonie](docs/android_speech_manual_check.md).
+
+## Tryby „Uprość” i „Popraw”
+
+Strzałki nad głównym przyciskiem zmieniają tryb bez usuwania wpisanego tekstu.
+„Uprość” zachowuje aparat, OCR i mikrofon. „Popraw” usuwa błędy językowe,
+zachowując sens wypowiedzi; korzysta z osobnego promptu na backendzie.
+W tym trybie aparat znika, a głośniczek odczytuje bieżący tekst z pola.
+Przycisk stop zatrzymuje odczyt. Zmiana trybu, otwarcie menu lub przejście
+aplikacji do tła również zatrzymuje odczyt. Potrzebny jest zainstalowany polski
+głos do odczytu bez internetu; aplikacja nie wybiera głosów wymagających sieci.
+Wynik i zaszyfrowana historia rozróżniają tekst uproszczony i poprawiony.
+Starsze wpisy historii są traktowane jako uproszczenia.
+
+Oba tryby mają wspólne limity 5/400 użyć dziennie. Najpierw trzeba wdrożyć
+backend obsługujący `mode=correct`, a potem aplikację. Aplikacja sprawdza tryb
+zwrócony przez API, aby nie wyświetlić uproszczenia ze starego serwera jako korekty.
+[Zadania i próby na telefonie](../docs/popraw-zadania.md).
+
+## Dostęp testerski
+
+Aplikacja obsługuje `tier=tester` i opcjonalną datę `testerAccessExpiresAt`
+z odpowiedzi limitu. Konto pokazuje datę ważności i informację o bezpłatnym dostępie.
+[Przyznawanie dostępu i kolejność wdrożenia](../docs/tester-access.pl.md).

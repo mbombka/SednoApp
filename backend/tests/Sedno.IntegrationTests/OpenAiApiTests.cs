@@ -20,13 +20,14 @@ public sealed class OpenAiApiTests(BackendFixture fixture)
         public int Calls;
         public string? Failure;
         public string? LastInput;
+        public string ExpectedInstructions = SimplificationPrompt.Text;
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken ct)
         {
             Calls++;
             using var body = JsonDocument.Parse(await request.Content!.ReadAsStringAsync(ct));
             LastInput = body.RootElement.GetProperty("input")[0].GetProperty("content").GetString();
             Assert.Equal("default", body.RootElement.GetProperty("service_tier").GetString());
-            Assert.Equal(SimplificationPrompt.Text, body.RootElement.GetProperty("instructions").GetString());
+            Assert.Equal(ExpectedInstructions, body.RootElement.GetProperty("instructions").GetString());
             Assert.False(body.RootElement.GetProperty("store").GetBoolean());
             if (Failure == "timeout") throw new TaskCanceledException("sensitive-upstream-error");
             if (Failure == "incomplete") return new HttpResponseMessage(HttpStatusCode.OK)
@@ -41,6 +42,53 @@ public sealed class OpenAiApiTests(BackendFixture fixture)
                 }))
             };
         }
+    }
+
+    [Fact]
+    public async Task CorrectionSharesQuotaAndSeparatesIdempotencyFromSimplification()
+    {
+        fixture.Clock.Set(new(2026, 10, 22, 12, 0, 0, TimeSpan.Zero));
+        var upstream = new Upstream { ExpectedInstructions = CorrectionPrompt.Text };
+        await using var factory = fixture.Factory.WithWebHostBuilder(web => web.ConfigureTestServices(services =>
+        {
+            services.RemoveAll<IModelProvider>();
+            services.AddSingleton<IModelProvider>(new OpenAiModelProvider(new HttpClient(upstream), new() { ApiKey = "test" }));
+        }));
+        using var client = factory.CreateClient();
+        using var guest = await client.PostAsJsonAsync("/v1/guest-sessions", new { installationId = Guid.NewGuid().ToString() });
+        guest.EnsureSuccessStatusCode();
+        using var session = JsonDocument.Parse(await guest.Content.ReadAsStringAsync());
+        client.DefaultRequestHeaders.Authorization = new("Bearer", session.RootElement.GetProperty("accessToken").GetString());
+        const string text = "Czy po 14:00 woda bendzie?";
+        async Task<HttpResponseMessage> Submit(string id, string? mode) =>
+            await client.PostAsJsonAsync("/v1/simplifications", new { requestId = id, text, mode });
+        using var invalid = await Submit("invalid", "unknown");
+        Assert.Equal(HttpStatusCode.BadRequest, invalid.StatusCode);
+        using var nullMode = await Submit("null", null);
+        Assert.Equal(HttpStatusCode.BadRequest, nullMode.StatusCode);
+        Assert.Equal(0, upstream.Calls);
+        using var corrected = await Submit("shared-id", "correct");
+        Assert.Equal(HttpStatusCode.OK, corrected.StatusCode);
+        using var correctionJson = JsonDocument.Parse(await corrected.Content.ReadAsStringAsync());
+        Assert.Equal("correct", correctionJson.RootElement.GetProperty("result").GetProperty("mode").GetString());
+        using var duplicate = await Submit("shared-id", "correct");
+        Assert.Equal(HttpStatusCode.Conflict, duplicate.StatusCode);
+        using var changedMode = await Submit("shared-id", "simplify");
+        Assert.Equal(HttpStatusCode.Conflict, changedMode.StatusCode);
+        Assert.Contains("key_conflict", await changedMode.Content.ReadAsStringAsync());
+        Assert.Equal(1, upstream.Calls);
+        upstream.ExpectedInstructions = SimplificationPrompt.Text;
+        using var simplified = await client.PostAsJsonAsync("/v1/simplifications", new { requestId = "legacy", text });
+        Assert.Equal(HttpStatusCode.OK, simplified.StatusCode);
+        using var quota = JsonDocument.Parse(await client.GetStringAsync("/v1/quota"));
+        Assert.Equal(3, quota.RootElement.GetProperty("remaining").GetInt32());
+        upstream.ExpectedInstructions = CorrectionPrompt.Text;
+        upstream.Failure = "http";
+        using var failed = await Submit("failure", "correct");
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, failed.StatusCode);
+        using var afterFailure = JsonDocument.Parse(await client.GetStringAsync("/v1/quota"));
+        Assert.Equal(3, afterFailure.RootElement.GetProperty("remaining").GetInt32());
+        Assert.DoesNotContain(text, string.Join('\n', fixture.Logs.Messages));
     }
 
     [Theory]
