@@ -5,6 +5,10 @@ API: **https://sednoapp-79241-api.web.app**, projekt `sednoapp-79241`, numer
 na istniejącym `sedno-api`; [stan i pozostałe ustawienia](../../../docs/billing-deployment-2026-10-20.pl.md).
 Strona `sedno.xyz` jest oddzielna.
 
+23.10.2026 wdrożono **`sedno-api-00013-8x6`** z polskim i angielskim (UK), osobnymi
+promptami i wspólnymi limitami. Hosting i cleanup korzystają z nowego obrazu.
+[Raport wdrożenia](../../../docs/backend-deployment-2026-10-23.pl.md).
+
 22.10.2026 wdrożono **`sedno-api-00012-9j4`**: aktualne prompty, tryb Popraw
 i czasowy dostęp testerski. Hosting kieruje do nowej rewizji; cleanup działa
 na tym samym obrazie.

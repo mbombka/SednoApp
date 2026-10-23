@@ -11,6 +11,10 @@ usunięto 19.10.2026. Obsługę płatności na istniejącym serwerze włączono
 20.10.2026 do testów przez Google Play; odbiór zakupów pozostaje do wykonania.
 [Wdrożenie, migracja i pozostałe porządki](deploy/firebase/README.pl.md).
 
+Aktualizacja 23.10.2026: wdrożono `sedno-api-00013-8x6` z polskimi i angielskimi
+promptami oraz polem `language` w API. Hosting i cleanup używają nowego obrazu.
+[Raport wdrożenia](../docs/backend-deployment-2026-10-23.pl.md).
+
 Aktualizacja 22.10.2026: wdrożono `sedno-api-00012-9j4` z aktualnymi promptami,
 trybem Popraw i czasowym dostępem testerskim.
 [Raport wdrożenia](../docs/backend-deployment-2026-10-22.pl.md).

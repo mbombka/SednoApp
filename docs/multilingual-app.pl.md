@@ -59,7 +59,8 @@ limitu, z kodem `invalid_language`. Język jest częścią zabezpieczonego odcis
 
 Najpierw wdróż nowy backend, potem aplikację. Stary backend może zignorować nowe
 pole; aplikacja odrzuca wynik oznaczony innym językiem i pozostawia tekst do edycji.
-Ta praca nie wdraża serwera i nie publikuje aplikacji w Google Play.
+Backend wdrożono 23.10.2026; przygotowano AAB 16.
+[Raport wdrożenia](backend-deployment-2026-10-23.pl.md). Aplikacji nie publikowano w Google Play.
 Ustawienia produkcyjnego modelu, retencji, timeoutu i limitu tokenów są wspólne.
 
 ## Dodawanie następnego języka
@@ -95,14 +96,14 @@ Wymagane są również ocena językowa promptów i odbiór z grupą docelową.
   i 38 testów narzędzia benchmarkowego zakończonych powodzeniem.
   Integracje użyły emulatora Firestore w kontenerze i syntetycznego modelu.
 - `JAVA_HOME=/opt/android-studio/jbr ./gradlew :app:compileDebugKotlin`:
-  `BUILD SUCCESSFUL`. Nie wykonywano budowy APK ani AAB.
+  `BUILD SUCCESSFUL`. Podpisany AAB 16 zbudowano następnie w ramach wdrożenia.
 - Oba generatory polityki prywatności: `--check` potwierdza zgodność źródeł.
 - Potwierdzono, że polski prompt upraszczania jest identyczny ze stanem na początku
   tej pracy, obejmującym wcześniejsze lokalne zmiany właściciela.
 
 Nie wykonywano wywołań rzeczywistego modelu, zakupów, wysyłania wiadomości
 Firebase ani prób na fizycznym telefonie. Testy nie zastępują oceny jakości
-językowej wyników AI. Nie wdrażano backendu i nie publikowano aplikacji.
+językowej wyników AI. Backend wdrożono w kolejnym kroku, opisanym w raporcie z 23.10.2026; aplikacji nie publikowano w Google Play.
 
 ## Główne zmienione pliki
 

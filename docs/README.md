@@ -20,7 +20,9 @@ Na początek przeczytaj [opis projektu](../README.md) i [listę prac przed publi
 | Zamknięte stare adresy API i sesje | [Kontrola dostępu backendu](backend-access-2026-10-20.pl.md) |
 | Lokalny limiter, proxy Hosting i RTDN | [Limity ruchu API](traffic-limiting-2026-10-21.pl.md) |
 | Aktualne wdrożenie backendu | [Wdrożenie 22.10.2026](backend-deployment-2026-10-22.pl.md) |
-| Aktualny pakiet Android | [Podpisane wydanie 15](../mobile/docs/google_play_release_15.md) |
+| Aktualny pakiet Android | [Podpisane wydanie 16](../mobile/docs/google_play_release_16.md) |
 
 [Archiwum](archiwum/README.md) zawiera opisy zakończonych prac i dawny szkic polityki.
 Nie służy do bieżącej konfiguracji. Historyczne pomiary pozostają przy narzędziu pomiarowym.
+
+[Wdrożenie polskiego i angielskiego backendu — 23.10.2026](backend-deployment-2026-10-23.pl.md).
