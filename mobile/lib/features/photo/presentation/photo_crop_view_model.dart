@@ -1,3 +1,5 @@
+import 'package:sedno_app/l10n/localization.dart';
+
 import 'dart:io';
 import 'dart:ui' as ui;
 
@@ -7,6 +9,9 @@ import 'package:sedno_app/features/photo/data/local_photo_image_service.dart';
 enum CropCorner { topLeft, topRight, bottomLeft, bottomRight }
 
 class PhotoCropViewModel extends ChangeNotifier {
+  AppLocalizations Function() localizations = polishStrings;
+  AppLocalizations get strings => localizations();
+
   PhotoCropViewModel({required this.path, required this.images});
 
   final String path;
@@ -26,7 +31,7 @@ class PhotoCropViewModel extends ChangeNotifier {
       }
       image = loaded;
     } catch (_) {
-      message = 'Nie udało się otworzyć zdjęcia. Zrób nowe zdjęcie.';
+      message = strings.photoOpenFailed;
     }
     if (!_disposed) notifyListeners();
   }
@@ -76,7 +81,7 @@ class PhotoCropViewModel extends ChangeNotifier {
       }
       return output;
     } catch (_) {
-      message = 'Nie udało się przygotować zdjęcia. Spróbuj ponownie.';
+      message = strings.photoPrepareFailed;
       return null;
     } finally {
       retained.dispose();

@@ -14,8 +14,9 @@ oryginał. Gumka, zmiana trybu i rozpoczęcie nagrywania lub zdjęcia czyszczą 
 Serwer uruchomiono 19.10.2026. Przed udostępnieniem aplikacji pozostają
 [pozostałe kontrole i przygotowanie Google Play](Tasks.md).
 Obsługę płatności włączono na istniejącym serwerze do testów; zakupów nie odebrano
-jeszcze na telefonie. Przygotowano [podpisany AAB 13](mobile/docs/google_play_release_13.md)
-z wynikiem w edytorze, mniejszą gumką i usuwaniem całej historii.
+jeszcze na telefonie. Przygotowano [podpisany AAB 15](mobile/docs/google_play_release_15.md)
+ze wszystkimi komunikatami pod polem tekstowym, stabilnym układem wyniku
+i zaktualizowanymi informacjami o aplikacji i prywatności.
 Zawiera też tryb Popraw, lokalny odczyt tekstu i obsługę dostępu testerskiego.
 Backend z aktualnymi promptami wdrożono 22.10.2026 jako `sedno-api-00012-9j4`,
 ze współbieżnością 80 żądań na instancję.

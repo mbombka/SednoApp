@@ -1,3 +1,4 @@
+import 'package:sedno_app/l10n/localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sedno_app/app/app_information.dart';
 import 'package:sedno_app/features/quota/domain/quota_reset.dart';
@@ -13,10 +14,10 @@ class AboutScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
-      title: const Text('O aplikacji'),
+      title: Text(context.l10n.about),
       leading: Navigator.of(context).canPop()
           ? IconButton(
-              tooltip: 'Wróć',
+              tooltip: context.l10n.back,
               style: IconButton.styleFrom(minimumSize: const Size(48, 48)),
               onPressed: () => Navigator.of(context).maybePop(),
               icon: const Icon(Icons.arrow_back),
@@ -35,34 +36,34 @@ class AboutScreen extends StatelessWidget {
             ),
           ),
           // Plain Polish: short sections, one sentence per line.
-          const _Heading('Do czego służy'),
-          const Text('Sedno upraszcza trudne polskie teksty.'),
-          const Text(
-            'Powstało dla osób słabosłyszących i osób, którym trudno zrozumieć złożony tekst.',
-          ),
-          const Text('Aplikacja jest dla osób od 13 lat.'),
-          const _Heading('Jak to działa'),
-          const Text('Wpisz lub wklej tekst albo zrób zdjęcie tekstu.'),
-          const Text('Przed wysłaniem możesz poprawić odczytany tekst.'),
-          const Text('Tekst może mieć najwyżej 4000 znaków.'),
-          const Text('Możesz zacząć bez zakładania konta.'),
-          const _Heading('Dzienny limit'),
-          const Text('Bez subskrypcji: 5 tekstów dziennie.'),
-          const Text('Z subskrypcją: 400 tekstów dziennie.'),
-          const Text(
-            'Cenę subskrypcji zobaczysz w menu Konto i w Google Play.',
-          ),
+          _Heading(context.l10n.appPurpose),
+          Text(context.l10n.appDescription),
+          Text(context.l10n.appAudience),
+          Text(context.l10n.appAge),
+          _Heading(context.l10n.howItWorks),
+          Text(context.l10n.typingInstructions),
+          Text(context.l10n.captureInstructions),
+          Text(context.l10n.captureSubmitInstructions),
+          Text(context.l10n.localMediaNotice),
+          Text(context.l10n.speechModelRequirements),
+          Text(context.l10n.playbackRequirements),
+          Text(context.l10n.restoreInstructions),
+          Text(context.l10n.inputLimitNotice),
+          Text(context.l10n.guestNotice),
+          _Heading(context.l10n.dailyLimit),
+          Text(context.l10n.freeAllowance),
+          Text(context.l10n.paidAllowance),
+          Text(context.l10n.sharedAllowance),
+          Text(context.l10n.subscriptionPriceNotice),
           // Local clock time first; UTC for users comparing with other sources.
-          Text(
-            'Nowy limit codziennie o ${QuotaReset.localTime()} (00:00 UTC).',
-          ),
-          const _Heading('Ważne'),
-          const Text('AI może popełniać błędy.'),
-          const Text('Sprawdź wynik, zanim go wykorzystasz.'),
-          const _Heading('Kontakt'),
-          const Text('Autor: Mariusz Bąbka'),
+          Text(context.l10n.resetAbout(QuotaReset.localTime())),
+          _Heading(context.l10n.important),
+          Text(context.l10n.aiErrorNotice),
+          Text(context.l10n.checkResult),
+          _Heading(context.l10n.contact),
+          Text(context.l10n.author),
           const SizedBox(height: 8),
-          const Text('Kontakt: ${AppInformation.contact}'),
+          Text(context.l10n.contactAddress(AppInformation.contact)),
           const SizedBox(height: 16),
           WebsiteInformation(opener: openUrl),
           const SizedBox(height: 16),
@@ -71,7 +72,7 @@ class AboutScreen extends StatelessWidget {
             onPressed: () => Navigator.of(context).push<void>(
               MaterialPageRoute(builder: (_) => const PrivacyScreen()),
             ),
-            child: const Text('Prywatność i dane'),
+            child: Text(context.l10n.privacy),
           ),
         ],
       ),

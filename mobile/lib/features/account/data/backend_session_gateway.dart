@@ -1,3 +1,5 @@
+import 'package:sedno_app/l10n/localization.dart';
+
 import 'dart:convert';
 import 'dart:math';
 
@@ -55,6 +57,9 @@ class AndroidIntegrityTokenSource implements IntegrityTokenSource {
 }
 
 class BackendSessionGateway {
+  AppLocalizations Function() localizations = polishStrings;
+  AppLocalizations get strings => localizations();
+
   BackendSessionGateway({
     required this.baseUrl,
     required this.client,
@@ -87,7 +92,7 @@ class BackendSessionGateway {
   /// only when no account or guest session has been stored.
   Future<String> accessToken() async {
     if (await storage.read('deletion_confirmed') == 'true') {
-      throw StateError('Dokończ usuwanie danych na urządzeniu.');
+      throw StateError(strings.finishLocalDeletion);
     }
     final account = await storage.read(_accountKey);
     if (account != null) return account;
@@ -133,12 +138,10 @@ class BackendSessionGateway {
       }),
     );
     if (response.statusCode == 403) {
-      throw const AccountActionException(
-        'Serwer nie potwierdził instalacji aplikacji. Spróbuj ponownie lub zainstaluj Sedno z Google Play.',
-      );
+      throw AccountActionException(strings.installationRejected);
     }
     if (response.statusCode != 200) {
-      throw StateError('Nie można rozpocząć sesji. Spróbuj ponownie.');
+      throw StateError(strings.sessionStartFailed);
     }
     final token =
         (jsonDecode(response.body) as Map<String, dynamic>)['accessToken']
@@ -160,12 +163,12 @@ class BackendSessionGateway {
     if (response.statusCode == 401) {
       await rejectSession(guest);
       throw AccountActionException(
-        'Zaloguj się ponownie, aby połączyć konto.',
+        strings.signInToLink,
         account: Account(id: 'guest', provider: IdentityProvider.guest),
       );
     }
     if (response.statusCode != 200) {
-      throw StateError('Nie można połączyć konta. Spróbuj ponownie.');
+      throw StateError(strings.cannotLinkAccount);
     }
     final data = jsonDecode(response.body) as Map<String, dynamic>;
     final account = Account.fromJson(data['account'] as Map<String, dynamic>);
@@ -183,7 +186,7 @@ class BackendSessionGateway {
   Future<void> deleteAccount({String? firebaseIdToken}) async {
     if (await storage.read('deletion_confirmed') == 'true') return;
     final token = await storage.read(_accountKey);
-    if (token == null) throw StateError('Zaloguj się ponownie.');
+    if (token == null) throw StateError(strings.signInAgain);
     final response = await client.delete(
       baseUrl.resolve('/v1/account'),
       headers: {
@@ -195,17 +198,15 @@ class BackendSessionGateway {
     if (response.statusCode == 401) {
       await rejectSession(token);
       throw AccountActionException(
-        'Sesja wygasła. Zaloguj się ponownie.',
+        strings.sessionExpiredSignIn,
         account: Account(id: 'guest', provider: IdentityProvider.guest),
       );
     }
     if (response.statusCode == 403) {
-      throw const AccountActionException(
-        'Zaloguj się ponownie, aby usunąć konto.',
-      );
+      throw AccountActionException(strings.signInToDelete);
     }
     if (response.statusCode != 204) {
-      throw StateError('Nie można usunąć konta. Spróbuj ponownie.');
+      throw StateError(strings.cannotDeleteAccount);
     }
     await storage.write('deletion_confirmed', 'true');
     sessionRevision.value++;
@@ -250,7 +251,7 @@ class BackendSessionGateway {
         headers: {'Authorization': 'Bearer $token'},
       );
       if (response.statusCode != 204 && response.statusCode != 401) {
-        throw StateError('Nie można wylogować. Spróbuj ponownie.');
+        throw StateError(strings.cannotSignOut);
       }
     }
     await storage.delete(_accountKey);

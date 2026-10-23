@@ -1,3 +1,4 @@
+import 'package:sedno_app/l10n/localization.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase;
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -7,6 +8,8 @@ import 'package:sedno_app/features/account/domain/account_repository.dart';
 
 class FirebaseAccountRepository
     implements AccountRepository, AccountStateSource {
+  AppLocalizations Function() localizations = polishStrings;
+  AppLocalizations get strings => localizations();
   FirebaseAccountRepository({
     required this.auth,
     required this.google,
@@ -79,7 +82,7 @@ class FirebaseAccountRepository
           throw AccountActionException(error.message, account: pending);
         } catch (_) {
           throw AccountActionException(
-            'Konto zostało utworzone, ale nie udało się wysłać wiadomości. Spróbuj wysłać ją ponownie.',
+            strings.accountCreatedEmailFailed,
             account: pending,
           );
         }
@@ -117,18 +120,16 @@ class FirebaseAccountRepository
   Future<void> resendVerificationEmail() => _firebaseOperation(() async {
     final user = auth.currentUser;
     if (user == null || !_requiresVerification(user)) {
-      throw const AccountActionException(
-        'Zaloguj się przez e-mail, aby potwierdzić adres.',
-      );
+      throw AccountActionException(strings.signInToVerify);
     }
-    await auth.setLanguageCode('pl');
+    await auth.setLanguageCode(strings.localeName.split('_').first);
     await user.sendEmailVerification();
   });
 
   @override
   Future<void> sendPasswordResetEmail(String email) =>
       _firebaseOperation(() async {
-        await auth.setLanguageCode('pl');
+        await auth.setLanguageCode(strings.localeName.split('_').first);
         try {
           await auth.sendPasswordResetEmail(email: email.trim());
         } on firebase.FirebaseAuthException catch (error) {
@@ -142,7 +143,7 @@ class FirebaseAccountRepository
     final user = auth.currentUser;
     if (user == null) {
       throw AccountActionException(
-        'Zaloguj się ponownie, aby sprawdzić stan konta.',
+        strings.signInToCheckAccount,
         account: Account(id: 'guest', provider: IdentityProvider.guest),
       );
     }
@@ -155,22 +156,20 @@ class FirebaseAccountRepository
       return await action();
     } on firebase.FirebaseAuthException catch (error) {
       final message = switch (error.code) {
-        'weak-password' => 'Hasło jest za słabe. Użyj co najmniej 6 znaków.',
-        'invalid-email' => 'Sprawdź, czy adres e-mail jest wpisany poprawnie.',
-        'email-already-in-use' =>
-          'Ten adres jest już używany. Zaloguj się do istniejącego konta.',
-        'too-many-requests' =>
-          'Za dużo prób. Odczekaj chwilę i spróbuj ponownie.',
-        'network-request-failed' =>
-          'Brak połączenia. Sprawdź internet i spróbuj ponownie.',
-        'user-mismatch' => 'Wybierz to samo konto, które chcesz usunąć.',
-        'requires-recent-login' => 'Zaloguj się ponownie, aby usunąć konto.',
-        'invalid-credential' || 'wrong-password' || 'user-not-found' =>
-          'Nie udało się zalogować. Sprawdź adres e-mail i hasło.',
+        'weak-password' => strings.weakPassword,
+        'invalid-email' => strings.checkEmailAddress,
+        'email-already-in-use' => strings.emailAlreadyUsed,
+        'too-many-requests' => strings.tooManyAttempts,
+        'network-request-failed' => strings.checkInternet,
+        'user-mismatch' => strings.chooseSameAccount,
+        'requires-recent-login' => strings.signInToDelete,
+        'invalid-credential' ||
+        'wrong-password' ||
+        'user-not-found' => strings.invalidCredentials,
         'user-token-expired' ||
         'invalid-user-token' ||
-        'user-disabled' => 'Zaloguj się ponownie, aby sprawdzić stan konta.',
-        _ => 'Nie udało się wykonać tej czynności. Spróbuj ponownie.',
+        'user-disabled' => strings.signInToCheckAccount,
+        _ => strings.actionFailed,
       };
       final user = auth.currentUser;
       final sessionExpired = {
@@ -197,7 +196,7 @@ class FirebaseAccountRepository
     final user = auth.currentUser;
     if (user == null) {
       throw AccountActionException(
-        'Zaloguj się ponownie, aby sprawdzić stan konta.',
+        strings.signInToCheckAccount,
         account: Account(id: 'guest', provider: IdentityProvider.guest),
       );
     }
@@ -219,7 +218,9 @@ class FirebaseAccountRepository
         // Verification and backend admission are separate steps. A rejected
         // installation or network failure must not discard Firebase identity.
         throw AccountActionException(
-          error is AccountActionException ? error.message : 'Nie udało się połączyć z kontem Sedna. Sprawdź połączenie i spróbuj ponownie.',
+          error is AccountActionException
+              ? error.message
+              : strings.accountLinkFailed,
           account: _awaitingSession(user),
         );
       }
@@ -242,16 +243,12 @@ class FirebaseAccountRepository
       await _firebaseOperation(() async {
         final user = auth.currentUser;
         if (user == null) {
-          throw const AccountActionException(
-            'Zaloguj się ponownie, aby usunąć konto.',
-          );
+          throw AccountActionException(strings.signInToDelete);
         }
         final firebase.AuthCredential credential;
         if (_usesPassword(user)) {
           if (password == null || password.isEmpty) {
-            throw const AccountActionException(
-              'Wpisz hasło, aby potwierdzić usunięcie konta.',
-            );
+            throw AccountActionException(strings.passwordToDelete);
           }
           credential = firebase.EmailAuthProvider.credential(
             email: user.email!,
@@ -266,9 +263,7 @@ class FirebaseAccountRepository
         await user.reauthenticateWithCredential(credential);
         final token = await user.getIdToken(true);
         if (token == null) {
-          throw const AccountActionException(
-            'Zaloguj się ponownie, aby usunąć konto.',
-          );
+          throw AccountActionException(strings.signInToDelete);
         }
         await sessions.deleteAccount(firebaseIdToken: token);
       });

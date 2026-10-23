@@ -1,3 +1,4 @@
+import 'package:sedno_app/app/app_language.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/widgets.dart';
@@ -17,6 +18,14 @@ import 'package:sedno_app/features/subscription/presentation/subscription_view_m
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  const preferences = FlutterSecureStorage();
+  final languages = LanguageController(
+    read: () => preferences.read(key: 'app_language'),
+    write: (value) => value == null
+        ? preferences.delete(key: 'app_language')
+        : preferences.write(key: 'app_language', value: value),
+  );
+  await languages.load();
   const apiKey = String.fromEnvironment('FIREBASE_API_KEY');
   const appId = String.fromEnvironment('FIREBASE_APP_ID');
   const projectId = String.fromEnvironment('FIREBASE_PROJECT_ID');
@@ -38,6 +47,7 @@ Future<void> main() async {
       integrity: const AndroidIntegrityTokenSource(playProjectNumber),
     );
   }
+  if (sessions != null) sessions.localizations = () => languages.strings;
   if (sessions != null &&
       apiKey.isNotEmpty &&
       appId.isNotEmpty &&
@@ -58,7 +68,7 @@ Future<void> main() async {
       google: GoogleSignIn.instance,
       sessions: sessions,
       clearHistory: history.clear,
-    );
+    )..localizations = () => languages.strings;
   }
   const productId = PlaySubscriptionConfiguration.productId;
   final subscription =
@@ -76,10 +86,12 @@ Future<void> main() async {
           productId: productId,
         );
   if (subscription != null) {
+    subscription.localizations = () => languages.strings;
     sessions!.sessionRevision.addListener(subscription.refresh);
   }
   runApp(
     SednoApp(
+      languageController: languages,
       accountRepository: accounts,
       subscriptionModel: subscription,
       historyRepository: history,

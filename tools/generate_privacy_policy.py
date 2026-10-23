@@ -66,13 +66,19 @@ def generate():
 <h1>{esc(title)}</h1><p>Wersja: <time datetime="{policy['version']}">{esc(policy['versionLabel'])}</time></p>
 {body}<h2>Źródła i warunki dostawców</h2>{sources}</main></body></html>
 '''
-    return {
+    documents = {
         'docs/privacy-policy.pl.md': md,
         'mobile/lib/features/privacy/domain/privacy_policy.dart': dart,
         'mobile/lib/app/app_information.dart': info,
         'docs/public/prywatnosc/index.html': page(policy['title'], sections),
         'docs/public/usun-konto/index.html': page('Sedno — usunięcie konta i danych', [sections[i] for i in (0, 2, 8, 9, 10)], True),
     }
+    # OVH and backend pages share the same versioned source.
+    for page_name in ('prywatnosc', 'usun-konto'):
+        documents[f'website/SednoWebsite/public/{page_name}/index.html'] = documents[
+            f'docs/public/{page_name}/index.html'
+        ]
+    return documents
 
 
 if __name__ == '__main__':

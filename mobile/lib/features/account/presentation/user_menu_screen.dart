@@ -1,3 +1,6 @@
+import 'package:sedno_app/app/app_language.dart';
+import 'package:sedno_app/app/language_screen.dart';
+import 'package:sedno_app/l10n/localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sedno_app/app/app_theme.dart';
 import 'package:sedno_app/features/about/presentation/about_screen.dart';
@@ -20,7 +23,7 @@ class UserMenuScreen extends StatelessWidget {
       centerTitle: true,
       actions: [
         IconButton(
-          tooltip: 'Zamknij menu',
+          tooltip: context.l10n.closeMenu,
           style: IconButton.styleFrom(minimumSize: const Size(48, 48)),
           onPressed: () => Navigator.of(context).pop(),
           icon: const Icon(Icons.close),
@@ -53,7 +56,7 @@ class UserMenuScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 20),
                   Text(
-                    'Witaj w Sedno',
+                    context.l10n.welcome,
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.headlineMedium,
                   ),
@@ -72,14 +75,14 @@ class UserMenuScreen extends StatelessWidget {
                       onPressed: () =>
                           Navigator.of(context)
                               .pop(UserMenuDestination.account),
-                      child: const Text('Konto'),
+                      child: Text(context.l10n.account),
                     ),
                   ),
                   const SizedBox(height: 36),
                   Padding(
                     padding: const EdgeInsets.only(left: 16, bottom: 16),
                     child: Text(
-                      'W aplikacji',
+                      context.l10n.inApp,
                       style: Theme.of(context).textTheme.titleSmall,
                     ),
                   ),
@@ -90,7 +93,7 @@ class UserMenuScreen extends StatelessWidget {
                     child: Column(
                       children: [
                         _MenuRow(
-                          label: 'Start',
+                          label: context.l10n.start,
                           icon: Icons.home_outlined,
                           onTap: () =>
                               Navigator.of(context)
@@ -102,15 +105,29 @@ class UserMenuScreen extends StatelessWidget {
                           color: _background,
                         ),
                         _MenuRow(
-                          label: 'Historia',
+                          label: context.l10n.history,
                           icon: Icons.history,
                           onTap: () =>
                               Navigator.of(context)
                                   .pop(UserMenuDestination.history),
                         ),
                         const Divider(height: 1, color: _background),
+                        if (LanguageScope.maybeOf(context)
+                            case final controller?) ...[
+                          _MenuRow(
+                            label: context.l10n.language,
+                            icon: Icons.language,
+                            onTap: () => Navigator.of(context).push<void>(
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    LanguageScreen(controller: controller),
+                              ),
+                            ),
+                          ),
+                          const Divider(height: 1, color: _background),
+                        ],
                         _MenuRow(
-                          label: 'O aplikacji',
+                          label: context.l10n.about,
                           icon: Icons.info_outline,
                           onTap: () => Navigator.of(context).push<void>(
                             MaterialPageRoute(
@@ -137,7 +154,7 @@ class UserMenuScreen extends StatelessWidget {
                   onPressed: () => Navigator.of(context).push<void>(
                     MaterialPageRoute(builder: (_) => const PrivacyScreen()),
                   ),
-                  child: const Text('Prywatność i dane'),
+                  child: Text(context.l10n.privacy),
                 ),
               ),
             ),

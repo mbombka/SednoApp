@@ -1,3 +1,5 @@
+import 'package:sedno_app/l10n/localization.dart';
+
 import 'dart:async';
 
 import 'package:sedno_app/features/simplification/domain/text_mode.dart';
@@ -14,6 +16,9 @@ typedef SubmitText = Future<void> Function(InputText input);
 enum TextInputStatus { idle, loading, success, error }
 
 class TextInputViewModel extends ChangeNotifier {
+  AppLocalizations Function() localizations = polishStrings;
+  AppLocalizations get strings => localizations();
+
   TextInputViewModel({required this.onSubmit});
 
   final SubmitText onSubmit;
@@ -31,13 +36,21 @@ class TextInputViewModel extends ChangeNotifier {
   bool get isOverLimit => characterCount > InputText.maxCharacters;
   bool get canSubmit => !isLoading && !isOverLimit;
 
+  // Locale changes keep the text and loading state, but discard old translated errors.
+  void updateLocalizations(AppLocalizations value) {
+    final changed = strings.localeName != value.localeName;
+    localizations = () => value;
+    if (changed && !isLoading) {
+      _errorMessage = isOverLimit ? strings.textTooLong : null;
+      if (_status == TextInputStatus.error) _status = TextInputStatus.idle;
+    }
+  }
+
   void setMode(TextMode value) {
     if (isLoading || mode == value) return;
     mode = value;
     _status = TextInputStatus.idle;
-    _errorMessage = isOverLimit
-        ? 'Tekst może mieć maksymalnie 4000 znaków.'
-        : null;
+    _errorMessage = isOverLimit ? strings.textTooLong : null;
     notifyListeners();
   }
 
@@ -45,9 +58,7 @@ class TextInputViewModel extends ChangeNotifier {
     if (isLoading || value == _text) return;
     _text = value;
     _status = TextInputStatus.idle;
-    _errorMessage = isOverLimit
-        ? 'Tekst może mieć maksymalnie 4000 znaków.'
-        : null;
+    _errorMessage = isOverLimit ? strings.textTooLong : null;
     notifyListeners();
   }
 
@@ -71,9 +82,11 @@ class TextInputViewModel extends ChangeNotifier {
     InputText input;
     try {
       input = InputText(_text);
-    } on FormatException catch (error) {
+    } on FormatException {
       _status = TextInputStatus.error;
-      _errorMessage = error.message;
+      _errorMessage = _text.trim().isEmpty
+          ? strings.emptyText
+          : strings.textTooLong;
       notifyListeners();
       return;
     }
@@ -89,43 +102,37 @@ class TextInputViewModel extends ChangeNotifier {
       if (_disposed) return;
       _status = TextInputStatus.error;
       _errorMessage = mode == TextMode.correct
-          ? 'Poprawianie tekstu nie jest jeszcze dostępne.'
-          : 'Upraszczanie tekstu nie jest jeszcze dostępne.';
+          ? strings.correctionUnavailable
+          : strings.simplificationUnavailable;
     } on TimeoutException {
       if (_disposed) return;
       _status = TextInputStatus.error;
-      _errorMessage = 'Przekroczono czas oczekiwania. Spróbuj ponownie.';
+      _errorMessage = strings.requestTimeout;
     } on QuotaExceededException {
       if (_disposed) return;
       _status = TextInputStatus.error;
       _errorMessage =
-          'Dzisiejszy limit został wykorzystany.\n'
-          'Nowy limit o ${QuotaReset.localTime()}.';
+          '${strings.quotaUsed}\n${strings.resetAt(QuotaReset.localTime())}';
     } on SimplificationApiException catch (error) {
       if (_disposed) return;
       _status = TextInputStatus.error;
       _errorMessage = switch (error.kind) {
-        SimplificationFailure.offline =>
-          'Brak połączenia z internetem. Spróbuj ponownie.',
-        SimplificationFailure.timeout =>
-          'Przekroczono czas oczekiwania. Spróbuj ponownie.',
-        SimplificationFailure.unauthorized =>
-          'Sesja wygasła. Sprawdź konto i spróbuj ponownie.',
-        SimplificationFailure.rateLimited =>
-          'Dzisiejszy limit został wykorzystany. Sprawdź czas odnowienia.',
-        SimplificationFailure.unavailable =>
-          'Usługa jest chwilowo niedostępna. Spróbuj ponownie.',
+        SimplificationFailure.offline => strings.offline,
+        SimplificationFailure.timeout => strings.requestTimeout,
+        SimplificationFailure.unauthorized => strings.sessionExpired,
+        SimplificationFailure.rateLimited => strings.quotaExhausted,
+        SimplificationFailure.unavailable => strings.serviceUnavailable,
         SimplificationFailure.rejected =>
           mode == TextMode.correct
-              ? 'Nie można poprawić tego tekstu. Sprawdź dane i spróbuj ponownie.'
-              : 'Nie można uprościć tego tekstu. Sprawdź dane i spróbuj ponownie.',
+              ? strings.correctionRejected
+              : strings.simplificationRejected,
       };
     } catch (_) {
       if (_disposed) return;
       _status = TextInputStatus.error;
       _errorMessage = mode == TextMode.correct
-          ? 'Nie udało się poprawić tekstu. Spróbuj ponownie.'
-          : 'Nie udało się uprościć tekstu. Spróbuj ponownie.';
+          ? strings.correctionFailed
+          : strings.simplificationFailed;
     }
     notifyListeners();
   }

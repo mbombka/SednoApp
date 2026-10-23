@@ -1,3 +1,4 @@
+import 'package:sedno_app/l10n/localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sedno_app/features/quota/domain/quota_state.dart';
@@ -15,32 +16,31 @@ class TesterAccessPanel extends StatelessWidget {
       final expiresAt = value?.testerAccessExpiresAt;
       if (value == null || expiresAt == null) return const SizedBox.shrink();
       final date = expiresAt.toLocal();
-      String two(int number) => number.toString().padLeft(2, '0');
+      final dates = MaterialLocalizations.of(context);
       final until =
-          '${two(date.day)}.${two(date.month)}.${date.year} r., '
-          '${two(date.hour)}:${two(date.minute)}';
+          '${dates.formatCompactDate(date)}, ${dates.formatTimeOfDay(TimeOfDay.fromDateTime(date), alwaysUse24HourFormat: true)}';
       final active = expiresAt.isAfter(value.serverTime);
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const SizedBox(height: 24),
           Text(
-            'Dostęp testerski',
+            context.l10n.testerAccess,
             style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: 8),
           if (active) ...[
-            Text('Dostęp testerski do $until (czas lokalny).'),
-            const Text('Możesz przetworzyć do 400 tekstów dziennie.'),
-            const Text('Dostęp jest bezpłatny i wygaśnie automatycznie.'),
+            Text(context.l10n.testerUntil(until)),
+            Text(context.l10n.testerAllowance),
+            Text(context.l10n.testerExpiryNotice),
             if (value.tier == QuotaTier.subscription)
-              const Text('Masz też aktywną subskrypcję Google Play.'),
+              Text(context.l10n.testerHasSubscription),
           ] else ...[
-            const Text('Dostęp testerski wygasł.'),
+            Text(context.l10n.testerExpired),
             Text(
               value.tier == QuotaTier.subscription
-                  ? 'Twoja subskrypcja Google Play nadal zapewnia większy limit.'
-                  : 'Obowiązuje darmowy limit 5 tekstów dziennie. Dzisiejsze użycie pozostaje bez zmian.',
+                  ? context.l10n.subscriptionStillActive
+                  : context.l10n.freeLimitRestored,
             ),
           ],
         ],

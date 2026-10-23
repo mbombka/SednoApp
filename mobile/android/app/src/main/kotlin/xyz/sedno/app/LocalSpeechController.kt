@@ -34,7 +34,7 @@ class LocalSpeechController(private val activity: Activity) {
     private var session: Session? = null
     private var permissionPending = false
 
-    fun listen(result: MethodChannel.Result) {
+    fun listen(language: String, result: MethodChannel.Result) {
         if (session != null || permissionPending) {
             result.error("busy", null, null)
             return
@@ -44,7 +44,11 @@ class LocalSpeechController(private val activity: Activity) {
             result.error("unavailable", null, null)
             return
         }
-        val current = Session(result)
+        if (language !in setOf("pl-PL", "en-GB")) {
+            result.error("language", null, null)
+            return
+        }
+        val current = Session(result, language)
         session = current
         if (activity.checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             permissionPending = true
@@ -78,7 +82,7 @@ class LocalSpeechController(private val activity: Activity) {
             current.recognizer = recognizer
             val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
                 putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-                putExtra(RecognizerIntent.EXTRA_LANGUAGE, "pl-PL")
+                putExtra(RecognizerIntent.EXTRA_LANGUAGE, current.language)
                 putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true)
                 putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, false)
             }
@@ -86,7 +90,8 @@ class LocalSpeechController(private val activity: Activity) {
                 override fun onSupportResult(support: RecognitionSupport) {
                     if (session !== current) return
                     val installed = support.installedOnDeviceLanguages.any {
-                        it.replace('_', '-').equals("pl-PL", true) || it.equals("pl", true)
+                        it.replace('_', '-').equals(current.language, true) ||
+                            it.equals(current.language.substringBefore('-'), true)
                     }
                     if (!installed) fail(current, "language") else start(current, intent)
                 }
@@ -254,7 +259,7 @@ class LocalSpeechController(private val activity: Activity) {
         try { current.recognizer?.destroy() } catch (_: Exception) {}
     }
 
-    private inner class Session(val result: MethodChannel.Result) {
+    private inner class Session(val result: MethodChannel.Result, val language: String) {
         val recording = AtomicBoolean(false)
         var recognizer: SpeechRecognizer? = null
         var recorder: AudioRecord? = null

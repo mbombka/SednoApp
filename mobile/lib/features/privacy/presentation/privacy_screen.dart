@@ -1,3 +1,5 @@
+import 'package:sedno_app/features/privacy/domain/localized_privacy_policy.dart';
+import 'package:sedno_app/l10n/localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sedno_app/features/shared/presentation/link_text.dart';
 import 'package:sedno_app/features/shared/presentation/website_information.dart';
@@ -15,10 +17,10 @@ class PrivacyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
-      title: const Text('Prywatność i dane'),
+      title: Text(context.l10n.privacy),
       leading: Navigator.of(context).canPop()
           ? IconButton(
-              tooltip: 'Wróć',
+              tooltip: context.l10n.back,
               style: IconButton.styleFrom(minimumSize: const Size(48, 48)),
               onPressed: () => Navigator.of(context).maybePop(),
               icon: const Icon(Icons.arrow_back),
@@ -31,10 +33,16 @@ class PrivacyScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text('Wersja: ${PrivacyPolicy.versionLabel}'),
+            Text(
+              context.l10n.policyVersion(
+                LocalizedPrivacyPolicy.versionLabel(context.language),
+              ),
+            ),
             const SizedBox(height: 16),
             WebsiteInformation(opener: openUrl),
-            for (final section in PrivacyPolicy.sections) ...[
+            for (final section in LocalizedPrivacyPolicy.sections(
+              context.language,
+            )) ...[
               const SizedBox(height: 24),
               _Heading(section.title),
               for (final paragraph in section.paragraphs) ...[

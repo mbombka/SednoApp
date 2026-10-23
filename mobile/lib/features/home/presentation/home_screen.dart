@@ -1,3 +1,6 @@
+import 'package:sedno_app/features/privacy/domain/localized_privacy_policy.dart';
+import 'package:sedno_app/l10n/localization.dart';
+
 import 'dart:async';
 
 import 'package:sedno_app/features/home/presentation/eraser_icon.dart';
@@ -32,9 +35,9 @@ class HomeScreen extends StatefulWidget {
     this.onSubmit,
     this.editorResult,
     this.onModeChanged,
-    this.playbackService = const AndroidTextPlaybackService(),
+    this.playbackService,
     this.isActive = true,
-    this.speechService = const AndroidSpeechService(),
+    this.speechService,
     this.onCameraPressed,
     this.photoRepository,
     this.simplificationRepository,
@@ -46,11 +49,11 @@ class HomeScreen extends StatefulWidget {
   final String appName;
   final EditorResultViewModel? editorResult;
   final ValueChanged<TextMode>? onModeChanged;
-  final TextPlaybackService playbackService;
+  final TextPlaybackService? playbackService;
   final TextEditingController textController;
   final SubmitText? onSubmit;
   final bool isActive;
-  final SpeechService speechService;
+  final SpeechService? speechService;
   final VoidCallback? onCameraPressed;
   final PhotoTextRepository? photoRepository;
   final SimplificationRepository? simplificationRepository;
@@ -74,14 +77,27 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   final Stopwatch _quotaAge = Stopwatch();
   bool _aiNoticeAccepted = false;
   bool _confirmingSubmission = false;
+  bool _cameraUnavailable = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _editorResult = widget.editorResult ?? EditorResultViewModel();
-    _playbackViewModel = TextPlaybackViewModel(widget.playbackService);
-    _speechViewModel = SpeechInputViewModel(widget.speechService);
+    _playbackViewModel = TextPlaybackViewModel(
+      widget.playbackService ??
+          AndroidTextPlaybackService(
+            localizations: () => context.l10n,
+            language: () => context.language,
+          ),
+    );
+    _speechViewModel = SpeechInputViewModel(
+      widget.speechService ??
+          AndroidSpeechService(
+            localizations: () => context.l10n,
+            language: () => context.language,
+          ),
+    );
     _inputViewModel = TextInputViewModel(onSubmit: _submit);
     _inputViewModel.addListener(_onInputStateChanged);
     _inputViewModel.setText(widget.textController.text);
@@ -95,6 +111,25 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     }
     _attachQuota(widget.simplificationRepository);
     widget.textController.addListener(_onTextChanged);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _updateLocalizations();
+  }
+
+  void _updateLocalizations() {
+    final strings = context.l10n;
+    if (_inputViewModel.strings.localeName != strings.localeName) {
+      _speechViewModel.message = null;
+      _playbackViewModel.message = null;
+      _photoViewModel?.clearMessage();
+    }
+    _inputViewModel.updateLocalizations(strings);
+    _speechViewModel.localizations = () => strings;
+    _playbackViewModel.localizations = () => strings;
+    _photoViewModel?.localizations = () => strings;
   }
 
   void _attachQuota(SimplificationRepository? repository) {
@@ -168,7 +203,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         Duration.microsecondsPerMinute;
     final hours = totalMinutes ~/ 60;
     final minutes = totalMinutes.remainder(60);
-    return 'za $hours godz. $minutes min';
+    return context.l10n.timeRemaining('$hours', '$minutes');
   }
 
   static Future<void> _unavailableSubmission(InputText _) async {
@@ -197,14 +232,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         await showDialog<void>(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Sprawdź połączenie'),
-            content: const Text(
-              'Nie można sprawdzić limitu. Sprawdź połączenie.',
-            ),
+            title: Text(context.l10n.checkConnection),
+            content: Text(context.l10n.quotaCheckFailed),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Zamknij'),
+                child: Text(context.l10n.close),
               ),
             ],
           ),
@@ -217,25 +250,22 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         final proceed = await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Dzienny limit'),
+            title: Text(context.l10n.dailyLimit),
             content: Text(
               quota.remaining == 1
-                  ? '${_mode == TextMode.correct ? 'Pozostało 1 użycie AI.' : 'Pozostało 1 uproszczenie.'}\n'
-                        'Nowy limit o ${QuotaReset.localTime(resetAt: quota.resetAt)} (${_timeUntilReset(quota)}).'
-                  : 'Wykorzystano dzienny limit.\n'
-                        'Nowy limit o ${QuotaReset.localTime(resetAt: quota.resetAt)} (${_timeUntilReset(quota)}).\n'
-                        'Subskrypcję i jej cenę znajdziesz w menu Konto.',
+                  ? '${_mode == TextMode.correct ? context.l10n.quotaOneUse : context.l10n.quotaOneSimplification}\n${context.l10n.resetWithRemaining(QuotaReset.localTime(resetAt: quota.resetAt), _timeUntilReset(quota))}'
+                  : '${context.l10n.quotaUsedDialog}\n${context.l10n.resetWithRemaining(QuotaReset.localTime(resetAt: quota.resetAt), _timeUntilReset(quota))}\n${context.l10n.subscriptionInAccount}',
               key: const Key('quotaMessage'),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text('Zamknij'),
+                child: Text(context.l10n.close),
               ),
               if (quota.remaining > 0)
                 FilledButton(
                   onPressed: () => Navigator.pop(context, true),
-                  child: const Text('Dalej'),
+                  child: Text(context.l10n.continueAction),
                 ),
             ],
           ),
@@ -249,29 +279,29 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           builder: (context) => AlertDialog(
             title: Text(
               _mode == TextMode.correct
-                  ? 'Zanim poprawisz tekst'
-                  : 'Zanim uprościsz tekst',
+                  ? context.l10n.beforeCorrection
+                  : context.l10n.beforeSimplification,
             ),
-            content: const SingleChildScrollView(
+            content: SingleChildScrollView(
               child: Text(
-                PrivacyScreen.aiNotice,
-                key: Key('aiProcessingNotice'),
+                LocalizedPrivacyPolicy.aiNotice(context.language),
+                key: const Key('aiProcessingNotice'),
               ),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text('Anuluj'),
+                child: Text(context.l10n.cancel),
               ),
               TextButton(
                 onPressed: () => Navigator.of(context).push<void>(
                   MaterialPageRoute(builder: (_) => const PrivacyScreen()),
                 ),
-                child: const Text('Prywatność i dane'),
+                child: Text(context.l10n.privacy),
               ),
               FilledButton(
                 onPressed: () => Navigator.pop(context, true),
-                child: const Text('Rozumiem, wyślij'),
+                child: Text(context.l10n.acceptAndSend),
               ),
             ],
           ),
@@ -290,7 +320,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Future<void> _submit(InputText input) async {
     if (widget.onSubmit case final callback?) return callback(input);
     if (_simplificationViewModel case final model?) {
-      final result = await model.simplify(input, mode: _mode);
+      final result = await model.simplify(
+        input,
+        mode: _mode,
+        language: context.language,
+      );
       if (!mounted) return;
       if (widget.historyRepository case final history?) {
         try {
@@ -326,6 +360,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   void _clearEditor() {
+    _cameraUnavailable = false;
     unawaited(_playbackViewModel.stop());
     _editorResult.clear();
     _simplificationViewModel?.reset();
@@ -350,7 +385,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     }
     if (oldWidget.playbackService != widget.playbackService) {
       _playbackViewModel.dispose();
-      _playbackViewModel = TextPlaybackViewModel(widget.playbackService);
+      _playbackViewModel = TextPlaybackViewModel(
+        widget.playbackService ??
+            AndroidTextPlaybackService(
+              localizations: () => context.l10n,
+              language: () => context.language,
+            ),
+      );
     }
     if (oldWidget.textController != widget.textController) {
       oldWidget.textController.removeListener(_onTextChanged);
@@ -359,7 +400,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     }
     if (oldWidget.speechService != widget.speechService) {
       _speechViewModel.dispose();
-      _speechViewModel = SpeechInputViewModel(widget.speechService);
+      _speechViewModel = SpeechInputViewModel(
+        widget.speechService ??
+            AndroidSpeechService(
+              localizations: () => context.l10n,
+              language: () => context.language,
+            ),
+      );
     }
     if (oldWidget.photoRepository != widget.photoRepository) {
       _photoViewModel?.dispose();
@@ -378,6 +425,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             );
       _attachQuota(widget.simplificationRepository);
     }
+    _updateLocalizations();
   }
 
   @override
@@ -435,9 +483,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       // in the editor for manual correction.
       await _requestSubmission();
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Aparat będzie dostępny wkrótce.')),
-      );
+      setState(() => _cameraUnavailable = true);
     }
   }
 
@@ -457,6 +503,56 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             _inputViewModel.isLoading ||
             _speechViewModel.busy ||
             (_photoViewModel?.isLoading ?? false);
+        final messages = <Widget>[
+          if (_cameraUnavailable)
+            _EditorNotice(
+              context.l10n.cameraUnavailable,
+              messageKey: const Key('cameraUnavailableMessage'),
+              liveRegion: true,
+            ),
+          if (_editorResult.hasOriginal)
+            _EditorNotice(
+              context.l10n.aiWarning,
+              messageKey: const Key('aiErrorWarning'),
+            ),
+          if (_speechViewModel.busy)
+            _EditorNotice(
+              context.l10n.listeningNotice,
+              messageKey: const Key('speechStatus'),
+              liveRegion: true,
+            ),
+          if (_playbackViewModel.message case final message?
+              when _mode == TextMode.correct)
+            _EditorNotice(
+              message,
+              messageKey: const Key('playbackMessage'),
+              liveRegion: true,
+            ),
+          if (_speechViewModel.message case final message?
+              when _mode == TextMode.simplify)
+            _EditorNotice(
+              message,
+              messageKey: const Key('speechMessage'),
+              liveRegion: true,
+            ),
+          if (_inputViewModel.errorMessage case final error?)
+            _EditorNotice(error, liveRegion: true),
+          if (_photoViewModel?.message case final message?
+              when _mode == TextMode.simplify)
+            _EditorNotice(
+              message,
+              messageKey: const Key('photoMessage'),
+              liveRegion: true,
+            ),
+          if (_inputViewModel.status == TextInputStatus.success &&
+              widget.simplificationRepository == null)
+            _EditorNotice(
+              _mode == TextMode.correct
+                  ? context.l10n.correctionSubmitted
+                  : context.l10n.simplificationSubmitted,
+              liveRegion: true,
+            ),
+        ];
         return PopScope<void>(
           canPop: !widget.isActive || !_editorResult.hasOriginal,
           onPopInvokedWithResult: (didPop, _) {
@@ -489,28 +585,64 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                               bottom: Radius.circular(36),
                             ),
                           ),
-                          child: Semantics(
-                            label:
-                                _editorResult.mode?.resultHeading ??
-                                (_mode == TextMode.correct
-                                    ? 'Tekst do poprawienia'
-                                    : 'Tekst do uproszczenia'),
-                            child: TextField(
-                              controller: widget.textController,
-                              enabled: !busy,
-                              expands: true,
-                              minLines: null,
-                              maxLines: null,
-                              textAlignVertical: TextAlignVertical.top,
-                              style: Theme.of(context).textTheme.headlineSmall,
-                              textCapitalization: TextCapitalization.sentences,
-                              decoration: const InputDecoration(
-                                hintText: 'Wpisz lub wklej tekst',
-                                border: InputBorder.none,
-                                enabledBorder: InputBorder.none,
-                                focusedBorder: InputBorder.none,
-                                contentPadding: EdgeInsets.zero,
-                              ),
+                          child: LayoutBuilder(
+                            builder: (context, editorConstraints) => Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Expanded(
+                                  child: Semantics(
+                                    label:
+                                        _editorResult.mode
+                                            ?.localizedResultHeading(
+                                              context.l10n,
+                                            ) ??
+                                        (_mode == TextMode.correct
+                                            ? context.l10n.textForCorrection
+                                            : context
+                                                  .l10n
+                                                  .textForSimplification),
+                                    child: TextField(
+                                      controller: widget.textController,
+                                      enabled: !busy,
+                                      expands: true,
+                                      minLines: null,
+                                      maxLines: null,
+                                      textAlignVertical: TextAlignVertical.top,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineSmall,
+                                      textCapitalization:
+                                          TextCapitalization.sentences,
+                                      decoration: InputDecoration(
+                                        hintText: context.l10n.inputHint,
+                                        border: InputBorder.none,
+                                        enabledBorder: InputBorder.none,
+                                        focusedBorder: InputBorder.none,
+                                        contentPadding: EdgeInsets.zero,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                if (messages.isNotEmpty)
+                                  ConstrainedBox(
+                                    // Keep space to edit even when several notices
+                                    // wrap at large text sizes or with a keyboard.
+                                    constraints: BoxConstraints(
+                                      maxHeight:
+                                          editorConstraints.maxHeight / 2,
+                                    ),
+                                    child: SingleChildScrollView(
+                                      key: const Key('editorMessages'),
+                                      primary: false,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: messages,
+                                      ),
+                                    ),
+                                  ),
+                              ],
                             ),
                           ),
                         ),
@@ -525,8 +657,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                   minimumSize: const Size(48, 48),
                                 ),
                                 tooltip: _mode == TextMode.simplify
-                                    ? 'Przełącz na poprawianie tekstu'
-                                    : 'Przełącz na upraszczanie tekstu',
+                                    ? context.l10n.switchToCorrection
+                                    : context.l10n.switchToSimplification,
                                 onPressed:
                                     busy ||
                                         !widget.isActive ||
@@ -542,7 +674,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                   style: IconButton.styleFrom(
                                     minimumSize: const Size(48, 48),
                                   ),
-                                  tooltip: 'Wyczyść tekst',
+                                  tooltip: context.l10n.clearText,
                                   onPressed:
                                       busy ||
                                           !widget.isActive ||
@@ -570,11 +702,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                     ),
                                     tooltip: _mode == TextMode.correct
                                         ? (_playbackViewModel.isPlaying
-                                              ? 'Zatrzymaj odczyt'
-                                              : 'Odczytaj tekst')
+                                              ? context.l10n.stopPlayback
+                                              : context.l10n.readAloud)
                                         : _speechViewModel.busy
-                                        ? 'Anuluj nagrywanie'
-                                        : 'Uprość mowę',
+                                        ? context.l10n.cancelRecording
+                                        : context.l10n.simplifySpeech,
                                     style: IconButton.styleFrom(
                                       minimumSize: const Size(56, 56),
                                       backgroundColor: const Color(0xFFC2E7FF),
@@ -643,11 +775,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                               color: Colors.white,
                                               semanticsLabel:
                                                   _mode == TextMode.correct
-                                                  ? 'Poprawianie…'
-                                                  : 'Upraszczanie…',
+                                                  ? context.l10n.correcting
+                                                  : context.l10n.simplifying,
                                             ),
                                           )
-                                        : Text(_mode.action),
+                                        : Text(
+                                            _mode.localizedAction(context.l10n),
+                                          ),
                                   ),
                                 ),
                               ),
@@ -680,8 +814,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                         label:
                                             (_photoViewModel?.isLoading ??
                                                 false)
-                                            ? 'Odczytywanie…'
-                                            : 'Aparat',
+                                            ? context.l10n.reading
+                                            : context.l10n.camera,
                                         child: const ExcludeSemantics(
                                           child: Icon(
                                             Icons.photo_camera_outlined,
@@ -695,70 +829,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                             ],
                           ),
                         ),
-                        if (_editorResult.hasOriginal)
-                          const Padding(
-                            padding: EdgeInsets.all(12),
-                            child: Text(
-                              'AI może się mylić. Sprawdź wynik.',
-                              key: Key('aiErrorWarning'),
-                            ),
-                          ),
-                        if (_speechViewModel.busy)
-                          Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: Semantics(
-                              liveRegion: true,
-                              child: const Text(
-                                'Nasłuchiwanie… Mów po polsku. Koniec po 1,5 sekundy ciszy lub po 60 sekundach. Przycisk stop anuluje nagrywanie.',
-                                key: Key('speechStatus'),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ),
-                        if (_playbackViewModel.message case final message?
-                            when _mode == TextMode.correct)
-                          Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: Semantics(
-                              liveRegion: true,
-                              child: Text(
-                                message,
-                                key: const Key('playbackMessage'),
-                              ),
-                            ),
-                          ),
-                        if (_speechViewModel.message case final message?
-                            when _mode == TextMode.simplify)
-                          Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: Semantics(
-                              liveRegion: true,
-                              child: Text(
-                                message,
-                                key: const Key('speechMessage'),
-                              ),
-                            ),
-                          ),
-                        if (_inputViewModel.errorMessage case final error?)
-                          Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: Text(error, semanticsLabel: error),
-                          ),
-                        if (_photoViewModel?.message case final message?
-                            when _mode == TextMode.simplify) ...[
-                          const SizedBox(height: 12),
-                          Text(message, key: const Key('photoMessage')),
-                        ],
                         SizedBox(height: bottomSpacing),
-                        if (_inputViewModel.status == TextInputStatus.success &&
-                            widget.simplificationRepository == null) ...[
-                          const SizedBox(height: 16),
-                          Text(
-                            _mode == TextMode.correct
-                                ? 'Tekst został przekazany do poprawienia.'
-                                : 'Tekst został przekazany do uproszczenia.',
-                          ),
-                        ],
                       ],
                     ),
                   ),
@@ -770,4 +841,21 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       },
     );
   }
+}
+
+class _EditorNotice extends StatelessWidget {
+  const _EditorNotice(this.message, {this.messageKey, this.liveRegion = false});
+
+  final String message;
+  final Key? messageKey;
+  final bool liveRegion;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.only(top: 12),
+    child: Semantics(
+      liveRegion: liveRegion,
+      child: Text(message, key: messageKey, textAlign: TextAlign.left),
+    ),
+  );
 }

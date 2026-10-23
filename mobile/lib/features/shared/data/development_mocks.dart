@@ -1,3 +1,4 @@
+import 'package:sedno_app/features/shared/domain/app_language.dart';
 import 'package:sedno_app/features/account/domain/account.dart';
 import 'package:sedno_app/features/account/domain/account_repository.dart';
 import 'package:sedno_app/features/history/domain/history_entry.dart';
@@ -69,13 +70,15 @@ class MockSimplificationRepository implements SimplificationRepository {
   final Map<String, SimplificationResponse> _responses = {};
   final Map<String, String> _requestTexts = {};
   final Map<String, String> _requestModes = {};
+  final Map<String, AppLanguage> _requestLanguages = {};
 
   @override
   Future<SimplificationResponse> simplify(SimplificationRequest request) async {
     final previous = _responses[request.requestId];
     if (previous != null) {
       if (_requestTexts[request.requestId] != request.input.value ||
-          _requestModes[request.requestId] != request.mode.name) {
+          _requestModes[request.requestId] != request.mode.name ||
+          _requestLanguages[request.requestId] != request.language) {
         throw const FormatException('Identyfikator żądania jest już użyty.');
       }
       return previous;
@@ -84,10 +87,13 @@ class MockSimplificationRepository implements SimplificationRepository {
     final response = SimplificationResponse(
       result: SimplificationResult(
         id: request.requestId,
-        text: request.mode.name == 'correct'
+        text: request.language == AppLanguage.english
+            ? 'Demo: ${request.input.value}'
+            : request.mode.name == 'correct'
             ? 'Przykładowa poprawa: ${request.input.value}'
             : 'Przykładowe uproszczenie: ${request.input.value}',
         mode: request.mode,
+        language: request.language,
         createdAt: clock().toUtc(),
       ),
       quota: quotaState,
@@ -95,6 +101,7 @@ class MockSimplificationRepository implements SimplificationRepository {
     _responses[request.requestId] = response;
     _requestTexts[request.requestId] = request.input.value;
     _requestModes[request.requestId] = request.mode.name;
+    _requestLanguages[request.requestId] = request.language;
     return response;
   }
 }

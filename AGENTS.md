@@ -2,10 +2,10 @@
 
 ## Purpose
 An Android application built with Flutter/Dart that simplifies Polish
-texts, primarily for people who are hard of hearing or have cognitive
+and English texts, primarily for people who are hard of hearing or have cognitive
 difficulties.
 Project name: SednoApp. Display name: Sedno.
-All user-facing content must be in Polish.
+User-facing content must be localized in Polish and British English. Keep Polish as the fallback; prepare additional languages through the shared localization mechanism.
 
 ## Existing Code
 Extend the existing scaffold; do not regenerate the project.
@@ -91,7 +91,7 @@ The privacy policy requires controller details, providers, legal bases,
 and retention rules. Do not make unsupported legal compliance claims.
 
 ## Accessibility
-Simple Polish, light backgrounds, dark navy text, blue buttons.
+Simple Polish and English, light backgrounds, dark navy text, blue buttons.
 WCAG AA contrast, touch targets ≥48 dp, text scaling,
 TalkBack support, and labels for icons.
 Display a warning that AI simplification may contain errors.

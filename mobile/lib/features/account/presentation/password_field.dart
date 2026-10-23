@@ -1,3 +1,4 @@
+import 'package:sedno_app/l10n/localization.dart';
 import 'package:flutter/material.dart';
 
 class PasswordField extends StatefulWidget {
@@ -42,8 +43,12 @@ class _PasswordFieldState extends State<PasswordField> {
       suffixIcon: IconButton(
         constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
         tooltip: widget.confirmation
-            ? (_visible ? 'Ukryj powtórzone hasło' : 'Pokaż powtórzone hasło')
-            : (_visible ? 'Ukryj hasło' : 'Pokaż hasło'),
+            ? (_visible
+                  ? context.l10n.hideConfirmedPassword
+                  : context.l10n.showConfirmedPassword)
+            : (_visible
+                  ? context.l10n.hidePassword
+                  : context.l10n.showPassword),
         onPressed: widget.enabled
             ? () => setState(() => _visible = !_visible)
             : null,

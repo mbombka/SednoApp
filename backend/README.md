@@ -247,3 +247,10 @@ dalej pomijać `mode`. Zmiana nie wymaga migracji Firestore ani nowych usług.
 Pole `TesterAccessExpiresAt` konta w Firestore daje czasowy limit 400 operacji
 dziennie bez zakupu. Datę sprawdza transakcja limitu; użycie nie jest zerowane.
 [Skrypt administracyjny, ręczna edycja i wdrożenie](../docs/tester-access.pl.md).
+
+## Język tekstu
+
+`POST /v1/simplifications` przyjmuje opcjonalne `language: pl | en` (domyślnie `pl`).
+Oba tryby mają osobne prompty polskie i angielskie w `Prompts/`; angielski używa
+pisowni brytyjskiej. Języki korzystają ze wspólnego limitu i ustawień modelu.
+[Opis zgodności, wdrożenia i rozszerzania](../docs/multilingual-app.pl.md).

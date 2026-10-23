@@ -18,6 +18,8 @@ public sealed class SimplificationService(IUsageStore usage, IModelProvider mode
             throw new InputValidationException("invalid_request_id", "Nieprawidłowy identyfikator żądania.");
         if (input.Mode is not ("simplify" or "correct"))
             throw new InputValidationException("invalid_mode", "Nieprawidłowy tryb tekstu.");
+        if (input.Language is not ("pl" or "en"))
+            throw new InputValidationException("invalid_language", "Unsupported text language.");
         if (string.IsNullOrWhiteSpace(input.Text))
             throw new InputValidationException("empty_text", "Wpisz tekst.");
         if (new StringInfo(input.Text).LengthInTextElements > 4000)
@@ -32,6 +34,9 @@ public sealed class SimplificationService(IUsageStore usage, IModelProvider mode
         var modeKey = input.Mode == "correct"
             ? HMACSHA256.HashData(fingerprintKey, "sedno.correct.v1"u8)
             : fingerprintKey;
+        // Keep existing Polish fingerprints, bind every other language to the key.
+        if (input.Language != "pl")
+            modeKey = HMACSHA256.HashData(modeKey, Encoding.UTF8.GetBytes($"sedno.language.v1:{input.Language}"));
         var fingerprint = Convert.ToHexString(HMACSHA256.HashData(modeKey, Encoding.UTF8.GetBytes(input.Text)));
         ReservationOutcome reservation;
         using (timings?.Measure(SimplificationStage.Reservation))
@@ -42,8 +47,8 @@ public sealed class SimplificationService(IUsageStore usage, IModelProvider mode
         {
             using (timings?.Measure(SimplificationStage.Model))
                 output = input.Mode == "correct"
-                    ? await model.CorrectAsync(input.Text, cancellationToken)
-                    : await model.SimplifyAsync(input.Text, cancellationToken);
+                    ? await model.CorrectAsync(input.Text, input.Language, cancellationToken)
+                    : await model.SimplifyAsync(input.Text, input.Language, cancellationToken);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
@@ -68,6 +73,6 @@ public sealed class SimplificationService(IUsageStore usage, IModelProvider mode
         QuotaDto quota;
         using (timings?.Measure(SimplificationStage.QuotaRead))
             quota = await usage.GetQuotaAsync(identityId, cancellationToken);
-        return ("succeeded", new(new(input.RequestId, output, clock.GetUtcNow(), input.Mode), quota), quota);
+        return ("succeeded", new(new(input.RequestId, output, clock.GetUtcNow(), input.Mode, input.Language), quota), quota);
     }
 }

@@ -7,7 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:sedno_app/app/app.dart';
+import 'package:sedno_app/features/home/presentation/home_screen.dart';
 import 'package:sedno_app/features/shared/data/development_mocks.dart';
+import 'package:sedno_app/features/simplification/domain/text_mode.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,6 +25,9 @@ Future<void> main() async {
       ),
     );
   await font.load();
+  final icons = FontLoader('MaterialIcons')
+    ..addFont(rootBundle.load('fonts/MaterialIcons-Regular.otf'));
+  await icons.load();
   final boundaryKey = GlobalKey();
   runApp(
     MediaQuery(
@@ -62,6 +67,67 @@ Future<void> main() async {
       'dostawa wody zostanie wstrzymana w godzinach od 8:00 do 14:00.';
   await WidgetsBinding.instance.endOfFrame;
   await save('home-with-text');
+
+  HomeScreen? home;
+  void findHome(Element element) {
+    if (element.widget case final HomeScreen screen) home = screen;
+    element.visitChildren(findHome);
+  }
+
+  findHome(boundaryKey.currentContext! as Element);
+  Future<void> showResult(String text, String name) async {
+    editor.controller!.value = TextEditingValue(
+      text: text,
+      selection: const TextSelection.collapsed(offset: 0),
+    );
+    home!.editorResult!.show(
+      originalText:
+          'Przykładowy oryginalny komunikat o przerwie w dostawie wody.',
+      mode: TextMode.simplify,
+    );
+    await WidgetsBinding.instance.endOfFrame;
+    await WidgetsBinding.instance.endOfFrame;
+    void resetScroll(Element element) {
+      if (element is StatefulElement && element.state is ScrollableState) {
+        final position = (element.state as ScrollableState).position;
+        position.jumpTo(position.minScrollExtent);
+        stdout.writeln('$name: scroll extent ${position.maxScrollExtent}');
+      }
+      element.visitChildren(resetScroll);
+    }
+
+    resetScroll(boundaryKey.currentContext! as Element);
+    await WidgetsBinding.instance.endOfFrame;
+    await WidgetsBinding.instance.endOfFrame;
+    await save(name);
+  }
+
+  await showResult(
+    'Jutro od 8:00 do 14:00 nie będzie wody.\n\n'
+        'W tym czasie będą trwały prace przy wodociągu. '
+        'Przygotuj wcześniej zapas wody.',
+    'result-short',
+  );
+  await showResult(
+    'Jutro od 8:00 do 14:00 nie będzie wody.\n\n'
+        'Pracownicy naprawią wodociąg przy ulicy Lipowej. '
+        'Przerwa dotyczy wszystkich budynków przy tej ulicy.\n\n'
+        'Jak się przygotować?\n\n'
+        'Nalej wcześniej wodę do butelek lub dzbanka. '
+        'Przygotuj tyle wody, ile potrzebujesz do picia, '
+        'gotowania i mycia rąk.\n\n'
+        'Jeśli możesz, zrób pranie i umyj naczynia przed 8:00. '
+        'Podczas przerwy nie uruchamiaj pralki ani zmywarki.\n\n'
+        'Co zrobić po zakończeniu prac?\n\n'
+        'Odkręć kran i sprawdź, czy woda jest czysta. '
+        'Na początku może być lekko mętna. '
+        'Poczekaj, aż znów będzie przejrzysta.\n\n'
+        'Jeśli po 14:00 nadal nie będzie wody, '
+        'skontaktuj się z administracją budynku. '
+        'Numer telefonu znajdziesz na tablicy ogłoszeń przy wejściu.\n\n'
+        'Przekaż tę informację sąsiadom, którzy mogą jej potrzebować.',
+    'result-long',
+  );
   exit(0);
 }
 

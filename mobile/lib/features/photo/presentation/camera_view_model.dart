@@ -1,3 +1,5 @@
+import 'package:sedno_app/l10n/localization.dart';
+
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -5,6 +7,9 @@ import 'package:sedno_app/features/photo/data/camera_device_service.dart';
 import 'package:sedno_app/features/photo/domain/photo_text_repository.dart';
 
 class CameraViewModel extends ChangeNotifier {
+  AppLocalizations Function() localizations = polishStrings;
+  AppLocalizations get strings => localizations();
+
   CameraViewModel(this.camera);
 
   final CameraDeviceService camera;
@@ -33,9 +38,9 @@ class CameraViewModel extends ChangeNotifier {
         await camera.initialize();
         ready = !_disposed && _active && revision == _revision;
       } on CameraPermissionDenied {
-        message = 'Brak dostępu do aparatu. Zezwól na dostęp w ustawieniach telefonu.';
+        message = strings.cameraPermission;
       } catch (_) {
-        message = 'Nie udało się uruchomić aparatu. Spróbuj ponownie.';
+        message = strings.cameraStartFailed;
       }
       if (!_disposed) notifyListeners();
     });
@@ -59,7 +64,7 @@ class CameraViewModel extends ChangeNotifier {
       }
       return path;
     } catch (_) {
-      message = 'Nie udało się zrobić zdjęcia. Spróbuj ponownie.';
+      message = strings.photoCaptureFailed;
       return null;
     } finally {
       busy = false;

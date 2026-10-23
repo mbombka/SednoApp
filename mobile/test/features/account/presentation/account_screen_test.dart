@@ -234,6 +234,7 @@ void main() {
       200,
       scrollable: find.byType(Scrollable).last,
     );
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Prywatność i dane'));
     await tester.pumpAndSettle();
     expect(find.text('Twoje prawa i kontakt'), findsOneWidget);

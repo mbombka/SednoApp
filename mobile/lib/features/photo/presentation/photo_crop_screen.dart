@@ -1,3 +1,5 @@
+import 'package:sedno_app/l10n/localization.dart';
+
 import 'dart:async';
 import 'dart:math' as math;
 
@@ -21,6 +23,16 @@ class _PhotoCropScreenState extends State<PhotoCropScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final strings = context.l10n;
+    if (widget.model.strings.localeName != strings.localeName) {
+      widget.model.message = null;
+    }
+    widget.model.localizations = () => strings;
+  }
+
+  @override
   void dispose() {
     widget.model.dispose();
     super.dispose();
@@ -34,23 +46,22 @@ class _PhotoCropScreenState extends State<PhotoCropScreen> {
       return PopScope(
         canPop: !model.busy,
         child: Scaffold(
-          appBar: AppBar(title: const Text('Zaznacz tekst')),
+          appBar: AppBar(title: Text(context.l10n.selectText)),
           body: SafeArea(
             child: Column(
               children: [
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(16, 8, 16, 0),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
                   child: Text(
-                    'Przesuń rogi ramki, aby zaznaczyć tekst. '
-                    'Bez zmian uprościmy tekst z całego zdjęcia.',
+                    '${context.l10n.cropInstructions}${context.l10n.cropWholePhotoNotice}',
                   ),
                 ),
                 Expanded(
                   child: model.image == null
                       ? Center(
                           child: model.message == null
-                              ? const CircularProgressIndicator(
-                                  semanticsLabel: 'Otwieranie zdjęcia',
+                              ? CircularProgressIndicator(
+                                  semanticsLabel: context.l10n.openingPhoto,
                                 )
                               : const SizedBox.shrink(),
                         )
@@ -80,7 +91,11 @@ class _PhotoCropScreenState extends State<PhotoCropScreen> {
                                 Navigator.pop(context, path);
                               }
                             },
-                      child: Text(model.busy ? 'Przygotowywanie…' : 'Uprość'),
+                      child: Text(
+                        model.busy
+                            ? context.l10n.preparing
+                            : context.l10n.simplify,
+                      ),
                     ),
                   ),
                 ),
@@ -134,7 +149,7 @@ class _Selection extends StatelessWidget {
                 ),
               ),
               for (final corner in CropCorner.values)
-                _handle(corner, selection, width, height),
+                _handle(context, corner, selection, width, height),
             ],
           ),
         ),
@@ -142,15 +157,21 @@ class _Selection extends StatelessWidget {
     },
   );
 
-  Widget _handle(CropCorner corner, Rect rect, double width, double height) {
+  Widget _handle(
+    BuildContext context,
+    CropCorner corner,
+    Rect rect,
+    double width,
+    double height,
+  ) {
     final left =
         corner == CropCorner.topLeft || corner == CropCorner.bottomLeft;
     final top = corner == CropCorner.topLeft || corner == CropCorner.topRight;
     final label = switch (corner) {
-      CropCorner.topLeft => 'Lewy górny róg ramki',
-      CropCorner.topRight => 'Prawy górny róg ramki',
-      CropCorner.bottomLeft => 'Lewy dolny róg ramki',
-      CropCorner.bottomRight => 'Prawy dolny róg ramki',
+      CropCorner.topLeft => context.l10n.cropTopLeft,
+      CropCorner.topRight => context.l10n.cropTopRight,
+      CropCorner.bottomLeft => context.l10n.cropBottomLeft,
+      CropCorner.bottomRight => context.l10n.cropBottomRight,
     };
     void adjust(double amount) => model.moveCorner(
       corner,
@@ -163,12 +184,13 @@ class _Selection extends StatelessWidget {
       height: 48,
       child: Semantics(
         label: label,
-        value:
-            'Poziomo ${((left ? model.selection.left : model.selection.right) * 100).round()}%, '
-            'pionowo ${((top ? model.selection.top : model.selection.bottom) * 100).round()}%',
-        increasedValue: 'Mniejsze zaznaczenie',
-        decreasedValue: 'Większe zaznaczenie',
-        hint: 'Zwiększ, aby zmniejszyć zaznaczenie. Zmniejsz, aby powiększyć zaznaczenie.',
+        value: context.l10n.cropPosition(
+          '${((left ? model.selection.left : model.selection.right) * 100).round()}',
+          '${((top ? model.selection.top : model.selection.bottom) * 100).round()}',
+        ),
+        increasedValue: context.l10n.smallerSelection,
+        decreasedValue: context.l10n.largerSelection,
+        hint: context.l10n.cropResizeHint,
         onIncrease: model.busy ? null : () => adjust(0.025),
         onDecrease: model.busy ? null : () => adjust(-0.025),
         child: GestureDetector(
