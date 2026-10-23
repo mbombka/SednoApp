@@ -15,15 +15,28 @@ void main() {
       MaterialApp(theme: AppTheme.light, home: const AboutScreen()),
     );
     expect(find.textContaining('osób słabosłyszących'), findsOneWidget);
+    await tester.scrollUntilVisible(find.textContaining('4000 znaków'), 100);
     expect(find.textContaining('4000 znaków'), findsOneWidget);
     // Prices depend on the Google Play country; the screen names none.
     expect(find.textContaining(RegExp(r'\d,\d\d')), findsNothing);
+    await tester.scrollUntilVisible(
+      find.text('Z subskrypcją: 400 tekstów dziennie.'),
+      150,
+    );
     expect(find.text('Z subskrypcją: 400 tekstów dziennie.'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.textContaining('Nowy limit codziennie'),
+      150,
+    );
     expect(
       find.text(
         'Nowy limit codziennie o ${QuotaReset.localTime()} (00:00 UTC).',
       ),
       findsOneWidget,
+    );
+    await tester.scrollUntilVisible(
+      find.textContaining('AI może popełniać błędy'),
+      150,
     );
     expect(find.textContaining('AI może popełniać błędy'), findsOneWidget);
     await tester.scrollUntilVisible(
@@ -127,6 +140,7 @@ void main() {
         await tester.scrollUntilVisible(
           find.text(AppInformation.website),
           150,
+          maxScrolls: 200,
           scrollable: find.byType(Scrollable).first,
         );
         await tester.pumpAndSettle();

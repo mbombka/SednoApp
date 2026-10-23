@@ -112,7 +112,7 @@ Identyfikatory można nadpisać przez `PLAY_SUBSCRIPTION_PRODUCT_ID` i
 `PLAY_SUBSCRIPTION_BASE_PLAN_ID` w argumentach budowy. Samo włączenie panelu
 nie uruchamia płatności na serwerze. [Pełne przygotowanie i testy](docs/google_play_subscription_sandbox.md).
 
-Gotowy podpisany pakiet do testów: [wydanie 13](docs/google_play_release_13.md).
+Gotowy podpisany pakiet do testów: [wydanie 16](docs/google_play_release_16.md).
 
 Aparat działa wewnątrz Sedna: **Zrób zdjęcie → Zaznacz tekst → Uprość**.
 Ramka początkowo obejmuje całe zdjęcie. Można przesunąć jej rogi, aby wybrać
@@ -238,3 +238,10 @@ zwrócony przez API, aby nie wyświetlić uproszczenia ze starego serwera jako k
 Aplikacja obsługuje `tier=tester` i opcjonalną datę `testerAccessExpiresAt`
 z odpowiedzi limitu. Konto pokazuje datę ważności i informację o bezpłatnym dostępie.
 [Przyznawanie dostępu i kolejność wdrożenia](../docs/tester-access.pl.md).
+
+## Wersje językowe
+
+Aplikacja obsługuje polski i angielski (UK). Menu → Język pozwala wybrać język
+lub używać preferencji telefonu. Ten sam wybór obejmuje tekst i funkcje mowy.
+[Architektura, źródła tłumaczeń, prompty i dodawanie języków](../docs/multilingual-app.pl.md).
+Backend z obsługą `language` musi zostać wdrożony przed nową aplikacją.

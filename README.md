@@ -1,6 +1,6 @@
 # Sedno
 
-Sedno to aplikacja na Androida, która upraszcza i poprawia polskie teksty. Można wpisać
+Sedno to aplikacja na Androida, która upraszcza i poprawia polskie i angielskie teksty. Można wpisać
 tekst, wkleić go, odczytać ze zdjęcia lub podyktować (Android 13+ z lokalnym
 modelem języka polskiego). Zdjęcia i dźwięk pozostają na telefonie.
 Wynik przygotowuje AI, dlatego trzeba go sprawdzić. Przełącznik nad przyciskiem
@@ -14,12 +14,11 @@ oryginał. Gumka, zmiana trybu i rozpoczęcie nagrywania lub zdjęcia czyszczą 
 Serwer uruchomiono 19.10.2026. Przed udostępnieniem aplikacji pozostają
 [pozostałe kontrole i przygotowanie Google Play](Tasks.md).
 Obsługę płatności włączono na istniejącym serwerze do testów; zakupów nie odebrano
-jeszcze na telefonie. Przygotowano [podpisany AAB 13](mobile/docs/google_play_release_13.md)
-z wynikiem w edytorze, mniejszą gumką i usuwaniem całej historii.
-Zawiera też tryb Popraw, lokalny odczyt tekstu i obsługę dostępu testerskiego.
-Backend z aktualnymi promptami wdrożono 22.10.2026 jako `sedno-api-00012-9j4`,
+jeszcze na telefonie. Przygotowano [podpisany AAB 16](mobile/docs/google_play_release_16.md)
+z polskim i angielskim (UK), wyborem języka oraz osobnymi promptami obu trybów.
+Backend z aktualnymi promptami wdrożono 23.10.2026 jako `sedno-api-00013-8x6`,
 ze współbieżnością 80 żądań na instancję.
-[Raport wdrożenia](docs/backend-deployment-2026-10-22.pl.md).
+[Raport wdrożenia](docs/backend-deployment-2026-10-23.pl.md).
 Obsługę usuwania konta przez e-mail właściciel potwierdził 20.10.2026.
 
 Backend przełączono na Firestore 19.10.2026. API i godzinowe sprzątanie działają.

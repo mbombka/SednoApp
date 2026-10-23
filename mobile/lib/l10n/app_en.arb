@@ -1,0 +1,414 @@
+{
+  "@@locale": "en",
+  "restoreOriginal": "Restore original text",
+  "userMenu": "User menu",
+  "speechNotRecognised": "No speech recognised. Please try again.",
+  "speechFailed": "Could not recognise speech. Please try again.",
+  "microphonePermission": "To use speech, allow microphone access in the app settings.",
+  "speechRequirements": "On-device speech recognition needs Android 13 or later and a compatible speech engine.",
+  "speechModelMissing": "No on-device English speech model is installed. Download it in the Android speech recognition settings.",
+  "speechTimeout": "Speech recognition took too long. Please try again.",
+  "speechAndroidOnly": "On-device speech recognition is available on Android 13 or later.",
+  "historyClearFailed": "Could not delete all history. Please try again.",
+  "deleteHistoryEntryTitle": "Delete this text from history?",
+  "cannotUndo": "This cannot be undone.",
+  "delete": "Delete",
+  "historyEntryDeleted": "Text deleted.",
+  "deleteHistoryTitle": "Delete all history?",
+  "deleteHistoryNotice": "All saved texts will be deleted from this phone. This cannot be undone.",
+  "deleteAllHistory": "Delete all history",
+  "historyDeleted": "All history deleted.",
+  "historyLocalNotice": "Texts are saved only on this phone.",
+  "historyRetentionNotice": "Each text is automatically deleted after 7 days.",
+  "historySignOutNotice": "Signing out deletes all history.",
+  "deleteHistoryNow": "Delete all history now",
+  "deletingHistory": "Deleting history",
+  "loadingHistory": "Loading history",
+  "historyLoadFailed": "Could not load history.",
+  "tryAgain": "Try again",
+  "historyEmpty": "You have no saved texts yet.",
+  "historyEmptyNotice": "Every simplified or corrected text will appear here.",
+  "correctedVersion": "Corrected version",
+  "simplifiedVersion": "Simple version",
+  "originalText": "Original text",
+  "hideOriginal": "Hide original",
+  "showOriginal": "Show original",
+  "today": "Today",
+  "readTextFailed": "Could not read the text. Please try again.",
+  "voiceMissing": "Cannot read the text aloud. Check that an English voice for offline reading is downloaded in your phone settings.",
+  "playbackAndroidOnly": "Reading aloud is available on Android.",
+  "about": "About",
+  "back": "Back",
+  "appPurpose": "What Sedno does",
+  "appDescription": "Sedno simplifies and corrects Polish and English texts.",
+  "appAudience": "It was created for people who are hard of hearing and people who find complex text difficult to understand.",
+  "appAge": "The app is for people aged 13 and over.",
+  "howItWorks": "How it works",
+  "typingInstructions": "Type or paste text. Choose Simplify or Correct.",
+  "captureInstructions": "In Simplify mode, you can also take a photo of text or say it aloud.",
+  "captureSubmitInstructions": "After selecting text in a photo, choose Simplify. Dictated text is simplified automatically.",
+  "localMediaNotice": "Photos and audio stay on your phone. Only text is sent to AI.",
+  "speechModelRequirements": "Speech needs Android 13 or later and a downloaded English speech model.",
+  "playbackRequirements": "In Correct mode, the speaker reads the text aloud. You need a downloaded English voice for offline reading.",
+  "restoreInstructions": "The result appears in the same field. Tap its heading or Back to return to the original.",
+  "inputLimitNotice": "Text can have up to 4000 characters.",
+  "guestNotice": "You can start without creating an account.",
+  "dailyLimit": "Daily limit",
+  "freeAllowance": "Without a subscription: 5 texts a day.",
+  "paidAllowance": "With a subscription: 400 texts a day.",
+  "sharedAllowance": "Simplifying and correcting share the same limit.",
+  "subscriptionPriceNotice": "You can see the subscription price in Account and in Google Play.",
+  "important": "Important",
+  "aiErrorNotice": "AI can make mistakes.",
+  "checkResult": "Check the result before using it.",
+  "author": "Author: Mariusz Bąbka",
+  "privacy": "Privacy and data",
+  "websiteOpenFailed": "Cannot open the website. Check your browser.",
+  "website": "Sedno website",
+  "photoNoText": "No text detected. Take a clearer photo.",
+  "cameraPermission": "No camera access. Allow access in your phone settings.",
+  "cameraStartFailed": "Could not start the camera. Please try again.",
+  "photoCaptureFailed": "Could not take a photo. Please try again.",
+  "selectText": "Select text",
+  "cropInstructions": "Move the corners of the frame to select the text. ",
+  "cropWholePhotoNotice": "If you leave it unchanged, we will simplify text from the whole photo.",
+  "openingPhoto": "Opening photo",
+  "simplify": "Simplify",
+  "cropTopLeft": "Top left corner of the frame",
+  "cropTopRight": "Top right corner of the frame",
+  "cropBottomLeft": "Bottom left corner of the frame",
+  "cropBottomRight": "Bottom right corner of the frame",
+  "smallerSelection": "Smaller selection",
+  "largerSelection": "Larger selection",
+  "cropResizeHint": "Increase to make the selection smaller. Decrease to make it larger.",
+  "takeTextPhoto": "Take a photo of text",
+  "startingCamera": "Starting camera",
+  "takingPhoto": "Taking photo…",
+  "takePhoto": "Take photo",
+  "photoOpenFailed": "Could not open the photo. Take a new photo.",
+  "photoPrepareFailed": "Could not prepare the photo. Please try again.",
+  "simplifyHeading": "simplify text",
+  "simplifiedText": "Simplified text",
+  "correctedText": "Corrected text",
+  "emptyText": "Text cannot be empty.",
+  "textTooLong": "Text can have up to 4000 characters.",
+  "subscriptionActive": "Your subscription is active.",
+  "subscriptionAllowance": "You can simplify up to 400 texts a day.",
+  "manageSubscriptionNotice": "To change your payment or cancel your subscription, go to Google Play.",
+  "manageSubscription": "Manage subscription in Google Play",
+  "testerAccessNotice": "You have free tester access.",
+  "restorePurchases": "Restore purchases",
+  "refreshAccess": "Refresh access",
+  "subscriptionBenefits": "You can simplify up to 400 texts a day (without a subscription: 5).",
+  "subscriptionSignInNotice": "To buy or restore a subscription, sign in to your Sedno account.",
+  "buySubscription": "Buy subscription",
+  "refreshSubscription": "Refresh subscription",
+  "subscriptionRenewalNotice": "The subscription renews automatically every month.",
+  "subscriptionCancelNotice": "You can cancel it at any time in Google Play.",
+  "paymentReadFailed": "Cannot read payments. Try restoring purchases.",
+  "signInBeforePurchase": "Sign in before buying.",
+  "subscriptionAlreadyActive": "Your subscription is already active.",
+  "signInBeforeRestore": "Sign in before restoring a purchase.",
+  "purchasesChecked": "Purchases checked. Confirmation may take a moment.",
+  "playOpenFailed": "Cannot open Google Play. Open the store and choose Payments and subscriptions → Subscriptions.",
+  "paymentPending": "Payment is awaiting confirmation. Your limit stays the same.",
+  "purchaseCancelled": "Purchase cancelled.",
+  "purchaseFailed": "Could not buy the subscription. Please try again.",
+  "subscriptionInactive": "Your subscription is not active.",
+  "subscriptionVerifyFailed": "Cannot confirm your subscription. Sign in, check your connection and restore purchases.",
+  "subscriptionCheckFailed": "Cannot check your subscription. Sign in and try again.",
+  "hideConfirmedPassword": "Hide repeated password",
+  "showConfirmedPassword": "Show repeated password",
+  "hidePassword": "Hide password",
+  "showPassword": "Show password",
+  "enterEmail": "Enter your email address.",
+  "enterValidEmail": "Enter a valid email address.",
+  "passwordResetSent": "If an account with this address exists, you will receive a password reset link. Check your spam folder too.",
+  "emailSendFailed": "Could not send the email. Please try again.",
+  "accountLoadFailed": "Could not load your account or finish deleting data. Please try again.",
+  "verificationEmailSent": "We sent an email with a link. Check your inbox and spam folder.",
+  "emailNotVerified": "Your address is not verified yet. Click the link in the email and try again.",
+  "signInFailed": "Could not sign in. Check your details and try again.",
+  "signOutFailed": "Could not sign out. Please try again.",
+  "deleteAccountTitle": "Delete account?",
+  "deleteAccountIdentity": "Confirm your identity to delete your account.",
+  "password": "Password",
+  "keepAccount": "Keep account",
+  "deleteAccountAndData": "Delete account and data",
+  "accountDeleted": "Your account and data have been deleted. Cancel your subscription separately in Google Play.",
+  "accountDeleteIncomplete": "Could not finish deleting. Please try again.",
+  "emailAccountMethod": " (email and password)",
+  "finishDataCleanup": "Refresh account and finish clearing data",
+  "accountNotConfigured": "Account options will appear here.",
+  "signOut": "Sign out",
+  "deleteAccount": "Delete account",
+  "emailVerified": "Email address verified",
+  "checkInbox": "Check your email",
+  "finishAccountLinkNotice": "Your address is verified. You still need to connect to your Sedno account. You do not need to click the email link again.",
+  "verifyEmailInstructions": "To finish creating your account, click the link in the email from Sedno. Check your spam folder too. Then come back here and choose “Check verification”.",
+  "guestWhileVerifying": "Until then, you can use the app without an account.",
+  "finishSignIn": "Finish signing in",
+  "checkVerification": "Check verification",
+  "resendEmail": "Send email again",
+  "signOutUseGuest": "Sign out and use without an account",
+  "signIn": "Sign in",
+  "newAccount": "New account",
+  "recoverAccess": "Recover access",
+  "guestSignInNotice": "You can use the app without signing in.",
+  "signInGoogle": "Sign in with Google",
+  "emailAddress": "Email address",
+  "enterPassword": "Enter your password.",
+  "passwordMinLength": "Use at least 6 characters.",
+  "repeatPassword": "Repeat password",
+  "enterRepeatedPassword": "Repeat your password.",
+  "passwordMismatch": "Passwords must match.",
+  "verificationEmailNotice": "We will send an email with a link to verify your email address.",
+  "passwordResetInstructions": "Enter your account email address. We will send a password reset link.",
+  "signInEmail": "Sign in with email",
+  "createAccount": "Create account",
+  "sendResetLink": "Send password reset link",
+  "forgotPassword": "Forgot password",
+  "createAccountLink": "No account? Create one",
+  "backToSignIn": "Back to sign in",
+  "testerAccess": "Tester access",
+  "testerAllowance": "You can process up to 400 texts a day.",
+  "testerExpiryNotice": "Access is free and will expire automatically.",
+  "testerHasSubscription": "You also have an active Google Play subscription.",
+  "testerExpired": "Tester access has expired.",
+  "subscriptionStillActive": "Your Google Play subscription still gives you a higher limit.",
+  "freeLimitRestored": "The free limit of 5 texts a day applies. Today's usage stays the same.",
+  "closeMenu": "Close menu",
+  "welcome": "Welcome to Sedno",
+  "inApp": "In the app",
+  "accountCreatedEmailFailed": "Your account was created, but the email could not be sent. Try sending it again.",
+  "signInToVerify": "Sign in with email to verify your address.",
+  "signInToCheckAccount": "Sign in again to check your account status.",
+  "weakPassword": "Your password is too weak. Use at least 6 characters.",
+  "checkEmailAddress": "Check that your email address is entered correctly.",
+  "emailAlreadyUsed": "This address is already in use. Sign in to your existing account.",
+  "tooManyAttempts": "Too many attempts. Wait a moment and try again.",
+  "checkInternet": "No connection. Check your internet and try again.",
+  "chooseSameAccount": "Choose the same account that you want to delete.",
+  "signInToDelete": "Sign in again to delete your account.",
+  "invalidCredentials": "Could not sign in. Check your email address and password.",
+  "actionFailed": "Could not complete this action. Please try again.",
+  "accountLinkFailed": "Could not connect to your Sedno account. Check your connection and try again.",
+  "passwordToDelete": "Enter your password to confirm account deletion.",
+  "finishLocalDeletion": "Finish deleting data on this device.",
+  "installationRejected": "The server could not verify this app installation. Try again or install Sedno from Google Play.",
+  "sessionStartFailed": "Cannot start a session. Please try again.",
+  "signInToLink": "Sign in again to connect your account.",
+  "cannotLinkAccount": "Cannot connect your account. Please try again.",
+  "signInAgain": "Sign in again.",
+  "sessionExpiredSignIn": "Your session has expired. Sign in again.",
+  "cannotDeleteAccount": "Cannot delete your account. Please try again.",
+  "cannotSignOut": "Cannot sign out. Please try again.",
+  "correctionUnavailable": "Text correction is not available yet.",
+  "simplificationUnavailable": "Text simplification is not available yet.",
+  "requestTimeout": "The request timed out. Please try again.",
+  "offline": "No internet connection. Please try again.",
+  "sessionExpired": "Your session has expired. Check your account and try again.",
+  "quotaExhausted": "You have used today's allowance. Check the reset time.",
+  "serviceUnavailable": "The service is temporarily unavailable. Please try again.",
+  "correctionRejected": "Cannot correct this text. Check it and try again.",
+  "simplificationRejected": "Cannot simplify this text. Check it and try again.",
+  "correctionFailed": "Could not correct the text. Please try again.",
+  "simplificationFailed": "Could not simplify the text. Please try again.",
+  "checkConnection": "Check your connection",
+  "quotaCheckFailed": "Cannot check your allowance. Check your connection.",
+  "subscriptionInAccount": "You can find the subscription and its price in Account.",
+  "beforeCorrection": "Before you correct text",
+  "beforeSimplification": "Before you simplify text",
+  "acceptAndSend": "I understand, send",
+  "cameraUnavailable": "The camera will be available soon.",
+  "aiWarning": "AI can be wrong",
+  "listeningNotice": "Listening… Speak English. Recording ends after 1.5 seconds of silence or after 60 seconds. The stop button cancels recording.",
+  "correctionSubmitted": "The text has been sent for correction.",
+  "simplificationSubmitted": "The text has been sent for simplification.",
+  "textForCorrection": "Text to correct",
+  "textForSimplification": "Text to simplify",
+  "inputHint": "Type or paste text",
+  "switchToCorrection": "Switch to text correction",
+  "switchToSimplification": "Switch to text simplification",
+  "clearText": "Clear text",
+  "stopPlayback": "Stop reading",
+  "readAloud": "Read text aloud",
+  "cancelRecording": "Cancel recording",
+  "simplifySpeech": "Simplify speech",
+  "cancel": "Cancel",
+  "history": "History",
+  "account": "Account",
+  "start": "Home",
+  "contact": "Contact",
+  "close": "Close",
+  "continueAction": "Continue",
+  "correct": "Correct",
+  "correctHeading": "correct text",
+  "correcting": "Correcting…",
+  "simplifying": "Simplifying…",
+  "reading": "Reading…",
+  "camera": "Camera",
+  "preparing": "Preparing…",
+  "subscription": "Subscription",
+  "yesterday": "Yesterday",
+  "signedIn": "Signed in.",
+  "googleAccountMethod": " (Google account)",
+  "language": "Language",
+  "systemLanguage": "Phone language",
+  "polish": "Polish",
+  "english": "English (UK)",
+  "languageNotice": "The language applies to menus, simplification, correction and speech. Choose the language of your text. Sedno does not translate texts.",
+  "languageSaveFailed": "Could not save the language. Please try again.",
+  "resetDaily": "Your allowance resets every day at {time}.",
+  "@resetDaily": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "resetAbout": "Your allowance resets every day at {time} (00:00 UTC).",
+  "@resetAbout": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "resetAt": "Your allowance resets at {time}.",
+  "@resetAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "quotaUsed": "You have used today’s allowance.",
+  "quotaOneSimplification": "You have 1 simplification left.",
+  "quotaOneUse": "You have 1 AI use left.",
+  "quotaUsedDialog": "You have used your daily allowance.",
+  "resetWithRemaining": "Your allowance resets at {time} ({remaining}).",
+  "@resetWithRemaining": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "timeRemaining": "in {hours} h {minutes} min",
+  "@timeRemaining": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "monthlyPrice": "{price} per month",
+  "@monthlyPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "historyExpires": "Will be deleted on {date}.",
+  "@historyExpires": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteSavedText": "Delete text saved: {date}",
+  "@deleteSavedText": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "contactAddress": "Contact: {email}",
+  "@contactAddress": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "signedInAs": "Signed in as {email}{method}",
+  "@signedInAs": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      },
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+  "accountEmail": "Email address: {email}",
+  "@accountEmail": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "emailToVerify": "Address to verify: {email}",
+  "@emailToVerify": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "resendAfter": "Send again in {seconds} s",
+  "@resendAfter": {
+    "placeholders": {
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "testerUntil": "Tester access until {date} (local time).",
+  "@testerUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "cropPosition": "Horizontal {horizontal}%, vertical {vertical}%",
+  "@cropPosition": {
+    "placeholders": {
+      "horizontal": {
+        "type": "String"
+      },
+      "vertical": {
+        "type": "String"
+      }
+    }
+  },
+  "welcomeName": "Welcome to {name}",
+  "@welcomeName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "policyVersion": "Version: {date}",
+  "@policyVersion": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  }
+}

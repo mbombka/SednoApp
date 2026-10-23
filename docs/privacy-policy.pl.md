@@ -1,6 +1,6 @@
 # Polityka prywatności Sedno
 
-Wersja: 22 października 2026 r.
+Wersja: 23 października 2026 r.
 
 ## Administrator i kontakt
 
@@ -8,7 +8,7 @@ Administrator: Mariusz Bąbka, osoba fizyczna, ul. Słowiańska 91, Modlniczka, 
 
 Polityka dotyczy aplikacji Sedno i obsługi jej użytkowników. Pierwszym wybranym rynkiem jest Polska. Aplikacja jest przeznaczona dla osób od 13. roku życia. Osoby w wieku 13–17 lat powinny korzystać z niej za zgodą rodzica lub opiekuna. Aplikacja nie sprawdza wieku ani nie zbiera daty urodzenia.
 
-Informacje o prywatności na stronie: https://sedno.xyz/#prywatnosc. Strona zawiera krótkie podsumowanie; pełna treść zasad jest dostępna na tym ekranie. Instrukcja usunięcia konta jest dostępna pod adresem https://sedno.xyz/usun-konto. Serwer działa od 19 października 2026 r.
+Pełna polityka prywatności jest dostępna pod adresem https://sedno.xyz/prywatnosc/ i w aplikacji. Krótkie podsumowanie znajdziesz na https://sedno.xyz/#prywatnosc. Instrukcja usunięcia konta jest dostępna pod adresem https://sedno.xyz/usun-konto. Serwer działa od 19 października 2026 r.
 
 ## Tekst i sztuczna inteligencja
 
@@ -26,19 +26,21 @@ Usuniemy konto Sedno, jego dane na serwerze i lokalną historię na tym urządze
 
 W aplikacji wybierz Konto → Usuń konto → Usuń konto i dane. Po powodzeniu usuwamy tożsamość Sedno w Firebase, sesje konta, powiązane instalacje, metadane żądań oraz rekordy zakupów w bazie Sedno. Nie usuwamy Twojego konta Google.
 
-Bez aplikacji napisz na contact@sedno.xyz z tematem „Usunięcie konta Sedno”. Podaj e-mail używany do logowania. Nie wysyłaj hasła, kodów logowania, tokenów, dokumentu tożsamości, zdjęć ani tekstów do uproszczenia. Samo wysłanie wiadomości nie usuwa konta. Przed usunięciem potwierdzimy, że kontrolujesz konto; w razie wątpliwości poprosimy tylko o dodatkowe informacje niezbędne do weryfikacji.
+Bez aplikacji napisz na contact@sedno.xyz z tematem „Usunięcie konta Sedno”. Podaj e-mail używany do logowania. Nie wysyłaj hasła, kodów logowania, tokenów, dokumentu tożsamości, zdjęć ani tekstów do uproszczenia lub poprawienia. Samo wysłanie wiadomości nie usuwa konta. Przed usunięciem potwierdzimy, że kontrolujesz konto; w razie wątpliwości poprosimy tylko o dodatkowe informacje niezbędne do weryfikacji.
 
 Usunięcie konta przez e-mail lub na innym urządzeniu nie usuwa historii na pozostałych urządzeniach. Usuń ją w Historii albo wyczyść dane aplikacji w ustawieniach Androida. Nie mamy zdalnego dostępu do lokalnej historii. Zakupy i dane zachowane przez Google podlegają zasadom Google.
 
-## Zdjęcia i historia na urządzeniu
+## Zdjęcia, głos i historia na urządzeniu
 
 Zdjęcia, kadrowanie i rozpoznawanie tekstu odbywają się na urządzeniu. Sedno nie wysyła zdjęć do serwera ani dostawcy AI. Rozpoznany tekst trafia od razu do uproszczenia. Po błędzie lub anulowaniu możesz go poprawić. Po odczycie, anulowaniu lub błędzie aplikacja podejmuje próbę usunięcia kopii roboczych zdjęcia; nagłe zatrzymanie procesu może przerwać czyszczenie. Osobne kopie zapisane przez aplikację aparatu pozostają pod Twoją kontrolą.
 
 Mikrofon służy do lokalnego rozpoznawania polskiej mowy na obsługiwanych urządzeniach z Androidem 13 lub nowszym i pobranym modelem językowym. Dźwięk jest przetwarzany w pamięci urządzenia, bez zapisu nagrania i bez wysyłania go do serwera Sedno ani OpenAI. Po 1,5 sekundy ciszy po mowie lub po maksymalnie 60 sekundach nagrywanie się kończy, a rozpoznany tekst trafia do upraszczania przez serwer i OpenAI, tak jak tekst ze zdjęcia. Stop anuluje sesję. Możesz odmówić dostępu do mikrofonu i nadal wpisywać tekst lub używać aparatu.
 
-Historia zawiera oryginał, uproszczenie i datę. Jest szyfrowana, lokalna i wyłączona z kopii zapasowych Androida. Wpis wygasa po 7 dniach. Wygasłe wpisy nie są wyświetlane; czyszczenie następuje przy odczycie, uruchomieniu i wznowieniu aplikacji. Gdy aplikacja jest zamknięta, usunięcie następuje przy następnym takim zdarzeniu. Możesz usunąć wpisy wcześniej. Wylogowanie czyści lokalną historię.
+Odczyt tekstu na głos w trybie Popraw odbywa się na urządzeniu. Sedno wybiera pobrany polski głos, który nie wymaga połączenia z internetem. Tekst do odczytu nie jest w tym celu wysyłany do serwera Sedno ani OpenAI. Jeśli taki głos nie jest dostępny, odczyt nie uruchomi się. Pobranie modelu rozpoznawania mowy lub głosu w ustawieniach Androida może wymagać internetu i podlega zasadom dostawcy silnika mowy.
 
-Urządzenie przechowuje też zabezpieczoną sesję i losowy identyfikator instalacji. Samo usunięcie konta nie usuwa tego losowego identyfikatora z urządzenia. Usuniesz go, czyszcząc dane aplikacji w Androidzie.
+Historia zawiera oryginał, wynik uproszczenia lub poprawienia, wybrany tryb, język przetwarzania i datę. Jest szyfrowana, lokalna i wyłączona z kopii zapasowych Androida. Wpis wygasa po 7 dniach. Wygasłe wpisy nie są wyświetlane; czyszczenie następuje przy odczycie, uruchomieniu i wznowieniu aplikacji. Gdy aplikacja jest zamknięta, usunięcie następuje przy następnym takim zdarzeniu. Możesz usunąć wpisy wcześniej. Wylogowanie czyści lokalną historię.
+
+Urządzenie przechowuje też zabezpieczoną sesję i losowy identyfikator instalacji oraz wybrany język aplikacji, jeśli ustawisz go ręcznie. Samo usunięcie konta nie usuwa tego losowego identyfikatora z urządzenia. Usuniesz go, czyszcząc dane aplikacji w Androidzie.
 
 ## Konto, limity i subskrypcja
 
@@ -50,17 +52,17 @@ Google Play obsługuje płatność i subskrypcję. Sedno nie otrzymuje numeru ka
 
 ## Dostawcy i dane techniczne
 
-OpenAI obsługuje uproszczenie tekstu przez API. Dla standardowej umowy klienta z Polski podmiotem umownym wskazanym w warunkach OpenAI jest OpenAI Ireland Ltd. Dostawca przetwarza treść na potrzeby wykonania usługi oraz dane niezbędne do bezpieczeństwa zgodnie ze swoimi warunkami.
+OpenAI obsługuje upraszczanie i poprawianie tekstu przez API. Dla standardowej umowy klienta z Polski podmiotem umownym wskazanym w warunkach OpenAI jest OpenAI Ireland Ltd. Dostawca przetwarza treść na potrzeby wykonania usługi oraz dane niezbędne do bezpieczeństwa zgodnie ze swoimi warunkami.
 
 Google obsługuje Firebase Authentication, Google Sign-In, ML Kit, Play Integrity i Google Play. Google Ireland Limited i Google LLC uczestniczą w świadczeniu usług zgodnie z warunkami odpowiednich produktów. OVHcloud obsługuje pocztę administratora w domenie sedno.xyz.
 
 ML Kit rozpoznaje tekst na urządzeniu. SDK może przekazywać Google metryki techniczne i użycia, na przykład identyfikatory instalacji, model urządzenia, wersję aplikacji, błędy i czas działania. Lokalny OCR nie oznacza braku takiej komunikacji. Zdjęcie i rozpoznana treść nie są częścią tej telemetrii. Nie integrujemy reklam, Firebase Analytics ani Crashlytics.
 
-Infrastruktura Sedno: Google Cloud Run dla serwera, Cloud Firestore Standard w regionie europe-central2 (Warszawa) oraz Firebase Hosting udostępniający API i dokumenty. Według standardowych warunków Google Cloud dla polskiego adresu rozliczeniowego podmiotem umownym jest Google Cloud Poland Sp. z o.o. Serwer działa od 19 października 2026 r. Ta wersja informacji jest przeznaczona do publikacji wraz z migracją bazy do Firestore. Uruchomienie zasobów nie potwierdza zawarcia wszystkich wymaganych umów ani zakończenia kontroli przed publikacją aplikacji.
+Infrastruktura Sedno: Google Cloud Run dla serwera, Cloud Firestore Standard w regionie europe-central2 (Warszawa) oraz Firebase Hosting udostępniający API i dokumenty. Według standardowych warunków Google Cloud dla polskiego adresu rozliczeniowego podmiotem umownym jest Google Cloud Poland Sp. z o.o. Serwer działa od 19 października 2026 r. Uruchomienie zasobów nie potwierdza zawarcia wszystkich wymaganych umów ani zakończenia kontroli przed publikacją aplikacji.
 
 ## Cele i podstawy przetwarzania
 
-Uproszczenie tekstu na Twoje żądanie, prowadzenie konta i obsługa uprawnienia do subskrypcji: art. 6 ust. 1 lit. b RODO — wykonanie umowy o usługę lub działania podejmowane na Twoje żądanie.
+Uproszczenie lub poprawienie tekstu na Twoje żądanie, prowadzenie konta i obsługa uprawnienia do subskrypcji: art. 6 ust. 1 lit. b RODO — wykonanie umowy o usługę lub działania podejmowane na Twoje żądanie.
 
 Bezpieczeństwo, przeciwdziałanie nadużyciom i rozliczanie limitów: art. 6 ust. 1 lit. f RODO — uzasadniony interes ochrony usługi. Ograniczamy dane do niezbędnych metadanych i nie wykorzystujemy ich do reklamy. Możesz zgłosić sprzeciw, który ocenimy w odniesieniu do konkretnej sytuacji.
 
@@ -68,7 +70,7 @@ Odpowiedzi na zwykłe pytania i niezbędna obsługa problemów: art. 6 ust. 1 li
 
 Nie traktujemy instalacji, komunikatu o AI ani uprawnienia aparatu jako zgody na dowolne przetwarzanie. Ocena, czy konkretna diagnostyka SDK wymaga odrębnej zgody na dostęp do urządzenia, musi poprzedzić udostępnienie tej funkcji w produkcji. Sama ta polityka nie zastępuje mechanizmu wymaganej zgody.
 
-Tekst i niezbędne dane techniczne są potrzebne do wykonania uproszczenia. Konto i dane zakupu są potrzebne tylko przy korzystaniu z odpowiednich funkcji. Aparat jest opcjonalny — możesz wpisać lub wkleić tekst. Sedno nie korzysta z profilowania reklamowego ani nie podejmuje decyzji o skutkach prawnych na podstawie treści uproszczenia. Błędną blokadę limitu lub ochrony usługi możesz zgłosić administratorowi.
+Tekst i niezbędne dane techniczne są potrzebne do wykonania uproszczenia lub poprawienia. Konto i dane zakupu są potrzebne tylko przy korzystaniu z odpowiednich funkcji. Aparat i mikrofon są opcjonalne — możesz wpisać lub wkleić tekst. Sedno nie korzysta z profilowania reklamowego ani nie podejmuje decyzji o skutkach prawnych na podstawie treści uproszczenia lub poprawienia. Błędną blokadę limitu lub ochrony usługi możesz zgłosić administratorowi.
 
 ## Dane poza Europejskim Obszarem Gospodarczym
 
@@ -98,7 +100,7 @@ W zakresie wynikającym z RODO możesz żądać dostępu do danych i ich kopii, 
 
 Napisz na contact@sedno.xyz. Odpowiadamy bez zbędnej zwłoki, co do zasady w ciągu miesiąca od otrzymania żądania. W przypadkach przewidzianych przez RODO termin można przedłużyć o dwa miesiące; o przyczynie poinformujemy w pierwszym miesiącu. W razie uzasadnionych wątpliwości dotyczących tożsamości poprosimy o niezbędne potwierdzenie, bez rutynowego żądania dokumentu tożsamości.
 
-Możesz złożyć skargę do Prezesa Urzędu Ochrony Danych Osobowych: https://uodo.gov.pl. Zwykła wiadomość dotycząca danych nie wymaga podawania tekstów, które upraszczasz.
+Możesz złożyć skargę do Prezesa Urzędu Ochrony Danych Osobowych: https://uodo.gov.pl. Zwykła wiadomość dotycząca danych nie wymaga podawania tekstów, które upraszczasz lub poprawiasz.
 
 ## Zmiany polityki
 

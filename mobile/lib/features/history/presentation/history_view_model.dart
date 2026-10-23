@@ -1,3 +1,5 @@
+import 'package:sedno_app/l10n/localization.dart';
+
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -5,6 +7,9 @@ import 'package:sedno_app/features/history/domain/history_entry.dart';
 import 'package:sedno_app/features/history/domain/history_repository.dart';
 
 class HistoryViewModel extends ChangeNotifier {
+  AppLocalizations Function() localizations = polishStrings;
+  AppLocalizations get strings => localizations();
+
   HistoryViewModel(this.repository);
 
   final HistoryRepository repository;
@@ -76,7 +81,7 @@ class HistoryViewModel extends ChangeNotifier {
       return true;
     } catch (_) {
       if (!_disposed) {
-        actionError = 'Nie udało się usunąć całej historii. Spróbuj ponownie.';
+        actionError = strings.historyClearFailed;
       }
       return false;
     } finally {

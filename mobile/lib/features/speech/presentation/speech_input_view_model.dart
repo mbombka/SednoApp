@@ -1,7 +1,11 @@
+import 'package:sedno_app/l10n/localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sedno_app/features/speech/domain/speech_service.dart';
 
 class SpeechInputViewModel extends ChangeNotifier {
+  AppLocalizations Function() localizations = polishStrings;
+  AppLocalizations get strings => localizations();
+
   SpeechInputViewModel(this._service);
   final SpeechService _service;
   bool busy = false;
@@ -20,7 +24,7 @@ class SpeechInputViewModel extends ChangeNotifier {
       if (_disposed || generation != _generation) return null;
       if (text == null) return null;
       if (text.trim().isEmpty) {
-        message = 'Nie rozpoznano mowy. Spróbuj ponownie.';
+        message = strings.speechNotRecognised;
         return null;
       }
       return text.trim();
@@ -29,7 +33,7 @@ class SpeechInputViewModel extends ChangeNotifier {
       return null;
     } catch (_) {
       if (!_disposed && generation == _generation) {
-        message = 'Nie udało się rozpoznać mowy. Spróbuj ponownie.';
+        message = strings.speechFailed;
       }
       return null;
     } finally {

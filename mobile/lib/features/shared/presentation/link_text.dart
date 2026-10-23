@@ -1,3 +1,4 @@
+import 'package:sedno_app/l10n/localization.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -17,11 +18,8 @@ Future<void> openLink(BuildContext context, Uri uri, UrlOpener opener) async {
     opened = false;
   }
   if (opened || !context.mounted) return;
-  ScaffoldMessenger.maybeOf(context)?.showSnackBar(
-    const SnackBar(
-      content: Text('Nie można otworzyć strony. Sprawdź przeglądarkę.'),
-    ),
-  );
+  ScaffoldMessenger.maybeOf(context)
+      ?.showSnackBar(SnackBar(content: Text(context.l10n.websiteOpenFailed)));
 }
 
 /// Text in which every https:// address is a tappable link.

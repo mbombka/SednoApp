@@ -1,3 +1,4 @@
+import 'package:sedno_app/l10n/localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sedno_app/app/app_information.dart';
 import 'package:sedno_app/features/shared/presentation/link_text.dart';
@@ -6,20 +7,20 @@ import 'package:sedno_app/features/shared/presentation/link_text.dart';
 class WebsiteInformation extends StatelessWidget {
   const WebsiteInformation({
     this.address = AppInformation.website,
-    this.label = 'Strona internetowa Sedno',
+    this.label,
     this.opener = openExternalUrl,
     super.key,
   });
 
   final String address;
-  final String label;
+  final String? label;
   final UrlOpener opener;
 
   @override
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
-      Text(label),
+      Text(label ?? context.l10n.website),
       Align(
         alignment: Alignment.centerLeft,
         child: Semantics(

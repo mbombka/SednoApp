@@ -11,8 +11,12 @@ Future<void> submitText(WidgetTester tester) async {
   }
 }
 
-Future<void> navigateTo(WidgetTester tester, String destination) async {
-  await tester.tap(find.byTooltip('Menu użytkownika'));
+Future<void> navigateTo(
+  WidgetTester tester,
+  String destination, {
+  String menuTooltip = 'Menu użytkownika',
+}) async {
+  await tester.tap(find.byTooltip(menuTooltip));
   await tester.pumpAndSettle();
   await tester.ensureVisible(find.text(destination).last);
   await tester.pumpAndSettle();

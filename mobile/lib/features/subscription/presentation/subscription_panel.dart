@@ -1,3 +1,4 @@
+import 'package:sedno_app/l10n/localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sedno_app/features/quota/domain/quota_reset.dart';
@@ -24,9 +25,9 @@ class SubscriptionPanel extends StatelessWidget {
       final textTheme = Theme.of(context).textTheme;
       final active = model.status?.active == true;
       final tester = signedIn && quota?.value?.tier == QuotaTier.tester;
-      final resetTime =
-          'Nowy limit codziennie o '
-          '${QuotaReset.localTime(resetAt: quota?.value?.resetAt)}.';
+      final resetTime = context.l10n.resetDaily(
+        QuotaReset.localTime(resetAt: quota?.value?.resetAt),
+      );
       // Plain Polish: one sentence per line.
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -35,68 +36,62 @@ class SubscriptionPanel extends StatelessWidget {
           const SizedBox(height: 40),
           const Divider(),
           const SizedBox(height: 16),
-          Text('Subskrypcja', style: textTheme.titleLarge),
+          Text(context.l10n.subscription, style: textTheme.titleLarge),
           const SizedBox(height: 8),
           if (active) ...[
-            const _Benefit('Subskrypcja jest aktywna.'),
-            const _Benefit('Możesz uprościć do 400 tekstów dziennie.'),
+            _Benefit(context.l10n.subscriptionActive),
+            _Benefit(context.l10n.subscriptionAllowance),
             _Benefit(resetTime),
             const SizedBox(height: 16),
-            const Text(
-              'Aby zmienić płatność lub anulować subskrypcję, przejdź do Google Play.',
-            ),
+            Text(context.l10n.manageSubscriptionNotice),
             const SizedBox(height: 8),
             TextButton(
               onPressed: model.busy ? null : model.manage,
-              child: const Text('Zarządzaj subskrypcją w Google Play'),
+              child: Text(context.l10n.manageSubscription),
             ),
           ] else if (tester) ...[
-            const Text('Korzystasz z bezpłatnego dostępu testerskiego.'),
+            Text(context.l10n.testerAccessNotice),
             OutlinedButton(
               onPressed: model.busy ? null : model.restore,
-              child: const Text('Przywróć zakupy'),
+              child: Text(context.l10n.restorePurchases),
             ),
             TextButton(
               onPressed: model.busy ? null : model.refresh,
-              child: const Text('Odśwież dostęp'),
+              child: Text(context.l10n.refreshAccess),
             ),
           ] else ...[
             if (model.offer != null) ...[
               Text(
-                '${model.offer!.price} miesięcznie',
+                context.l10n.monthlyPrice(model.offer!.price),
                 style: textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 8),
             ],
-            const _Benefit(
-              'Możesz uprościć do 400 tekstów dziennie (bez subskrypcji: 5).',
-            ),
+            _Benefit(context.l10n.subscriptionBenefits),
             _Benefit(resetTime),
             const SizedBox(height: 16),
             if (!signedIn) ...[
-              const Text(
-                'Aby kupić lub przywrócić subskrypcję, zaloguj się na swoje konto Sedno.',
-              ),
+              Text(context.l10n.subscriptionSignInNotice),
               const SizedBox(height: 8),
             ],
             FilledButton(
               onPressed: model.busy || model.offer == null ? null : model.buy,
-              child: const Text('Kup subskrypcję'),
+              child: Text(context.l10n.buySubscription),
             ),
             const SizedBox(height: 8),
             OutlinedButton(
               onPressed: model.busy ? null : model.restore,
-              child: const Text('Przywróć zakupy'),
+              child: Text(context.l10n.restorePurchases),
             ),
             TextButton(
               onPressed: model.busy ? null : model.refresh,
-              child: const Text('Odśwież subskrypcję'),
+              child: Text(context.l10n.refreshSubscription),
             ),
             const SizedBox(height: 8),
-            const Text('Subskrypcja odnawia się automatycznie co miesiąc.'),
-            const Text('Możesz ją anulować w każdej chwili w Google Play.'),
+            Text(context.l10n.subscriptionRenewalNotice),
+            Text(context.l10n.subscriptionCancelNotice),
           ],
           if (model.busy) const Center(child: CircularProgressIndicator()),
           if (model.message != null)

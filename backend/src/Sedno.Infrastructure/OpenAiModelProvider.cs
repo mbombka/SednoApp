@@ -31,19 +31,25 @@ public sealed class ModelProviderException() : Exception("Usługa upraszczania j
 
 public sealed class OpenAiModelProvider : IModelProvider
 {
-    private readonly ResponsesClient _responses;
-    private readonly ResponsesClient _corrections;
+    private readonly IReadOnlyDictionary<string, ResponsesClient> _simplifiers;
+    private readonly IReadOnlyDictionary<string, ResponsesClient> _correctors;
     public OpenAiModelProvider(HttpClient client, OpenAiModelOptions options, TimeProvider? clock = null,
         SimplificationTimings? timings = null)
     {
         options.Validate();
-        _corrections = new ResponsesClient(client, options.ApiKey, options.Model, CorrectionPrompt.Text,
+        ResponsesClient Create(string prompt) => new(client, options.ApiKey, options.Model, prompt,
             options.ReasoningEffort, options.ServiceTier, clock, options.MaxOutputTokens, options.TimeoutSeconds, timings);
-        _responses = new ResponsesClient(client, options.ApiKey, options.Model, SimplificationPrompt.Text,
-            options.ReasoningEffort, options.ServiceTier, clock, options.MaxOutputTokens, options.TimeoutSeconds, timings);
+        _simplifiers = new[] { "pl", "en" }.ToDictionary(language => language,
+            language => Create(SimplificationPrompt.ForLanguage(language)));
+        _correctors = new[] { "pl", "en" }.ToDictionary(language => language,
+            language => Create(CorrectionPrompt.ForLanguage(language)));
     }
     public Task<string> SimplifyAsync(string text, CancellationToken cancellationToken) =>
-        _responses.SimplifyAsync(text, cancellationToken);
+        SimplifyAsync(text, "pl", cancellationToken);
     public Task<string> CorrectAsync(string text, CancellationToken cancellationToken) =>
-        _corrections.SimplifyAsync(text, cancellationToken);
+        CorrectAsync(text, "pl", cancellationToken);
+    public Task<string> SimplifyAsync(string text, string language, CancellationToken cancellationToken) =>
+        _simplifiers[language].SimplifyAsync(text, cancellationToken);
+    public Task<string> CorrectAsync(string text, string language, CancellationToken cancellationToken) =>
+        _correctors[language].SimplifyAsync(text, cancellationToken);
 }

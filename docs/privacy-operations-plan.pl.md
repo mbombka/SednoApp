@@ -6,7 +6,7 @@ Osoby w wieku 13–17 lat powinny korzystać z aplikacji za zgodą rodzica lub o
 Usuwanie konta przez e-mail działa — potwierdzenie właściciela z 20.10.2026.
 
 Backend działa od 19.10.2026 w Warszawie; tego dnia produkcję przełączono na Firestore.
-Płatności są wyłączone. Właściciel zrezygnował z backupów nowej bazy na obecnym etapie.
+Płatności włączono na istniejącym API do testów; test zakupów na telefonie pozostaje do wykonania. Właściciel zrezygnował z backupów nowej bazy na obecnym etapie.
 [Konfiguracja serwera](../backend/deploy/firebase/README.pl.md).
 Google i OpenAI mają własne zasady przetwarzania; region bazy nie oznacza,
 że wszystkie dane pozostają w Polsce lub UE.
@@ -16,6 +16,8 @@ Google i OpenAI mają własne zasady przetwarzania; region bazy nie oznacza,
 | Dane | Okres i sposób usuwania |
 | --- | --- |
 | Tekst i wynik na serwerze Sedno | Bez zapisu treści w bazie i logach |
+| Zdjęcia i dźwięk | Przetwarzanie lokalne; bez wysyłania zdjęć i nagrań, bez zapisu nagrania mowy |
+| Odczyt na głos | Lokalny polski głos bez internetu; bez wysyłania tekstu do usługi odczytu |
 | Historia na telefonie | 7 dni; czyszczenie przy odczycie, starcie, wznowieniu i wylogowaniu; także ręczne |
 | Metadane żądań | 8 dni; osobne zadanie Cloud Run uruchamiane co godzinę |
 | Dzienne liczniki i rezerwacje | Do 8 dni; to samo zadanie; rezerwacja przestaje obciążać limit po 5 minutach |

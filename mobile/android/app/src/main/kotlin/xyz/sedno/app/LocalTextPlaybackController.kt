@@ -16,7 +16,7 @@ class LocalTextPlaybackController(private val context: Context) {
     private var lastUtterance = ""
     private var initializationTimeout: Runnable? = null
 
-    fun speak(text: String?, result: MethodChannel.Result) {
+    fun speak(text: String?, language: String, result: MethodChannel.Result) {
         stop()
         if (text.isNullOrBlank() || text.codePointCount(0, text.length) > 32000) {
             result.error("invalid_text", "Nieprawidłowy tekst.", null)
@@ -38,9 +38,9 @@ class LocalTextPlaybackController(private val context: Context) {
                     }
                     try {
                         val voice = tts.voices?.filter {
-                            it.locale.language == "pl" && !it.isNetworkConnectionRequired &&
+                            it.locale.language == language.substringBefore('-') && !it.isNetworkConnectionRequired &&
                                 !it.features.contains(TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED)
-                        }?.sortedBy { it.name }?.firstOrNull()
+                        }?.sortedWith(compareBy({ if (it.locale.toLanguageTag().equals(language, true)) 0 else 1 }, { it.name }))?.firstOrNull()
                         if (voice == null || tts.setVoice(voice) != TextToSpeech.SUCCESS) {
                             fail()
                             return@post

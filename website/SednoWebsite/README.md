@@ -1,9 +1,9 @@
 # Sedno — strona wizytówka
 
 Statyczna strona po polsku: HTML i CSS, bez instalacji, budowania i bazy danych.
-Używa fontów systemowych, lokalnej ikony i lokalnych zrzutów ekranu. Nie ma JavaScriptu, formularzy,
+Używa fontów systemowych, lokalnej ikony i rysunków ekranów w HTML i lokalnych ikon SVG. Nie ma JavaScriptu, formularzy,
 logowania, analityki, reklam ani zasobów ładowanych z zewnętrznych serwerów.
-To wizytówka projektu, a nie aplikacja ani jej backend; przykład uproszczenia nie korzysta z AI.
+To wizytówka projektu, a nie aplikacja ani jej backend; przykłady są poglądowe i nie korzystają z AI.
 
 ## Miejsce w monorepozytorium
 
@@ -27,8 +27,11 @@ public/                    — cała strona gotowa do przesłania
     └── index.html         — instrukcja usunięcia konta
 ```
 
-Wszystkie pliki strony edytujemy bezpośrednio w `public/`. To jedyna kopia
-przeznaczona do publikacji; nie potrzeba generatora z repozytorium aplikacji.
+Stronę główną i style edytujemy bezpośrednio w `public/`.
+Politykę prywatności i usuwanie konta generujemy z `docs/privacy-policy.pl.json`
+poleceniem `python3 tools/generate_privacy_policy.py` z katalogu głównego repozytorium.
+`python3 tools/generate_privacy_policy.py --check` sprawdza też kopie na tej stronie.
+Nie edytuj wygenerowanych podstron ręcznie.
 
 ## Podgląd lokalny
 
@@ -76,10 +79,20 @@ ich na hosting. Instrukcja OVH: [publikacja strony](https://docs.ovhcloud.com/en
 
 ## Aktualizacja treści
 
-Strona główna opisuje aplikację jako będącą w przygotowaniu. Po premierze zaktualizuj
+Strona główna opisuje aplikację jako będącą w fazie testów. Po premierze zaktualizuj
 ten komunikat i dodaj rzeczywisty link do Google Play.
 
 Sekcja `#prywatnosc` zawiera podsumowanie i link do pełnego dokumentu.
 Dokumenty dostarczył właściciel projektu. Zachowuj rozróżnienie działających funkcji
 i planowanej konfiguracji; publikacja dokumentów nie wdraża opisanych w nich planów.
 Przed publikacją sprawdź aktualność treści, dat i danych kontaktowych.
+
+Sekcja `#przyklad` pokazuje pięć instrukcji: tekst pisany, zdjęcie, mowę,
+poprawianie i odczyt. Rysunki ekranów są zbudowane z HTML/CSS i ikon SVG,
+więc tekst powiększa się wraz z ustawieniami przeglądarki. Każdy przykład ma
+osobny wiersz, a na węższych ekranach kolejne kroki układają się pionowo.
+Wszystkie rysunki ekranów mają wspólne wymiary. Zdjęcie pokazujemy w czterech
+krokach: otwarcie aparatu, „Zrób zdjęcie”, kadrowanie i wynik. Podgląd kartki
+`img/kartka-z-tekstem.svg` jest rysunkiem z fakturą papieru i cieniem, utworzonym
+z kodu SVG. Mowę i odczyt przedstawiają statyczne fale dźwiękowe w SVG.
+Stare pliki WebP pozostają w `img/` jako materiały historyczne; strona ich nie używa.

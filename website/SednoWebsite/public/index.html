@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#f8fafc">
-    <meta name="description" content="Sedno to projekt aplikacji na Androida, która upraszcza polskie teksty. Wklej tekst lub zrób zdjęcie i przejdź do sedna.">
+    <meta name="description" content="Sedno to projekt aplikacji na Androida, która upraszcza i poprawia polskie teksty. Wpisz tekst, zrób zdjęcie lub powiedz go na głos.">
     <title>Sedno — mniej trudnych słów, więcej zrozumienia</title>
     <link rel="icon" href="favicon.svg?v=3" type="image/svg+xml">
     <link rel="stylesheet" href="styles.css">
@@ -22,14 +22,14 @@
     <main id="tresc" tabindex="-1">
       <section class="hero wrap" aria-labelledby="tytul">
         <div class="hero-copy">
-          <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> Projekt aplikacji na Androida</p>
+          <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> Aplikacja na Androida</p>
           <h1 id="tytul">Mniej trudnych słów.<br><span>Więcej zrozumienia.</span></h1>
-          <p class="lead">Pismo z urzędu, długa wiadomość, skomplikowana instrukcja. Sedno pomaga zrozumieć je prostszym językiem.</p>
-          <a class="button" href="#przyklad">Zobacz przykład <span aria-hidden="true">↓</span></a>
-          <p class="availability">Aplikacja w przygotowaniu.</p>
+          <p class="lead">Pismo z urzędu, długa wiadomość, skomplikowana instrukcja. Sedno pomaga zrozumieć je prostszym językiem. Może też poprawić błędy w Twoim tekście i przeczytać go na głos.</p>
+          <a class="button" href="#przyklad">Zobacz, jak używać <span aria-hidden="true">↓</span></a>
+          <p class="availability">Aplikacja jest w fazie testów.</p>
         </div>
 
-        <figure class="example" id="przyklad" aria-labelledby="przyklad-tytul">
+        <figure class="example" aria-labelledby="przyklad-tytul">
           <div class="example-top"><img class="small-mark" src="favicon.svg?v=3" width="28" height="28" alt="" aria-hidden="true"><span id="przyklad-tytul">Ten sam sens. Prostsze słowa.</span></div>
           <div class="original">
             <p class="text-label">Tekst oryginalny</p>
@@ -51,35 +51,206 @@
 
       <section class="steps-section" id="jak-to-dziala" aria-labelledby="kroki">
         <div class="wrap">
-          <div class="section-heading"><p class="eyebrow">Od tekstu do sedna</p><h2 id="kroki">Trzy proste kroki.</h2></div>
+          <div class="section-heading"><p class="eyebrow">Od tekstu do sedna</p><h2 id="kroki">Dwa proste kroki.</h2></div>
           <ol class="steps">
-            <li><span class="step-number" aria-hidden="true">01</span><h3>Dodaj tekst</h3><p>Wpisz go, wklej albo zrób zdjęcie. Na zdjęciu zaznacz fragment i wybierz Uprość.</p></li>
-            <li><span class="step-number" aria-hidden="true">02</span><h3>Sedno upraszcza tekst</h3><p>Sedno użyje sztucznej inteligencji, by napisać tekst prostszym językiem.</p></li>
-            <li><span class="step-number" aria-hidden="true">03</span><h3>Przeczytaj po swojemu</h3><p>Przeczytaj wynik i porównaj go z oryginałem. Wszystko w jednym miejscu.</p></li>
+            <li><span class="step-number" aria-hidden="true">01</span><h3>Dodaj tekst</h3><p>Wpisz go, wklej, zrób zdjęcie lub powiedz na głos.</p></li>
+            <li><span class="step-number" aria-hidden="true">02</span><h3>Uprość lub popraw</h3><p>Wybierz, czego potrzebujesz. Wynik pojawi się w tym samym polu. Możesz go dalej zmieniać.</p></li>
           </ol>
-          <figure class="screens">
-            <div class="screens-row">
-              <img src="img/ekran-start.webp" width="600" height="1195" loading="lazy" decoding="async" alt="Ekran startowy aplikacji Sedno: pole „Wpisz lub wklej tekst”, przycisk Uprość i przycisk aparatu.">
-              <img src="img/ekran-wynik.webp" width="600" height="1195" loading="lazy" decoding="async" alt="Ekran „Uproszczony tekst” w aplikacji Sedno. Krótkie zdania o tym, jak gmina współpracuje ze szkołą. Pod tekstem przyciski Pokaż oryginał i Nowy tekst.">
-            </div>
-            <figcaption>Ekrany z wersji testowej aplikacji Sedno.</figcaption>
-          </figure>
           <p class="ai-note"><span class="note-icon" aria-hidden="true">i</span> Sztuczna inteligencja może się pomylić. Ważne informacje sprawdź w oryginale.</p>
         </div>
       </section>
 
+      <section class="instructions wrap" id="przyklad" aria-labelledby="instrukcje-tytul">
+        <div class="section-heading"><p class="eyebrow">Zobacz, co nacisnąć</p><h2 id="instrukcje-tytul">Sedno krok po kroku.</h2></div>
+        <p class="instructions-intro">Każdy przykład pokazuje jedną czynność. Kółko wskazuje, co nacisnąć. Strzałka pokazuje, co dzieje się dalej.</p>
+        <p class="diagram-note">To uproszczone rysunki ekranów. Teksty są przykładowe. W aplikacji wygląd może się nieco różnić.</p>
+<article class="walkthrough" aria-labelledby="tekst-pisany">
+  <h3 id="tekst-pisany">Uprość tekst pisany</h3>
+  <p class="walkthrough-intro">Masz trudną wiadomość? Wpisz ją lub wklej do Sedna.</p>
+  <ol class="walkthrough-frames"><li class="walkthrough-step">
+  <h4><span class="instruction-number">1</span> Wpisz tekst i naciśnij „Uprość”.</h4>
+  <p>Na ekranie powinien być wybrany tryb Uprość.</p>
+  <div class="diagram"><div class="phone-picture">
+  <div class="phone-heading"><span>Sedno – uprość tekst:</span><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="9" r="3"/><path d="M5 18c1-5 13-5 14 0"/></svg></div>
+  <div class="editor-picture"><p>W celu zmiany terminu wizyty prosimy o kontakt telefoniczny.</p></div>
+  <div class="mode-picture"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h15l-4-4M20 17H5l4 4"/></svg><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 14 10-11 8 7-10 11H8zM7 10l8 7M11 21h10"/></svg></div>
+  <div class="actions-picture"><span class="control-picture side-picture"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/></svg></span><span class="control-picture primary-picture marked">Uprość</span><span class="control-picture side-picture"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="14" rx="3"/><path d="m8 7 2-4h4l2 4"/><circle cx="12" cy="14" r="4"/></svg></span></div>
+</div></div>
+</li>
+<li class="walkthrough-step">
+  <h4><span class="instruction-number">2</span> Przeczytaj prostszy tekst.</h4>
+  <p>Wynik pojawi się w tym samym polu. Możesz go zmienić.</p>
+  <div class="diagram"><div class="phone-picture">
+  <div class="phone-heading"><span>Uproszczony tekst</span><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="9" r="3"/><path d="M5 18c1-5 13-5 14 0"/></svg></div>
+  <div class="editor-picture"><p>Chcesz zmienić termin wizyty? Zadzwoń.</p><p class="picture-warning">AI może się mylić</p></div>
+  <div class="mode-picture"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h15l-4-4M20 17H5l4 4"/></svg><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 14 10-11 8 7-10 11H8zM7 10l8 7M11 21h10"/></svg></div>
+  <div class="actions-picture"><span class="control-picture side-picture"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/></svg></span><span class="control-picture primary-picture">Uprość</span><span class="control-picture side-picture"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="14" rx="3"/><path d="m8 7 2-4h4l2 4"/><circle cx="12" cy="14" r="4"/></svg></span></div>
+</div></div>
+</li></ol>
+
+</article>
+<article class="walkthrough" aria-labelledby="tekst-ze-zdjecia">
+  <h3 id="tekst-ze-zdjecia">Uprość tekst ze zdjęcia</h3>
+  <p class="walkthrough-intro">Masz pismo na papierze? Zrób zdjęcie w Sednie.</p>
+  <ol class="walkthrough-frames"><li class="walkthrough-step">
+  <h4><span class="instruction-number">1</span> Naciśnij aparat.</h4>
+  <p>Otworzysz aparat w aplikacji.</p>
+  <div class="diagram"><div class="phone-picture">
+  <div class="phone-heading"><span>Sedno – uprość tekst:</span><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="9" r="3"/><path d="M5 18c1-5 13-5 14 0"/></svg></div>
+  <div class="editor-picture"><p>Wpisz lub wklej tekst</p></div>
+  <div class="mode-picture"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h15l-4-4M20 17H5l4 4"/></svg><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 14 10-11 8 7-10 11H8zM7 10l8 7M11 21h10"/></svg></div>
+  <div class="actions-picture"><span class="control-picture side-picture"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/></svg></span><span class="control-picture primary-picture">Uprość</span><span class="control-picture side-picture marked"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="14" rx="3"/><path d="m8 7 2-4h4l2 4"/><circle cx="12" cy="14" r="4"/></svg></span></div>
+</div></div>
+</li>
+<li class="walkthrough-step">
+  <h4><span class="instruction-number">2</span> Naciśnij „Zrób zdjęcie”.</h4>
+  <p>Ustaw telefon tak, żeby cała kartka i tekst były wyraźne.</p>
+  <div class="diagram"><div class="phone-picture photo-phone">
+  <div class="phone-heading"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12H4m7-7-7 7 7 7"/></svg><span>Zrób zdjęcie tekstu</span></div>
+
+  <div class="photo-preview">
+    <img src="img/kartka-z-tekstem.svg" width="640" height="840" alt="Kartka na drewnianym stole. Tekst: W celu zmiany terminu wizyty prosimy o kontakt telefoniczny.">
+
+  </div>
+  <div class="photo-action"><span class="control-picture capture-picture marked"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="14" rx="3"/><path d="m8 7 2-4h4l2 4"/><circle cx="12" cy="14" r="4"/></svg>Zrób zdjęcie</span></div>
+</div></div>
+</li>
+<li class="walkthrough-step">
+  <h4><span class="instruction-number">3</span> Zaznacz tekst i naciśnij „Uprość”.</h4>
+  <p>Przesuń rogi ramki na fragment, który chcesz uprościć.</p>
+  <div class="diagram"><div class="phone-picture photo-phone">
+  <div class="phone-heading"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12H4m7-7-7 7 7 7"/></svg><span>Zaznacz tekst</span></div>
+  <p class="crop-hint">Przesuń rogi ramki, aby zaznaczyć tekst.</p>
+  <div class="photo-preview crop-preview">
+    <img src="img/kartka-z-tekstem.svg" width="640" height="840" alt="Kartka na drewnianym stole. Tekst: W celu zmiany terminu wizyty prosimy o kontakt telefoniczny.">
+    <div class="selection-frame" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+  </div>
+  <div class="photo-action"><span class="control-picture capture-picture marked">Uprość</span></div>
+</div></div>
+</li>
+<li class="walkthrough-step">
+  <h4><span class="instruction-number">4</span> Przeczytaj prostszy tekst.</h4>
+  <p>Sedno odczyta tekst ze zdjęcia i go uprości.</p>
+  <div class="diagram"><div class="phone-picture">
+  <div class="phone-heading"><span>Uproszczony tekst</span><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="9" r="3"/><path d="M5 18c1-5 13-5 14 0"/></svg></div>
+  <div class="editor-picture"><p>Chcesz zmienić termin wizyty? Zadzwoń.</p><p class="picture-warning">AI może się mylić</p></div>
+  <div class="mode-picture"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h15l-4-4M20 17H5l4 4"/></svg><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 14 10-11 8 7-10 11H8zM7 10l8 7M11 21h10"/></svg></div>
+  <div class="actions-picture"><span class="control-picture side-picture"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/></svg></span><span class="control-picture primary-picture">Uprość</span><span class="control-picture side-picture"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="14" rx="3"/><path d="m8 7 2-4h4l2 4"/><circle cx="12" cy="14" r="4"/></svg></span></div>
+</div></div>
+</li></ol>
+  <p class="walkthrough-note">Zdjęcie zostaje na telefonie. Do AI trafia odczytany tekst. Jeśli uproszczenie się nie uda, odczytany tekst pozostanie w polu. Możesz go wtedy poprawić.</p>
+</article>
+<article class="walkthrough" aria-labelledby="tekst-z-mowy">
+  <h3 id="tekst-z-mowy">Uprość mowę</h3>
+  <p class="walkthrough-intro">Chcesz powiedzieć tekst zamiast go pisać? Wybierz tryb Uprość.</p>
+  <ol class="walkthrough-frames"><li class="walkthrough-step">
+  <h4><span class="instruction-number">1</span> Naciśnij mikrofon.</h4>
+  <p>Jeśli telefon zapyta o dostęp do mikrofonu, zezwól na niego.</p>
+  <div class="diagram"><div class="phone-picture">
+  <div class="phone-heading"><span>Sedno – uprość tekst:</span><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="9" r="3"/><path d="M5 18c1-5 13-5 14 0"/></svg></div>
+  <div class="editor-picture"><p>Wpisz lub wklej tekst</p></div>
+  <div class="mode-picture"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h15l-4-4M20 17H5l4 4"/></svg><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 14 10-11 8 7-10 11H8zM7 10l8 7M11 21h10"/></svg></div>
+  <div class="actions-picture"><span class="control-picture side-picture marked"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/></svg></span><span class="control-picture primary-picture">Uprość</span><span class="control-picture side-picture"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="14" rx="3"/><path d="m8 7 2-4h4l2 4"/><circle cx="12" cy="14" r="4"/></svg></span></div>
+</div></div>
+</li>
+<li class="walkthrough-step">
+  <h4><span class="instruction-number">2</span> Powiedz tekst na głos.</h4>
+  <p>Mów po polsku. Na koniec zrób krótką przerwę.</p>
+  <div class="diagram"><div class="sound-picture" role="img" aria-label="Fala dźwiękowa: osoba mówi do telefonu.">
+  <span class="sound-symbol" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/></svg></span>
+  <svg class="sound-wave" viewBox="0 0 280 200" width="280" height="200" aria-hidden="true"><path d="M12 100h256" fill="none" stroke="#9bb9ed" stroke-width="2"/><g fill="#0057b7"><rect x="30" y="92.0" width="5" height="16" rx="2.5"/><rect x="42" y="87.0" width="5" height="26" rx="2.5"/><rect x="54" y="78.0" width="5" height="44" rx="2.5"/><rect x="66" y="67.0" width="5" height="66" rx="2.5"/><rect x="78" y="81.0" width="5" height="38" rx="2.5"/><rect x="90" y="58.0" width="5" height="84" rx="2.5"/><rect x="102" y="47.0" width="5" height="106" rx="2.5"/><rect x="114" y="71.0" width="5" height="58" rx="2.5"/><rect x="126" y="37.0" width="5" height="126" rx="2.5"/><rect x="138" y="53.0" width="5" height="94" rx="2.5"/><rect x="150" y="74.0" width="5" height="52" rx="2.5"/><rect x="162" y="44.0" width="5" height="112" rx="2.5"/><rect x="174" y="64.0" width="5" height="72" rx="2.5"/><rect x="186" y="80.0" width="5" height="40" rx="2.5"/><rect x="198" y="55.0" width="5" height="90" rx="2.5"/><rect x="210" y="71.0" width="5" height="58" rx="2.5"/><rect x="222" y="85.0" width="5" height="30" rx="2.5"/><rect x="234" y="77.0" width="5" height="46" rx="2.5"/><rect x="246" y="89.0" width="5" height="22" rx="2.5"/></g></svg>
+  <p>Mów po polsku</p>
+  <span class="sound-caption">Sedno zamienia mowę na tekst.</span>
+</div></div>
+</li>
+<li class="walkthrough-step">
+  <h4><span class="instruction-number">3</span> Przeczytaj prostszy tekst.</h4>
+  <p>Po 1,5 sekundy ciszy Sedno samo uprości rozpoznany tekst.</p>
+  <div class="diagram"><div class="phone-picture">
+  <div class="phone-heading"><span>Uproszczony tekst</span><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="9" r="3"/><path d="M5 18c1-5 13-5 14 0"/></svg></div>
+  <div class="editor-picture"><p>Chcesz zmienić termin wizyty? Zadzwoń.</p><p class="picture-warning">AI może się mylić</p></div>
+  <div class="mode-picture"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h15l-4-4M20 17H5l4 4"/></svg><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 14 10-11 8 7-10 11H8zM7 10l8 7M11 21h10"/></svg></div>
+  <div class="actions-picture"><span class="control-picture side-picture"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/></svg></span><span class="control-picture primary-picture">Uprość</span><span class="control-picture side-picture"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="14" rx="3"/><path d="m8 7 2-4h4l2 4"/><circle cx="12" cy="14" r="4"/></svg></span></div>
+</div></div>
+</li></ol>
+  <p class="walkthrough-note">Mowa jest rozpoznawana na telefonie. Potrzebujesz Androida 13 lub nowszego, obsługi tej funkcji i pobranego polskiego modelu mowy. Nagrywanie trwa najwyżej minutę. Stop anuluje nagrywanie.</p>
+</article>
+<article class="walkthrough" aria-labelledby="poprawianie">
+  <h3 id="poprawianie">Popraw tekst pisany</h3>
+  <p class="walkthrough-intro">Chcesz poprawić błędy w swojej wiadomości? Wybierz tryb Popraw przed wpisaniem tekstu.</p>
+  <ol class="walkthrough-frames"><li class="walkthrough-step">
+  <h4><span class="instruction-number">1</span> Wpisz tekst i naciśnij „Popraw”.</h4>
+  <p>Tryb zmienisz przyciskiem ze strzałkami nad dużym przyciskiem.</p>
+  <div class="diagram"><div class="phone-picture">
+  <div class="phone-heading"><span>Sedno – popraw tekst:</span><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="9" r="3"/><path d="M5 18c1-5 13-5 14 0"/></svg></div>
+  <div class="editor-picture"><p>jutro niemoge przyjsc na spotkanie</p></div>
+  <div class="mode-picture"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h15l-4-4M20 17H5l4 4"/></svg><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 14 10-11 8 7-10 11H8zM7 10l8 7M11 21h10"/></svg></div>
+  <div class="actions-picture"><span class="control-picture side-picture"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9h4l5-5v16l-5-5H3zM16 8a6 6 0 0 1 0 8M19 4a11 11 0 0 1 0 16"/></svg></span><span class="control-picture primary-picture marked">Popraw</span><span class="side-placeholder"></span></div>
+</div></div>
+</li>
+<li class="walkthrough-step">
+  <h4><span class="instruction-number">2</span> Przeczytaj poprawiony tekst.</h4>
+  <p>Sedno poprawi błędy. Sprawdź, czy tekst mówi to, co chcesz.</p>
+  <div class="diagram"><div class="phone-picture">
+  <div class="phone-heading"><span>Poprawiony tekst</span><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="9" r="3"/><path d="M5 18c1-5 13-5 14 0"/></svg></div>
+  <div class="editor-picture"><p>Jutro nie mogę przyjść na spotkanie.</p><p class="picture-warning">AI może się mylić</p></div>
+  <div class="mode-picture"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h15l-4-4M20 17H5l4 4"/></svg><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 14 10-11 8 7-10 11H8zM7 10l8 7M11 21h10"/></svg></div>
+  <div class="actions-picture"><span class="control-picture side-picture"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9h4l5-5v16l-5-5H3zM16 8a6 6 0 0 1 0 8M19 4a11 11 0 0 1 0 16"/></svg></span><span class="control-picture primary-picture">Popraw</span><span class="side-placeholder"></span></div>
+</div></div>
+</li></ol>
+
+</article>
+<article class="walkthrough" aria-labelledby="odczyt">
+  <h3 id="odczyt">Posłuchaj poprawionego tekstu</h3>
+  <p class="walkthrough-intro">W trybie Popraw telefon może przeczytać tekst z pola na głos.</p>
+  <ol class="walkthrough-frames"><li class="walkthrough-step">
+  <h4><span class="instruction-number">1</span> Naciśnij głośnik.</h4>
+  <p>Najpierw popraw tekst. Potem naciśnij głośnik po lewej stronie.</p>
+  <div class="diagram"><div class="phone-picture">
+  <div class="phone-heading"><span>Poprawiony tekst</span><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="9" r="3"/><path d="M5 18c1-5 13-5 14 0"/></svg></div>
+  <div class="editor-picture"><p>Jutro nie mogę przyjść na spotkanie.</p><p class="picture-warning">AI może się mylić</p></div>
+  <div class="mode-picture"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h15l-4-4M20 17H5l4 4"/></svg><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 14 10-11 8 7-10 11H8zM7 10l8 7M11 21h10"/></svg></div>
+  <div class="actions-picture"><span class="control-picture side-picture marked"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9h4l5-5v16l-5-5H3zM16 8a6 6 0 0 1 0 8M19 4a11 11 0 0 1 0 16"/></svg></span><span class="control-picture primary-picture">Popraw</span><span class="side-placeholder"></span></div>
+</div></div>
+</li>
+<li class="walkthrough-step">
+  <h4><span class="instruction-number">2</span> Posłuchaj tekstu.</h4>
+  <p>Telefon czyta na głos. Przycisk stop zatrzymuje czytanie.</p>
+  <div class="diagram"><div class="sound-picture" role="img" aria-label="Fala dźwiękowa: telefon czyta tekst na głos.">
+  <span class="sound-symbol" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9h4l5-5v16l-5-5H3zM16 8a6 6 0 0 1 0 8M19 4a11 11 0 0 1 0 16"/></svg></span>
+  <svg class="sound-wave" viewBox="0 0 280 200" width="280" height="200" aria-hidden="true"><path d="M12 100h256" fill="none" stroke="#9bb9ed" stroke-width="2"/><g fill="#0057b7"><rect x="30" y="92.0" width="5" height="16" rx="2.5"/><rect x="42" y="87.0" width="5" height="26" rx="2.5"/><rect x="54" y="78.0" width="5" height="44" rx="2.5"/><rect x="66" y="67.0" width="5" height="66" rx="2.5"/><rect x="78" y="81.0" width="5" height="38" rx="2.5"/><rect x="90" y="58.0" width="5" height="84" rx="2.5"/><rect x="102" y="47.0" width="5" height="106" rx="2.5"/><rect x="114" y="71.0" width="5" height="58" rx="2.5"/><rect x="126" y="37.0" width="5" height="126" rx="2.5"/><rect x="138" y="53.0" width="5" height="94" rx="2.5"/><rect x="150" y="74.0" width="5" height="52" rx="2.5"/><rect x="162" y="44.0" width="5" height="112" rx="2.5"/><rect x="174" y="64.0" width="5" height="72" rx="2.5"/><rect x="186" y="80.0" width="5" height="40" rx="2.5"/><rect x="198" y="55.0" width="5" height="90" rx="2.5"/><rect x="210" y="71.0" width="5" height="58" rx="2.5"/><rect x="222" y="85.0" width="5" height="30" rx="2.5"/><rect x="234" y="77.0" width="5" height="46" rx="2.5"/><rect x="246" y="89.0" width="5" height="22" rx="2.5"/></g></svg>
+  <p>Telefon czyta na głos</p>
+  <span class="sound-caption">Słuchasz tekstu ze swojego telefonu.</span>
+</div></div>
+</li></ol>
+  <p class="walkthrough-note">Odczyt działa lokalnie. Potrzebujesz polskiego głosu pobranego do odczytu bez internetu w ustawieniach telefonu.</p>
+</article>
+        <aside class="editor-help" aria-label="Warto wiedzieć">
+          <h3>Warto wiedzieć</h3>
+          <ul>
+            <li>Wynik zastępuje tekst w tym samym polu. Możesz go dalej zmieniać.</li>
+            <li>Aby wrócić do tekstu sprzed ostatniego uproszczenia lub poprawienia, naciśnij nagłówek „Uproszczony tekst” lub „Poprawiony tekst”. Możesz też użyć przycisku Wstecz w telefonie.</li>
+            <li>Aby skopiować tekst, przytrzymaj go, zaznacz i wybierz „Kopiuj” z menu telefonu.</li>
+            <li>Zmiana trybu, gumka, mikrofon i aparat usuwają obecny tekst. Zapisz potrzebny tekst przed ich użyciem.</li>
+            <li>Przed pierwszym wysłaniem Sedno wyjaśni, że tekst trafi do AI. Uproszczenie i poprawienie wymagają internetu. Tekst może mieć najwyżej 4000 znaków.</li>
+          </ul>
+          <p class="ai-note">AI może się pomylić. Ważne informacje sprawdź w oryginale.</p>
+        </aside>
+      </section>
+
       <section class="privacy wrap" id="prywatnosc" aria-labelledby="prywatnosc-tytul">
-        <div><p class="eyebrow">Twoje teksty. Twoja kontrola.</p><h2 id="prywatnosc-tytul">Prywatność od początku.</h2><p class="privacy-intro">Tak projektujemy Sedno: zdjęcia zostają na telefonie, a historia jest przechowywana lokalnie.</p><a class="privacy-link" href="prywatnosc/index.html">Pełna polityka prywatności <span aria-hidden="true">→</span></a></div>
+        <div><p class="eyebrow">Twoje teksty. Twoja kontrola.</p><h2 id="prywatnosc-tytul">Prywatność od początku.</h2><p class="privacy-intro">Zdjęcia i dźwięk zostają na telefonie. Historia też jest zapisywana tylko na Twoim urządzeniu.</p><a class="privacy-link" href="prywatnosc/index.html">Pełna polityka prywatności <span aria-hidden="true">→</span></a></div>
         <dl class="privacy-list">
           <div><dt>Zdjęcie zostaje u Ciebie</dt><dd>Odczyt tekstu ze zdjęcia odbywa się na urządzeniu. Samo zdjęcie nie jest wysyłane.</dd></div>
-          <div><dt>Tekst przetwarza AI</dt><dd>Tekst do uproszczenia trafia przez serwer do dostawcy AI — OpenAI. Serwer Sedno nie zapisuje jego treści.</dd></div>
+          <div><dt>Głos zostaje u Ciebie</dt><dd>Telefon rozpoznaje mowę i czyta tekst lokalnie. Sedno nie wysyła dźwięku do serwera ani OpenAI. Do uproszczenia wysyła tylko rozpoznany tekst.</dd></div>
+          <div><dt>Tekst przetwarza AI</dt><dd>Tekst do uproszczenia lub poprawienia trafia przez serwer do dostawcy AI — OpenAI. Serwer Sedno nie zapisuje jego treści.</dd></div>
           <div><dt>Historia na 7 dni</dt><dd>Zaszyfrowana historia jest zapisywana tylko na Twoim urządzeniu. Możesz usunąć ją wcześniej. Wylogowanie usuwa historię z telefonu.</dd></div>
         </dl>
       </section>
 
       <section class="closing wrap" aria-labelledby="na-koniec">
         <div><p class="eyebrow">Sedno</p><h2 id="na-koniec">Żeby słowa były bliżej ludzi.</h2></div>
-        <p>Pracujemy nad aplikacją na Androida.<br>Link do pobrania pojawi się tutaj po premierze.</p>
+        <p>Aplikacja jest w fazie testów.<br>Link do pobrania pojawi się tutaj po premierze.</p>
       </section>
     </main>
     <footer class="footer wrap">

@@ -1,3 +1,4 @@
+import 'package:sedno_app/l10n/localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sedno_app/features/simplification/domain/text_mode.dart';
 import 'package:flutter/material.dart';
@@ -42,6 +43,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    final strings = context.l10n;
+    if (_model.strings.localeName != strings.localeName) {
+      _model.actionError = null;
+    }
+    _model.localizations = () => strings;
     final tabs = DefaultTabController.maybeOf(context);
     if (tabs != _tabs) {
       _tabs?.removeListener(_onTabChanged);
@@ -76,16 +82,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Usunąć ten tekst z historii?'),
-        content: const Text('Tego nie można cofnąć.'),
+        title: Text(context.l10n.deleteHistoryEntryTitle),
+        content: Text(context.l10n.cannotUndo),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Anuluj'),
+            child: Text(context.l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Usuń'),
+            child: Text(context.l10n.delete),
           ),
         ],
       ),
@@ -94,26 +100,25 @@ class _HistoryScreenState extends State<HistoryScreen> {
     await _model.delete(entry.id);
     if (!mounted || _model.hasError) return;
     _expanded.remove(entry.id);
-    ScaffoldMessenger.maybeOf(context)
-        ?.showSnackBar(const SnackBar(content: Text('Usunięto tekst.')));
+    ScaffoldMessenger.maybeOf(
+      context,
+    )?.showSnackBar(SnackBar(content: Text(context.l10n.historyEntryDeleted)));
   }
 
   Future<void> _confirmClearAll() async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Usunąć całą historię?'),
-        content: const Text(
-          'Wszystkie zapisane teksty zostaną usunięte z tego telefonu. Tego nie można cofnąć.',
-        ),
+        title: Text(context.l10n.deleteHistoryTitle),
+        content: Text(context.l10n.deleteHistoryNotice),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Anuluj'),
+            child: Text(context.l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Usuń całą historię'),
+            child: Text(context.l10n.deleteAllHistory),
           ),
         ],
       ),
@@ -122,9 +127,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
     final cleared = await _model.clearAll();
     if (!mounted || !cleared) return;
     _expanded.clear();
-    ScaffoldMessenger.maybeOf(
-      context,
-    )?.showSnackBar(const SnackBar(content: Text('Usunięto całą historię.')));
+    ScaffoldMessenger.maybeOf(context)
+        ?.showSnackBar(SnackBar(content: Text(context.l10n.historyDeleted)));
   }
 
   @override
@@ -135,12 +139,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('Historia', style: Theme.of(context).textTheme.headlineSmall),
+          Text(
+            context.l10n.history,
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
           const SizedBox(height: 12),
           // Plain Polish: one piece of information per line.
-          const Text('Teksty są zapisane tylko na tym telefonie.'),
-          const Text('Każdy tekst usuwa się sam po 7 dniach.'),
-          const Text('Wylogowanie usuwa całą historię.'),
+          Text(context.l10n.historyLocalNotice),
+          Text(context.l10n.historyRetentionNotice),
+          Text(context.l10n.historySignOutNotice),
           const SizedBox(height: 8),
           OutlinedButton.icon(
             key: const Key('clearHistoryButton'),
@@ -152,7 +159,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 : _confirmClearAll,
             icon: const Icon(Icons.delete_outline),
             iconAlignment: IconAlignment.end,
-            label: const Text('Usuń całą historię teraz'),
+            label: Text(context.l10n.deleteHistoryNow),
             style: OutlinedButton.styleFrom(
               minimumSize: const Size(48, 48),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -165,30 +172,28 @@ class _HistoryScreenState extends State<HistoryScreen> {
             ),
           const SizedBox(height: 16),
           if (_model.isClearing)
-            const Center(
+            Center(
               child: CircularProgressIndicator(
-                semanticsLabel: 'Usuwanie historii',
+                semanticsLabel: context.l10n.deletingHistory,
               ),
             )
           else if (_model.isLoading)
-            const Center(
+            Center(
               child: CircularProgressIndicator(
-                semanticsLabel: 'Wczytywanie historii',
+                semanticsLabel: context.l10n.loadingHistory,
               ),
             )
           else if (_model.hasError) ...[
-            const Text('Nie udało się wczytać historii.'),
+            Text(context.l10n.historyLoadFailed),
             const SizedBox(height: 8),
             OutlinedButton(
               onPressed: _refresh,
               style: OutlinedButton.styleFrom(minimumSize: const Size(0, 48)),
-              child: const Text('Spróbuj ponownie'),
+              child: Text(context.l10n.tryAgain),
             ),
           ] else if (_model.entries.isEmpty) ...[
-            const Text('Nie masz jeszcze zapisanych tekstów.'),
-            const Text(
-              'Każdy uproszczony lub poprawiony tekst pojawi się tutaj.',
-            ),
+            Text(context.l10n.historyEmpty),
+            Text(context.l10n.historyEmptyNotice),
           ] else
             ..._model.entries.map(_entry),
         ],
@@ -199,7 +204,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Widget _entry(HistoryEntry entry) {
     final textTheme = Theme.of(context).textTheme;
     final now = widget.clock();
-    final created = HistoryDates.created(entry.createdAt, now);
+    final created = HistoryDates.created(
+      entry.createdAt,
+      now,
+      strings: context.l10n,
+    );
     final expanded = _expanded.contains(entry.id);
     return Card(
       child: Padding(
@@ -208,14 +217,18 @@ class _HistoryScreenState extends State<HistoryScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(created, style: textTheme.titleSmall),
-            Text('Zostanie usunięty ${HistoryDates.expires(entry.createdAt)}.'),
+            Text(
+              context.l10n.historyExpires(
+                HistoryDates.expires(entry.createdAt, strings: context.l10n),
+              ),
+            ),
             const SizedBox(height: 12),
             Semantics(
               header: true,
               child: Text(
                 entry.result.mode == TextMode.correct
-                    ? 'Wersja poprawiona'
-                    : 'Wersja prosta',
+                    ? context.l10n.correctedVersion
+                    : context.l10n.simplifiedVersion,
                 style: textTheme.titleMedium,
               ),
             ),
@@ -225,7 +238,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
               const SizedBox(height: 12),
               Semantics(
                 header: true,
-                child: Text('Oryginalny tekst', style: textTheme.titleMedium),
+                child: Text(
+                  context.l10n.originalText,
+                  style: textTheme.titleMedium,
+                ),
               ),
               const SizedBox(height: 4),
               SelectableText(entry.original.value),
@@ -247,15 +263,19 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   style: OutlinedButton.styleFrom(
                     minimumSize: const Size(48, 48),
                   ),
-                  child: Text(expanded ? 'Ukryj oryginał' : 'Pokaż oryginał'),
+                  child: Text(
+                    expanded
+                        ? context.l10n.hideOriginal
+                        : context.l10n.showOriginal,
+                  ),
                 ),
                 TextButton.icon(
                   onPressed: () => _confirmDelete(entry),
                   icon: const Icon(Icons.delete_outline),
-                  // TalkBack names the entry instead of repeating "Usuń".
+                  // TalkBack names the entry instead of repeating context.l10n.delete.
                   label: Text(
-                    'Usuń',
-                    semanticsLabel: 'Usuń tekst zapisany: $created',
+                    context.l10n.delete,
+                    semanticsLabel: context.l10n.deleteSavedText(created),
                   ),
                   style: TextButton.styleFrom(
                     minimumSize: const Size(48, 48),
@@ -274,7 +294,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
 /// Dates shown in the phone's local time, e.g. "Dziś, 13:05" or "17.10, 9:30".
 abstract final class HistoryDates {
-  static String created(DateTime createdAt, DateTime now) {
+  static String created(
+    DateTime createdAt,
+    DateTime now, {
+    AppLocalizations? strings,
+  }) {
+    strings ??= polishStrings();
     final local = createdAt.toLocal();
     final today = now.toLocal();
     // Calendar days in UTC avoid 23/25-hour days around time changes.
@@ -284,18 +309,21 @@ abstract final class HistoryDates {
       today.day,
     ).difference(DateTime.utc(local.year, local.month, local.day)).inDays;
     final day = switch (days) {
-      0 => 'Dziś',
-      1 => 'Wczoraj',
-      _ => _date(local),
+      0 => strings.today,
+      1 => strings.yesterday,
+      _ => _date(local, strings),
     };
     return '$day, ${local.hour}:${_two(local.minute)}';
   }
 
   /// The day the entry disappears (seven days after it was saved).
-  static String expires(DateTime createdAt) =>
-      _date(createdAt.add(const Duration(days: 7)).toLocal());
+  static String expires(DateTime createdAt, {AppLocalizations? strings}) =>
+      _date(createdAt.add(const Duration(days: 7)).toLocal(), strings);
 
-  static String _date(DateTime local) =>
-      '${_two(local.day)}.${_two(local.month)}';
+  static String _date(DateTime local, AppLocalizations? strings) {
+    final separator = strings?.localeName.startsWith('en') == true ? '/' : '.';
+    return '${_two(local.day)}$separator${_two(local.month)}';
+  }
+
   static String _two(int value) => value.toString().padLeft(2, '0');
 }

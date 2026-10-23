@@ -15,6 +15,7 @@ void main() {
       200,
       scrollable: find.byType(Scrollable).last,
     );
+    await tester.pumpAndSettle();
     await tester.tap(find.text('O aplikacji'));
     await tester.pumpAndSettle();
     expect(find.byType(AboutScreen), findsOneWidget);

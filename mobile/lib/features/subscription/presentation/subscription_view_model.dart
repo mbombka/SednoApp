@@ -1,9 +1,14 @@
+import 'package:sedno_app/l10n/localization.dart';
+
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:sedno_app/features/subscription/domain/subscription_repository.dart';
 
 class SubscriptionViewModel extends ChangeNotifier {
+  AppLocalizations Function() localizations = polishStrings;
+  AppLocalizations get strings => localizations();
+
   SubscriptionViewModel({
     required this.store,
     required this.repository,
@@ -26,7 +31,7 @@ class SubscriptionViewModel extends ChangeNotifier {
         _queue = _queue.then((_) => _purchases(items));
       },
       onError: (Object _) {
-        message = 'Nie można odczytać płatności. Spróbuj przywrócić zakupy.';
+        message = strings.paymentReadFailed;
         _notify();
       },
     );
@@ -58,10 +63,10 @@ class SubscriptionViewModel extends ChangeNotifier {
     final current = await repository.current();
     status = current;
     if (current.accountBinding.isEmpty) {
-      throw StateError('Zaloguj się przed zakupem.');
+      throw StateError(strings.signInBeforePurchase);
     }
     if (current.active) {
-      message = 'Subskrypcja jest już aktywna.';
+      message = strings.subscriptionAlreadyActive;
       return;
     }
     await store.buy(current.accountBinding);
@@ -69,18 +74,18 @@ class SubscriptionViewModel extends ChangeNotifier {
   Future<void> restore() => _run(() async {
     final current = await repository.current();
     if (current.accountBinding.isEmpty) {
-      throw StateError('Zaloguj się przed przywróceniem zakupu.');
+      throw StateError(strings.signInBeforeRestore);
     }
     await store.restore();
     status = await repository.current();
-    message = 'Sprawdzono zakupy. Potwierdzenie może potrwać chwilę.';
+    message = strings.purchasesChecked;
   });
 
   Future<void> manage() async {
     try {
       await store.manage();
     } catch (_) {
-      message = 'Nie można otworzyć Google Play. Otwórz sklep i wybierz Płatności i subskrypcje → Subskrypcje.';
+      message = strings.playOpenFailed;
       _notify();
     }
   }
@@ -90,19 +95,18 @@ class SubscriptionViewModel extends ChangeNotifier {
       if (_disposed) return;
       switch (item.state) {
         case StorePurchaseState.pending:
-          message =
-              'Płatność oczekuje na potwierdzenie. Limit pozostaje bez zmian.';
+          message = strings.paymentPending;
         case StorePurchaseState.canceled:
-          message = 'Zakup anulowano.';
+          message = strings.purchaseCancelled;
         case StorePurchaseState.error:
-          message = 'Nie udało się kupić subskrypcji. Spróbuj ponownie.';
+          message = strings.purchaseFailed;
         case StorePurchaseState.purchased:
         case StorePurchaseState.restored:
           await _run(() async {
             status = await repository.verify(item.token);
             message = status!.active
-                ? 'Subskrypcja jest aktywna.'
-                : 'Subskrypcja nie jest aktywna.';
+                ? strings.subscriptionActive
+                : strings.subscriptionInactive;
           });
       }
       _notify();
@@ -118,7 +122,7 @@ class SubscriptionViewModel extends ChangeNotifier {
       await action();
     } catch (_) {
       status = null;
-      message = 'Nie można potwierdzić subskrypcji. Zaloguj się, sprawdź połączenie i przywróć zakupy.';
+      message = strings.subscriptionVerifyFailed;
     } finally {
       busy = false;
       _notify();

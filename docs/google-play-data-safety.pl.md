@@ -2,14 +2,15 @@
 
 Materiał do przygotowania formularza, nie potwierdzenie jego wysłania.
 Pakiet: **`xyz.sedno.app`**, projekt Firebase: `sednoapp-79241`.
-Serwer działa od 19.10.2026; płatności są wyłączone. Odpowiedzi dopasuj do
+Serwer działa od 19.10.2026; płatności włączono na istniejącym API do testów.
+Testy zakupów na telefonie pozostają do wykonania. Odpowiedzi dopasuj do
 faktycznie publikowanego wydania, zależności SDK i ustawień dostawców.
 
 ## Podstawowe odpowiedzi
 
 | Pole | Informacja do formularza |
 | --- | --- |
-| Zbieranie danych | Tak: tekst do uproszczenia, identyfikatory i dane techniczne; opcjonalnie dane konta i zakupów |
+| Zbieranie danych | Tak: tekst do uproszczenia lub poprawienia, identyfikatory i dane techniczne; opcjonalnie dane konta i zakupów |
 | Szyfrowanie w przesyłaniu | Produkcja wymaga HTTPS; sprawdź całe wydanie i infrastrukturę |
 | Tworzenie konta | Google lub e-mail i hasło; można zacząć jako gość |
 | Usuwanie konta | Konto → Usuń konto; także zgłoszenie przez stronę |
@@ -25,7 +26,7 @@ faktycznie publikowanego wydania, zależności SDK i ustawień dostawców.
 | Adres e-mail i identyfikator konta | Dobrowolne logowanie; prowadzenie konta |
 | Identyfikatory instalacji i sesji | Wymagane do żądań serwera; limity i ochrona przed nadużyciami |
 | Daty, statusy i liczniki żądań | Działanie usługi i bezpieczeństwo |
-| Tekst użytkownika | Wysyłany przez backend do OpenAI do uproszczenia |
+| Tekst użytkownika | Wysyłany przez backend do OpenAI do uproszczenia lub poprawienia |
 | Historia zakupów | Po włączeniu płatności: weryfikacja subskrypcji i powiązanie z kontem |
 | Diagnostyka i metryki SDK | ML Kit i inne użyte usługi; sprawdź wersje i ruch sieciowy |
 | Nazwa i zdjęcie profilu Google | Sprawdź na koncie testowym, co otrzymuje Firebase; sam backend nie zapisuje nazwy |
@@ -33,7 +34,11 @@ faktycznie publikowanego wydania, zależności SDK i ustawień dostawców.
 Kategoria obejmująca wymagany identyfikator instalacji nie staje się w całości
 opcjonalna przez to, że logowanie jest dobrowolne. Dopasuj nazwy kategorii do formularza Play.
 
-Zdjęcia OCR i lokalna historia nie są wysyłane. Sedno nie pobiera numerów kart,
+Zdjęcia OCR, nagrania mowy i lokalna historia nie są wysyłane.
+Rozpoznawanie mowy działa lokalnie na obsługiwanych urządzeniach z Androidem 13+
+i pobranym polskim modelem. Rozpoznany tekst jest wysyłany do uproszczenia.
+Odczyt tekstu w trybie Popraw używa pobranego polskiego głosu bez internetu;
+nie wysyła tekstu do usługi odczytu w chmurze. Sedno nie pobiera numerów kart,
 kontaktów, SMS ani lokalizacji. Sprawdź osobno zachowanie dostawców SDK.
 Dowolny tekst użytkownika może zawierać dane wrażliwe mimo braku takich formularzy.
 

@@ -1,3 +1,5 @@
+import 'package:sedno_app/l10n/localization.dart';
+
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -5,6 +7,9 @@ import 'package:sedno_app/features/simplification/domain/input_text.dart';
 import 'package:sedno_app/features/speech_output/domain/text_playback_service.dart';
 
 class TextPlaybackViewModel extends ChangeNotifier {
+  AppLocalizations Function() localizations = polishStrings;
+  AppLocalizations get strings => localizations();
+
   TextPlaybackViewModel(this.service);
   final TextPlaybackService service;
   bool isPlaying = false;
@@ -16,8 +21,8 @@ class TextPlaybackViewModel extends ChangeNotifier {
     if (isPlaying) return;
     try {
       InputText(text);
-    } on FormatException catch (error) {
-      message = error.message;
+    } on FormatException {
+      message = text.trim().isEmpty ? strings.emptyText : strings.textTooLong;
       notifyListeners();
       return;
     }
@@ -31,7 +36,7 @@ class TextPlaybackViewModel extends ChangeNotifier {
       if (!_disposed && revision == _revision) {
         message = error is FormatException
             ? error.message
-            : 'Nie udało się odczytać tekstu. Spróbuj ponownie.';
+            : strings.readTextFailed;
       }
     } finally {
       if (!_disposed && revision == _revision) {

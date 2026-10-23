@@ -1,3 +1,5 @@
+import 'package:sedno_app/app/app_language.dart';
+import 'package:sedno_app/l10n/localization.dart';
 import 'package:sedno_app/features/account/presentation/user_menu_screen.dart';
 
 import 'dart:io';
@@ -24,8 +26,9 @@ import 'package:sedno_app/features/shared/data/development_mocks.dart';
 import 'package:sedno_app/features/quota/domain/quota_repository.dart';
 import 'package:sedno_app/features/simplification/domain/simplification_repository.dart';
 
-class SednoApp extends StatelessWidget {
+class SednoApp extends StatefulWidget {
   const SednoApp({
+    this.languageController,
     this.simplificationRepository,
     this.historyRepository,
     this.accountRepository,
@@ -33,6 +36,7 @@ class SednoApp extends StatelessWidget {
     super.key,
   });
 
+  final LanguageController? languageController;
   final SimplificationRepository? simplificationRepository;
   final HistoryRepository? historyRepository;
   final AccountRepository? accountRepository;
@@ -42,20 +46,40 @@ class SednoApp extends StatelessWidget {
   static const displayName = 'Sedno';
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: displayName,
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.light,
-      themeMode: ThemeMode.light,
-      home: _AppNavigation(
-        simplificationRepository: simplificationRepository,
-        historyRepository: historyRepository,
-        accountRepository: accountRepository,
-        subscriptionModel: subscriptionModel,
-      ),
-    );
+  State<SednoApp> createState() => _SednoAppState();
+}
+
+class _SednoAppState extends State<SednoApp> {
+  late final LanguageController _languages =
+      widget.languageController ?? LanguageController();
+  @override
+  void dispose() {
+    if (widget.languageController == null) _languages.dispose();
+    super.dispose();
   }
+
+  @override
+  Widget build(BuildContext context) => LanguageScope(
+    controller: _languages,
+    child: ListenableBuilder(
+      listenable: _languages,
+      builder: (context, _) => MaterialApp(
+        title: SednoApp.displayName,
+        debugShowCheckedModeBanner: false,
+        locale: _languages.language.locale,
+        supportedLocales: AppLanguage.values.map((language) => language.locale),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        theme: AppTheme.light,
+        themeMode: ThemeMode.light,
+        home: _AppNavigation(
+          simplificationRepository: widget.simplificationRepository,
+          historyRepository: widget.historyRepository,
+          accountRepository: widget.accountRepository,
+          subscriptionModel: widget.subscriptionModel,
+        ),
+      ),
+    ),
+  );
 }
 
 class _AppNavigation extends StatefulWidget {
@@ -111,6 +135,17 @@ class _AppNavigationState extends State<_AppNavigation>
     _purgeHistory();
     _simplificationRepository = widget.simplificationRepository;
     unawaited(widget.subscriptionModel?.start());
+  }
+
+  String? _localeName;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final localeName = context.l10n.localeName;
+    if (_localeName != null && _localeName != localeName) {
+      widget.subscriptionModel?.message = null;
+    }
+    _localeName = localeName;
   }
 
   void _onEditorResultChanged() {
@@ -195,8 +230,8 @@ class _AppNavigationState extends State<_AppNavigation>
     return LayoutBuilder(
       builder: (context, constraints) {
         final title = _selectedPage == 0
-            ? (_editorResult.mode?.resultHeading ??
-                  '${SednoApp.displayName} - ${_mode.heading}:')
+            ? (_editorResult.mode?.localizedResultHeading(context.l10n) ??
+                  '${SednoApp.displayName} - ${_mode.localizedHeading(context.l10n)}:')
             : SednoApp.displayName;
         final titleLayout =
             TextPainter(
@@ -229,7 +264,7 @@ class _AppNavigationState extends State<_AppNavigation>
               toolbarHeight: toolbarHeight,
               title: _selectedPage == 0 && _editorResult.hasOriginal
                   ? Tooltip(
-                      message: 'Przywróć oryginalny tekst',
+                      message: context.l10n.restoreOriginal,
                       child: TextButton(
                         key: const Key('restoreOriginalButton'),
                         onPressed: _editorResult.busy ? null : _restoreOriginal,
@@ -247,7 +282,7 @@ class _AppNavigationState extends State<_AppNavigation>
               centerTitle: false,
               actions: [
                 IconButton(
-                  tooltip: 'Menu użytkownika',
+                  tooltip: context.l10n.userMenu,
                   icon: const Icon(Icons.account_circle_outlined, size: 32),
                   color: AppTheme.blue,
                   onPressed: _openUserMenu,

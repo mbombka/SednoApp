@@ -8,16 +8,21 @@ public record AccountDto(string Id, string Provider);
 public record AuthenticatedSessionDto(string AccessToken, AccountDto Account, QuotaDto Quota);
 public record VerifiedIdentity(string Uid, string Provider, bool EmailVerified = false, long AuthTime = 0);
 public record SessionIdentity(Guid IdentityId, Guid? AccountId, Guid SessionId);
-public record SimplificationResultDto(string Id, string Text, DateTimeOffset CreatedAt, string Mode = "simplify");
+public record SimplificationResultDto(string Id, string Text, DateTimeOffset CreatedAt, string Mode = "simplify", string Language = "pl");
 public record SimplificationResponseDto(SimplificationResultDto Result, QuotaDto Quota);
 public record RequestStatusDto(string RequestId, string Status, DateTimeOffset ReservationDay, DateTimeOffset? FinishedAt, QuotaDto Quota);
-public record SimplificationInput(string RequestId, string Text, string Mode = "simplify");
+public record SimplificationInput(string RequestId, string Text, string Mode = "simplify", string Language = "pl");
 public record ReservationOutcome(string Kind, QuotaDto Quota);
 
 public sealed class SimplificationTimeoutException() : Exception("Upraszczanie trwało zbyt długo. Spróbuj ponownie.");
 
 public interface IModelProvider
 {
+    // Legacy adapters remain Polish-only unless they explicitly implement languages.
+    Task<string> SimplifyAsync(string text, string language, CancellationToken cancellationToken) =>
+        language == "pl" ? SimplifyAsync(text, cancellationToken) : throw new NotSupportedException("Unsupported language.");
+    Task<string> CorrectAsync(string text, string language, CancellationToken cancellationToken) =>
+        language == "pl" ? CorrectAsync(text, cancellationToken) : throw new NotSupportedException("Unsupported language.");
     Task<string> SimplifyAsync(string text, CancellationToken cancellationToken);
     Task<string> CorrectAsync(string text, CancellationToken cancellationToken) =>
         throw new NotSupportedException("Tryb poprawiania jest niedostępny.");

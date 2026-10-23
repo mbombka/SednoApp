@@ -33,7 +33,7 @@ void main() {
         findsOneWidget,
       );
       expect(
-        find.textContaining('Strona zawiera krótkie podsumowanie'),
+        find.textContaining('Krótkie podsumowanie znajdziesz'),
         findsOneWidget,
       );
       expect(

@@ -30,7 +30,7 @@ class MainActivity : FlutterActivity() {
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "sedno/text-playback")
             .setMethodCallHandler { call, result ->
                 when (call.method) {
-                    "speak" -> playback.speak(call.arguments as? String, result)
+                    "speak" -> playback.speak(call.argument<String>("text"), call.argument<String>("language") ?: "pl-PL", result)
                     "stop" -> { playback.stop(); result.success(null) }
                     else -> result.notImplemented()
                 }
@@ -38,7 +38,7 @@ class MainActivity : FlutterActivity() {
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "sedno/speech")
             .setMethodCallHandler { call, result ->
                 when (call.method) {
-                    "listen" -> speech.listen(result)
+                    "listen" -> speech.listen(call.argument<String>("language") ?: "pl-PL", result)
                     "cancel" -> {
                         speech.cancel()
                         result.success(null)

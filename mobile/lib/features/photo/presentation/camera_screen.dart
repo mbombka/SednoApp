@@ -1,3 +1,5 @@
+import 'package:sedno_app/l10n/localization.dart';
+
 import 'dart:async';
 
 import 'package:camera/camera.dart';
@@ -28,6 +30,16 @@ class _CameraScreenState extends State<CameraScreen>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final strings = context.l10n;
+    if (widget.model.strings.localeName != strings.localeName) {
+      widget.model.message = null;
+    }
+    widget.model.localizations = () => strings;
+  }
+
+  @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     widget.model.dispose();
@@ -43,7 +55,7 @@ class _CameraScreenState extends State<CameraScreen>
       return PopScope(
         canPop: !model.busy,
         child: Scaffold(
-          appBar: AppBar(title: const Text('Zrób zdjęcie tekstu')),
+          appBar: AppBar(title: Text(context.l10n.takeTextPhoto)),
           body: SafeArea(
             child: Column(
               children: [
@@ -59,8 +71,8 @@ class _CameraScreenState extends State<CameraScreen>
                               semanticsLabel: model.message,
                             ),
                           )
-                        : const CircularProgressIndicator(
-                            semanticsLabel: 'Uruchamianie aparatu',
+                        : CircularProgressIndicator(
+                            semanticsLabel: context.l10n.startingCamera,
                           ),
                   ),
                 ),
@@ -87,7 +99,9 @@ class _CameraScreenState extends State<CameraScreen>
                           : null,
                       icon: const Icon(Icons.photo_camera_outlined),
                       label: Text(
-                        model.busy ? 'Robienie zdjęcia…' : 'Zrób zdjęcie',
+                        model.busy
+                            ? context.l10n.takingPhoto
+                            : context.l10n.takePhoto,
                       ),
                     ),
                   ),
@@ -95,7 +109,7 @@ class _CameraScreenState extends State<CameraScreen>
                 if (!model.ready && model.message != null)
                   TextButton(
                     onPressed: () => model.setActive(true),
-                    child: const Text('Spróbuj ponownie'),
+                    child: Text(context.l10n.tryAgain),
                   ),
               ],
             ),

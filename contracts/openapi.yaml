@@ -361,6 +361,11 @@ components:
       type: object
       required: [requestId, text]
       properties:
+        language:
+          type: string
+          enum: [pl, en]
+          default: pl
+          description: Text processing language. English uses British English. Output stays in the selected language; translation is not provided. Missing language means Polish for backward compatibility.
         mode:
           type: string
           enum: [simplify, correct]
@@ -382,6 +387,11 @@ components:
       type: object
       required: [id, text, createdAt]
       properties:
+        language:
+          type: string
+          enum: [pl, en]
+          default: pl
+          description: Language used for this result; absent in older API versions.
         id: { type: string }
         text: { type: string }
         createdAt: { type: string, format: date-time }

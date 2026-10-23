@@ -60,7 +60,10 @@ void main() {
       await service.speak('Polski tekst');
       await service.stop();
       expect(calls.map((c) => c.method), ['speak', 'stop']);
-      expect(calls.first.arguments, 'Polski tekst');
+      expect(calls.first.arguments, {
+        'text': 'Polski tekst',
+        'language': 'pl-PL',
+      });
       messenger.setMockMethodCallHandler(
         channel,
         (_) async =>

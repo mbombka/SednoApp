@@ -11,6 +11,10 @@ usunięto 19.10.2026. Obsługę płatności na istniejącym serwerze włączono
 20.10.2026 do testów przez Google Play; odbiór zakupów pozostaje do wykonania.
 [Wdrożenie, migracja i pozostałe porządki](deploy/firebase/README.pl.md).
 
+Aktualizacja 23.10.2026: wdrożono `sedno-api-00013-8x6` z polskimi i angielskimi
+promptami oraz polem `language` w API. Hosting i cleanup używają nowego obrazu.
+[Raport wdrożenia](../docs/backend-deployment-2026-10-23.pl.md).
+
 Aktualizacja 22.10.2026: wdrożono `sedno-api-00012-9j4` z aktualnymi promptami,
 trybem Popraw i czasowym dostępem testerskim.
 [Raport wdrożenia](../docs/backend-deployment-2026-10-22.pl.md).
@@ -247,3 +251,10 @@ dalej pomijać `mode`. Zmiana nie wymaga migracji Firestore ani nowych usług.
 Pole `TesterAccessExpiresAt` konta w Firestore daje czasowy limit 400 operacji
 dziennie bez zakupu. Datę sprawdza transakcja limitu; użycie nie jest zerowane.
 [Skrypt administracyjny, ręczna edycja i wdrożenie](../docs/tester-access.pl.md).
+
+## Język tekstu
+
+`POST /v1/simplifications` przyjmuje opcjonalne `language: pl | en` (domyślnie `pl`).
+Oba tryby mają osobne prompty polskie i angielskie w `Prompts/`; angielski używa
+pisowni brytyjskiej. Języki korzystają ze wspólnego limitu i ustawień modelu.
+[Opis zgodności, wdrożenia i rozszerzania](../docs/multilingual-app.pl.md).

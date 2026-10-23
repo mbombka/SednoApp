@@ -1,10 +1,12 @@
+import 'package:sedno_app/features/privacy/domain/localized_privacy_policy.dart';
+import 'package:sedno_app/l10n/localization.dart';
+
 import 'dart:async';
 
 import 'package:sedno_app/features/account/presentation/tester_access_panel.dart';
 
 import 'package:sedno_app/features/account/presentation/password_field.dart';
 
-import 'package:sedno_app/features/privacy/presentation/privacy_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sedno_app/features/quota/domain/quota_state.dart';
@@ -41,6 +43,15 @@ class _AccountScreenState extends State<AccountScreen>
   _AccountForm _form = _AccountForm.signIn;
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
+  String? _localeName;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final localeName = context.l10n.localeName;
+    if (_localeName != null && _localeName != localeName) _message = null;
+    _localeName = localeName;
+  }
+
   void _clearPasswords() {
     _password.clear();
     _confirmPassword.clear();
@@ -58,9 +69,9 @@ class _AccountScreenState extends State<AccountScreen>
 
   String? _validateEmail(String? value) {
     final email = value?.trim() ?? '';
-    if (email.isEmpty) return 'Wpisz adres e-mail.';
+    if (email.isEmpty) return context.l10n.enterEmail;
     if (!RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(email)) {
-      return 'Wpisz poprawny adres e-mail.';
+      return context.l10n.enterValidEmail;
     }
     return null;
   }
@@ -85,17 +96,13 @@ class _AccountScreenState extends State<AccountScreen>
     try {
       await widget.repository!.sendPasswordResetEmail(_email.text);
       if (mounted) {
-        setState(
-          () => _message = 'Jeśli konto z tym adresem istnieje, otrzymasz wiadomość z linkiem do zmiany hasła. Sprawdź też folder Spam.',
-        );
+        setState(() => _message = context.l10n.passwordResetSent);
       }
     } on AccountActionException catch (error) {
       if (mounted) setState(() => _message = error.message);
     } catch (_) {
       if (mounted) {
-        setState(
-          () => _message = 'Nie udało się wysłać wiadomości. Spróbuj ponownie.',
-        );
+        setState(() => _message = context.l10n.emailSendFailed);
       }
     } finally {
       if (mounted) {
@@ -154,9 +161,7 @@ class _AccountScreenState extends State<AccountScreen>
       }
     } catch (_) {
       if (mounted) {
-        setState(
-          () => _message = 'Nie udało się odczytać konta lub dokończyć usuwania danych. Spróbuj ponownie.',
-        );
+        setState(() => _message = context.l10n.accountLoadFailed);
       }
     }
   }
@@ -192,17 +197,12 @@ class _AccountScreenState extends State<AccountScreen>
       await widget.repository!.resendVerificationEmail();
       if (!mounted) return;
       _startResendCooldown();
-      setState(
-        () => _message =
-            'Wysłaliśmy wiadomość z linkiem. Sprawdź pocztę i folder Spam.',
-      );
+      setState(() => _message = context.l10n.verificationEmailSent);
     } on AccountActionException catch (error) {
       if (mounted) setState(() => _message = error.message);
     } catch (_) {
       if (mounted) {
-        setState(
-          () => _message = 'Nie udało się wysłać wiadomości. Spróbuj ponownie.',
-        );
+        setState(() => _message = context.l10n.emailSendFailed);
       }
     } finally {
       if (mounted) {
@@ -232,10 +232,10 @@ class _AccountScreenState extends State<AccountScreen>
           _account = account;
           if (account.emailVerificationRequired) {
             if (verificationEmailSent) {
-              _message = 'Wysłaliśmy wiadomość z linkiem. Sprawdź pocztę i folder Spam.';
+              _message = context.l10n.verificationEmailSent;
             }
             if (checkingVerification) {
-              _message = 'Adres nie jest jeszcze potwierdzony. Kliknij link w wiadomości i spróbuj ponownie.';
+              _message = context.l10n.emailNotVerified;
             }
           }
         });
@@ -250,10 +250,7 @@ class _AccountScreenState extends State<AccountScreen>
       }
     } catch (_) {
       if (mounted) {
-        setState(
-          () => _message =
-              'Nie udało się zalogować. Sprawdź dane i spróbuj ponownie.',
-        );
+        setState(() => _message = context.l10n.signInFailed);
       }
     } finally {
       if (mounted) {
@@ -282,7 +279,7 @@ class _AccountScreenState extends State<AccountScreen>
       }
     } catch (_) {
       if (mounted) {
-        setState(() => _message = 'Nie udało się wylogować. Spróbuj ponownie.');
+        setState(() => _message = context.l10n.signOutFailed);
       }
     } finally {
       if (mounted) {
@@ -297,18 +294,18 @@ class _AccountScreenState extends State<AccountScreen>
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Usunąć konto?'),
+        title: Text(context.l10n.deleteAccountTitle),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(PrivacyScreen.deletionNotice),
-              const Text('Potwierdź swoją tożsamość, aby usunąć konto.'),
+              Text(LocalizedPrivacyPolicy.deletionNotice(context.language)),
+              Text(context.l10n.deleteAccountIdentity),
               if (_account?.provider == IdentityProvider.email)
                 TextField(
                   onChanged: (value) => password = value,
                   obscureText: true,
-                  decoration: const InputDecoration(labelText: 'Hasło'),
+                  decoration: InputDecoration(labelText: context.l10n.password),
                 ),
             ],
           ),
@@ -316,11 +313,11 @@ class _AccountScreenState extends State<AccountScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Zachowaj konto'),
+            child: Text(context.l10n.keepAccount),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Usuń konto i dane'),
+            child: Text(context.l10n.deleteAccountAndData),
           ),
         ],
       ),
@@ -339,7 +336,7 @@ class _AccountScreenState extends State<AccountScreen>
       if (mounted) {
         setState(() {
           _account = Account(id: 'guest', provider: IdentityProvider.guest);
-          _message = 'Konto i dane zostały usunięte. Subskrypcję anuluj osobno w Google Play.';
+          _message = context.l10n.accountDeleted;
         });
       }
     } on AccountActionException catch (error) {
@@ -351,10 +348,7 @@ class _AccountScreenState extends State<AccountScreen>
       }
     } catch (_) {
       if (mounted) {
-        setState(
-          () =>
-              _message = 'Nie udało się zakończyć usuwania. Spróbuj ponownie.',
-        );
+        setState(() => _message = context.l10n.accountDeleteIncomplete);
       }
     } finally {
       if (mounted) {
@@ -376,15 +370,15 @@ class _AccountScreenState extends State<AccountScreen>
   }
 
   // Subscriptions belong to the Sedno account, so show which one is active.
-  static String _signedInLabel(Account account) {
+  String _signedInLabel(Account account) {
     final email = account.email;
-    if (email == null) return 'Zalogowano.';
+    if (email == null) return context.l10n.signedIn;
     final method = switch (account.provider) {
-      IdentityProvider.google => ' (konto Google)',
-      IdentityProvider.email => ' (e-mail i hasło)',
+      IdentityProvider.google => context.l10n.googleAccountMethod,
+      IdentityProvider.email => context.l10n.emailAccountMethod,
       IdentityProvider.guest => '',
     };
-    return 'Zalogowano jako $email$method';
+    return context.l10n.signedInAs(email, method);
   }
 
   @override
@@ -401,7 +395,10 @@ class _AccountScreenState extends State<AccountScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('Konto', style: Theme.of(context).textTheme.headlineSmall),
+          Text(
+            context.l10n.account,
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
           const SizedBox(height: 16),
           if (_message case final message?) ...[
             Semantics(
@@ -415,43 +412,45 @@ class _AccountScreenState extends State<AccountScreen>
             if (!pending)
               TextButton(
                 onPressed: _busy ? null : _load,
-                child: const Text('Odśwież konto i dokończ czyszczenie'),
+                child: Text(context.l10n.finishDataCleanup),
               ),
             const SizedBox(height: 12),
           ],
-          if (repository == null) const Text('Tutaj pojawią się opcje konta.'),
+          if (repository == null) Text(context.l10n.accountNotConfigured),
           if (repository != null && signedIn) ...[
             Text(_signedInLabel(_account!)),
             const SizedBox(height: 16),
             OutlinedButton(
               onPressed: _busy ? null : _signOut,
-              child: const Text('Wyloguj się'),
+              child: Text(context.l10n.signOut),
             ),
             OutlinedButton(
               onPressed: _busy ? null : _deleteAccount,
-              child: const Text('Usuń konto'),
+              child: Text(context.l10n.deleteAccount),
             ),
           ],
           if (repository != null && pending) ...[
             Text(
-              awaitingSession ? 'Adres e-mail potwierdzony' : 'Sprawdź pocztę',
+              awaitingSession
+                  ? context.l10n.emailVerified
+                  : context.l10n.checkInbox,
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 12),
             if (_account?.email case final email?)
               Text(
                 awaitingSession
-                    ? 'Adres e-mail: $email'
-                    : 'Adres do potwierdzenia: $email',
+                    ? context.l10n.accountEmail(email)
+                    : context.l10n.emailToVerify(email),
               ),
             const SizedBox(height: 12),
             Text(
               awaitingSession
-                  ? 'Adres został potwierdzony. Pozostało połączenie z kontem Sedna. Nie musisz ponownie klikać linku w wiadomości.'
-                  : 'Aby dokończyć tworzenie konta, kliknij link w wiadomości od Sedna. Sprawdź też folder Spam. Potem wróć tutaj i wybierz „Sprawdź potwierdzenie”.',
+                  ? context.l10n.finishAccountLinkNotice
+                  : context.l10n.verifyEmailInstructions,
             ),
             const SizedBox(height: 12),
-            const Text('Do tego czasu możesz korzystać z aplikacji bez konta.'),
+            Text(context.l10n.guestWhileVerifying),
             const SizedBox(height: 16),
             FilledButton(
               onPressed: _busy
@@ -461,7 +460,9 @@ class _AccountScreenState extends State<AccountScreen>
                       checkingVerification: true,
                     ),
               child: Text(
-                awaitingSession ? 'Dokończ logowanie' : 'Sprawdź potwierdzenie',
+                awaitingSession
+                    ? context.l10n.finishSignIn
+                    : context.l10n.checkVerification,
               ),
             ),
             if (!awaitingSession)
@@ -471,30 +472,30 @@ class _AccountScreenState extends State<AccountScreen>
                     : _resendVerification,
                 child: Text(
                   _resendSeconds > 0
-                      ? 'Wyślij ponownie za $_resendSeconds s'
-                      : 'Wyślij wiadomość ponownie',
+                      ? context.l10n.resendAfter('$_resendSeconds')
+                      : context.l10n.resendEmail,
                 ),
               ),
             TextButton(
               onPressed: _busy ? null : _signOut,
-              child: const Text('Wyloguj się i korzystaj bez konta'),
+              child: Text(context.l10n.signOutUseGuest),
             ),
           ],
           if (repository != null && !signedIn && !pending) ...[
             Text(switch (_form) {
-              _AccountForm.signIn => 'Zaloguj się',
-              _AccountForm.register => 'Nowe konto',
-              _AccountForm.resetPassword => 'Odzyskaj dostęp',
+              _AccountForm.signIn => context.l10n.signIn,
+              _AccountForm.register => context.l10n.newAccount,
+              _AccountForm.resetPassword => context.l10n.recoverAccess,
             }, style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 12),
-            const Text('Możesz korzystać z aplikacji bez logowania.'),
+            Text(context.l10n.guestSignInNotice),
             const SizedBox(height: 16),
             if (_form == _AccountForm.signIn) ...[
               FilledButton(
                 onPressed: _busy
                     ? null
                     : () => _run(repository.signInWithGoogle),
-                child: const Text('Zaloguj przez Google'),
+                child: Text(context.l10n.signInGoogle),
               ),
               const SizedBox(height: 16),
             ],
@@ -510,8 +511,8 @@ class _AccountScreenState extends State<AccountScreen>
                     autocorrect: false,
                     autofillHints: const [AutofillHints.email],
                     validator: _validateEmail,
-                    decoration: const InputDecoration(
-                      labelText: 'Adres e-mail',
+                    decoration: InputDecoration(
+                      labelText: context.l10n.emailAddress,
                       errorMaxLines: 3,
                     ),
                   ),
@@ -520,16 +521,16 @@ class _AccountScreenState extends State<AccountScreen>
                     PasswordField(
                       key: ValueKey('password-$_form'),
                       controller: _password,
-                      label: 'Hasło',
+                      label: context.l10n.password,
                       enabled: !_busy,
                       newPassword: _form == _AccountForm.register,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Wpisz hasło.';
+                          return context.l10n.enterPassword;
                         }
                         if (_form == _AccountForm.register &&
                             value.length < 6) {
-                          return 'Użyj co najmniej 6 znaków.';
+                          return context.l10n.passwordMinLength;
                         }
                         return null;
                       },
@@ -539,30 +540,26 @@ class _AccountScreenState extends State<AccountScreen>
                     const SizedBox(height: 12),
                     PasswordField(
                       controller: _confirmPassword,
-                      label: 'Powtórz hasło',
+                      label: context.l10n.repeatPassword,
                       enabled: !_busy,
                       newPassword: true,
                       confirmation: true,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Powtórz hasło.';
+                          return context.l10n.enterRepeatedPassword;
                         }
                         if (value != _password.text) {
-                          return 'Hasła muszą być takie same.';
+                          return context.l10n.passwordMismatch;
                         }
                         return null;
                       },
                     ),
                     const SizedBox(height: 12),
-                    const Text(
-                      'Wyślemy wiadomość z linkiem do potwierdzenia adresu e-mail.',
-                    ),
+                    Text(context.l10n.verificationEmailNotice),
                   ],
                   if (_form == _AccountForm.resetPassword) ...[
                     const SizedBox(height: 12),
-                    const Text(
-                      'Wpisz adres e-mail swojego konta. Wyślemy link do zmiany hasła.',
-                    ),
+                    Text(context.l10n.passwordResetInstructions),
                   ],
                   const SizedBox(height: 16),
                   FilledButton(
@@ -572,10 +569,9 @@ class _AccountScreenState extends State<AccountScreen>
                         ? _resetPassword
                         : _submitEmail,
                     child: Text(switch (_form) {
-                      _AccountForm.signIn => 'Zaloguj przez e-mail',
-                      _AccountForm.register => 'Utwórz konto',
-                      _AccountForm.resetPassword =>
-                        'Wyślij link do zmiany hasła',
+                      _AccountForm.signIn => context.l10n.signInEmail,
+                      _AccountForm.register => context.l10n.createAccount,
+                      _AccountForm.resetPassword => context.l10n.sendResetLink,
                     }),
                   ),
                 ],
@@ -587,20 +583,20 @@ class _AccountScreenState extends State<AccountScreen>
                 onPressed: _busy
                     ? null
                     : () => _changeForm(_AccountForm.resetPassword),
-                child: const Text('Nie pamiętam hasła'),
+                child: Text(context.l10n.forgotPassword),
               ),
               TextButton(
                 onPressed: _busy
                     ? null
                     : () => _changeForm(_AccountForm.register),
-                child: const Text('Nie masz konta? Utwórz konto'),
+                child: Text(context.l10n.createAccountLink),
               ),
             ] else
               TextButton(
                 onPressed: _busy
                     ? null
                     : () => _changeForm(_AccountForm.signIn),
-                child: const Text('Wróć do logowania'),
+                child: Text(context.l10n.backToSignIn),
               ),
           ],
           if (_busy) const Center(child: CircularProgressIndicator()),

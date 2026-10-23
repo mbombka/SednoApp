@@ -1,3 +1,5 @@
+import 'package:sedno_app/features/shared/domain/app_language.dart';
+
 import 'dart:async';
 import 'dart:math';
 
@@ -22,32 +24,42 @@ class SimplificationViewModel {
   final String Function() _newRequestId;
   String? _pendingText;
   TextMode? _pendingMode;
+  AppLanguage? _pendingLanguage;
   String? _pendingRequestId;
 
   void reset() {
     _pendingText = null;
     _pendingMode = null;
+    _pendingLanguage = null;
     _pendingRequestId = null;
   }
 
   Future<SimplificationResult> simplify(
     InputText input, {
     TextMode mode = TextMode.simplify,
+    AppLanguage language = AppLanguage.polish,
   }) async {
-    if (_pendingText != input.value || _pendingMode != mode) {
+    if (_pendingText != input.value ||
+        _pendingMode != mode ||
+        _pendingLanguage != language) {
       _pendingText = input.value;
       _pendingMode = mode;
+      _pendingLanguage = language;
       _pendingRequestId = _newRequestId();
     }
     final response = await _attempt(input, mode);
     _pendingText = null;
     _pendingRequestId = null;
     final result = response.result;
+    if (result.language != language) {
+      throw const FormatException("Unexpected result language.");
+    }
     return SimplificationResult(
       id: result.id,
       text: result.text,
       createdAt: result.createdAt,
       mode: mode,
+      language: language,
     );
   }
 
@@ -73,6 +85,7 @@ class SimplificationViewModel {
             input: input,
             requestId: _pendingRequestId!,
             mode: mode,
+            language: _pendingLanguage!,
           ),
         )
         .timeout(timeout);

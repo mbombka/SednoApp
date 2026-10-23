@@ -2,6 +2,6 @@
 abstract final class AppInformation {
   static const website = "https://sedno.xyz";
   static const contact = "contact@sedno.xyz";
-  static const privacyUrl = "https://sedno.xyz/#prywatnosc";
+  static const privacyUrl = "https://sedno.xyz/prywatnosc/";
   static const deletionUrl = "https://sedno.xyz/usun-konto";
 }
