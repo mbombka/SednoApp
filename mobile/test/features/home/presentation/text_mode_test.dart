@@ -42,7 +42,6 @@ void main() {
         ),
       ),
     );
-    await tester.enterText(find.byType(TextField), 'Czy bendzie woda?');
     await tester.tap(find.byKey(const Key('modeSwitch')));
     await tester.pumpAndSettle();
     expect(find.text('Sedno - popraw tekst:'), findsOneWidget);
@@ -51,8 +50,9 @@ void main() {
     expect(find.byKey(const Key('speakerButton')), findsOneWidget);
     expect(
       tester.widget<TextField>(find.byType(TextField)).controller!.text,
-      'Czy bendzie woda?',
+      isEmpty,
     );
+    await tester.enterText(find.byType(TextField), 'Czy bendzie woda?');
     await tester.tap(find.text('Popraw'));
     await tester.pumpAndSettle();
     expect(find.text('Zanim poprawisz tekst'), findsOneWidget);
@@ -61,7 +61,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Poprawiony tekst'), findsOneWidget);
     expect((await history.readAll()).single.result.mode, TextMode.correct);
-    await tester.tap(find.text('Nowy tekst'));
+    await tester.tap(find.byKey(const Key('clearTextButton')));
     await tester.pumpAndSettle();
     expect(find.text('Popraw'), findsOneWidget);
     expect(
@@ -99,6 +99,7 @@ void main() {
       await show();
       await tester.tap(find.byKey(const Key('modeSwitch')));
       await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), 'Polski tekst');
       await tester.tap(find.byKey(const Key('speakerButton')));
       await tester.pump();
       expect(playback.text, 'Polski tekst');

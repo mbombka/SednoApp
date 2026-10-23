@@ -98,6 +98,35 @@ class _HistoryScreenState extends State<HistoryScreen> {
         ?.showSnackBar(const SnackBar(content: Text('Usunięto tekst.')));
   }
 
+  Future<void> _confirmClearAll() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Usunąć całą historię?'),
+        content: const Text(
+          'Wszystkie zapisane teksty zostaną usunięte z tego telefonu. Tego nie można cofnąć.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Anuluj'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Usuń całą historię'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    final cleared = await _model.clearAll();
+    if (!mounted || !cleared) return;
+    _expanded.clear();
+    ScaffoldMessenger.maybeOf(
+      context,
+    )?.showSnackBar(const SnackBar(content: Text('Usunięto całą historię.')));
+  }
+
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
     animation: _model,
@@ -112,8 +141,36 @@ class _HistoryScreenState extends State<HistoryScreen> {
           const Text('Teksty są zapisane tylko na tym telefonie.'),
           const Text('Każdy tekst usuwa się sam po 7 dniach.'),
           const Text('Wylogowanie usuwa całą historię.'),
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            key: const Key('clearHistoryButton'),
+            onPressed:
+                _model.isLoading ||
+                    _model.isClearing ||
+                    (_model.entries.isEmpty && !_model.hasError)
+                ? null
+                : _confirmClearAll,
+            icon: const Icon(Icons.delete_outline),
+            iconAlignment: IconAlignment.end,
+            label: const Text('Usuń całą historię teraz'),
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size(48, 48),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            ),
+          ),
+          if (_model.actionError case final message?)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Semantics(liveRegion: true, child: Text(message)),
+            ),
           const SizedBox(height: 16),
-          if (_model.isLoading)
+          if (_model.isClearing)
+            const Center(
+              child: CircularProgressIndicator(
+                semanticsLabel: 'Usuwanie historii',
+              ),
+            )
+          else if (_model.isLoading)
             const Center(
               child: CircularProgressIndicator(
                 semanticsLabel: 'Wczytywanie historii',

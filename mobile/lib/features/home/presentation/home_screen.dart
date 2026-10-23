@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:sedno_app/features/home/presentation/eraser_icon.dart';
+
 import 'package:sedno_app/features/simplification/domain/text_mode.dart';
 import 'package:sedno_app/features/speech_output/domain/text_playback_service.dart';
 import 'package:sedno_app/features/speech_output/data/android_text_playback_service.dart';
@@ -17,7 +19,7 @@ import 'package:sedno_app/features/quota/domain/quota_reset.dart';
 import 'package:sedno_app/features/quota/domain/quota_state.dart';
 import 'package:sedno_app/features/simplification/domain/input_text.dart';
 import 'package:sedno_app/features/simplification/domain/simplification_repository.dart';
-import 'package:sedno_app/features/simplification/presentation/result_screen.dart';
+import 'package:sedno_app/features/home/presentation/editor_result_view_model.dart';
 import 'package:sedno_app/features/simplification/presentation/simplification_view_model.dart';
 import 'package:sedno_app/features/speech/data/android_speech_service.dart';
 import 'package:sedno_app/features/speech/domain/speech_service.dart';
@@ -28,6 +30,7 @@ class HomeScreen extends StatefulWidget {
     required this.appName,
     required this.textController,
     this.onSubmit,
+    this.editorResult,
     this.onModeChanged,
     this.playbackService = const AndroidTextPlaybackService(),
     this.isActive = true,
@@ -41,6 +44,7 @@ class HomeScreen extends StatefulWidget {
   });
 
   final String appName;
+  final EditorResultViewModel? editorResult;
   final ValueChanged<TextMode>? onModeChanged;
   final TextPlaybackService playbackService;
   final TextEditingController textController;
@@ -59,6 +63,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   late final TextInputViewModel _inputViewModel;
+  late final EditorResultViewModel _editorResult;
   TextMode _mode = TextMode.simplify;
   late TextPlaybackViewModel _playbackViewModel;
   PhotoInputViewModel? _photoViewModel;
@@ -74,9 +79,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _editorResult = widget.editorResult ?? EditorResultViewModel();
     _playbackViewModel = TextPlaybackViewModel(widget.playbackService);
     _speechViewModel = SpeechInputViewModel(widget.speechService);
     _inputViewModel = TextInputViewModel(onSubmit: _submit);
+    _inputViewModel.addListener(_onInputStateChanged);
     _inputViewModel.setText(widget.textController.text);
     if (widget.photoRepository case final repository?) {
       _photoViewModel = PhotoInputViewModel(repository);
@@ -294,21 +301,45 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         }
       }
       if (!mounted) return;
-      Navigator.of(context).push<void>(
-        MaterialPageRoute(
-          builder: (_) => ResultScreen(
-            result: result,
-            originalText: input.value,
-            onNewText: widget.textController.clear,
-          ),
-        ),
-      );
+      FocusScope.of(context).unfocus();
+      _inputViewModel.replaceWithResult(result.text);
+      _editorResult.show(originalText: input.value, mode: result.mode);
+      _replaceText(result.text);
       return;
     }
     return _unavailableSubmission(input);
   }
 
-  void _onTextChanged() => _inputViewModel.setText(widget.textController.text);
+  void _onInputStateChanged() =>
+      _editorResult.setBusy(_inputViewModel.isLoading);
+
+  void _onTextChanged() {
+    if (_playbackViewModel.isPlaying) unawaited(_playbackViewModel.stop());
+    _inputViewModel.setText(widget.textController.text);
+  }
+
+  void _replaceText(String text) {
+    widget.textController.value = TextEditingValue(
+      text: text,
+      selection: TextSelection.collapsed(offset: text.length),
+    );
+  }
+
+  void _clearEditor() {
+    unawaited(_playbackViewModel.stop());
+    _editorResult.clear();
+    _simplificationViewModel?.reset();
+    widget.textController.clear();
+    _inputViewModel.clear();
+  }
+
+  void _restoreOriginal() {
+    final original = _editorResult.restoreOriginal();
+    if (original != null) {
+      FocusScope.of(context).unfocus();
+      _replaceText(original);
+    }
+  }
 
   @override
   void didUpdateWidget(covariant HomeScreen oldWidget) {
@@ -354,7 +385,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     widget.textController.removeListener(_onTextChanged);
     _speechViewModel.dispose();
+    _inputViewModel.removeListener(_onInputStateChanged);
     _inputViewModel.dispose();
+    if (widget.editorResult == null) _editorResult.dispose();
     _playbackViewModel.dispose();
     _photoViewModel?.dispose();
     _quotaSource?.quotaListenable.removeListener(_onQuotaChanged);
@@ -366,6 +399,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   void _toggleMode() {
     unawaited(_speechViewModel.cancel());
     unawaited(_playbackViewModel.stop());
+    _clearEditor();
     setState(() {
       _mode = _mode == TextMode.simplify ? TextMode.correct : TextMode.simplify;
       _inputViewModel.setMode(_mode);
@@ -375,6 +409,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   Future<void> _listen() async {
     FocusScope.of(context).unfocus();
+    _clearEditor();
     final text = await _speechViewModel.listen();
     if (!mounted || !widget.isActive || text == null) return;
     widget.textController.value = TextEditingValue(
@@ -385,11 +420,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   Future<void> _openCamera() async {
+    _clearEditor();
     if (widget.onCameraPressed case final callback?) {
       callback();
     } else if (_photoViewModel case final model?) {
       final text = await model.scan();
-      if (!mounted || text == null) return;
+      if (!mounted || !widget.isActive || text == null) return;
       widget.textController.value = TextEditingValue(
         text: text,
         selection: TextSelection.collapsed(offset: text.length),
@@ -410,6 +446,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     return AnimatedBuilder(
       animation: Listenable.merge([
         _inputViewModel,
+        _editorResult,
         _speechViewModel,
         _playbackViewModel,
         ?_photoViewModel,
@@ -420,260 +457,315 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             _inputViewModel.isLoading ||
             _speechViewModel.busy ||
             (_photoViewModel?.isLoading ?? false);
-        return LayoutBuilder(
-          builder: (context, constraints) {
-            // Match the compact bottom spacing in the reference, while
-            // leaving the Android navigation area outside the touch targets.
-            final bottomSpacing = 32.0 + MediaQuery.paddingOf(context).bottom;
-            final editorHeight =
-                (constraints.maxHeight - 112 - 48 - bottomSpacing).clamp(
-                  160.0,
-                  double.infinity,
-                );
-            return SizedBox(
-              height: constraints.maxHeight,
-              child: ColoredBox(
-                color: const Color(0xFFF5F7FB),
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Container(
-                        height: editorHeight,
-                        padding: const EdgeInsets.fromLTRB(24, 20, 24, 28),
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.vertical(
-                            bottom: Radius.circular(36),
+        return PopScope<void>(
+          canPop: !widget.isActive || !_editorResult.hasOriginal,
+          onPopInvokedWithResult: (didPop, _) {
+            if (!didPop && widget.isActive) _restoreOriginal();
+          },
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              // Match the compact bottom spacing in the reference, while
+              // leaving the Android navigation area outside the touch targets.
+              final bottomSpacing = 32.0 + MediaQuery.paddingOf(context).bottom;
+              final editorHeight =
+                  (constraints.maxHeight - 112 - 48 - bottomSpacing).clamp(
+                    160.0,
+                    double.infinity,
+                  );
+              return SizedBox(
+                height: constraints.maxHeight,
+                child: ColoredBox(
+                  color: const Color(0xFFF5F7FB),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Container(
+                          height: editorHeight,
+                          padding: const EdgeInsets.fromLTRB(24, 20, 24, 28),
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.vertical(
+                              bottom: Radius.circular(36),
+                            ),
                           ),
-                        ),
-                        child: Semantics(
-                          label: _mode == TextMode.correct
-                              ? 'Tekst do poprawienia'
-                              : 'Tekst do uproszczenia',
-                          child: TextField(
-                            controller: widget.textController,
-                            enabled: !busy,
-                            expands: true,
-                            minLines: null,
-                            maxLines: null,
-                            textAlignVertical: TextAlignVertical.top,
-                            style: Theme.of(context).textTheme.headlineSmall,
-                            textCapitalization: TextCapitalization.sentences,
-                            decoration: const InputDecoration(
-                              hintText: 'Wpisz lub wklej tekst',
-                              border: InputBorder.none,
-                              enabledBorder: InputBorder.none,
-                              focusedBorder: InputBorder.none,
-                              contentPadding: EdgeInsets.zero,
+                          child: Semantics(
+                            label:
+                                _editorResult.mode?.resultHeading ??
+                                (_mode == TextMode.correct
+                                    ? 'Tekst do poprawienia'
+                                    : 'Tekst do uproszczenia'),
+                            child: TextField(
+                              controller: widget.textController,
+                              enabled: !busy,
+                              expands: true,
+                              minLines: null,
+                              maxLines: null,
+                              textAlignVertical: TextAlignVertical.top,
+                              style: Theme.of(context).textTheme.headlineSmall,
+                              textCapitalization: TextCapitalization.sentences,
+                              decoration: const InputDecoration(
+                                hintText: 'Wpisz lub wklej tekst',
+                                border: InputBorder.none,
+                                enabledBorder: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                contentPadding: EdgeInsets.zero,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      Center(
-                        child: IconButton(
-                          key: const Key('modeSwitch'),
-                          tooltip: _mode == TextMode.simplify
-                              ? 'Przełącz na poprawianie tekstu'
-                              : 'Przełącz na upraszczanie tekstu',
-                          onPressed:
-                              busy || !widget.isActive || _confirmingSubmission
-                              ? null
-                              : _toggleMode,
-                          icon: const Icon(Icons.swap_horiz, size: 32),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: Center(
-                                child: IconButton.filledTonal(
-                                  key: Key(
-                                    _mode == TextMode.correct
-                                        ? 'speakerButton'
-                                        : 'microphoneButton',
-                                  ),
-                                  tooltip: _mode == TextMode.correct
-                                      ? (_playbackViewModel.isPlaying
-                                            ? 'Zatrzymaj odczyt'
-                                            : 'Odczytaj tekst')
-                                      : _speechViewModel.busy
-                                      ? 'Anuluj nagrywanie'
-                                      : 'Uprość mowę',
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              IconButton(
+                                key: const Key('modeSwitch'),
+                                style: IconButton.styleFrom(
+                                  minimumSize: const Size(48, 48),
+                                ),
+                                tooltip: _mode == TextMode.simplify
+                                    ? 'Przełącz na poprawianie tekstu'
+                                    : 'Przełącz na upraszczanie tekstu',
+                                onPressed:
+                                    busy ||
+                                        !widget.isActive ||
+                                        _confirmingSubmission
+                                    ? null
+                                    : _toggleMode,
+                                icon: const Icon(Icons.swap_horiz, size: 32),
+                              ),
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: IconButton(
+                                  key: const Key('clearTextButton'),
                                   style: IconButton.styleFrom(
-                                    minimumSize: const Size(56, 56),
-                                    backgroundColor: const Color(0xFFC2E7FF),
-                                    foregroundColor: const Color(0xFF14243A),
+                                    minimumSize: const Size(48, 48),
                                   ),
-                                  onPressed: _mode == TextMode.correct
-                                      ? (busy ||
-                                                !widget.isActive ||
-                                                _confirmingSubmission
-                                            ? null
-                                            : () {
-                                                if (_playbackViewModel
-                                                    .isPlaying) {
-                                                  unawaited(
-                                                    _playbackViewModel.stop(),
-                                                  );
-                                                } else {
-                                                  unawaited(
-                                                    _playbackViewModel.play(
-                                                      widget
-                                                          .textController
-                                                          .text,
-                                                    ),
-                                                  );
-                                                }
-                                              })
-                                      : _speechViewModel.busy
-                                      ? _speechViewModel.cancel
-                                      : busy ||
-                                            !widget.isActive ||
-                                            _confirmingSubmission
+                                  tooltip: 'Wyczyść tekst',
+                                  onPressed:
+                                      busy ||
+                                          !widget.isActive ||
+                                          _confirmingSubmission
                                       ? null
-                                      : _listen,
-                                  icon: Icon(
-                                    _mode == TextMode.correct
-                                        ? (_playbackViewModel.isPlaying
-                                              ? Icons.stop_rounded
-                                              : Icons.volume_up_rounded)
-                                        : _speechViewModel.busy
-                                        ? Icons.stop_rounded
-                                        : Icons.mic_rounded,
-                                    size: 28,
-                                  ),
+                                      : _clearEditor,
+                                  icon: const EraserIcon(),
                                 ),
                               ),
-                            ),
-                            Expanded(
-                              flex: 2,
-                              child: Center(
-                                child: FilledButton(
-                                  key: const Key('simplifyButton'),
-                                  style: FilledButton.styleFrom(
-                                    shape: const CircleBorder(),
-                                    padding: const EdgeInsets.all(20),
-                                    minimumSize: const Size(112, 112),
-                                  ),
-                                  onPressed: _inputViewModel.canSubmit && !busy
-                                      ? _requestSubmission
-                                      : null,
-                                  child: _inputViewModel.isLoading
-                                      ? SizedBox(
-                                          width: 28,
-                                          height: 28,
-                                          child: CircularProgressIndicator(
-                                            color: Colors.white,
-                                            semanticsLabel:
-                                                _mode == TextMode.correct
-                                                ? 'Poprawianie…'
-                                                : 'Upraszczanie…',
-                                          ),
-                                        )
-                                      : Text(_mode.action),
-                                ),
-                              ),
-                            ),
-                            if (_mode == TextMode.correct)
-                              const Expanded(child: SizedBox())
-                            else
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
                               Expanded(
                                 child: Center(
-                                  child: OutlinedButton(
-                                    key: const Key('cameraButton'),
-                                    style: OutlinedButton.styleFrom(
-                                      shape: const CircleBorder(),
-                                      side: BorderSide.none,
+                                  child: IconButton.filledTonal(
+                                    key: Key(
+                                      _mode == TextMode.correct
+                                          ? 'speakerButton'
+                                          : 'microphoneButton',
+                                    ),
+                                    tooltip: _mode == TextMode.correct
+                                        ? (_playbackViewModel.isPlaying
+                                              ? 'Zatrzymaj odczyt'
+                                              : 'Odczytaj tekst')
+                                        : _speechViewModel.busy
+                                        ? 'Anuluj nagrywanie'
+                                        : 'Uprość mowę',
+                                    style: IconButton.styleFrom(
+                                      minimumSize: const Size(56, 56),
                                       backgroundColor: const Color(0xFFC2E7FF),
                                       foregroundColor: const Color(0xFF14243A),
-                                      minimumSize: const Size(56, 56),
-                                      padding: const EdgeInsets.all(12),
                                     ),
-                                    onPressed: busy ? null : _openCamera,
-                                    child: Semantics(
-                                      label:
-                                          (_photoViewModel?.isLoading ?? false)
-                                          ? 'Odczytywanie…'
-                                          : 'Aparat',
-                                      child: const ExcludeSemantics(
-                                        child: Icon(
-                                          Icons.photo_camera_outlined,
-                                          size: 28,
+                                    onPressed: _mode == TextMode.correct
+                                        ? (busy ||
+                                                  !widget.isActive ||
+                                                  _confirmingSubmission
+                                              ? null
+                                              : () {
+                                                  if (_playbackViewModel
+                                                      .isPlaying) {
+                                                    unawaited(
+                                                      _playbackViewModel.stop(),
+                                                    );
+                                                  } else {
+                                                    unawaited(
+                                                      _playbackViewModel.play(
+                                                        widget
+                                                            .textController
+                                                            .text,
+                                                      ),
+                                                    );
+                                                  }
+                                                })
+                                        : _speechViewModel.busy
+                                        ? _speechViewModel.cancel
+                                        : busy ||
+                                              !widget.isActive ||
+                                              _confirmingSubmission
+                                        ? null
+                                        : _listen,
+                                    icon: Icon(
+                                      _mode == TextMode.correct
+                                          ? (_playbackViewModel.isPlaying
+                                                ? Icons.stop_rounded
+                                                : Icons.volume_up_rounded)
+                                          : _speechViewModel.busy
+                                          ? Icons.stop_rounded
+                                          : Icons.mic_rounded,
+                                      size: 28,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: Center(
+                                  child: FilledButton(
+                                    key: const Key('simplifyButton'),
+                                    style: FilledButton.styleFrom(
+                                      shape: const CircleBorder(),
+                                      padding: const EdgeInsets.all(20),
+                                      minimumSize: const Size(112, 112),
+                                    ),
+                                    onPressed:
+                                        _inputViewModel.canSubmit && !busy
+                                        ? _requestSubmission
+                                        : null,
+                                    child: _inputViewModel.isLoading
+                                        ? SizedBox(
+                                            width: 28,
+                                            height: 28,
+                                            child: CircularProgressIndicator(
+                                              color: Colors.white,
+                                              semanticsLabel:
+                                                  _mode == TextMode.correct
+                                                  ? 'Poprawianie…'
+                                                  : 'Upraszczanie…',
+                                            ),
+                                          )
+                                        : Text(_mode.action),
+                                  ),
+                                ),
+                              ),
+                              if (_mode == TextMode.correct)
+                                const Expanded(child: SizedBox())
+                              else
+                                Expanded(
+                                  child: Center(
+                                    child: OutlinedButton(
+                                      key: const Key('cameraButton'),
+                                      style: OutlinedButton.styleFrom(
+                                        shape: const CircleBorder(),
+                                        side: BorderSide.none,
+                                        backgroundColor: const Color(
+                                          0xFFC2E7FF,
+                                        ),
+                                        foregroundColor: const Color(
+                                          0xFF14243A,
+                                        ),
+                                        minimumSize: const Size(56, 56),
+                                        padding: const EdgeInsets.all(12),
+                                      ),
+                                      onPressed:
+                                          busy ||
+                                              !widget.isActive ||
+                                              _confirmingSubmission
+                                          ? null
+                                          : _openCamera,
+                                      child: Semantics(
+                                        label:
+                                            (_photoViewModel?.isLoading ??
+                                                false)
+                                            ? 'Odczytywanie…'
+                                            : 'Aparat',
+                                        child: const ExcludeSemantics(
+                                          child: Icon(
+                                            Icons.photo_camera_outlined,
+                                            size: 28,
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
+                            ],
+                          ),
+                        ),
+                        if (_editorResult.hasOriginal)
+                          const Padding(
+                            padding: EdgeInsets.all(12),
+                            child: Text(
+                              'AI może się mylić. Sprawdź wynik.',
+                              key: Key('aiErrorWarning'),
+                            ),
+                          ),
+                        if (_speechViewModel.busy)
+                          Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Semantics(
+                              liveRegion: true,
+                              child: const Text(
+                                'Nasłuchiwanie… Mów po polsku. Koniec po 1,5 sekundy ciszy lub po 60 sekundach. Przycisk stop anuluje nagrywanie.',
+                                key: Key('speechStatus'),
+                                textAlign: TextAlign.center,
                               ),
-                          ],
-                        ),
-                      ),
-                      if (_speechViewModel.busy)
-                        Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Semantics(
-                            liveRegion: true,
-                            child: const Text(
-                              'Nasłuchiwanie… Mów po polsku. Koniec po 1,5 sekundy ciszy lub po 60 sekundach. Przycisk stop anuluje nagrywanie.',
-                              key: Key('speechStatus'),
-                              textAlign: TextAlign.center,
                             ),
                           ),
-                        ),
-                      if (_playbackViewModel.message case final message?
-                          when _mode == TextMode.correct)
-                        Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Semantics(
-                            liveRegion: true,
-                            child: Text(
-                              message,
-                              key: const Key('playbackMessage'),
+                        if (_playbackViewModel.message case final message?
+                            when _mode == TextMode.correct)
+                          Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Semantics(
+                              liveRegion: true,
+                              child: Text(
+                                message,
+                                key: const Key('playbackMessage'),
+                              ),
                             ),
                           ),
-                        ),
-                      if (_speechViewModel.message case final message?
-                          when _mode == TextMode.simplify)
-                        Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Semantics(
-                            liveRegion: true,
-                            child: Text(
-                              message,
-                              key: const Key('speechMessage'),
+                        if (_speechViewModel.message case final message?
+                            when _mode == TextMode.simplify)
+                          Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Semantics(
+                              liveRegion: true,
+                              child: Text(
+                                message,
+                                key: const Key('speechMessage'),
+                              ),
                             ),
                           ),
-                        ),
-                      if (_inputViewModel.errorMessage case final error?)
-                        Padding(
-                          padding: const EdgeInsets.all(20),
-                          child: Text(error, semanticsLabel: error),
-                        ),
-                      if (_photoViewModel?.message case final message?
-                          when _mode == TextMode.simplify) ...[
-                        const SizedBox(height: 12),
-                        Text(message, key: const Key('photoMessage')),
+                        if (_inputViewModel.errorMessage case final error?)
+                          Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Text(error, semanticsLabel: error),
+                          ),
+                        if (_photoViewModel?.message case final message?
+                            when _mode == TextMode.simplify) ...[
+                          const SizedBox(height: 12),
+                          Text(message, key: const Key('photoMessage')),
+                        ],
+                        SizedBox(height: bottomSpacing),
+                        if (_inputViewModel.status == TextInputStatus.success &&
+                            widget.simplificationRepository == null) ...[
+                          const SizedBox(height: 16),
+                          Text(
+                            _mode == TextMode.correct
+                                ? 'Tekst został przekazany do poprawienia.'
+                                : 'Tekst został przekazany do uproszczenia.',
+                          ),
+                        ],
                       ],
-                      SizedBox(height: bottomSpacing),
-                      if (_inputViewModel.status == TextInputStatus.success &&
-                          widget.simplificationRepository == null) ...[
-                        const SizedBox(height: 16),
-                        Text(
-                          _mode == TextMode.correct
-                              ? 'Tekst został przekazany do poprawienia.'
-                              : 'Tekst został przekazany do uproszczenia.',
-                        ),
-                      ],
-                    ],
+                    ),
                   ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         );
       },
     );

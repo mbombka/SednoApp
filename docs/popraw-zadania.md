@@ -6,7 +6,7 @@ Makieta: [Przelaczanie.png](Przelaczanie.png).
 
 - [x] Dodać tryb do żądania API; zachować domyślne upraszczanie dla starszych aplikacji, wspólny limit i rozróżnienie żądań przy ponowieniach.
 - [x] Dodać osobny, osadzony prompt poprawiania bez zmiany promptu upraszczania i ustawień produkcyjnego modelu.
-- [x] Wprowadzić przełącznik zgodny z makietą, zmienne opisy i ukrywanie aparatu w trybie „Popraw”. Zachować wpisany tekst.
+- [x] Wprowadzić przełącznik zgodny z makietą, zmienne opisy i ukrywanie aparatu w trybie „Popraw”. Zmiana trybu czyści tekst zgodnie z [aktualnym przepływem edytora](edytor-wynik.pl.md).
 - [x] Dodać lokalny odczyt tekstu po polsku pod przyciskiem głośnika; zatrzymywać go po opuszczeniu ekranu i zmianie trybu.
 - [x] Rozróżnić wyniki obu trybów i zachować ten wybór w szyfrowanej historii, z obsługą starszych wpisów.
 - [x] Dodać testy logiki, interfejsu i API oraz uruchomić formatowanie, analizę i testy.
@@ -15,7 +15,7 @@ Makieta: [Przelaczanie.png](Przelaczanie.png).
 ## Zachowanie
 
 Strzałki nad przyciskiem przełączają tryby. Zmieniają się nagłówek,
-przycisk, opisy dostępności i ekran wyniku. W „Popraw” znika aparat,
+przycisk i opisy dostępności; wynik zastępuje zawartość edytora. W „Popraw” znika aparat,
 a mikrofon zastępuje odczyt tekstu wpisanego w pole. Głośnik nie uruchamia AI
 ani nie zużywa dziennego limitu. Zatrzymanie, zmiana trybu, otwarcie menu,
 wysłanie tekstu oraz przejście do tła kończą odczyt. Brak lokalnego polskiego

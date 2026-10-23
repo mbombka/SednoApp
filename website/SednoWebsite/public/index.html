@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f8fafc">
+    <meta name="description" content="Sedno to projekt aplikacji na Androida, która upraszcza polskie teksty. Wklej tekst lub zrób zdjęcie i przejdź do sedna.">
+    <title>Sedno — mniej trudnych słów, więcej zrozumienia</title>
+    <link rel="icon" href="favicon.svg?v=3" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#tresc">Przejdź do treści</a>
+    <header class="header wrap">
+      <a class="brand" href="#" aria-label="Sedno — początek strony"><img class="brand-mark" src="favicon.svg?v=3" width="36" height="36" alt="" aria-hidden="true">sedno<span class="brand-dot" aria-hidden="true">.</span></a>
+      <nav aria-label="Menu główne">
+        <a href="#jak-to-dziala">Jak to działa</a>
+        <a href="#prywatnosc">Prywatność</a>
+      </nav>
+    </header>
+
+    <main id="tresc" tabindex="-1">
+      <section class="hero wrap" aria-labelledby="tytul">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> Projekt aplikacji na Androida</p>
+          <h1 id="tytul">Mniej trudnych słów.<br><span>Więcej zrozumienia.</span></h1>
+          <p class="lead">Pismo z urzędu, długa wiadomość, skomplikowana instrukcja. Sedno pomaga zrozumieć je prostszym językiem.</p>
+          <a class="button" href="#przyklad">Zobacz przykład <span aria-hidden="true">↓</span></a>
+          <p class="availability">Aplikacja w przygotowaniu.</p>
+        </div>
+
+        <figure class="example" id="przyklad" aria-labelledby="przyklad-tytul">
+          <div class="example-top"><img class="small-mark" src="favicon.svg?v=3" width="28" height="28" alt="" aria-hidden="true"><span id="przyklad-tytul">Ten sam sens. Prostsze słowa.</span></div>
+          <div class="original">
+            <p class="text-label">Tekst oryginalny</p>
+            <p>W celu dokonania zmiany terminu wizyty prosimy o uprzedni kontakt telefoniczny z rejestracją.</p>
+          </div>
+          <div class="result">
+            <p class="text-label"><span aria-hidden="true">↳</span> Prościej z Sednem</p>
+            <p>Chcesz zmienić termin wizyty? Zadzwoń wcześniej do rejestracji.</p>
+          </div>
+          <figcaption>Przykład poglądowy uproszczenia tekstu.</figcaption>
+        </figure>
+      </section>
+
+      <section class="purpose wrap" aria-labelledby="dla-kogo">
+        <p class="eyebrow">Łatwiej zrozumieć. Łatwiej działać.</p>
+        <h2 id="dla-kogo">Prosty język jest dla każdego.</h2>
+        <p>Tworzymy Sedno przede wszystkim z myślą o osobach słabosłyszących i osobach, którym trudno zrozumieć złożony tekst. Ale prostsze słowa mogą pomóc każdemu z nas.</p>
+      </section>
+
+      <section class="steps-section" id="jak-to-dziala" aria-labelledby="kroki">
+        <div class="wrap">
+          <div class="section-heading"><p class="eyebrow">Od tekstu do sedna</p><h2 id="kroki">Trzy proste kroki.</h2></div>
+          <ol class="steps">
+            <li><span class="step-number" aria-hidden="true">01</span><h3>Dodaj tekst</h3><p>Wpisz go, wklej albo zrób zdjęcie. Na zdjęciu zaznacz fragment i wybierz Uprość.</p></li>
+            <li><span class="step-number" aria-hidden="true">02</span><h3>Sedno upraszcza tekst</h3><p>Sedno użyje sztucznej inteligencji, by napisać tekst prostszym językiem.</p></li>
+            <li><span class="step-number" aria-hidden="true">03</span><h3>Przeczytaj po swojemu</h3><p>Przeczytaj wynik i porównaj go z oryginałem. Wszystko w jednym miejscu.</p></li>
+          </ol>
+          <figure class="screens">
+            <div class="screens-row">
+              <img src="img/ekran-start.webp" width="600" height="1195" loading="lazy" decoding="async" alt="Ekran startowy aplikacji Sedno: pole „Wpisz lub wklej tekst”, przycisk Uprość i przycisk aparatu.">
+              <img src="img/ekran-wynik.webp" width="600" height="1195" loading="lazy" decoding="async" alt="Ekran „Uproszczony tekst” w aplikacji Sedno. Krótkie zdania o tym, jak gmina współpracuje ze szkołą. Pod tekstem przyciski Pokaż oryginał i Nowy tekst.">
+            </div>
+            <figcaption>Ekrany z wersji testowej aplikacji Sedno.</figcaption>
+          </figure>
+          <p class="ai-note"><span class="note-icon" aria-hidden="true">i</span> Sztuczna inteligencja może się pomylić. Ważne informacje sprawdź w oryginale.</p>
+        </div>
+      </section>
+
+      <section class="privacy wrap" id="prywatnosc" aria-labelledby="prywatnosc-tytul">
+        <div><p class="eyebrow">Twoje teksty. Twoja kontrola.</p><h2 id="prywatnosc-tytul">Prywatność od początku.</h2><p class="privacy-intro">Tak projektujemy Sedno: zdjęcia zostają na telefonie, a historia jest przechowywana lokalnie.</p><a class="privacy-link" href="prywatnosc/index.html">Pełna polityka prywatności <span aria-hidden="true">→</span></a></div>
+        <dl class="privacy-list">
+          <div><dt>Zdjęcie zostaje u Ciebie</dt><dd>Odczyt tekstu ze zdjęcia odbywa się na urządzeniu. Samo zdjęcie nie jest wysyłane.</dd></div>
+          <div><dt>Tekst przetwarza AI</dt><dd>Tekst do uproszczenia trafia przez serwer do dostawcy AI — OpenAI. Serwer Sedno nie zapisuje jego treści.</dd></div>
+          <div><dt>Historia na 7 dni</dt><dd>Zaszyfrowana historia jest zapisywana tylko na Twoim urządzeniu. Możesz usunąć ją wcześniej. Wylogowanie usuwa historię z telefonu.</dd></div>
+        </dl>
+      </section>
+
+      <section class="closing wrap" aria-labelledby="na-koniec">
+        <div><p class="eyebrow">Sedno</p><h2 id="na-koniec">Żeby słowa były bliżej ludzi.</h2></div>
+        <p>Pracujemy nad aplikacją na Androida.<br>Link do pobrania pojawi się tutaj po premierze.</p>
+      </section>
+    </main>
+    <footer class="footer wrap">
+      <a class="brand footer-brand" href="index.html" aria-label="Sedno — strona główna">sedno.</a>
+      <nav class="footer-links" aria-label="Dokumenty">
+        <a href="prywatnosc/index.html">Polityka prywatności</a>
+        <a href="usun-konto/index.html">Usuwanie konta</a>
+      </nav>
+      <p>Kontakt: contact@sedno.xyz <a href="mailto:contact@sedno.xyz">Napisz</a></p>
+      <a href="#tresc">Wróć na górę <span aria-hidden="true">↑</span></a>
+    </footer>
+  </body>
+</html>

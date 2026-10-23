@@ -2,6 +2,8 @@ import 'package:sedno_app/features/account/presentation/user_menu_screen.dart';
 
 import 'dart:io';
 
+import 'package:sedno_app/features/home/presentation/editor_result_view_model.dart';
+
 import 'package:sedno_app/features/simplification/domain/text_mode.dart';
 
 import 'dart:async';
@@ -76,6 +78,7 @@ class _AppNavigation extends StatefulWidget {
 class _AppNavigationState extends State<_AppNavigation>
     with WidgetsBindingObserver {
   final TextEditingController _inputController = TextEditingController();
+  final EditorResultViewModel _editorResult = EditorResultViewModel();
   late final _photoNavigation = PhotoNavigationService(() => context);
   late final _photoRepository = LocalPhotoTextRepository(
     captureService: _photoNavigation,
@@ -96,6 +99,7 @@ class _AppNavigationState extends State<_AppNavigation>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _editorResult.addListener(_onEditorResultChanged);
     _historyRepository =
         widget.historyRepository ??
         (Platform.isAndroid
@@ -107,6 +111,20 @@ class _AppNavigationState extends State<_AppNavigation>
     _purgeHistory();
     _simplificationRepository = widget.simplificationRepository;
     unawaited(widget.subscriptionModel?.start());
+  }
+
+  void _onEditorResultChanged() {
+    if (mounted) setState(() {});
+  }
+
+  void _restoreOriginal() {
+    final original = _editorResult.restoreOriginal();
+    if (original == null) return;
+    FocusManager.instance.primaryFocus?.unfocus();
+    _inputController.value = TextEditingValue(
+      text: original,
+      selection: TextSelection.collapsed(offset: original.length),
+    );
   }
 
   Future<void> _purgeHistory() async {
@@ -133,6 +151,8 @@ class _AppNavigationState extends State<_AppNavigation>
     _disposed = true;
     WidgetsBinding.instance.removeObserver(this);
     _historyRevision.dispose();
+    _editorResult.removeListener(_onEditorResultChanged);
+    _editorResult.dispose();
     _inputController.dispose();
     super.dispose();
   }
@@ -175,7 +195,8 @@ class _AppNavigationState extends State<_AppNavigation>
     return LayoutBuilder(
       builder: (context, constraints) {
         final title = _selectedPage == 0
-            ? '${SednoApp.displayName} - ${_mode.heading}:'
+            ? (_editorResult.mode?.resultHeading ??
+                  '${SednoApp.displayName} - ${_mode.heading}:')
             : SednoApp.displayName;
         final titleLayout =
             TextPainter(
@@ -206,7 +227,23 @@ class _AppNavigationState extends State<_AppNavigation>
           child: Scaffold(
             appBar: AppBar(
               toolbarHeight: toolbarHeight,
-              title: Text(title, softWrap: true, maxLines: 10),
+              title: _selectedPage == 0 && _editorResult.hasOriginal
+                  ? Tooltip(
+                      message: 'Przywróć oryginalny tekst',
+                      child: TextButton(
+                        key: const Key('restoreOriginalButton'),
+                        onPressed: _editorResult.busy ? null : _restoreOriginal,
+                        style: TextButton.styleFrom(
+                          foregroundColor: AppTheme.navy,
+                          padding: EdgeInsets.zero,
+                          minimumSize: const Size(48, 48),
+                          alignment: Alignment.centerLeft,
+                          textStyle: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        child: Text(title, softWrap: true, maxLines: 10),
+                      ),
+                    )
+                  : Text(title, softWrap: true, maxLines: 10),
               centerTitle: false,
               actions: [
                 IconButton(
@@ -224,6 +261,7 @@ class _AppNavigationState extends State<_AppNavigation>
                 HomeScreen(
                   key: ValueKey('home-$_dataRevision'),
                   appName: SednoApp.displayName,
+                  editorResult: _editorResult,
                   onModeChanged: (mode) => setState(() => _mode = mode),
                   isActive: _selectedPage == 0 && !_showingMenu,
                   textController: _inputController,
@@ -242,6 +280,7 @@ class _AppNavigationState extends State<_AppNavigation>
                   const SizedBox.shrink(),
                 AccountScreen(
                   onDataCleared: () {
+                    _editorResult.clear();
                     _inputController.clear();
                     _historyRevision.value++;
                     setState(() {

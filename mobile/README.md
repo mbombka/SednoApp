@@ -112,7 +112,7 @@ Identyfikatory można nadpisać przez `PLAY_SUBSCRIPTION_PRODUCT_ID` i
 `PLAY_SUBSCRIPTION_BASE_PLAN_ID` w argumentach budowy. Samo włączenie panelu
 nie uruchamia płatności na serwerze. [Pełne przygotowanie i testy](docs/google_play_subscription_sandbox.md).
 
-Gotowy podpisany pakiet do testów: [wydanie 12](docs/google_play_release_12.md).
+Gotowy podpisany pakiet do testów: [wydanie 13](docs/google_play_release_13.md).
 
 Aparat działa wewnątrz Sedna: **Zrób zdjęcie → Zaznacz tekst → Uprość**.
 Ramka początkowo obejmuje całe zdjęcie. Można przesunąć jej rogi, aby wybrać
@@ -130,9 +130,19 @@ O aplikacji oraz Prywatność i dane. Start działa bez logowania.
 Odnośnik do prywatności jest dostępny w menu użytkownika oraz w informacji
 przed pierwszym wysłaniem tekstu. Ekrany konta, logowania i rejestracji
 nie powtarzają tego odnośnika.
-Ekran wyniku zawiera „Pokaż oryginał” / „Ukryj oryginał” i „Nowy tekst”.
-Tekst można zaznaczyć i skopiować przez menu systemowe; osobny przycisk
-„Kopiuj” został celowo usunięty.
+Wynik zastępuje tekst w tym samym edytorze. Nagłówek „Uproszczony tekst” lub
+„Poprawiony tekst” jest przyciskiem przywracającym oryginał ostatniej operacji.
+Tak samo działa systemowy Wstecz; dopiero kolejne Wstecz może opuścić Start.
+Tekst można edytować, zaznaczać i kopiować przez menu systemowe.
+Gumka po prawej stronie przełącznika trybu czyści pole oraz zapamiętany oryginał.
+Zmiana trybu i rozpoczęcie nagrywania lub zdjęcia również je usuwają.
+Anulowanie lub błąd nagrywania/zdjęcia pozostawia puste pole; błąd wysyłania
+rozpoznanego tekstu do AI zachowuje go do ręcznej edycji.
+Historia nadal zapisuje oryginał i wynik niezależnie od przywracania i czyszczenia.
+W Historii przycisk „Usuń całą historię teraz” z koszem usuwa wszystkie lokalne
+wpisy po potwierdzeniu. Podczas usuwania jest zablokowany; po błędzie można ponowić
+próbę. Przy pustej historii przycisk jest nieaktywny.
+[Zmiana przepływu edytora](../docs/edytor-wynik.pl.md).
 
 Aplikacja jest przeznaczona dla osób od 13 lat. Osoby w wieku 13–17 lat
 powinny korzystać z niej za zgodą rodzica lub opiekuna.
@@ -200,15 +210,15 @@ polskiej mowy. Wymaga Androida 13 lub nowszego, lokalnego silnika i pobranego
 modelu języka polskiego. Audio nie jest zapisywane ani wysyłane na serwer.
 Po 1,5 s ciszy po wykryciu mowy lub po maksymalnie 60 s rejestracji aplikacja
 kończy nagrywanie i automatycznie przekazuje tekst do upraszczania, jak przy OCR.
-Przycisk stop anuluje sesję. Dotychczasowy tekst pozostaje do chwili poprawnego
-rozpoznania nowej wypowiedzi.
+Przycisk stop anuluje sesję. Rozpoczęcie nagrywania czyści dotychczasowy tekst.
+Rozpoznana wypowiedź zastępuje zawartość pola; po anulowaniu nagrywania pole jest puste.
 
 [Zadania i stan weryfikacji](docs/speech_tasks.md).
 [Wymagania techniczne i próby na telefonie](docs/android_speech_manual_check.md).
 
 ## Tryby „Uprość” i „Popraw”
 
-Strzałki nad głównym przyciskiem zmieniają tryb bez usuwania wpisanego tekstu.
+Strzałki nad głównym przyciskiem zmieniają tryb i usuwają tekst z edytora.
 „Uprość” zachowuje aparat, OCR i mikrofon. „Popraw” usuwa błędy językowe,
 zachowując sens wypowiedzi; korzysta z osobnego promptu na backendzie.
 W tym trybie aparat znika, a głośniczek odczytuje bieżący tekst z pola.

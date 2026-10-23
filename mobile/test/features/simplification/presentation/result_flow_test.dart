@@ -32,7 +32,7 @@ SimplificationResponse response(String id) => SimplificationResponse(
 );
 
 void main() {
-  testWidgets('success opens result, shows original and starts new text', (
+  testWidgets('success replaces editor text and header restores original', (
     tester,
   ) async {
     String? sentText;
@@ -49,32 +49,33 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(sentText, 'Trudny tekst');
+    expect(tester.testTextInput.isVisible, isFalse);
     expect(find.text('Uproszczony tekst'), findsOneWidget);
-    expect(find.text('To jest prosty tekst.'), findsOneWidget);
-    expect(find.byKey(const Key('aiErrorWarning')), findsNothing);
-    expect(find.byType(TabBar), findsNothing);
-    expect(find.byKey(const Key('originalText')), findsNothing);
-
-    await tester.tap(find.text('Pokaż oryginał'));
-    await tester.pump();
-    expect(find.text('Trudny tekst'), findsOneWidget);
-    await tester.tap(find.text('Ukryj oryginał'));
-    await tester.pump();
-    expect(find.byKey(const Key('originalText')), findsNothing);
-
-    expect(find.text('Kopiuj'), findsNothing);
-    expect(find.widgetWithText(FilledButton, 'Nowy tekst'), findsOneWidget);
-
-    await tester.tap(find.text('Nowy tekst'));
-    await tester.pumpAndSettle();
+    expect(find.byType(Scaffold), findsOneWidget);
     expect(find.byType(TextField), findsOneWidget);
     expect(
       tester.widget<TextField>(find.byType(TextField)).controller!.text,
-      isEmpty,
+      'To jest prosty tekst.',
     );
+    expect(tester.widget<TextField>(find.byType(TextField)).enabled, isTrue);
+    expect(find.byKey(const Key('aiErrorWarning')), findsOneWidget);
+    expect(find.text('Pokaż oryginał'), findsNothing);
+    expect(find.text('Nowy tekst'), findsNothing);
+    expect(find.text('Kopiuj'), findsNothing);
+
+    await tester.tap(find.byKey(const Key('restoreOriginalButton')));
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<TextField>(find.byType(TextField)).controller!.text,
+      'Trudny tekst',
+    );
+    expect(find.text('Sedno - uprość tekst:'), findsOneWidget);
+    expect(find.byKey(const Key('restoreOriginalButton')), findsNothing);
   });
 
-  testWidgets('error keeps input and retry opens result', (tester) async {
+  testWidgets('error keeps input and retry replaces it with result', (
+    tester,
+  ) async {
     var calls = 0;
     await tester.pumpWidget(
       SednoApp(

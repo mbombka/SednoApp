@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 1254 1254" role="img" aria-labelledby="title desc">
+  <title id="title">Sedno — ikona aplikacji</title>
+  <desc id="desc">Dwa białe, przesunięte względem siebie nawiasy tworzą zarys litery S wokół białej kropki na niebieskim tle.</desc>
+  <rect width="1254" height="1254" fill="#2457d6"/>
+  <g fill="#fff">
+    <path d="M242 454 C242 421 264 395 295 379 L655 208 C680 195 702 210 702 235 L702 327 C702 352 688 372 662 385 L440 492 C424 500 415 510 415 529 L415 687 C415 712 399 725 376 713 L273 660 C252 649 242 635 242 613 Z"/>
+    <circle cx="625.5" cy="624" r="117"/>
+    <path d="M826 600 C826 576 844 563 866 575 L966 625 C989 637 1002 655 1002 679 L1002 811 C1002 844 986 865 957 880 L578 1053 C554 1065 533 1058 533 1030 L533 934 C533 908 548 889 576 876 L801 765 C817 757 826 746 826 727 Z"/>
+  </g>
+</svg>

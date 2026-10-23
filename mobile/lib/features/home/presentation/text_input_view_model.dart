@@ -51,6 +51,21 @@ class TextInputViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  // The view receives the result before the submission Future completes.
+  void replaceWithResult(String value) {
+    _text = value;
+    _errorMessage = null;
+    notifyListeners();
+  }
+
+  void clear() {
+    if (isLoading) return;
+    _text = '';
+    _status = TextInputStatus.idle;
+    _errorMessage = null;
+    notifyListeners();
+  }
+
   Future<void> submit() async {
     if (isLoading) return;
     InputText input;

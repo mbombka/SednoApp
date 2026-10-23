@@ -117,7 +117,7 @@ void main() {
     );
   });
 
-  testWidgets('no text, denial and processing failure preserve current input', (
+  testWidgets('no text, denial and processing failure leave new input empty', (
     tester,
   ) async {
     final controller = TextEditingController(text: 'Zachowaj');
@@ -136,36 +136,38 @@ void main() {
       await showScreen(tester, controller, scenario.$1);
       await tester.tap(find.byKey(const Key('cameraButton')));
       await tester.pump();
-      expect(controller.text, 'Zachowaj');
+      expect(controller.text, isEmpty);
       expect(find.textContaining(scenario.$2), findsOneWidget);
     }
   });
 
-  testWidgets('cancellation preserves input and scanning disables actions', (
-    tester,
-  ) async {
-    final controller = TextEditingController(text: 'Zachowaj');
-    addTearDown(controller.dispose);
-    final pending = Completer<String?>();
-    await showScreen(
-      tester,
-      controller,
-      FakePhotoRepository(() => pending.future),
-    );
+  testWidgets(
+    'camera clears input immediately and cancellation leaves it empty',
+    (tester) async {
+      final controller = TextEditingController(text: 'Zachowaj');
+      addTearDown(controller.dispose);
+      final pending = Completer<String?>();
+      await showScreen(
+        tester,
+        controller,
+        FakePhotoRepository(() => pending.future),
+      );
 
-    await tester.tap(find.byKey(const Key('cameraButton')));
-    await tester.pump();
-    expect(find.bySemanticsLabel('Odczytywanie…'), findsOneWidget);
-    expect(tester.widget<TextField>(find.byType(TextField)).enabled, isFalse);
-    expect(
-      tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
-      isNull,
-    );
+      await tester.tap(find.byKey(const Key('cameraButton')));
+      await tester.pump();
+      expect(controller.text, isEmpty);
+      expect(find.bySemanticsLabel('Odczytywanie…'), findsOneWidget);
+      expect(tester.widget<TextField>(find.byType(TextField)).enabled, isFalse);
+      expect(
+        tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
+        isNull,
+      );
 
-    pending.complete(null);
-    await tester.pump();
-    expect(controller.text, 'Zachowaj');
-    expect(find.bySemanticsLabel('Aparat'), findsOneWidget);
-    expect(find.byKey(const Key('photoMessage')), findsNothing);
-  });
+      pending.complete(null);
+      await tester.pump();
+      expect(controller.text, isEmpty);
+      expect(find.bySemanticsLabel('Aparat'), findsOneWidget);
+      expect(find.byKey(const Key('photoMessage')), findsNothing);
+    },
+  );
 }

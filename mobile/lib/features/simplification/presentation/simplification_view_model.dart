@@ -24,6 +24,12 @@ class SimplificationViewModel {
   TextMode? _pendingMode;
   String? _pendingRequestId;
 
+  void reset() {
+    _pendingText = null;
+    _pendingMode = null;
+    _pendingRequestId = null;
+  }
+
   Future<SimplificationResult> simplify(
     InputText input, {
     TextMode mode = TextMode.simplify,

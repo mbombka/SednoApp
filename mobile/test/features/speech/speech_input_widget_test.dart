@@ -55,6 +55,7 @@ void main() {
   ) async {
     await start(tester);
     expect(find.byKey(const Key('speechStatus')), findsOneWidget);
+    expect(controller.text, isEmpty);
     expect(tester.widget<TextField>(find.byType(TextField)).enabled, isFalse);
     expect(
       tester
@@ -71,7 +72,7 @@ void main() {
     await tester.tap(find.byTooltip('Anuluj nagrywanie'));
     await tester.pumpAndSettle();
     expect(service.cancellations, 1);
-    expect(controller.text, 'Poprzedni tekst');
+    expect(controller.text, isEmpty);
     expect(submitted, isEmpty);
   });
 
@@ -117,13 +118,13 @@ void main() {
     expect(tester.widget<TextField>(find.byType(TextField)).enabled, isTrue);
   });
 
-  testWidgets('recognition error preserves the previous input', (tester) async {
+  testWidgets('recognition error leaves the new editor empty', (tester) async {
     await start(tester);
     service.pending.completeError(
       const SpeechException('Brak modelu polskiego.'),
     );
     await tester.pumpAndSettle();
-    expect(controller.text, 'Poprzedni tekst');
+    expect(controller.text, isEmpty);
     expect(find.text('Brak modelu polskiego.'), findsOneWidget);
     expect(submitted, isEmpty);
   });
@@ -151,7 +152,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(service.cancellations, 1);
     expect(submitted, isEmpty);
-    expect(controller.text, 'Poprzedni tekst');
+    expect(controller.text, isEmpty);
   });
 
   testWidgets('backgrounding cancels speech', (tester) async {

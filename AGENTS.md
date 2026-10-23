@@ -24,8 +24,15 @@ Read README, existing code, and current dependencies before making changes.
   Production settings: gpt-6-luna, reasoning.effort=none, service_tier=default,
   store=false, no conversation/previous_response_id, 4096 output tokens, 8 s timeout.
   Mock models require explicit Development configuration.
-- Full-screen result: selectable text, Pokaż oryginał / Ukryj oryginał,
-  Nowy tekst. Copying uses the system text-selection menu; no separate Kopiuj button.
+- Results replace the text in the same editable field. The result heading
+  (Uproszczony tekst / Poprawiony tekst) and system Back restore the original
+  from the latest successful operation. Copying uses the system text-selection
+  menu; no separate Kopiuj button.
+- Changing Uprość/Popraw, pressing the eraser, or starting microphone/camera input
+  clears the editor and the saved original. Cancelled/failed capture leaves the
+  editor empty; recognized text remains editable after a submission error or cancellation.
+  Place the eraser to the right of the mode switch, with the same button style
+  and touch-target size; use a slightly smaller 28 dp eraser icon.
 - Encrypted, local-only history with manual deletion and 7-day expiration.
   Never display expired entries; delete them on reads, startup, and resume.
   Display the retention notice in Historia. Exclude history from backups.
