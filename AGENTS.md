@@ -1,11 +1,11 @@
 # SednoApp / Sedno
 
 ## Purpose
-An Android application built with Flutter/Dart that simplifies Polish
-and English texts, primarily for people who are hard of hearing or have cognitive
+An Android application built with Flutter/Dart that simplifies supported-language
+texts, primarily for people who are hard of hearing or have cognitive
 difficulties.
 Project name: SednoApp. Display name: Sedno.
-User-facing content must be localized in Polish and British English. Keep Polish as the fallback; prepare additional languages through the shared localization mechanism.
+Localize user-facing content in Polish, British and American English, French, German, Italian, Spanish, Portuguese (Portugal), Slovak, Czech, Romanian, Norwegian Bokmål and Swedish. Keep Polish as the fallback and use the shared localization mechanism.
 
 ## Existing Code
 Extend the existing scaffold; do not regenerate the project.

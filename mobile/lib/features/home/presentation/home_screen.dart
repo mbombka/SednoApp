@@ -1,3 +1,4 @@
+import 'package:sedno_app/features/privacy/domain/ai_notice_repository.dart';
 import 'package:sedno_app/features/privacy/domain/localized_privacy_policy.dart';
 import 'package:sedno_app/l10n/localization.dart';
 
@@ -33,6 +34,7 @@ class HomeScreen extends StatefulWidget {
     required this.appName,
     required this.textController,
     this.onSubmit,
+    this.aiNoticeRepository,
     this.editorResult,
     this.onModeChanged,
     this.playbackService,
@@ -46,6 +48,7 @@ class HomeScreen extends StatefulWidget {
     super.key,
   });
 
+  final AiNoticeRepository? aiNoticeRepository;
   final String appName;
   final EditorResultViewModel? editorResult;
   final ValueChanged<TextMode>? onModeChanged;
@@ -214,6 +217,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     if (_confirmingSubmission) return;
     _confirmingSubmission = true;
     try {
+      _clearMessages();
       if (_playbackViewModel.isPlaying) await _playbackViewModel.stop();
       // Let the existing validator report empty or overlong input before asking.
       try {
@@ -232,6 +236,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         await showDialog<void>(
           context: context,
           builder: (context) => AlertDialog(
+            scrollable: true,
             title: Text(context.l10n.checkConnection),
             content: Text(context.l10n.quotaCheckFailed),
             actions: [
@@ -250,6 +255,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         final proceed = await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
+            scrollable: true,
             title: Text(context.l10n.dailyLimit),
             content: Text(
               quota.remaining == 1
@@ -274,19 +280,23 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       }
       if (!mounted) return;
       if (!_aiNoticeAccepted) {
+        _aiNoticeAccepted =
+            await widget.aiNoticeRepository?.hasAccepted() ?? false;
+        if (!mounted) return;
+      }
+      if (!_aiNoticeAccepted) {
         final accepted = await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
+            scrollable: true,
             title: Text(
               _mode == TextMode.correct
                   ? context.l10n.beforeCorrection
                   : context.l10n.beforeSimplification,
             ),
-            content: SingleChildScrollView(
-              child: Text(
-                LocalizedPrivacyPolicy.aiNotice(context.language),
-                key: const Key('aiProcessingNotice'),
-              ),
+            content: Text(
+              LocalizedPrivacyPolicy.aiNotice(context.language),
+              key: const Key('aiProcessingNotice'),
             ),
             actions: [
               TextButton(
@@ -308,6 +318,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         );
         if (!mounted || accepted != true) return;
         _aiNoticeAccepted = true;
+        await widget.aiNoticeRepository?.accept();
       }
       if (!mounted) return;
       if (_quotaSource?.quotaListenable.value?.remaining == 0) return;
@@ -359,8 +370,17 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     );
   }
 
+  void _clearMessages() {
+    setState(() {
+      _cameraUnavailable = false;
+      _photoViewModel?.clearMessage();
+      _speechViewModel.message = null;
+      _playbackViewModel.message = null;
+    });
+  }
+
   void _clearEditor() {
-    _cameraUnavailable = false;
+    _clearMessages();
     unawaited(_playbackViewModel.stop());
     _editorResult.clear();
     _simplificationViewModel?.reset();

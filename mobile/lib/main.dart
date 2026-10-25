@@ -1,3 +1,4 @@
+import 'package:sedno_app/features/privacy/data/local_ai_notice_repository.dart';
 import 'package:sedno_app/app/app_language.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -92,6 +93,11 @@ Future<void> main() async {
   runApp(
     SednoApp(
       languageController: languages,
+      aiNoticeRepository: LocalAiNoticeRepository(
+        read: () => preferences.read(key: 'ai_notice_accepted'),
+        write: (value) =>
+            preferences.write(key: 'ai_notice_accepted', value: value),
+      ),
       accountRepository: accounts,
       subscriptionModel: subscription,
       historyRepository: history,

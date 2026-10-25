@@ -1,0 +1,416 @@
+{
+  "@@locale": "sk",
+  "restoreOriginal": "Obnoviť pôvodný text",
+  "userMenu": "Používateľské menu",
+  "speechNotRecognised": "Reč sa nerozpoznala. Skúste to znova.",
+  "speechFailed": "Reč sa nepodarilo rozpoznať. Skúste to znova.",
+  "microphonePermission": "Povoľte mikrofón v nastaveniach aplikácie.",
+  "speechRequirements": "Miestne rozpoznávanie reči vyžaduje Android 13 alebo novší a vhodný rozpoznávač reči.",
+  "speechModelMissing": "Stiahnite slovenský model v nastaveniach rozpoznávania reči systému Android.",
+  "speechTimeout": "Rozpoznávanie trvalo príliš dlho. Skúste to znova.",
+  "speechAndroidOnly": "Miestne rozpoznávanie reči je dostupné od Androidu 13.",
+  "historyClearFailed": "Celú históriu sa nepodarilo vymazať. Skúste to znova.",
+  "deleteHistoryEntryTitle": "Vymazať tento text z histórie?",
+  "cannotUndo": "Tento krok sa nedá vrátiť späť.",
+  "delete": "Vymazať",
+  "historyEntryDeleted": "Text bol vymazaný.",
+  "deleteHistoryTitle": "Vymazať celú históriu?",
+  "deleteHistoryNotice": "Všetky uložené texty sa vymažú z tohto telefónu. Tento krok sa nedá vrátiť späť.",
+  "deleteAllHistory": "Vymazať celú históriu",
+  "historyDeleted": "História bola vymazaná.",
+  "historyLocalNotice": "Texty sa ukladajú iba v tomto telefóne.",
+  "historyRetentionNotice": "Každý text sa automaticky vymaže po 7 dňoch.",
+  "historySignOutNotice": "Odhlásenie vymaže celú históriu.",
+  "deleteHistoryNow": "Vymazať celú históriu teraz",
+  "deletingHistory": "Vymazávanie histórie",
+  "loadingHistory": "Načítavanie histórie",
+  "historyLoadFailed": "Históriu sa nepodarilo načítať.",
+  "tryAgain": "Skúsiť znova",
+  "historyEmpty": "Zatiaľ nemáte uložené texty.",
+  "historyEmptyNotice": "Tu sa zobrazia zjednodušené a opravené texty.",
+  "correctedVersion": "Opravená verzia",
+  "simplifiedVersion": "Jednoduchá verzia",
+  "originalText": "Pôvodný text",
+  "hideOriginal": "Skryť originál",
+  "showOriginal": "Zobraziť originál",
+  "today": "Dnes",
+  "readTextFailed": "Text sa nepodarilo prečítať. Skúste to znova.",
+  "voiceMissing": "Overte, či máte stiahnutý slovenský hlas na čítanie bez internetu.",
+  "playbackAndroidOnly": "Čítanie nahlas je dostupné v Androide.",
+  "about": "O aplikácii",
+  "back": "Späť",
+  "appPurpose": "Na čo slúži Sedno",
+  "appDescription": "Sedno zjednodušuje a opravuje texty v podporovaných jazykoch.",
+  "appAudience": "Pre ľudí so sluchovým postihnutím a ľudí, ktorí ťažšie rozumejú zložitým textom.",
+  "appAge": "Aplikácia je určená ľuďom od 13 rokov.",
+  "howItWorks": "Ako to funguje",
+  "typingInstructions": "Napíšte alebo vložte text. Vyberte Zjednodušiť alebo Opraviť.",
+  "captureInstructions": "V režime Zjednodušiť môžete text aj odfotografovať alebo nadiktovať.",
+  "captureSubmitInstructions": "Označte text na fotografii a vyberte Zjednodušiť. Nadiktovaný text sa zjednoduší automaticky.",
+  "localMediaNotice": "Fotografie a zvuk zostávajú v telefóne. Do AI sa odosiela iba text.",
+  "speechModelRequirements": "Diktovanie vyžaduje Android 13 alebo novší a stiahnutý slovenský model reči.",
+  "playbackRequirements": "V režime Opraviť reproduktor číta text nahlas. Potrebujete stiahnutý slovenský hlas fungujúci bez internetu.",
+  "restoreInstructions": "Výsledok sa zobrazí v rovnakom poli. Ťuknite na nadpis alebo Späť a obnovíte originál.",
+  "inputLimitNotice": "Text môže mať najviac 4000 znakov.",
+  "guestNotice": "Môžete začať bez vytvorenia účtu.",
+  "dailyLimit": "Denný limit",
+  "freeAllowance": "Bez predplatného: 5 textov denne.",
+  "paidAllowance": "S predplatným: 400 textov denne.",
+  "sharedAllowance": "Zjednodušovanie a oprava majú spoločný limit.",
+  "subscriptionPriceNotice": "Cenu predplatného nájdete v časti Účet a v Google Play.",
+  "important": "Dôležité",
+  "aiErrorNotice": "AI môže robiť chyby.",
+  "checkResult": "Pred použitím skontrolujte výsledok.",
+  "author": "Autor: Mariusz Bąbka",
+  "privacy": "Súkromie a údaje",
+  "websiteOpenFailed": "Stránku sa nepodarilo otvoriť. Skontrolujte prehliadač.",
+  "website": "Web Sedno",
+  "photoNoText": "Text sa nenašiel. Urobte ostrejšiu fotografiu.",
+  "cameraPermission": "Povoľte fotoaparát v nastaveniach telefónu.",
+  "cameraStartFailed": "Fotoaparát sa nepodarilo spustiť. Skúste to znova.",
+  "photoCaptureFailed": "Fotografiu sa nepodarilo urobiť. Skúste to znova.",
+  "selectText": "Označiť text",
+  "cropInstructions": "Posuňte rohy rámčeka a označte text. ",
+  "cropWholePhotoNotice": "Bez zmeny sa zjednoduší text z celej fotografie.",
+  "openingPhoto": "Otváranie fotografie",
+  "simplify": "Zjednodušiť",
+  "cropTopLeft": "Ľavý horný roh rámčeka",
+  "cropTopRight": "Pravý horný roh rámčeka",
+  "cropBottomLeft": "Ľavý dolný roh rámčeka",
+  "cropBottomRight": "Pravý dolný roh rámčeka",
+  "smallerSelection": "Menší výber",
+  "largerSelection": "Väčší výber",
+  "cropResizeHint": "Zvýšením zmenšíte výber. Znížením ho zväčšíte.",
+  "takeTextPhoto": "Odfotografovať text",
+  "startingCamera": "Spúšťanie fotoaparátu",
+  "takingPhoto": "Fotografovanie…",
+  "takePhoto": "Odfotografovať",
+  "photoOpenFailed": "Fotografiu sa nepodarilo otvoriť. Urobte novú.",
+  "photoPrepareFailed": "Fotografiu sa nepodarilo pripraviť. Skúste to znova.",
+  "simplifyHeading": "zjednodušiť text",
+  "simplifiedText": "Zjednodušený text",
+  "correctedText": "Opravený text",
+  "emptyText": "Text nesmie byť prázdny.",
+  "textTooLong": "Text môže mať najviac 4000 znakov.",
+  "subscriptionActive": "Predplatné je aktívne.",
+  "subscriptionAllowance": "Môžete zjednodušiť až 400 textov denne.",
+  "manageSubscriptionNotice": "Zmenu platby alebo zrušenie predplatného vykonáte v Google Play.",
+  "manageSubscription": "Spravovať predplatné v Google Play",
+  "testerAccessNotice": "Máte bezplatný testovací prístup.",
+  "restorePurchases": "Obnoviť nákupy",
+  "refreshAccess": "Aktualizovať prístup",
+  "subscriptionBenefits": "Až 400 textov denne s predplatným, 5 bez predplatného.",
+  "subscriptionSignInNotice": "Na kúpu alebo obnovenie predplatného sa prihláste do účtu Sedno.",
+  "buySubscription": "Kúpiť predplatné",
+  "refreshSubscription": "Aktualizovať predplatné",
+  "subscriptionRenewalNotice": "Predplatné sa automaticky obnovuje každý mesiac.",
+  "subscriptionCancelNotice": "Kedykoľvek ho môžete zrušiť v Google Play.",
+  "paymentReadFailed": "Platby sa nepodarilo načítať. Skúste obnoviť nákupy.",
+  "signInBeforePurchase": "Pred nákupom sa prihláste.",
+  "subscriptionAlreadyActive": "Predplatné je už aktívne.",
+  "signInBeforeRestore": "Pred obnovením nákupu sa prihláste.",
+  "purchasesChecked": "Nákupy boli overené. Potvrdenie môže chvíľu trvať.",
+  "playOpenFailed": "Google Play sa nepodarilo otvoriť. Otvorte obchod a vyberte Platby a predplatné → Predplatné.",
+  "paymentPending": "Platba čaká na potvrdenie. Limit sa nemení.",
+  "purchaseCancelled": "Nákup bol zrušený.",
+  "purchaseFailed": "Predplatné sa nepodarilo kúpiť. Skúste to znova.",
+  "subscriptionInactive": "Predplatné nie je aktívne.",
+  "subscriptionVerifyFailed": "Predplatné sa nedá potvrdiť. Prihláste sa, skontrolujte pripojenie a obnovte nákupy.",
+  "subscriptionCheckFailed": "Predplatné sa nedá overiť. Prihláste sa a skúste to znova.",
+  "hideConfirmedPassword": "Skryť zopakované heslo",
+  "showConfirmedPassword": "Zobraziť zopakované heslo",
+  "hidePassword": "Skryť heslo",
+  "showPassword": "Zobraziť heslo",
+  "enterEmail": "Zadajte e-mailovú adresu.",
+  "enterValidEmail": "Zadajte platnú e-mailovú adresu.",
+  "passwordResetSent": "Ak účet s touto adresou existuje, dostanete odkaz na zmenu hesla. Skontrolujte aj spam.",
+  "emailSendFailed": "E-mail sa nepodarilo odoslať. Skúste to znova.",
+  "accountLoadFailed": "Účet sa nepodarilo načítať alebo dokončiť vymazanie údajov. Skúste to znova.",
+  "verificationEmailSent": "Odoslali sme e-mail s odkazom. Skontrolujte doručenú poštu a spam.",
+  "emailNotVerified": "Adresa ešte nie je potvrdená. Otvorte odkaz v e-maile a skúste to znova.",
+  "signInFailed": "Prihlásenie zlyhalo. Skontrolujte údaje a skúste to znova.",
+  "signOutFailed": "Odhlásenie zlyhalo. Skúste to znova.",
+  "deleteAccountTitle": "Odstrániť účet?",
+  "deleteAccountIdentity": "Potvrďte svoju totožnosť a odstráňte účet.",
+  "password": "Heslo",
+  "keepAccount": "Ponechať účet",
+  "deleteAccountAndData": "Odstrániť účet a údaje",
+  "accountDeleted": "Účet a údaje boli odstránené. Predplatné zrušte samostatne v Google Play.",
+  "accountDeleteIncomplete": "Odstránenie sa nepodarilo dokončiť. Skúste to znova.",
+  "emailAccountMethod": " (e-mail a heslo)",
+  "finishDataCleanup": "Aktualizovať účet a dokončiť čistenie",
+  "accountNotConfigured": "Tu sa zobrazia možnosti účtu.",
+  "signOut": "Odhlásiť sa",
+  "deleteAccount": "Odstrániť účet",
+  "emailVerified": "E-mailová adresa potvrdená",
+  "checkInbox": "Skontrolujte e-mail",
+  "finishAccountLinkNotice": "Adresa je potvrdená. Zostáva pripojiť účet Sedno. Odkaz v e-maile už nemusíte otvárať.",
+  "verifyEmailInstructions": "Otvorte odkaz v e-maile od Sedno a dokončite vytvorenie účtu. Skontrolujte aj spam. Potom sa vráťte a vyberte „Overiť potvrdenie“.",
+  "guestWhileVerifying": "Dovtedy môžete aplikáciu používať bez účtu.",
+  "finishSignIn": "Dokončiť prihlásenie",
+  "checkVerification": "Overiť potvrdenie",
+  "resendEmail": "Znova odoslať e-mail",
+  "signOutUseGuest": "Odhlásiť sa a používať bez účtu",
+  "signIn": "Prihlásiť sa",
+  "newAccount": "Nový účet",
+  "recoverAccess": "Obnoviť prístup",
+  "guestSignInNotice": "Aplikáciu môžete používať bez prihlásenia.",
+  "signInGoogle": "Prihlásiť sa cez Google",
+  "emailAddress": "E-mailová adresa",
+  "enterPassword": "Zadajte heslo.",
+  "passwordMinLength": "Použite aspoň 6 znakov.",
+  "repeatPassword": "Zopakovať heslo",
+  "enterRepeatedPassword": "Zopakujte heslo.",
+  "passwordMismatch": "Heslá sa musia zhodovať.",
+  "verificationEmailNotice": "Pošleme e-mail s odkazom na potvrdenie adresy.",
+  "passwordResetInstructions": "Zadajte e-mail účtu. Pošleme odkaz na zmenu hesla.",
+  "signInEmail": "Prihlásiť sa e-mailom",
+  "createAccount": "Vytvoriť účet",
+  "sendResetLink": "Odoslať odkaz na zmenu hesla",
+  "forgotPassword": "Zabudnuté heslo",
+  "createAccountLink": "Nemáte účet? Vytvorte si ho",
+  "backToSignIn": "Späť na prihlásenie",
+  "testerAccess": "Testovací prístup",
+  "testerAllowance": "Môžete spracovať až 400 textov denne.",
+  "testerExpiryNotice": "Prístup je bezplatný a skončí automaticky.",
+  "testerHasSubscription": "Máte aj aktívne predplatné Google Play.",
+  "testerExpired": "Testovací prístup sa skončil.",
+  "subscriptionStillActive": "Predplatné Google Play vám naďalej poskytuje vyšší limit.",
+  "freeLimitRestored": "Platí bezplatný limit 5 textov denne. Dnešné použitie sa nemení.",
+  "closeMenu": "Zavrieť menu",
+  "welcome": "Vitajte v Sedno",
+  "inApp": "V aplikácii",
+  "accountCreatedEmailFailed": "Účet bol vytvorený, ale e-mail sa nepodarilo odoslať. Skúste ho odoslať znova.",
+  "signInToVerify": "Na potvrdenie adresy sa prihláste e-mailom.",
+  "signInToCheckAccount": "Znova sa prihláste a overte stav účtu.",
+  "weakPassword": "Heslo je príliš slabé. Použite aspoň 6 znakov.",
+  "checkEmailAddress": "Skontrolujte zadanú e-mailovú adresu.",
+  "emailAlreadyUsed": "Táto adresa sa už používa. Prihláste sa do existujúceho účtu.",
+  "tooManyAttempts": "Príliš veľa pokusov. Chvíľu počkajte a skúste to znova.",
+  "checkInternet": "Bez pripojenia. Skontrolujte internet a skúste to znova.",
+  "chooseSameAccount": "Vyberte účet, ktorý chcete odstrániť.",
+  "signInToDelete": "Na odstránenie účtu sa znova prihláste.",
+  "invalidCredentials": "Prihlásenie zlyhalo. Skontrolujte e-mail a heslo.",
+  "actionFailed": "Akcia zlyhala. Skúste to znova.",
+  "accountLinkFailed": "Účet Sedno sa nepodarilo pripojiť. Skontrolujte pripojenie a skúste to znova.",
+  "passwordToDelete": "Zadajte heslo na potvrdenie odstránenia.",
+  "finishLocalDeletion": "Dokončite vymazanie údajov na tomto zariadení.",
+  "installationRejected": "Server neoveril inštaláciu. Skúste to znova alebo nainštalujte Sedno z Google Play.",
+  "sessionStartFailed": "Reláciu sa nepodarilo spustiť. Skúste to znova.",
+  "signInToLink": "Znova sa prihláste a pripojte účet.",
+  "cannotLinkAccount": "Účet sa nedá pripojiť. Skúste to znova.",
+  "signInAgain": "Znova sa prihláste.",
+  "sessionExpiredSignIn": "Platnosť relácie sa skončila. Znova sa prihláste.",
+  "cannotDeleteAccount": "Účet sa nedá odstrániť. Skúste to znova.",
+  "cannotSignOut": "Nedá sa odhlásiť. Skúste to znova.",
+  "correctionUnavailable": "Oprava textu zatiaľ nie je dostupná.",
+  "simplificationUnavailable": "Zjednodušovanie textu zatiaľ nie je dostupné.",
+  "requestTimeout": "Čas vypršal. Skúste to znova.",
+  "offline": "Bez internetového pripojenia. Skúste to znova.",
+  "sessionExpired": "Platnosť relácie sa skončila. Skontrolujte účet a skúste to znova.",
+  "quotaExhausted": "Dnešný limit je vyčerpaný. Skontrolujte čas obnovenia.",
+  "serviceUnavailable": "Služba je dočasne nedostupná. Skúste to znova.",
+  "correctionRejected": "Tento text sa nedá opraviť. Skontrolujte ho a skúste to znova.",
+  "simplificationRejected": "Tento text sa nedá zjednodušiť. Skontrolujte ho a skúste to znova.",
+  "correctionFailed": "Text sa nepodarilo opraviť. Skúste to znova.",
+  "simplificationFailed": "Text sa nepodarilo zjednodušiť. Skúste to znova.",
+  "checkConnection": "Skontrolujte pripojenie",
+  "quotaCheckFailed": "Limit sa nedá overiť. Skontrolujte pripojenie.",
+  "subscriptionInAccount": "Predplatné a cenu nájdete v časti Účet.",
+  "beforeCorrection": "Pred opravou textu",
+  "beforeSimplification": "Pred zjednodušením textu",
+  "acceptAndSend": "Rozumiem, odoslať",
+  "cameraUnavailable": "Fotoaparát bude čoskoro dostupný.",
+  "aiWarning": "AI sa môže mýliť",
+  "listeningNotice": "Počúvanie… Hovorte po slovensky. Koniec po 1,5 sekunde ticha alebo po 60 sekundách. Tlačidlo zastavenia zruší nahrávanie.",
+  "correctionSubmitted": "Text bol odoslaný na opravu.",
+  "simplificationSubmitted": "Text bol odoslaný na zjednodušenie.",
+  "textForCorrection": "Text na opravu",
+  "textForSimplification": "Text na zjednodušenie",
+  "inputHint": "Napíšte alebo vložte text",
+  "switchToCorrection": "Prepnúť na opravu",
+  "switchToSimplification": "Prepnúť na zjednodušenie",
+  "clearText": "Vymazať text",
+  "stopPlayback": "Zastaviť čítanie",
+  "readAloud": "Čítať nahlas",
+  "cancelRecording": "Zrušiť nahrávanie",
+  "simplifySpeech": "Zjednodušiť reč",
+  "cancel": "Zrušiť",
+  "history": "História",
+  "account": "Účet",
+  "start": "Štart",
+  "contact": "Kontakt",
+  "close": "Zavrieť",
+  "continueAction": "Pokračovať",
+  "correct": "Opraviť",
+  "correctHeading": "opraviť text",
+  "correcting": "Opravovanie…",
+  "simplifying": "Zjednodušovanie…",
+  "reading": "Čítanie…",
+  "camera": "Fotoaparát",
+  "preparing": "Príprava…",
+  "subscription": "Predplatné",
+  "yesterday": "Včera",
+  "signedIn": "Prihlásenie úspešné.",
+  "googleAccountMethod": " (účet Google)",
+  "language": "Jazyk",
+  "systemLanguage": "Jazyk telefónu",
+  "polish": "Poľština",
+  "english": "Angličtina (UK)",
+  "languageNotice": "Jazyk platí pre menu, zjednodušovanie, opravu a reč. Vyberte jazyk textu. Sedno neprekladá texty.",
+  "languageSaveFailed": "Jazyk sa nepodarilo uložiť. Skúste to znova.",
+  "resetDaily": "Limit sa obnovuje každý deň o {time}.",
+  "@resetDaily": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "resetAbout": "Limit sa obnovuje každý deň o {time} (00:00 UTC).",
+  "@resetAbout": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "resetAt": "Limit sa obnoví o {time}.",
+  "@resetAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "quotaUsed": "Dnešný limit je vyčerpaný.",
+  "quotaOneSimplification": "Zostáva 1 zjednodušenie.",
+  "quotaOneUse": "Zostáva 1 použitie AI.",
+  "quotaUsedDialog": "Denný limit je vyčerpaný.",
+  "resetWithRemaining": "Limit sa obnoví o {time} ({remaining}).",
+  "@resetWithRemaining": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "timeRemaining": "o {hours} h {minutes} min",
+  "@timeRemaining": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "monthlyPrice": "{price} mesačne",
+  "@monthlyPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "historyExpires": "Vymaže sa dňa {date}.",
+  "@historyExpires": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteSavedText": "Vymazať text uložený dňa {date}",
+  "@deleteSavedText": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "contactAddress": "Kontakt: {email}",
+  "@contactAddress": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "signedInAs": "Prihlásený používateľ: {email}{method}",
+  "@signedInAs": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      },
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+  "accountEmail": "E-mailová adresa: {email}",
+  "@accountEmail": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "emailToVerify": "Adresa na potvrdenie: {email}",
+  "@emailToVerify": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "resendAfter": "Odoslať znova o {seconds} s",
+  "@resendAfter": {
+    "placeholders": {
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "testerUntil": "Testovací prístup do {date} (miestny čas).",
+  "@testerUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "cropPosition": "Vodorovne {horizontal} %, zvisle {vertical} %",
+  "@cropPosition": {
+    "placeholders": {
+      "horizontal": {
+        "type": "String"
+      },
+      "vertical": {
+        "type": "String"
+      }
+    }
+  },
+  "welcomeName": "Vitajte v {name}",
+  "@welcomeName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "policyVersion": "Verzia: {date}",
+  "@policyVersion": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "speechModelDownloading": "Model reči sa sťahuje. Skúste to neskôr.",
+  "speechLanguageUnsupported": "Rozpoznávač v tomto telefóne nepodporuje miestne diktovanie v tomto jazyku. Môžete písať alebo použiť fotoaparát."
+}

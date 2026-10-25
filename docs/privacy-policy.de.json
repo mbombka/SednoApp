@@ -1,0 +1,125 @@
+{
+  "title": "Datenschutz und Daten",
+  "version": "2026-10-23",
+  "versionLabel": "2026-10-23",
+  "website": "https://sedno.xyz",
+  "privacyUrl": "https://sedno.xyz/prywatnosc/",
+  "deletionUrl": "https://sedno.xyz/usun-konto",
+  "email": "contact@sedno.xyz",
+  "aiNotice": "Dein Text wird über den Sedno-Server an OpenAI gesendet, um ihn zu vereinfachen oder zu korrigieren. Gib keine Daten ein, die du nicht weitergeben möchtest. Fotos und Ton bleiben auf dem Gerät. Nur Text wird an die KI gesendet. Vorlesen nutzt eine heruntergeladene lokale Stimme. Die KI kann Fehler machen. Prüfe das Ergebnis.",
+  "deletionNotice": "Wir löschen dein Sedno-Konto, seine Serverdaten und den lokalen Verlauf dieses Geräts. Das ist unwiderruflich. Die Kontolöschung kündigt kein Abo. Um Zahlungen zu stoppen: Google Play → Zahlungen und Abos → Abos → Sedno → Abo kündigen.",
+  "sections": [
+    {
+      "title": "Verantwortlicher und Nutzerkreis",
+      "paragraphs": [
+        "Verantwortlicher: Mariusz Bąbka, Privatperson, ul. Słowiańska 91, Modlniczka, Polen. Kontakt: contact@sedno.xyz. Es wurde kein Datenschutzbeauftragter benannt. Diese Hinweise betreffen Sedno und den Support. Polen ist der erste Zielmarkt. Die App ist ab 13 Jahren; 13- bis 17-Jährige sollten sie mit Erlaubnis eines Elternteils oder einer sorgeberechtigten Person nutzen. Alter und Geburtsdatum werden nicht erhoben. Polnische Datenschutzhinweise: https://sedno.xyz/prywatnosc/, Zusammenfassung: https://sedno.xyz/#prywatnosc, Kontolöschung: https://sedno.xyz/usun-konto. Der Server läuft seit 19. Oktober 2026."
+      ]
+    },
+    {
+      "title": "Text und künstliche Intelligenz",
+      "paragraphs": [
+        "Dein Text wird über den Sedno-Server an OpenAI gesendet, um ihn zu vereinfachen oder zu korrigieren. Gib keine Daten ein, die du nicht weitergeben möchtest. Fotos und Ton bleiben auf dem Gerät. Nur Text wird an die KI gesendet. Vorlesen nutzt eine heruntergeladene lokale Stimme. Die KI kann Fehler machen. Prüfe das Ergebnis.",
+        "Vereinfachen und Korrigieren nutzen die OpenAI Responses API. Sedno verarbeitet den Inhalt im Arbeitsspeicher und speichert weder Original noch Ergebnis in Datenbank oder Logs. Fotos und der gesamte Verlauf werden nicht übertragen. Deaktivierte API-Speicherung bedeutet keine Nullaufbewahrung beim Anbieter. API-Daten werden standardmäßig nicht zum Modelltraining verwendet. Sicherheitslogs können Inhalte bis zu 30 Tage enthalten, mit Ausnahmen des Anbieters; Caches können Zwischenzustände speichern. Wir versprechen weder Nullaufbewahrung noch ausschließliche Verarbeitung in der EU. Sende keine Gesundheits-, Behinderungs- oder sonstigen besonders geschützten Daten. Entferne unnötige eigene und fremde personenbezogene Daten. App-Nutzung ist keine pauschale Einwilligung."
+      ]
+    },
+    {
+      "title": "Konto und Daten löschen",
+      "paragraphs": [
+        "Wir löschen dein Sedno-Konto, seine Serverdaten und den lokalen Verlauf dieses Geräts. Das ist unwiderruflich. Die Kontolöschung kündigt kein Abo. Um Zahlungen zu stoppen: Google Play → Zahlungen und Abos → Abos → Sedno → Abo kündigen.",
+        "In der App: Konto → Konto löschen → Konto und Daten löschen. Nach Erfolg entfernen wir Sednos Firebase-Identität, Sitzungen, verknüpfte Installationen, Anfragemetadaten und Kaufdatensätze, nicht dein Google-Konto. Ohne App: E-Mail an contact@sedno.xyz, Betreff „Sedno-Konto löschen“, mit der Anmeldeadresse. Sende keine Passwörter, Codes, Tokens, Ausweise, Fotos oder Texte. Die E-Mail allein löscht nichts; wir prüfen deine Kontrolle über das Konto und fragen nur notwendige Zusatzangaben ab. Die Löschung aus der Ferne löscht keinen Verlauf anderer Geräte. Lösche ihn dort im Verlauf oder über Androids App-Daten. Wir haben keinen Fernzugriff. Bei Google verbleibende Daten unterliegen dessen Regeln."
+      ]
+    },
+    {
+      "title": "Fotos, Sprache und lokaler Speicher",
+      "paragraphs": [
+        "Fotoaufnahme, Zuschnitt und OCR erfolgen auf dem Gerät. Sedno überträgt keine Fotos. Erkannter Text wird direkt zur Vereinfachung gesendet und bleibt nach Fehler oder Abbruch bearbeitbar. Nach Erkennung, Fehler oder Abbruch versucht die App, Arbeitskopien zu löschen; ein Prozessabbruch kann dies verhindern. Kopien anderer Kamera-Apps bleiben unter deiner Kontrolle.",
+        "Spracherkennung erfolgt lokal auf kompatiblen Geräten ab Android 13 mit heruntergeladenem Modell der gewählten Sprache. Ton bleibt im Arbeitsspeicher, ohne Aufnahme-Datei oder Übertragung an Sedno/OpenAI. Ende nach 1,5 Sekunden Stille nach dem Sprechen oder spätestens 60 Sekunden. Erkannter Text wird wie Fototext gesendet; Stopp bricht ab. Vorlesen im Modus Korrigieren verwendet nur eine heruntergeladene Stimme ohne Internet; fehlt sie, startet es nicht. Modell- und Stimmdownloads können Internet benötigen und unterliegen dem Sprachanbieter. Kamera und Mikrofon sind optional; Eingeben oder Einfügen bleibt möglich.",
+        "Der Verlauf enthält Original, Ergebnis, Modus, Sprache und Datum, ist verschlüsselt, lokal und von Android-Backups ausgeschlossen. Einträge verfallen nach 7 Tagen und werden nicht mehr angezeigt. Bereinigung erfolgt beim Lesen, Start und Fortsetzen, bei geschlossener App beim nächsten Ereignis. Manuelles Löschen ist möglich; Abmelden leert alles. Gespeichert werden außerdem geschützte Sitzung, zufällige Installationskennung und manuelle Sprachwahl. Die Kontolöschung entfernt die lokale Kennung nicht; lösche dafür die Android-App-Daten."
+      ]
+    },
+    {
+      "title": "Konto, Limits und Abo",
+      "paragraphs": [
+        "Ein Konto ist optional. Firebase Authentication bietet Google oder E-Mail/Passwort. Sedno speichert Firebase-UID, Anmeldeart und Erstellungsdatum, erhält aber keine Google-/Firebase-Passwörter. Google kann E-Mail, Profil, IP und Verbindungsdaten verarbeiten. Sicherheit und Limits benötigen pseudonyme Installations-, Sitzungs- und Anfragekennungen, Datum, Status und HMAC-Textfingerabdruck, keine Textkopie. Die Kennung ist nicht anonym. Anmeldung erneuert kein Gratislimit. IP-Adressen dienen der Ratenbegrenzung, sind kein Sedno-Datenbankfeld, können aber von Infrastrukturbetreibern verarbeitet werden. Play Integrity prüft App und Gerät ohne Text oder Foto. Google Play wickelt Zahlungen ab. Sedno erhält keine Karten- oder Bankdaten, speichert jedoch verschlüsseltes Kauftoken, Hash, Kontozuordnung, Status, Ablauf und Prüfdaten. Benachrichtigungskennungen verhindern doppelte Verarbeitung."
+      ]
+    },
+    {
+      "title": "Anbieter und technische Daten",
+      "paragraphs": [
+        "OpenAI verarbeitet Text und Sicherheitsdaten nach seinen Bedingungen; Standardverträge polnischer Kunden benennen OpenAI Ireland Ltd. Google bietet Firebase Authentication, Google Sign-In, ML Kit, Play Integrity und Google Play mit Google Ireland Limited und Google LLC nach Produktbedingungen. OVHcloud betreibt die sedno.xyz-E-Mail. ML Kit kann Installationskennungen, Gerätemodell, App-Version, Fehler und Laufzeitmetriken an Google senden, aber keine Fotos oder erkannten Texte in dieser Telemetrie. Lokale OCR bedeutet nicht keine Kommunikation. Keine Werbung, Firebase Analytics oder Crashlytics. Infrastruktur: Cloud Run, Firestore Standard europe-central2 (Warschau), Firebase Hosting. Standardvertrag bei polnischer Rechnungsadresse: Google Cloud Poland Sp. z o.o. Laufende Dienste bestätigen keine abgeschlossenen Verträge oder Freigabeprüfungen."
+      ]
+    },
+    {
+      "title": "Zwecke und Rechtsgrundlagen",
+      "paragraphs": [
+        "Textbearbeitung, Konto und Aboberechtigung: Art. 6 Abs. 1 b DSGVO, Vertrag bzw. gewünschte Maßnahmen. Sicherheit, Missbrauchsschutz und Limits: Art. 6 Abs. 1 f, berechtigtes Interesse am Dienstschutz, mit notwendigen Metadaten ohne Werbung; Widersprüche werden fallbezogen geprüft. Allgemeiner Support: Art. 6 Abs. 1 f. Datenrechte: Art. 6 Abs. 1 c und Art. 12–22; minimale Bearbeitungsnachweise: Art. 5 Abs. 2 und Art. 24. Installation, KI-Hinweis und Kameraberechtigung sind keine allgemeine Einwilligung. Erforderliche Einwilligungen für SDK-Diagnostik müssen vor produktiver Nutzung geprüft und umgesetzt werden; diese Hinweise ersetzen sie nicht. Text und notwendige technische Daten sind für die Bearbeitung erforderlich, Konto-/Kaufdaten nur für diese Funktionen. Keine Werbeprofile oder rechtlich wirksamen Entscheidungen anhand der Ergebnisse. Falsche Sperren können gemeldet werden."
+      ]
+    },
+    {
+      "title": "Daten außerhalb des EWR",
+      "paragraphs": [
+        "Google und OpenAI können außerhalb des EWR, auch in den USA, verarbeiten; Firebase Authentication nutzt US-Infrastruktur. Warschauer Datenspeicherung garantiert keinen Verbleib aller Daten in Polen oder dem EWR. Vor Produktion sind Auftragsverarbeitungsbedingungen und passende Transfergarantien erforderlich. Anbieter beschreiben Standardvertragsklauseln und Angemessenheitsbeschlüsse für erfasste Empfänger; Marken allein garantieren keinen Mechanismus für jede Übermittlung. Bedingungen und Kopien eingesetzter Garantien sind beim Verantwortlichen erhältlich. Anbieterbedingungen stehen unten."
+      ]
+    },
+    {
+      "title": "Aufbewahrung bei Sedno",
+      "paragraphs": [
+        "Servertexte und Ergebnisse werden nur im Arbeitsspeicher genutzt. Lokaler Verlauf: 7 Tage. Ein stündlicher Auftrag löscht Anfragemetadaten und HMAC-Fingerabdrücke älter als 8 Tage unabhängig vom Verkehr; Tageszähler und Reservierungen bleiben bis zu 8 Tage. Kontositzungen gelten 7, Gastsitzungen 90 Tage; abgelaufene Sitzungen erlauben auch vor physischem Löschen keinen Zugriff. Unverknüpfte Gastidentitäten über 90 Tage werden gelöscht, sobald Sitzungen und Anfragen fehlen, eventuell später als Tag 90. Konten, zugeordnete Installationen und Sedno-Käufe bleiben bis zur Kontolöschung; inaktive Konten und abgelaufene Käufe werden nicht automatisch gelöscht. Technische Play-Benachrichtigungskennungen haben keine automatische Löschfrist, enthalten weder Kauftoken noch Kontoverknüpfung. Nicht umgesetzte Fristen werden nicht behauptet."
+      ]
+    },
+    {
+      "title": "Betriebliche Aufbewahrung",
+      "paragraphs": [
+        "Festgelegte Produktionsregeln: technische Logs und Backups bis 30 Tage; Korrespondenz bis 90 Tage nach Fallabschluss; minimale Nachweise zu Datenrechten bis 12 Monate, nur Datum, Art und Ergebnis. Hauptlogs sind auf 30 Tage eingestellt. Alte SQL-Backups decken Firestore nicht ab. Neue Sicherungen und Wiederherstellung brauchen gesonderte Einrichtung und werden nicht als aktiv vorausgesetzt; wenn aktiviert, höchstens 30 Tage. Weitere Speicher, Exporte und E-Mail-Prozesse müssen vor Veröffentlichung geprüft und angepasst werden. Backups dienen Wiederherstellung, nicht Nutzung gelöschter Konten; Löschungen müssen vor erneutem Zugriff wieder angewandt werden. Gesetzliche Pflichten oder Streitfälle erlauben nur notwendige Daten und Dauer. Anbieterfristen bleiben unberührt: Firebase beschreibt mehrere Wochen für Anmelde-IPs, andere Authentifizierungsdaten bis zum Löschauftrag und danach bis 180 Tage für aktive Systeme und Backups. Google-Zahlungsdaten und Metriken folgen eigenen Regeln; OpenAI ist oben beschrieben."
+      ]
+    },
+    {
+      "title": "Deine Rechte und Kontakt",
+      "paragraphs": [
+        "Im gesetzlichen Umfang kannst du Auskunft und Kopie, Berichtigung, Löschung, Einschränkung und Übertragbarkeit verlangen, berechtigten Interessen widersprechen und Einwilligungen ohne Rückwirkung widerrufen. Bedingungen und Ausnahmen der DSGVO gelten. Schreibe an contact@sedno.xyz. Antwort ohne unnötige Verzögerung, in der Regel binnen eines Monats. Zulässige Verlängerung um zwei Monate wird im ersten Monat begründet. Bei begründeten Identitätszweifeln verlangen wir nur notwendige Bestätigung, nicht routinemäßig Ausweise. Beschwerde bei der polnischen Aufsicht UODO: https://uodo.gov.pl. Für eine Datenanfrage musst du keine bearbeiteten Texte senden."
+      ]
+    },
+    {
+      "title": "Änderungen",
+      "paragraphs": [
+        "Jede Version ist datiert. Wesentliche Änderungen kündigen wir vor neuer Verarbeitung auf der Datenschutzseite und in Updatehinweisen an. Ein geändertes Dokument ersetzt keine erforderliche Einwilligung. Neue Anbieter, Zwecke oder Fristen erfordern aktualisierte Informationen und tatsächliche Dienstkonfiguration."
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "commission.europa.eu",
+      "url": "https://commission.europa.eu/law/law-topic/data-protection/information-business-and-organisations/legal-grounds-processing-data_en"
+    },
+    {
+      "title": "developers.openai.com",
+      "url": "https://developers.openai.com/api/docs/guides/your-data"
+    },
+    {
+      "title": "openai.com",
+      "url": "https://openai.com/policies/services-agreement/"
+    },
+    {
+      "title": "firebase.google.com",
+      "url": "https://firebase.google.com/support/privacy"
+    },
+    {
+      "title": "developers.google.com",
+      "url": "https://developers.google.com/ml-kit/android-data-disclosure"
+    },
+    {
+      "title": "cloud.google.com",
+      "url": "https://cloud.google.com/terms/google-entity"
+    },
+    {
+      "title": "cloud.google.com",
+      "url": "https://cloud.google.com/terms/data-processing-addendum"
+    },
+    {
+      "title": "policies.google.com",
+      "url": "https://policies.google.com/privacy/frameworks?hl=en"
+    }
+  ],
+  "versionPrefix": "Version",
+  "sourcesTitle": "Quellen und Anbieterbedingungen"
+}

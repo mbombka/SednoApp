@@ -5,10 +5,10 @@ import 'package:sedno_app/l10n/app_localizations.dart';
 export 'package:sedno_app/features/shared/domain/app_language.dart';
 
 extension AppLanguageLocale on AppLanguage {
-  Locale get locale => switch (this) {
-    AppLanguage.polish => const Locale('pl', 'PL'),
-    AppLanguage.english => const Locale('en', 'GB'),
-  };
+  Locale get locale {
+    final parts = speechTag.split('-');
+    return Locale(parts.first, parts.last);
+  }
 }
 
 class LanguageController extends ChangeNotifier with WidgetsBindingObserver {
@@ -25,7 +25,9 @@ class LanguageController extends ChangeNotifier with WidgetsBindingObserver {
   AppLanguage? get selected => _selected;
   AppLanguage get language =>
       _selected ??
-      AppLanguage.resolve(_deviceLocales.map((locale) => locale.languageCode));
+      AppLanguage.resolve(
+        _deviceLocales.map((locale) => locale.toLanguageTag()),
+      );
   AppLocalizations get strings => lookupAppLocalizations(language.locale);
 
   Future<void> load() async {

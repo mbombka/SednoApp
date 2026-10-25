@@ -1,5 +1,8 @@
 # Serwer w Firebase i Google Cloud — Firestore
 
+23.10.2026: wdrożono **sedno-api-00014-mmh** z 13 wariantami językowymi i przygotowano
+**AAB 0.2.0 (17)**. [Aktualny raport wdrożenia i pakietu](../../../docs/backend-deployment-2026-10-23-multilingual.pl.md).
+
 API: **https://sednoapp-79241-api.web.app**, projekt `sednoapp-79241`, numer
 `1003558402460`. Obsługę płatności Google Play włączono do testów 20.10.2026
 na istniejącym `sedno-api`; [stan i pozostałe ustawienia](../../../docs/billing-deployment-2026-10-20.pl.md).

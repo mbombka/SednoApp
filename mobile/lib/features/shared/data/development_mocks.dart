@@ -87,7 +87,7 @@ class MockSimplificationRepository implements SimplificationRepository {
     final response = SimplificationResponse(
       result: SimplificationResult(
         id: request.requestId,
-        text: request.language == AppLanguage.english
+        text: request.language != AppLanguage.polish
             ? 'Demo: ${request.input.value}'
             : request.mode.name == 'correct'
             ? 'Przykładowa poprawa: ${request.input.value}'

@@ -1,0 +1,15 @@
+[
+  {"slug":"pl","lang":"pl","arb":"pl","policy":"pl","name":"Polski"},
+  {"slug":"en","lang":"en-GB","arb":"en","policy":"en","name":"English (UK)"},
+  {"slug":"en-us","lang":"en-US","arb":"en_US","policy":"en","name":"English (US)"},
+  {"slug":"fr","lang":"fr","arb":"fr","policy":"fr","name":"Français"},
+  {"slug":"de","lang":"de","arb":"de","policy":"de","name":"Deutsch"},
+  {"slug":"it","lang":"it","arb":"it","policy":"it","name":"Italiano"},
+  {"slug":"es","lang":"es","arb":"es","policy":"es","name":"Español"},
+  {"slug":"pt","lang":"pt-PT","arb":"pt","policy":"pt","name":"Português (Portugal)"},
+  {"slug":"sk","lang":"sk","arb":"sk","policy":"sk","name":"Slovenčina"},
+  {"slug":"cs","lang":"cs","arb":"cs","policy":"cs","name":"Čeština"},
+  {"slug":"ro","lang":"ro","arb":"ro","policy":"ro","name":"Română"},
+  {"slug":"nb","lang":"nb","arb":"nb","policy":"nb","name":"Norsk bokmål"},
+  {"slug":"sv","lang":"sv","arb":"sv","policy":"sv","name":"Svenska"}
+]

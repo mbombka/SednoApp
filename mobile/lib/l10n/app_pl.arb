@@ -40,7 +40,7 @@
   "about": "O aplikacji",
   "back": "Wróć",
   "appPurpose": "Do czego służy",
-  "appDescription": "Sedno upraszcza i poprawia polskie i angielskie teksty.",
+  "appDescription": "Sedno upraszcza i poprawia teksty w obsługiwanych językach.",
   "appAudience": "Powstało dla osób słabosłyszących i osób, którym trudno zrozumieć złożony tekst.",
   "appAge": "Aplikacja jest dla osób od 13 lat.",
   "howItWorks": "Jak to działa",
@@ -410,5 +410,7 @@
         "type": "String"
       }
     }
-  }
+  },
+  "speechModelDownloading": "Model mowy jest pobierany. Spróbuj później.",
+  "speechLanguageUnsupported": "Silnik mowy w tym telefonie nie obsługuje lokalnego dyktowania w tym języku. Możesz wpisać tekst lub użyć aparatu."
 }

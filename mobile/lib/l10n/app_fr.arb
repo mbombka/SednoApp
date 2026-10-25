@@ -1,0 +1,416 @@
+{
+  "@@locale": "fr",
+  "restoreOriginal": "Rétablir le texte original",
+  "userMenu": "Menu utilisateur",
+  "speechNotRecognised": "Aucune parole reconnue. Réessayez.",
+  "speechFailed": "La reconnaissance vocale a échoué. Réessayez.",
+  "microphonePermission": "Autorisez le microphone dans les paramètres de l’application.",
+  "speechRequirements": "La reconnaissance locale nécessite Android 13 ou plus et un moteur vocal compatible.",
+  "speechModelMissing": "Téléchargez le modèle vocal français dans les paramètres de reconnaissance vocale Android.",
+  "speechTimeout": "La reconnaissance a pris trop de temps. Réessayez.",
+  "speechAndroidOnly": "La reconnaissance locale est disponible sur Android 13 ou plus.",
+  "historyClearFailed": "Impossible de supprimer tout l’historique. Réessayez.",
+  "deleteHistoryEntryTitle": "Supprimer ce texte de l’historique ?",
+  "cannotUndo": "Cette action est irréversible.",
+  "delete": "Supprimer",
+  "historyEntryDeleted": "Texte supprimé.",
+  "deleteHistoryTitle": "Supprimer tout l’historique ?",
+  "deleteHistoryNotice": "Tous les textes enregistrés seront supprimés de ce téléphone. Cette action est irréversible.",
+  "deleteAllHistory": "Supprimer tout l’historique",
+  "historyDeleted": "Historique supprimé.",
+  "historyLocalNotice": "Les textes sont enregistrés uniquement sur ce téléphone.",
+  "historyRetentionNotice": "Chaque texte est supprimé automatiquement après 7 jours.",
+  "historySignOutNotice": "La déconnexion supprime tout l’historique.",
+  "deleteHistoryNow": "Supprimer tout l’historique maintenant",
+  "deletingHistory": "Suppression de l’historique",
+  "loadingHistory": "Chargement de l’historique",
+  "historyLoadFailed": "Impossible de charger l’historique.",
+  "tryAgain": "Réessayer",
+  "historyEmpty": "Vous n’avez aucun texte enregistré.",
+  "historyEmptyNotice": "Vos textes simplifiés ou corrigés apparaîtront ici.",
+  "correctedVersion": "Version corrigée",
+  "simplifiedVersion": "Version simple",
+  "originalText": "Texte original",
+  "hideOriginal": "Masquer l’original",
+  "showOriginal": "Afficher l’original",
+  "today": "Aujourd’hui",
+  "readTextFailed": "Impossible de lire le texte. Réessayez.",
+  "voiceMissing": "Vérifiez qu’une voix française pour la lecture hors connexion est téléchargée sur le téléphone.",
+  "playbackAndroidOnly": "La lecture à voix haute est disponible sur Android.",
+  "about": "À propos",
+  "back": "Retour",
+  "appPurpose": "À quoi sert Sedno",
+  "appDescription": "Sedno simplifie et corrige les textes dans les langues prises en charge.",
+  "appAudience": "Pour les personnes malentendantes et celles qui ont du mal à comprendre les textes complexes.",
+  "appAge": "L’application est destinée aux personnes de 13 ans et plus.",
+  "howItWorks": "Comment ça marche",
+  "typingInstructions": "Saisissez ou collez un texte. Choisissez Simplifier ou Corriger.",
+  "captureInstructions": "En mode Simplifier, vous pouvez aussi photographier un texte ou le dicter.",
+  "captureSubmitInstructions": "Après avoir sélectionné le texte sur la photo, choisissez Simplifier. Le texte dicté est simplifié automatiquement.",
+  "localMediaNotice": "Les photos et le son restent sur le téléphone. Seul le texte est envoyé à l’IA.",
+  "speechModelRequirements": "La dictée nécessite Android 13 ou plus et un modèle vocal français téléchargé.",
+  "playbackRequirements": "En mode Corriger, le haut-parleur lit le texte. Une voix française téléchargée et utilisable hors connexion est nécessaire.",
+  "restoreInstructions": "Le résultat remplace le texte dans le même champ. Touchez son titre ou Retour pour rétablir l’original.",
+  "inputLimitNotice": "Le texte peut contenir 4000 caractères au maximum.",
+  "guestNotice": "Vous pouvez commencer sans créer de compte.",
+  "dailyLimit": "Limite quotidienne",
+  "freeAllowance": "Sans abonnement : 5 textes par jour.",
+  "paidAllowance": "Avec abonnement : 400 textes par jour.",
+  "sharedAllowance": "La simplification et la correction partagent la même limite.",
+  "subscriptionPriceNotice": "Le prix de l’abonnement apparaît dans Compte et Google Play.",
+  "important": "Important",
+  "aiErrorNotice": "L’IA peut faire des erreurs.",
+  "checkResult": "Vérifiez le résultat avant de l’utiliser.",
+  "author": "Auteur : Mariusz Bąbka",
+  "privacy": "Confidentialité et données",
+  "websiteOpenFailed": "Impossible d’ouvrir le site. Vérifiez votre navigateur.",
+  "website": "Site de Sedno",
+  "photoNoText": "Aucun texte détecté. Prenez une photo plus nette.",
+  "cameraPermission": "Autorisez l’appareil photo dans les paramètres du téléphone.",
+  "cameraStartFailed": "Impossible de démarrer l’appareil photo. Réessayez.",
+  "photoCaptureFailed": "Impossible de prendre la photo. Réessayez.",
+  "selectText": "Sélectionner le texte",
+  "cropInstructions": "Déplacez les coins du cadre pour sélectionner le texte. ",
+  "cropWholePhotoNotice": "Sans modification, le texte de toute la photo sera simplifié.",
+  "openingPhoto": "Ouverture de la photo",
+  "simplify": "Simplifier",
+  "cropTopLeft": "Coin supérieur gauche du cadre",
+  "cropTopRight": "Coin supérieur droit du cadre",
+  "cropBottomLeft": "Coin inférieur gauche du cadre",
+  "cropBottomRight": "Coin inférieur droit du cadre",
+  "smallerSelection": "Sélection plus petite",
+  "largerSelection": "Sélection plus grande",
+  "cropResizeHint": "Augmentez pour réduire la sélection. Diminuez pour l’agrandir.",
+  "takeTextPhoto": "Photographier un texte",
+  "startingCamera": "Démarrage de l’appareil photo",
+  "takingPhoto": "Prise de photo…",
+  "takePhoto": "Prendre une photo",
+  "photoOpenFailed": "Impossible d’ouvrir la photo. Prenez-en une autre.",
+  "photoPrepareFailed": "Impossible de préparer la photo. Réessayez.",
+  "simplifyHeading": "simplifier le texte",
+  "simplifiedText": "Texte simplifié",
+  "correctedText": "Texte corrigé",
+  "emptyText": "Le texte ne peut pas être vide.",
+  "textTooLong": "Le texte peut contenir 4000 caractères au maximum.",
+  "subscriptionActive": "Votre abonnement est actif.",
+  "subscriptionAllowance": "Vous pouvez simplifier jusqu’à 400 textes par jour.",
+  "manageSubscriptionNotice": "Pour modifier le paiement ou annuler l’abonnement, ouvrez Google Play.",
+  "manageSubscription": "Gérer l’abonnement dans Google Play",
+  "testerAccessNotice": "Vous bénéficiez d’un accès test gratuit.",
+  "restorePurchases": "Restaurer les achats",
+  "refreshAccess": "Actualiser l’accès",
+  "subscriptionBenefits": "Jusqu’à 400 textes par jour avec abonnement, 5 sans abonnement.",
+  "subscriptionSignInNotice": "Connectez-vous à votre compte Sedno pour acheter ou restaurer un abonnement.",
+  "buySubscription": "S’abonner",
+  "refreshSubscription": "Actualiser l’abonnement",
+  "subscriptionRenewalNotice": "L’abonnement est renouvelé automatiquement chaque mois.",
+  "subscriptionCancelNotice": "Vous pouvez l’annuler à tout moment dans Google Play.",
+  "paymentReadFailed": "Impossible de lire les paiements. Essayez de restaurer les achats.",
+  "signInBeforePurchase": "Connectez-vous avant l’achat.",
+  "subscriptionAlreadyActive": "Votre abonnement est déjà actif.",
+  "signInBeforeRestore": "Connectez-vous avant de restaurer un achat.",
+  "purchasesChecked": "Achats vérifiés. La confirmation peut prendre un moment.",
+  "playOpenFailed": "Impossible d’ouvrir Google Play. Ouvrez le magasin, puis Paiements et abonnements → Abonnements.",
+  "paymentPending": "Le paiement attend confirmation. Votre limite reste inchangée.",
+  "purchaseCancelled": "Achat annulé.",
+  "purchaseFailed": "L’achat de l’abonnement a échoué. Réessayez.",
+  "subscriptionInactive": "Votre abonnement n’est pas actif.",
+  "subscriptionVerifyFailed": "Impossible de confirmer l’abonnement. Connectez-vous, vérifiez la connexion et restaurez les achats.",
+  "subscriptionCheckFailed": "Impossible de vérifier l’abonnement. Connectez-vous et réessayez.",
+  "hideConfirmedPassword": "Masquer le mot de passe répété",
+  "showConfirmedPassword": "Afficher le mot de passe répété",
+  "hidePassword": "Masquer le mot de passe",
+  "showPassword": "Afficher le mot de passe",
+  "enterEmail": "Saisissez votre adresse e-mail.",
+  "enterValidEmail": "Saisissez une adresse e-mail valide.",
+  "passwordResetSent": "Si un compte existe avec cette adresse, vous recevrez un lien de réinitialisation. Vérifiez aussi les courriers indésirables.",
+  "emailSendFailed": "L’envoi de l’e-mail a échoué. Réessayez.",
+  "accountLoadFailed": "Impossible de charger le compte ou de terminer la suppression des données. Réessayez.",
+  "verificationEmailSent": "Un e-mail avec un lien a été envoyé. Vérifiez votre boîte de réception et les courriers indésirables.",
+  "emailNotVerified": "L’adresse n’est pas encore confirmée. Cliquez sur le lien de l’e-mail et réessayez.",
+  "signInFailed": "Connexion impossible. Vérifiez vos informations et réessayez.",
+  "signOutFailed": "Déconnexion impossible. Réessayez.",
+  "deleteAccountTitle": "Supprimer le compte ?",
+  "deleteAccountIdentity": "Confirmez votre identité pour supprimer le compte.",
+  "password": "Mot de passe",
+  "keepAccount": "Conserver le compte",
+  "deleteAccountAndData": "Supprimer le compte et les données",
+  "accountDeleted": "Le compte et les données ont été supprimés. Annulez l’abonnement séparément dans Google Play.",
+  "accountDeleteIncomplete": "Impossible de terminer la suppression. Réessayez.",
+  "emailAccountMethod": " (e-mail et mot de passe)",
+  "finishDataCleanup": "Actualiser le compte et terminer le nettoyage",
+  "accountNotConfigured": "Les options du compte apparaîtront ici.",
+  "signOut": "Se déconnecter",
+  "deleteAccount": "Supprimer le compte",
+  "emailVerified": "Adresse e-mail confirmée",
+  "checkInbox": "Vérifiez vos e-mails",
+  "finishAccountLinkNotice": "Votre adresse est confirmée. Il reste à connecter le compte Sedno. Il est inutile de cliquer à nouveau sur le lien.",
+  "verifyEmailInstructions": "Cliquez sur le lien de l’e-mail de Sedno pour terminer la création du compte. Vérifiez aussi les courriers indésirables. Revenez ensuite et choisissez « Vérifier la confirmation ».",
+  "guestWhileVerifying": "En attendant, vous pouvez utiliser l’application sans compte.",
+  "finishSignIn": "Terminer la connexion",
+  "checkVerification": "Vérifier la confirmation",
+  "resendEmail": "Renvoyer l’e-mail",
+  "signOutUseGuest": "Se déconnecter et utiliser sans compte",
+  "signIn": "Se connecter",
+  "newAccount": "Nouveau compte",
+  "recoverAccess": "Récupérer l’accès",
+  "guestSignInNotice": "Vous pouvez utiliser l’application sans connexion.",
+  "signInGoogle": "Se connecter avec Google",
+  "emailAddress": "Adresse e-mail",
+  "enterPassword": "Saisissez votre mot de passe.",
+  "passwordMinLength": "Utilisez au moins 6 caractères.",
+  "repeatPassword": "Répéter le mot de passe",
+  "enterRepeatedPassword": "Répétez votre mot de passe.",
+  "passwordMismatch": "Les mots de passe doivent être identiques.",
+  "verificationEmailNotice": "Un e-mail avec un lien de confirmation sera envoyé.",
+  "passwordResetInstructions": "Saisissez l’adresse e-mail du compte. Vous recevrez un lien pour changer le mot de passe.",
+  "signInEmail": "Se connecter par e-mail",
+  "createAccount": "Créer un compte",
+  "sendResetLink": "Envoyer le lien de réinitialisation",
+  "forgotPassword": "Mot de passe oublié",
+  "createAccountLink": "Pas de compte ? Créer un compte",
+  "backToSignIn": "Retour à la connexion",
+  "testerAccess": "Accès test",
+  "testerAllowance": "Vous pouvez traiter jusqu’à 400 textes par jour.",
+  "testerExpiryNotice": "L’accès est gratuit et expire automatiquement.",
+  "testerHasSubscription": "Vous avez aussi un abonnement Google Play actif.",
+  "testerExpired": "L’accès test a expiré.",
+  "subscriptionStillActive": "Votre abonnement Google Play vous donne toujours une limite supérieure.",
+  "freeLimitRestored": "La limite gratuite de 5 textes par jour s’applique. L’utilisation du jour reste inchangée.",
+  "closeMenu": "Fermer le menu",
+  "welcome": "Bienvenue dans Sedno",
+  "inApp": "Dans l’application",
+  "accountCreatedEmailFailed": "Le compte a été créé, mais l’envoi de l’e-mail a échoué. Essayez de le renvoyer.",
+  "signInToVerify": "Connectez-vous par e-mail pour confirmer votre adresse.",
+  "signInToCheckAccount": "Reconnectez-vous pour vérifier l’état du compte.",
+  "weakPassword": "Mot de passe trop faible. Utilisez au moins 6 caractères.",
+  "checkEmailAddress": "Vérifiez l’adresse e-mail saisie.",
+  "emailAlreadyUsed": "Cette adresse est déjà utilisée. Connectez-vous au compte existant.",
+  "tooManyAttempts": "Trop de tentatives. Attendez un moment et réessayez.",
+  "checkInternet": "Pas de connexion. Vérifiez Internet et réessayez.",
+  "chooseSameAccount": "Choisissez le compte que vous souhaitez supprimer.",
+  "signInToDelete": "Reconnectez-vous pour supprimer le compte.",
+  "invalidCredentials": "Connexion impossible. Vérifiez l’adresse e-mail et le mot de passe.",
+  "actionFailed": "Cette action a échoué. Réessayez.",
+  "accountLinkFailed": "Impossible de connecter le compte Sedno. Vérifiez la connexion et réessayez.",
+  "passwordToDelete": "Saisissez le mot de passe pour confirmer la suppression.",
+  "finishLocalDeletion": "Terminez la suppression des données sur cet appareil.",
+  "installationRejected": "Le serveur n’a pas pu vérifier l’installation. Réessayez ou installez Sedno depuis Google Play.",
+  "sessionStartFailed": "Impossible de démarrer une session. Réessayez.",
+  "signInToLink": "Reconnectez-vous pour associer le compte.",
+  "cannotLinkAccount": "Impossible d’associer le compte. Réessayez.",
+  "signInAgain": "Reconnectez-vous.",
+  "sessionExpiredSignIn": "La session a expiré. Reconnectez-vous.",
+  "cannotDeleteAccount": "Impossible de supprimer le compte. Réessayez.",
+  "cannotSignOut": "Impossible de se déconnecter. Réessayez.",
+  "correctionUnavailable": "La correction n’est pas encore disponible.",
+  "simplificationUnavailable": "La simplification n’est pas encore disponible.",
+  "requestTimeout": "Délai dépassé. Réessayez.",
+  "offline": "Pas de connexion Internet. Réessayez.",
+  "sessionExpired": "La session a expiré. Vérifiez le compte et réessayez.",
+  "quotaExhausted": "La limite du jour est atteinte. Consultez l’heure de renouvellement.",
+  "serviceUnavailable": "Service temporairement indisponible. Réessayez.",
+  "correctionRejected": "Impossible de corriger ce texte. Vérifiez-le et réessayez.",
+  "simplificationRejected": "Impossible de simplifier ce texte. Vérifiez-le et réessayez.",
+  "correctionFailed": "La correction a échoué. Réessayez.",
+  "simplificationFailed": "La simplification a échoué. Réessayez.",
+  "checkConnection": "Vérifiez la connexion",
+  "quotaCheckFailed": "Impossible de vérifier la limite. Vérifiez la connexion.",
+  "subscriptionInAccount": "L’abonnement et son prix se trouvent dans Compte.",
+  "beforeCorrection": "Avant de corriger le texte",
+  "beforeSimplification": "Avant de simplifier le texte",
+  "acceptAndSend": "J’ai compris, envoyer",
+  "cameraUnavailable": "L’appareil photo sera bientôt disponible.",
+  "aiWarning": "L’IA peut se tromper",
+  "listeningNotice": "Écoute… Parlez français. Fin après 1,5 seconde de silence ou 60 secondes. Le bouton d’arrêt annule l’enregistrement.",
+  "correctionSubmitted": "Le texte a été envoyé pour correction.",
+  "simplificationSubmitted": "Le texte a été envoyé pour simplification.",
+  "textForCorrection": "Texte à corriger",
+  "textForSimplification": "Texte à simplifier",
+  "inputHint": "Saisissez ou collez un texte",
+  "switchToCorrection": "Passer à la correction",
+  "switchToSimplification": "Passer à la simplification",
+  "clearText": "Effacer le texte",
+  "stopPlayback": "Arrêter la lecture",
+  "readAloud": "Lire à voix haute",
+  "cancelRecording": "Annuler l’enregistrement",
+  "simplifySpeech": "Simplifier la parole",
+  "cancel": "Annuler",
+  "history": "Historique",
+  "account": "Compte",
+  "start": "Accueil",
+  "contact": "Contact",
+  "close": "Fermer",
+  "continueAction": "Continuer",
+  "correct": "Corriger",
+  "correctHeading": "corriger le texte",
+  "correcting": "Correction…",
+  "simplifying": "Simplification…",
+  "reading": "Lecture…",
+  "camera": "Appareil photo",
+  "preparing": "Préparation…",
+  "subscription": "Abonnement",
+  "yesterday": "Hier",
+  "signedIn": "Connexion réussie.",
+  "googleAccountMethod": " (compte Google)",
+  "language": "Langue",
+  "systemLanguage": "Langue du téléphone",
+  "polish": "Polonais",
+  "english": "Anglais (Royaume-Uni)",
+  "languageNotice": "La langue s’applique aux menus, à la simplification, à la correction et à la parole. Choisissez la langue du texte. Sedno ne traduit pas les textes.",
+  "languageSaveFailed": "Impossible d’enregistrer la langue. Réessayez.",
+  "resetDaily": "La limite est renouvelée chaque jour à {time}.",
+  "@resetDaily": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "resetAbout": "La limite est renouvelée chaque jour à {time} (00:00 UTC).",
+  "@resetAbout": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "resetAt": "La limite sera renouvelée à {time}.",
+  "@resetAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "quotaUsed": "Vous avez utilisé votre limite du jour.",
+  "quotaOneSimplification": "Il reste 1 simplification.",
+  "quotaOneUse": "Il reste 1 utilisation de l’IA.",
+  "quotaUsedDialog": "Vous avez atteint la limite quotidienne.",
+  "resetWithRemaining": "La limite sera renouvelée à {time} ({remaining}).",
+  "@resetWithRemaining": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "timeRemaining": "dans {hours} h {minutes} min",
+  "@timeRemaining": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "monthlyPrice": "{price} par mois",
+  "@monthlyPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "historyExpires": "Suppression prévue le {date}.",
+  "@historyExpires": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteSavedText": "Supprimer le texte enregistré le {date}",
+  "@deleteSavedText": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "contactAddress": "Contact : {email}",
+  "@contactAddress": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "signedInAs": "Connecté : {email}{method}",
+  "@signedInAs": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      },
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+  "accountEmail": "Adresse e-mail : {email}",
+  "@accountEmail": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "emailToVerify": "Adresse à confirmer : {email}",
+  "@emailToVerify": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "resendAfter": "Renvoyer dans {seconds} s",
+  "@resendAfter": {
+    "placeholders": {
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "testerUntil": "Accès test jusqu’au {date} (heure locale).",
+  "@testerUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "cropPosition": "Horizontal : {horizontal} %, vertical : {vertical} %",
+  "@cropPosition": {
+    "placeholders": {
+      "horizontal": {
+        "type": "String"
+      },
+      "vertical": {
+        "type": "String"
+      }
+    }
+  },
+  "welcomeName": "Bienvenue dans {name}",
+  "@welcomeName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "policyVersion": "Version : {date}",
+  "@policyVersion": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "speechModelDownloading": "Le modèle vocal est en cours de téléchargement. Réessayez plus tard.",
+  "speechLanguageUnsupported": "Le moteur vocal de ce téléphone ne propose pas la dictée locale dans cette langue. Vous pouvez saisir le texte ou utiliser l’appareil photo."
+}

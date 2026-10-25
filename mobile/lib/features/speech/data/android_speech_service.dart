@@ -24,7 +24,9 @@ class AndroidSpeechService implements SpeechService {
       throw SpeechException(switch (error.code) {
         'permission' => strings.microphonePermission,
         'unavailable' => strings.speechRequirements,
-        'language' => strings.speechModelMissing,
+        'language' || 'language_download' => strings.speechModelMissing,
+        'language_downloading' => strings.speechModelDownloading,
+        'language_unsupported' => strings.speechLanguageUnsupported,
         'no_speech' => strings.speechNotRecognised,
         'timeout' => strings.speechTimeout,
         _ => strings.speechFailed,

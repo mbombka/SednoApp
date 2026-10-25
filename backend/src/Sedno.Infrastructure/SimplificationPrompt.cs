@@ -1,3 +1,5 @@
+using Sedno.Application;
+using System.Collections.Concurrent;
 using System.Security.Cryptography;
 using System.Text;
 namespace Sedno.Infrastructure;
@@ -6,14 +8,13 @@ public static class SimplificationPrompt
 {
     public static string Text { get; } = Load();
     public static string Sha256 { get; } = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(Text)));
-    public static string ForLanguage(string language) => language switch
+    private static readonly ConcurrentDictionary<string, Lazy<string>> Translations = new();
+    public static string ForLanguage(string language)
     {
-        "pl" => Text,
-        "en" => English.Value,
-        _ => throw new ArgumentException("Unsupported text language.", nameof(language))
-    };
-    // API language "en" selects the British English prompt variant.
-    private static readonly Lazy<string> English = new(() => Load("en-gb"));
+        var variant = TextLanguages.PromptVariant(language);
+        return language == "pl" ? Text : Translations.GetOrAdd(variant,
+            key => new Lazy<string>(() => Load(key))).Value;
+    }
     private static string Load(string language = "pl")
     {
         using var stream = typeof(SimplificationPrompt).Assembly.GetManifestResourceStream($"Sedno.Infrastructure.Prompts.simplify.{language}.txt")

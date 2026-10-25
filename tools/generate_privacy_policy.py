@@ -73,11 +73,9 @@ def generate():
         'docs/public/prywatnosc/index.html': page(policy['title'], sections),
         'docs/public/usun-konto/index.html': page('Sedno — usunięcie konta i danych', [sections[i] for i in (0, 2, 8, 9, 10)], True),
     }
-    # OVH and backend pages share the same versioned source.
-    for page_name in ('prywatnosc', 'usun-konto'):
-        documents[f'website/SednoWebsite/public/{page_name}/index.html'] = documents[
-            f'docs/public/{page_name}/index.html'
-        ]
+    # The website uses the same policy, with localized navigation and language links.
+    from generate_website import legacy_pages
+    documents.update(legacy_pages())
     return documents
 
 

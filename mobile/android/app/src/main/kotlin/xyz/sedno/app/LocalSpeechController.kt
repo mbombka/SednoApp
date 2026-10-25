@@ -44,7 +44,7 @@ class LocalSpeechController(private val activity: Activity) {
             result.error("unavailable", null, null)
             return
         }
-        if (language !in setOf("pl-PL", "en-GB")) {
+        if (language !in setOf("pl-PL", "en-GB", "en-US", "fr-FR", "de-DE", "it-IT", "es-ES", "pt-PT", "sk-SK", "cs-CZ", "ro-RO", "nb-NO", "sv-SE")) {
             result.error("language", null, null)
             return
         }
@@ -90,10 +90,17 @@ class LocalSpeechController(private val activity: Activity) {
                 override fun onSupportResult(support: RecognitionSupport) {
                     if (session !== current) return
                     val installed = support.installedOnDeviceLanguages.any {
-                        it.replace('_', '-').equals(current.language, true) ||
-                            it.equals(current.language.substringBefore('-'), true)
+                        SpeechLanguages.matches(current.language, it)
                     }
-                    if (!installed) fail(current, "language") else start(current, intent)
+                    if (installed) {
+                        start(current, intent)
+                    } else if (support.pendingOnDeviceLanguages.any { SpeechLanguages.matches(current.language, it) }) {
+                        fail(current, "language_downloading")
+                    } else if (support.supportedOnDeviceLanguages.any { SpeechLanguages.matches(current.language, it) }) {
+                        fail(current, "language_download")
+                    } else {
+                        fail(current, "language_unsupported")
+                    }
                 }
                 override fun onError(error: Int) {
                     if (session === current) fail(current, "unavailable")
@@ -142,8 +149,8 @@ class LocalSpeechController(private val activity: Activity) {
                     if (session !== current) return
                     fail(current, when (error) {
                         SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> "permission"
-                        SpeechRecognizer.ERROR_LANGUAGE_NOT_SUPPORTED,
-                        SpeechRecognizer.ERROR_LANGUAGE_UNAVAILABLE -> "language"
+                        SpeechRecognizer.ERROR_LANGUAGE_NOT_SUPPORTED -> "language_unsupported"
+                        SpeechRecognizer.ERROR_LANGUAGE_UNAVAILABLE -> "language_download"
                         SpeechRecognizer.ERROR_NO_MATCH,
                         SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> "no_speech"
                         else -> "recognition"

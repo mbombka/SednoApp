@@ -1,0 +1,78 @@
+# Súkromie a údaje
+
+Verzia: 2026-10-23
+
+## Prevádzkovateľ a používatelia
+
+Prevádzkovateľ: Mariusz Bąbka, fyzická osoba, ul. Słowiańska 91, Modlniczka, Poľsko; contact@sedno.xyz. Zodpovedná osoba nebola určená. Prvým trhom je Poľsko. Sedno je od 13 rokov; používatelia vo veku 13–17 rokov ho majú používať so súhlasom rodiča alebo opatrovníka. Vek ani dátum narodenia nezisťujeme. Poľské informácie: https://sedno.xyz/prywatnosc/, https://sedno.xyz/#prywatnosc a odstránenie účtu https://sedno.xyz/usun-konto. Server funguje od 19. októbra 2026.
+
+## Text a umelá inteligencia
+
+Text sa cez server Sedno posiela OpenAI na zjednodušenie alebo opravu. Nezadávaj údaje, ktoré nechceš zdieľať. Fotografie a zvuk zostávajú v zariadení. AI dostáva iba text. Čítanie používa stiahnutý miestny hlas. AI sa môže mýliť. Skontroluj výsledok.
+
+Používame OpenAI Responses API. Sedno spracúva text a výsledok iba v pamäti, nie v databáze ani denníkoch; neposiela fotografie ani celý archív. store=false neznamená nulové uchovávanie u dodávateľa. Údaje API štandardne neslúžia na trénovanie; bezpečnostné záznamy môžu obsahovať text 30 dní, s výnimkami dodávateľa a dočasnými vyrovnávacími pamäťami. Nesľubujeme spracovanie iba v EÚ. Neposielaj údaje o zdraví, postihnutí ani iné osobitne chránené údaje; odstráň zbytočné osobné údaje svoje aj iných. Používanie nie je všeobecný súhlas.
+
+## Odstránenie účtu
+
+Odstránime účet Sedno, údaje na serveri a miestnu históriu tohto zariadenia. Krok je nezvratný. Odstránenie účtu neruší predplatné. Platby zastavíš v Google Play → Platby a predplatné → Predplatné → Sedno → Zrušiť predplatné.
+
+V aplikácii: Účet → Odstrániť účet → Odstrániť účet a údaje. Vymažeme identitu Firebase, relácie, prepojené inštalácie, metadáta požiadaviek a záznamy nákupov, nie účet Google. Bez aplikácie napíš na contact@sedno.xyz s predmetom „Odstránenie účtu Sedno“ a prihlasovacím e-mailom. Neposielaj heslá, kódy, tokeny, doklady, fotografie ani texty. E-mail sám účet neodstráni: primerane overíme prístup k účtu. Históriu iných zariadení odstráň v Histórii alebo údajoch aplikácie Android; nemáme vzdialený prístup. Google uchováva svoje údaje podľa vlastných pravidiel.
+
+## Fotografie, hlas a miestne údaje
+
+Fotografie, orezanie a OCR zostávajú v zariadení. Rozpoznaný text sa odošle na zjednodušenie; po chybe alebo zrušení sa dá upraviť. Pracovné kópie sa aplikácia pokúša odstrániť po čítaní, chybe či zrušení; náhle ukončenie môže čistenie prerušiť. Kópie iných aplikácií fotoaparátu spravuješ samostatne.
+
+Diktovanie funguje miestne na podporovanom Androide 13+ so stiahnutým modelom zvoleného jazyka. Zvuk je len v pamäti, bez súboru či posielania Sednu alebo OpenAI. Končí po 1,5 sekundy ticha po reči alebo najneskôr po 60 sekundách; Zastaviť ho zruší. AI dostane iba text. Čítanie v režime opravy vyžaduje miestny hlas bez siete. Sťahovanie modelov a hlasov môže vyžadovať internet a podmienky poskytovateľa. Fotoaparát a mikrofón sú voliteľné.
+
+Šifrovaná miestna história obsahuje originál, výsledok, režim, jazyk a dátum; je vylúčená zo záloh Android. Platí 7 dní; staršie položky sa nezobrazujú a mažú pri čítaní, spustení a návrate, pri zatvorenej aplikácii až pri ďalšej udalosti. Ručné vymazanie je možné; odhlásenie históriu vymaže. Miestne je uložená aj chránená relácia, náhodné ID inštalácie a voľba jazyka. Odstránenie účtu nemaže miestne ID; vymaž údaje aplikácie Android.
+
+## Účet, limity a platby
+
+Účet je voliteľný. Firebase Authentication spravuje Google alebo e-mail a heslo; Sedno eviduje UID, spôsob prihlásenia a dátum, nie heslá. Google môže spracúvať profil, e-mail, IP a spojenie. Limity chránia pseudonymné ID inštalácie, relácie a požiadavky, dátumy, stavy a HMAC odtlačok, nie kópia textu. Nie sú anonymné; prihlásenie neobnovuje bezplatný limit. IP slúži na obmedzenie požiadaviek, nie ako pole databázy Sedno, no môže byť v infraštruktúre. Play Integrity overuje aplikáciu a zariadenie bez textu či fotografie. Google Play spravuje platby; Sedno nedostáva kartu ani účet, eviduje šifrovaný nákupný token, hash, prepojenie účtu, stav, platnosť, overenie a ID oznámení proti duplicitám.
+
+## Dodávatelia a technické údaje
+
+OpenAI: text a bezpečnosť, štandardná zmluva pre Poľsko OpenAI Ireland Ltd. Google Ireland Limited a Google LLC: Firebase Authentication, Google Sign-In, ML Kit, Play Integrity, Google Play podľa produktu. OVHcloud: e-mail sedno.xyz. ML Kit môže posielať ID inštalácie, model, verziu, chyby a časy, nie fotografiu ani rozpoznaný text v tejto telemetrii. Miestne OCR nevylučuje komunikáciu. Bez reklám, Firebase Analytics a Crashlytics. Cloud Run, Firestore Standard europe-central2 (Varšava), Firebase Hosting; štandardná poľská Cloud zmluva Google Cloud Poland Sp. z o.o. Fungujúca služba nepotvrdzuje ukončenie zmluvných a publikačných kontrol.
+
+## Účely a právne základy
+
+GDPR čl. 6 ods. 1 písm. b): text, účet a predplatné na plnenie zmluvy alebo vyžiadané kroky. Písm. f): bezpečnosť, prevencia zneužitia, limity a bežná podpora, nevyhnutné metadáta bez reklamy; námietky posudzujeme individuálne. Písm. c), čl. 12–22: práva k údajom; čl. 5 ods. 2 a 24: minimálny dôkaz vybavenia. Inštalácia, upozornenie AI ani povolenie fotoaparátu nie sú všeobecný súhlas. Prípadný súhlas pre diagnostiku SDK treba vyhodnotiť a zaviesť pred produkciou, politika ho nenahrádza. Nevyhnutné údaje sú podmienkou príslušnej funkcie, účet a nákup sú voliteľné. Bez reklamného profilovania či právnych rozhodnutí podľa výsledku AI. Nesprávne blokovanie nahlás prevádzkovateľovi.
+
+## Prenosy mimo EHP
+
+Google a OpenAI môžu spracúvať mimo EHP vrátane USA; Firebase Authentication používa americkú infraštruktúru. Varšavská databáza nezaručuje umiestnenie všetkých údajov v EHP. Produkcia vyžaduje zmluvy a primerané záruky prenosov. Dodávatelia opisujú štandardné doložky a rozhodnutia o primeranosti pre zahrnutých príjemcov; samotná značka nie je záruka. Podmienky a kópie použitých záruk si vyžiadaj od prevádzkovateľa; zdroje sú nižšie.
+
+## Uchovávanie v Sedne
+
+Text a výsledok: iba pamäť; miestna história 7 dní. Hodinová úloha nezávislá od prevádzky maže metadáta a HMAC staršie ako 8 dní; denné počítadlá a rezervácie do 8 dní. Relácie účtov 7 dní, hostí 90; neplatné sú odmietnuté pred fyzickým zmazaním. Neprepojené identity hostí staršie ako 90 dní sa odstránia až bez relácií a požiadaviek, aj neskôr. Účty, prepojené inštalácie a nákupy zostávajú do odstránenia účtu; neaktívne účty ani vypršané nákupy sa automaticky nemažú. ID oznámení Play nemajú automatickú expiráciu ani nákupný token či väzbu na účet. Nesľubujeme nezavedené lehoty.
+
+## Prevádzkové pravidlá uchovávania
+
+Prijaté pravidlá produkcie: technické denníky a zálohy do 30 dní, korešpondencia do 90 dní po uzavretí prípadu, minimálny dôkaz práv 12 mesiacov iba dátum, typ, výsledok. Hlavný denník je nastavený na 30 dní. Staré SQL zálohy nezahŕňajú Firestore; nové zálohy a obnova potrebujú samostatné nastavenie, nie sú automaticky aktívne, pri aktivácii limit 30 dní. Ostatné úložiská, exporty a e-mail treba pred publikovaním preveriť a nastaviť. Zálohy slúžia na obnovu, nie používanie odstránených účtov; pred sprístupnením obnovy opakovať mazania. Zákonné povinnosti a spory len v nevyhnutnom rozsahu a čase. Firebase uvádza IP prihlásení niekoľko týždňov, iné autentifikačné údaje do žiadosti o zmazanie a potom do 180 dní v aktívnych systémoch a zálohách. Google platby a metriky majú vlastné pravidlá, OpenAI vyššie.
+
+## Tvoje práva
+
+Za podmienok a výnimiek GDPR môžeš žiadať prístup, kópiu, opravu, vymazanie, obmedzenie, prenosnosť, namietať oprávnený záujem a odvolať súhlas bez vplyvu na skoršie spracúvanie. Kontakt: contact@sedno.xyz; odpoveď bez zbytočného odkladu obvykle do mesiaca, zákonné predĺženie o dva mesiace vysvetlíme v prvom mesiaci. Pri dôvodných pochybnostiach overíme iba nevyhnutné, doklady nežiadame rutinne. Sťažnosť: poľský UODO, https://uodo.gov.pl. Na žiadosť o údaje netreba posielať texty aplikácie.
+
+## Zmeny
+
+Verzie majú dátum. Podstatné zmeny oznámime na stránke súkromia a v poznámkach aktualizácie pred novým spracúvaním. Dokument nenahrádza potrebný súhlas. Zmeny dodávateľa, účelu a lehôt sa musia prejaviť aj v skutočnom nastavení služby.
+
+## Zdroje a podmienky dodávateľov
+
+commission.europa.eu: https://commission.europa.eu/law/law-topic/data-protection/information-business-and-organisations/legal-grounds-processing-data_en
+
+developers.openai.com: https://developers.openai.com/api/docs/guides/your-data
+
+openai.com: https://openai.com/policies/services-agreement/
+
+firebase.google.com: https://firebase.google.com/support/privacy
+
+developers.google.com: https://developers.google.com/ml-kit/android-data-disclosure
+
+cloud.google.com: https://cloud.google.com/terms/google-entity
+
+cloud.google.com: https://cloud.google.com/terms/data-processing-addendum
+
+policies.google.com: https://policies.google.com/privacy/frameworks?hl=en
+

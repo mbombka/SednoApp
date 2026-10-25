@@ -1,5 +1,8 @@
 # Aplikacja Android
 
+23.10.2026: wdrożono **sedno-api-00014-mmh** z 13 wariantami językowymi i przygotowano
+**AAB 0.2.0 (17)**. [Aktualny raport wdrożenia i pakietu](../docs/backend-deployment-2026-10-23-multilingual.pl.md).
+
 Potrzebujesz Fluttera z Dartem zgodnym z [pubspec.yaml](pubspec.yaml), Android SDK
 oraz emulatora lub telefonu. Wszystkie polecenia poniżej wykonuj w `mobile/`.
 
@@ -130,6 +133,14 @@ O aplikacji oraz Prywatność i dane. Start działa bez logowania.
 Odnośnik do prywatności jest dostępny w menu użytkownika oraz w informacji
 przed pierwszym wysłaniem tekstu. Ekrany konta, logowania i rejestracji
 nie powtarzają tego odnośnika.
+
+Akceptacja informacji „Zanim uprościsz tekst” / „Zanim poprawisz tekst” jest
+zapisywana lokalnie dla instalacji, wspólnie dla obu trybów. Po akceptacji monit
+nie wraca przy kolejnych uruchomieniach ani po wylogowaniu. Anulowanie nie zapisuje
+akceptacji. Usunięcie danych aplikacji lub ponowna instalacja przywraca monit.
+Jeżeli zapis ustawienia się nie powiedzie, akceptacja działa w bieżącym
+uruchomieniu, a po kolejnym uruchomieniu aplikacja zapyta ponownie.
+
 Wynik zastępuje tekst w tym samym edytorze. Nagłówek „Uproszczony tekst” lub
 „Poprawiony tekst” jest przyciskiem przywracającym oryginał ostatniej operacji.
 Tak samo działa systemowy Wstecz; dopiero kolejne Wstecz może opuścić Start.
@@ -170,7 +181,7 @@ przeładowanie kodu Fluttera jej nie zmienia.
 
 [Raport wdrożenia backendu i budowy APK — 19.10.2026](../docs/archiwum/email-verification-2026-10-19.pl.md).
 
-Po rejestracji aplikacja wysyła przez Firebase wiadomość w języku polskim.
+Po rejestracji aplikacja wysyła przez Firebase wiadomość w wybranym języku.
 Konto czeka na potwierdzenie adresu. W tym czasie uproszczenia nadal działają
 w trybie gościa, z dotychczasowym limitem instalacji.
 
@@ -200,14 +211,14 @@ pole hasła ma opisany przycisk podglądu, niezależny od drugiego pola.
 Przełączenie formularza czyści hasła i ponownie je ukrywa.
 
 „Nie pamiętam hasła” prowadzi do formularza wysłania linku przez Firebase.
-Wiadomość jest po polsku. Komunikat po wysłaniu jest taki sam dla istniejącego
+Wiadomość używa języka przekazanego do Firebase (dostarczenie i szablony wymagają odbioru). Komunikat po wysłaniu jest taki sam dla istniejącego
 i nieistniejącego konta. Prawdziwe dostarczenie poczty wymaga testu na telefonie.
 
 ## Upraszczanie mowy
 
 Przycisk mikrofonu po lewej stronie „Uprość” uruchamia lokalne rozpoznawanie
-polskiej mowy. Wymaga Androida 13 lub nowszego, lokalnego silnika i pobranego
-modelu języka polskiego. Audio nie jest zapisywane ani wysyłane na serwer.
+mowy w wybranym języku. Wymaga Androida 13 lub nowszego, lokalnego silnika i pobranego
+modelu wybranego języka. Audio nie jest zapisywane ani wysyłane na serwer.
 Po 1,5 s ciszy po wykryciu mowy lub po maksymalnie 60 s rejestracji aplikacja
 kończy nagrywanie i automatycznie przekazuje tekst do upraszczania, jak przy OCR.
 Przycisk stop anuluje sesję. Rozpoczęcie nagrywania czyści dotychczasowy tekst.
@@ -223,8 +234,8 @@ Strzałki nad głównym przyciskiem zmieniają tryb i usuwają tekst z edytora.
 zachowując sens wypowiedzi; korzysta z osobnego promptu na backendzie.
 W tym trybie aparat znika, a głośniczek odczytuje bieżący tekst z pola.
 Przycisk stop zatrzymuje odczyt. Zmiana trybu, otwarcie menu lub przejście
-aplikacji do tła również zatrzymuje odczyt. Potrzebny jest zainstalowany polski
-głos do odczytu bez internetu; aplikacja nie wybiera głosów wymagających sieci.
+aplikacji do tła również zatrzymuje odczyt. Potrzebny jest zainstalowany lokalny
+głos wybranego języka do odczytu bez internetu; aplikacja nie wybiera głosów wymagających sieci.
 Wynik i zaszyfrowana historia rozróżniają tekst uproszczony i poprawiony.
 Starsze wpisy historii są traktowane jako uproszczenia.
 
@@ -241,7 +252,8 @@ z odpowiedzi limitu. Konto pokazuje datę ważności i informację o bezpłatnym
 
 ## Wersje językowe
 
-Aplikacja obsługuje polski i angielski (UK). Menu → Język pozwala wybrać język
+Kod aplikacji obsługuje [13 wariantów językowych](../docs/multilingual-13-languages.pl.md),
+w tym portugalski z Portugalii i norweski Bokmål. Menu → Język pozwala wybrać język
 lub używać preferencji telefonu. Ten sam wybór obejmuje tekst i funkcje mowy.
 [Architektura, źródła tłumaczeń, prompty i dodawanie języków](../docs/multilingual-app.pl.md).
 Backend z obsługą `language` musi zostać wdrożony przed nową aplikacją.

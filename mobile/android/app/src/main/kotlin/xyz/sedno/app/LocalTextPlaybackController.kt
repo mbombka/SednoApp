@@ -7,7 +7,7 @@ import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import io.flutter.plugin.common.MethodChannel
 
-/** Uses an installed Polish voice that does not require a network connection. */
+/** Uses an installed voice for the selected language that does not require a network connection. */
 class LocalTextPlaybackController(private val context: Context) {
     private val main = Handler(Looper.getMainLooper())
     private var engine: TextToSpeech? = null
@@ -38,7 +38,7 @@ class LocalTextPlaybackController(private val context: Context) {
                     }
                     try {
                         val voice = tts.voices?.filter {
-                            it.locale.language == language.substringBefore('-') && !it.isNetworkConnectionRequired &&
+                            SpeechLanguages.matches(language, it.locale.toLanguageTag()) && !it.isNetworkConnectionRequired &&
                                 !it.features.contains(TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED)
                         }?.sortedWith(compareBy({ if (it.locale.toLanguageTag().equals(language, true)) 0 else 1 }, { it.name }))?.firstOrNull()
                         if (voice == null || tts.setVoice(voice) != TextToSpeech.SUCCESS) {
