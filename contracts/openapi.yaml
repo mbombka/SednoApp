@@ -363,9 +363,9 @@ components:
       properties:
         language:
           type: string
-          enum: [pl, en]
+          enum: [pl, en, en-US, fr, de, it, es, pt, sk, cs, ro, nb, sv]
           default: pl
-          description: Text processing language. English uses British English. Output stays in the selected language; translation is not provided. Missing language means Polish for backward compatibility.
+          description: Text processing language. Legacy en uses British English; en-US selects American English. Portuguese uses Portugal; nb selects Norwegian Bokmål. Output stays in the selected language; translation is not provided. Missing language means Polish for backward compatibility.
         mode:
           type: string
           enum: [simplify, correct]
@@ -389,7 +389,7 @@ components:
       properties:
         language:
           type: string
-          enum: [pl, en]
+          enum: [pl, en, en-US, fr, de, it, es, pt, sk, cs, ro, nb, sv]
           default: pl
           description: Language used for this result; absent in older API versions.
         id: { type: string }

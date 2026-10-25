@@ -1,0 +1,416 @@
+{
+  "@@locale": "ro",
+  "restoreOriginal": "Restabilește textul original",
+  "userMenu": "Meniu utilizator",
+  "speechNotRecognised": "Nu s-a recunoscut vorbirea. Încearcă din nou.",
+  "speechFailed": "Recunoașterea vorbirii a eșuat. Încearcă din nou.",
+  "microphonePermission": "Permite accesul la microfon în setările aplicației.",
+  "speechRequirements": "Recunoașterea locală necesită Android 13 sau mai nou și un motor vocal compatibil.",
+  "speechModelMissing": "Descarcă modelul vocal românesc din setările de recunoaștere vocală Android.",
+  "speechTimeout": "Recunoașterea a durat prea mult. Încearcă din nou.",
+  "speechAndroidOnly": "Recunoașterea locală este disponibilă începând cu Android 13.",
+  "historyClearFailed": "Nu s-a putut șterge întregul istoric. Încearcă din nou.",
+  "deleteHistoryEntryTitle": "Ștergi acest text din istoric?",
+  "cannotUndo": "Acțiunea nu poate fi anulată.",
+  "delete": "Șterge",
+  "historyEntryDeleted": "Text șters.",
+  "deleteHistoryTitle": "Ștergi întregul istoric?",
+  "deleteHistoryNotice": "Toate textele salvate vor fi șterse de pe acest telefon. Acțiunea nu poate fi anulată.",
+  "deleteAllHistory": "Șterge întregul istoric",
+  "historyDeleted": "Istoric șters.",
+  "historyLocalNotice": "Textele sunt salvate doar pe acest telefon.",
+  "historyRetentionNotice": "Fiecare text este șters automat după 7 zile.",
+  "historySignOutNotice": "Deconectarea șterge întregul istoric.",
+  "deleteHistoryNow": "Șterge întregul istoric acum",
+  "deletingHistory": "Se șterge istoricul",
+  "loadingHistory": "Se încarcă istoricul",
+  "historyLoadFailed": "Nu s-a putut încărca istoricul.",
+  "tryAgain": "Încearcă din nou",
+  "historyEmpty": "Nu ai încă texte salvate.",
+  "historyEmptyNotice": "Textele simplificate sau corectate vor apărea aici.",
+  "correctedVersion": "Versiune corectată",
+  "simplifiedVersion": "Versiune simplă",
+  "originalText": "Text original",
+  "hideOriginal": "Ascunde originalul",
+  "showOriginal": "Arată originalul",
+  "today": "Astăzi",
+  "readTextFailed": "Textul nu a putut fi citit. Încearcă din nou.",
+  "voiceMissing": "Verifică dacă ai descărcat o voce în română pentru citire fără internet.",
+  "playbackAndroidOnly": "Citirea cu voce tare este disponibilă pe Android.",
+  "about": "Despre aplicație",
+  "back": "Înapoi",
+  "appPurpose": "La ce folosește Sedno",
+  "appDescription": "Sedno simplifică și corectează texte în limbile acceptate.",
+  "appAudience": "Pentru persoane cu dificultăți de auz sau de înțelegere a textelor complexe.",
+  "appAge": "Aplicația este destinată persoanelor de cel puțin 13 ani.",
+  "howItWorks": "Cum funcționează",
+  "typingInstructions": "Scrie sau lipește un text. Alege Simplifică sau Corectează.",
+  "captureInstructions": "În modul Simplifică poți și să fotografiezi textul sau să îl dictezi.",
+  "captureSubmitInstructions": "Selectează textul din fotografie și alege Simplifică. Textul dictat este simplificat automat.",
+  "localMediaNotice": "Fotografiile și sunetul rămân pe telefon. Doar textul este trimis către IA.",
+  "speechModelRequirements": "Dictarea necesită Android 13 sau mai nou și un model vocal românesc descărcat.",
+  "playbackRequirements": "În modul Corectează, difuzorul citește textul. Ai nevoie de o voce în română descărcată, care funcționează fără internet.",
+  "restoreInstructions": "Rezultatul apare în același câmp. Atinge titlul sau Înapoi pentru a restabili originalul.",
+  "inputLimitNotice": "Textul poate avea cel mult 4000 de caractere.",
+  "guestNotice": "Poți începe fără să creezi un cont.",
+  "dailyLimit": "Limită zilnică",
+  "freeAllowance": "Fără abonament: 5 texte pe zi.",
+  "paidAllowance": "Cu abonament: 400 de texte pe zi.",
+  "sharedAllowance": "Simplificarea și corectarea folosesc aceeași limită.",
+  "subscriptionPriceNotice": "Prețul abonamentului apare în Cont și în Google Play.",
+  "important": "Important",
+  "aiErrorNotice": "IA poate face greșeli.",
+  "checkResult": "Verifică rezultatul înainte de a-l folosi.",
+  "author": "Autor: Mariusz Bąbka",
+  "privacy": "Confidențialitate și date",
+  "websiteOpenFailed": "Site-ul nu poate fi deschis. Verifică browserul.",
+  "website": "Site-ul Sedno",
+  "photoNoText": "Nu s-a detectat text. Fă o fotografie mai clară.",
+  "cameraPermission": "Permite accesul la cameră în setările telefonului.",
+  "cameraStartFailed": "Camera nu a putut fi pornită. Încearcă din nou.",
+  "photoCaptureFailed": "Fotografia nu a putut fi făcută. Încearcă din nou.",
+  "selectText": "Selectează textul",
+  "cropInstructions": "Mută colțurile cadrului pentru a selecta textul. ",
+  "cropWholePhotoNotice": "Fără modificări, va fi simplificat textul din întreaga fotografie.",
+  "openingPhoto": "Se deschide fotografia",
+  "simplify": "Simplifică",
+  "cropTopLeft": "Colțul din stânga sus al cadrului",
+  "cropTopRight": "Colțul din dreapta sus al cadrului",
+  "cropBottomLeft": "Colțul din stânga jos al cadrului",
+  "cropBottomRight": "Colțul din dreapta jos al cadrului",
+  "smallerSelection": "Selecție mai mică",
+  "largerSelection": "Selecție mai mare",
+  "cropResizeHint": "Mărește valoarea pentru a micșora selecția. Redu valoarea pentru a o mări.",
+  "takeTextPhoto": "Fotografiază un text",
+  "startingCamera": "Se pornește camera",
+  "takingPhoto": "Se face fotografia…",
+  "takePhoto": "Fă o fotografie",
+  "photoOpenFailed": "Fotografia nu a putut fi deschisă. Fă alta.",
+  "photoPrepareFailed": "Fotografia nu a putut fi pregătită. Încearcă din nou.",
+  "simplifyHeading": "simplifică textul",
+  "simplifiedText": "Text simplificat",
+  "correctedText": "Text corectat",
+  "emptyText": "Textul nu poate fi gol.",
+  "textTooLong": "Textul poate avea cel mult 4000 de caractere.",
+  "subscriptionActive": "Abonamentul tău este activ.",
+  "subscriptionAllowance": "Poți simplifica până la 400 de texte pe zi.",
+  "manageSubscriptionNotice": "Pentru a schimba plata sau a anula abonamentul, deschide Google Play.",
+  "manageSubscription": "Gestionează abonamentul în Google Play",
+  "testerAccessNotice": "Ai acces gratuit de testare.",
+  "restorePurchases": "Restabilește achizițiile",
+  "refreshAccess": "Actualizează accesul",
+  "subscriptionBenefits": "Până la 400 de texte pe zi cu abonament, 5 fără abonament.",
+  "subscriptionSignInNotice": "Autentifică-te în Sedno pentru a cumpăra sau a restabili un abonament.",
+  "buySubscription": "Cumpără abonament",
+  "refreshSubscription": "Actualizează abonamentul",
+  "subscriptionRenewalNotice": "Abonamentul se reînnoiește automat în fiecare lună.",
+  "subscriptionCancelNotice": "Îl poți anula oricând în Google Play.",
+  "paymentReadFailed": "Plățile nu pot fi citite. Încearcă să restabilești achizițiile.",
+  "signInBeforePurchase": "Autentifică-te înainte de cumpărare.",
+  "subscriptionAlreadyActive": "Abonamentul tău este deja activ.",
+  "signInBeforeRestore": "Autentifică-te înainte de restabilirea achiziției.",
+  "purchasesChecked": "Achiziții verificate. Confirmarea poate dura puțin.",
+  "playOpenFailed": "Google Play nu poate fi deschis. Deschide magazinul și alege Plăți și abonamente → Abonamente.",
+  "paymentPending": "Plata așteaptă confirmarea. Limita rămâne neschimbată.",
+  "purchaseCancelled": "Achiziție anulată.",
+  "purchaseFailed": "Abonamentul nu a putut fi cumpărat. Încearcă din nou.",
+  "subscriptionInactive": "Abonamentul tău nu este activ.",
+  "subscriptionVerifyFailed": "Abonamentul nu poate fi confirmat. Autentifică-te, verifică conexiunea și restabilește achizițiile.",
+  "subscriptionCheckFailed": "Abonamentul nu poate fi verificat. Autentifică-te și încearcă din nou.",
+  "hideConfirmedPassword": "Ascunde parola repetată",
+  "showConfirmedPassword": "Arată parola repetată",
+  "hidePassword": "Ascunde parola",
+  "showPassword": "Arată parola",
+  "enterEmail": "Introdu adresa de e-mail.",
+  "enterValidEmail": "Introdu o adresă de e-mail validă.",
+  "passwordResetSent": "Dacă există un cont cu această adresă, vei primi un link pentru resetarea parolei. Verifică și folderul Spam.",
+  "emailSendFailed": "E-mailul nu a putut fi trimis. Încearcă din nou.",
+  "accountLoadFailed": "Contul nu a putut fi încărcat sau ștergerea datelor nu s-a încheiat. Încearcă din nou.",
+  "verificationEmailSent": "Am trimis un e-mail cu un link. Verifică mesajele primite și folderul Spam.",
+  "emailNotVerified": "Adresa nu este încă confirmată. Deschide linkul din e-mail și încearcă din nou.",
+  "signInFailed": "Autentificarea a eșuat. Verifică datele și încearcă din nou.",
+  "signOutFailed": "Deconectarea a eșuat. Încearcă din nou.",
+  "deleteAccountTitle": "Ștergi contul?",
+  "deleteAccountIdentity": "Confirmă-ți identitatea pentru a șterge contul.",
+  "password": "Parolă",
+  "keepAccount": "Păstrează contul",
+  "deleteAccountAndData": "Șterge contul și datele",
+  "accountDeleted": "Contul și datele au fost șterse. Anulează abonamentul separat în Google Play.",
+  "accountDeleteIncomplete": "Ștergerea nu a putut fi încheiată. Încearcă din nou.",
+  "emailAccountMethod": " (e-mail și parolă)",
+  "finishDataCleanup": "Actualizează contul și încheie curățarea",
+  "accountNotConfigured": "Opțiunile contului vor apărea aici.",
+  "signOut": "Deconectare",
+  "deleteAccount": "Șterge contul",
+  "emailVerified": "Adresă de e-mail confirmată",
+  "checkInbox": "Verifică e-mailul",
+  "finishAccountLinkNotice": "Adresa este confirmată. Mai trebuie conectat contul Sedno. Nu este nevoie să deschizi din nou linkul.",
+  "verifyEmailInstructions": "Deschide linkul din e-mailul Sedno pentru a încheia crearea contului. Verifică și Spam. Apoi revino și alege „Verifică confirmarea”.",
+  "guestWhileVerifying": "Până atunci poți folosi aplicația fără cont.",
+  "finishSignIn": "Încheie autentificarea",
+  "checkVerification": "Verifică confirmarea",
+  "resendEmail": "Retrimite e-mailul",
+  "signOutUseGuest": "Deconectare și utilizare fără cont",
+  "signIn": "Autentificare",
+  "newAccount": "Cont nou",
+  "recoverAccess": "Recuperează accesul",
+  "guestSignInNotice": "Poți folosi aplicația fără autentificare.",
+  "signInGoogle": "Autentificare cu Google",
+  "emailAddress": "Adresă de e-mail",
+  "enterPassword": "Introdu parola.",
+  "passwordMinLength": "Folosește cel puțin 6 caractere.",
+  "repeatPassword": "Repetă parola",
+  "enterRepeatedPassword": "Repetă parola.",
+  "passwordMismatch": "Parolele trebuie să fie identice.",
+  "verificationEmailNotice": "Vom trimite un e-mail cu un link pentru confirmarea adresei.",
+  "passwordResetInstructions": "Introdu e-mailul contului. Vom trimite un link pentru schimbarea parolei.",
+  "signInEmail": "Autentificare prin e-mail",
+  "createAccount": "Creează cont",
+  "sendResetLink": "Trimite link de resetare",
+  "forgotPassword": "Am uitat parola",
+  "createAccountLink": "Nu ai cont? Creează unul",
+  "backToSignIn": "Înapoi la autentificare",
+  "testerAccess": "Acces de testare",
+  "testerAllowance": "Poți procesa până la 400 de texte pe zi.",
+  "testerExpiryNotice": "Accesul este gratuit și expiră automat.",
+  "testerHasSubscription": "Ai și un abonament Google Play activ.",
+  "testerExpired": "Accesul de testare a expirat.",
+  "subscriptionStillActive": "Abonamentul Google Play îți oferă în continuare o limită mai mare.",
+  "freeLimitRestored": "Se aplică limita gratuită de 5 texte pe zi. Utilizarea de azi rămâne neschimbată.",
+  "closeMenu": "Închide meniul",
+  "welcome": "Bine ai venit în Sedno",
+  "inApp": "În aplicație",
+  "accountCreatedEmailFailed": "Contul a fost creat, dar e-mailul nu a putut fi trimis. Încearcă să îl retrimiți.",
+  "signInToVerify": "Autentifică-te prin e-mail pentru a confirma adresa.",
+  "signInToCheckAccount": "Autentifică-te din nou pentru a verifica starea contului.",
+  "weakPassword": "Parola este prea slabă. Folosește cel puțin 6 caractere.",
+  "checkEmailAddress": "Verifică adresa de e-mail introdusă.",
+  "emailAlreadyUsed": "Adresa este deja folosită. Autentifică-te în contul existent.",
+  "tooManyAttempts": "Prea multe încercări. Așteaptă puțin și încearcă din nou.",
+  "checkInternet": "Fără conexiune. Verifică internetul și încearcă din nou.",
+  "chooseSameAccount": "Alege contul pe care vrei să îl ștergi.",
+  "signInToDelete": "Autentifică-te din nou pentru a șterge contul.",
+  "invalidCredentials": "Autentificarea a eșuat. Verifică e-mailul și parola.",
+  "actionFailed": "Acțiunea a eșuat. Încearcă din nou.",
+  "accountLinkFailed": "Contul Sedno nu a putut fi conectat. Verifică conexiunea și încearcă din nou.",
+  "passwordToDelete": "Introdu parola pentru a confirma ștergerea.",
+  "finishLocalDeletion": "Încheie ștergerea datelor de pe acest dispozitiv.",
+  "installationRejected": "Serverul nu a verificat instalarea. Încearcă din nou sau instalează Sedno din Google Play.",
+  "sessionStartFailed": "Sesiunea nu poate fi pornită. Încearcă din nou.",
+  "signInToLink": "Autentifică-te din nou pentru a conecta contul.",
+  "cannotLinkAccount": "Contul nu poate fi conectat. Încearcă din nou.",
+  "signInAgain": "Autentifică-te din nou.",
+  "sessionExpiredSignIn": "Sesiunea a expirat. Autentifică-te din nou.",
+  "cannotDeleteAccount": "Contul nu poate fi șters. Încearcă din nou.",
+  "cannotSignOut": "Deconectarea nu este posibilă. Încearcă din nou.",
+  "correctionUnavailable": "Corectarea nu este încă disponibilă.",
+  "simplificationUnavailable": "Simplificarea nu este încă disponibilă.",
+  "requestTimeout": "Timpul de așteptare a expirat. Încearcă din nou.",
+  "offline": "Fără conexiune la internet. Încearcă din nou.",
+  "sessionExpired": "Sesiunea a expirat. Verifică contul și încearcă din nou.",
+  "quotaExhausted": "Ai epuizat limita de azi. Verifică ora reînnoirii.",
+  "serviceUnavailable": "Serviciul este temporar indisponibil. Încearcă din nou.",
+  "correctionRejected": "Acest text nu poate fi corectat. Verifică-l și încearcă din nou.",
+  "simplificationRejected": "Acest text nu poate fi simplificat. Verifică-l și încearcă din nou.",
+  "correctionFailed": "Textul nu a putut fi corectat. Încearcă din nou.",
+  "simplificationFailed": "Textul nu a putut fi simplificat. Încearcă din nou.",
+  "checkConnection": "Verifică conexiunea",
+  "quotaCheckFailed": "Limita nu poate fi verificată. Verifică conexiunea.",
+  "subscriptionInAccount": "Abonamentul și prețul sunt în Cont.",
+  "beforeCorrection": "Înainte de corectarea textului",
+  "beforeSimplification": "Înainte de simplificarea textului",
+  "acceptAndSend": "Am înțeles, trimite",
+  "cameraUnavailable": "Camera va fi disponibilă în curând.",
+  "aiWarning": "IA poate greși",
+  "listeningNotice": "Se ascultă… Vorbește românește. Se încheie după 1,5 secunde de liniște sau 60 de secunde. Butonul de oprire anulează înregistrarea.",
+  "correctionSubmitted": "Textul a fost trimis pentru corectare.",
+  "simplificationSubmitted": "Textul a fost trimis pentru simplificare.",
+  "textForCorrection": "Text de corectat",
+  "textForSimplification": "Text de simplificat",
+  "inputHint": "Scrie sau lipește un text",
+  "switchToCorrection": "Treci la corectare",
+  "switchToSimplification": "Treci la simplificare",
+  "clearText": "Șterge textul",
+  "stopPlayback": "Oprește citirea",
+  "readAloud": "Citește cu voce tare",
+  "cancelRecording": "Anulează înregistrarea",
+  "simplifySpeech": "Simplifică vorbirea",
+  "cancel": "Anulează",
+  "history": "Istoric",
+  "account": "Cont",
+  "start": "Acasă",
+  "contact": "Contact",
+  "close": "Închide",
+  "continueAction": "Continuă",
+  "correct": "Corectează",
+  "correctHeading": "corectează textul",
+  "correcting": "Se corectează…",
+  "simplifying": "Se simplifică…",
+  "reading": "Se citește…",
+  "camera": "Cameră",
+  "preparing": "Se pregătește…",
+  "subscription": "Abonament",
+  "yesterday": "Ieri",
+  "signedIn": "Autentificare reușită.",
+  "googleAccountMethod": " (cont Google)",
+  "language": "Limbă",
+  "systemLanguage": "Limba telefonului",
+  "polish": "Polonă",
+  "english": "Engleză (Regatul Unit)",
+  "languageNotice": "Limba se aplică meniurilor, simplificării, corectării și vorbirii. Alege limba textului. Sedno nu traduce texte.",
+  "languageSaveFailed": "Limba nu a putut fi salvată. Încearcă din nou.",
+  "resetDaily": "Limita se reînnoiește zilnic la {time}.",
+  "@resetDaily": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "resetAbout": "Limita se reînnoiește zilnic la {time} (00:00 UTC).",
+  "@resetAbout": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "resetAt": "Limita se reînnoiește la {time}.",
+  "@resetAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "quotaUsed": "Ai epuizat limita de azi.",
+  "quotaOneSimplification": "Mai ai 1 simplificare.",
+  "quotaOneUse": "Mai ai 1 utilizare IA.",
+  "quotaUsedDialog": "Ai epuizat limita zilnică.",
+  "resetWithRemaining": "Limita se reînnoiește la {time} ({remaining}).",
+  "@resetWithRemaining": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "timeRemaining": "peste {hours} h și {minutes} min",
+  "@timeRemaining": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "monthlyPrice": "{price} pe lună",
+  "@monthlyPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "historyExpires": "Va fi șters la {date}.",
+  "@historyExpires": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteSavedText": "Șterge textul salvat la {date}",
+  "@deleteSavedText": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "contactAddress": "Contact: {email}",
+  "@contactAddress": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "signedInAs": "Autentificat ca {email}{method}",
+  "@signedInAs": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      },
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+  "accountEmail": "Adresă de e-mail: {email}",
+  "@accountEmail": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "emailToVerify": "Adresă de confirmat: {email}",
+  "@emailToVerify": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "resendAfter": "Retrimite peste {seconds} s",
+  "@resendAfter": {
+    "placeholders": {
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "testerUntil": "Acces de testare până la {date} (ora locală).",
+  "@testerUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "cropPosition": "Orizontal {horizontal}%, vertical {vertical}%",
+  "@cropPosition": {
+    "placeholders": {
+      "horizontal": {
+        "type": "String"
+      },
+      "vertical": {
+        "type": "String"
+      }
+    }
+  },
+  "welcomeName": "Bine ai venit în {name}",
+  "@welcomeName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "policyVersion": "Versiune: {date}",
+  "@policyVersion": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "speechModelDownloading": "Modelul vocal se descarcă. Încearcă mai târziu.",
+  "speechLanguageUnsupported": "Motorul vocal al acestui telefon nu oferă dictare locală în această limbă. Poți scrie sau folosi camera."
+}

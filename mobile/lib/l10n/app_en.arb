@@ -40,7 +40,7 @@
   "about": "About",
   "back": "Back",
   "appPurpose": "What Sedno does",
-  "appDescription": "Sedno simplifies and corrects Polish and English texts.",
+  "appDescription": "Sedno simplifies and corrects texts in the supported languages.",
   "appAudience": "It was created for people who are hard of hearing and people who find complex text difficult to understand.",
   "appAge": "The app is for people aged 13 and over.",
   "howItWorks": "How it works",
@@ -410,5 +410,7 @@
         "type": "String"
       }
     }
-  }
+  },
+  "speechModelDownloading": "The speech model is downloading. Try again later.",
+  "speechLanguageUnsupported": "The speech engine on this phone does not support on-device dictation in this language. You can type or use the camera."
 }

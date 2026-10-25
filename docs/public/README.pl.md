@@ -6,9 +6,11 @@ Publiczne adresy:
 - [Instrukcja usunięcia konta](https://sedno.xyz/usun-konto/).
 - [Podsumowanie na stronie głównej](https://sedno.xyz/#prywatnosc).
 
-Dokumenty w `docs/public/` są osadzane w backendzie. Ich identyczne kopie w
-`website/SednoWebsite/public/` są przeznaczone do publikacji na OVH przez SFTP.
-Wszystkie cztery pliki tworzy wspólny generator. Edycja repozytorium nie zmienia
+Dokumenty w `docs/public/` są osadzane w backendzie. Strona OVH w
+`website/SednoWebsite/public/` korzysta z tych samych źródeł polityki, ale ma
+własny układ i przełącznik języka. Generator polskiej polityki tworzy dokumenty
+backendu i stare polskie adresy strony. Pozostałe wersje strony tworzy
+`python3 tools/generate_website.py`. Edycja repozytorium nie zmienia
 strony `sedno.xyz`. Przed publikacją sprawdź dostępność i wersję dokumentów online.
 
 ## Aktualizacja treści
@@ -22,8 +24,16 @@ python3 tools/generate_privacy_policy.py --check
 ```
 
 Generator aktualizuje politykę Markdown, treść w aplikacji oraz
-[prywatnosc/index.html](prywatnosc/index.html) i [usun-konto/index.html](usun-konto/index.html), a także ich kopie w
-`website/SednoWebsite/public/`. Kontrola `--check` obejmuje również te kopie.
+[prywatnosc/index.html](prywatnosc/index.html) i [usun-konto/index.html](usun-konto/index.html), a także polskie strony pod starymi adresami w
+`website/SednoWebsite/public/`. Kontrola `--check` obejmuje również te strony.
+Po zmianie dowolnego źródła polityki uruchom też generator całej strony:
+
+```sh
+python3 tools/generate_website.py
+python3 tools/generate_website.py --check
+```
+
+[Opis wszystkich adresów i źródeł tłumaczeń](../../website/SednoWebsite/README.md).
 Pełnej polityki nie skracaj przez usuwanie informacji o danych, prawach i dostawcach.
 
 Opublikuj HTML w hostingu domeny `sedno.xyz`. Sekcja `#prywatnosc` na stronie

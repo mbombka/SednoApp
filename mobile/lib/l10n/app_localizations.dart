@@ -5,8 +5,18 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
+import 'app_localizations_cs.dart';
+import 'app_localizations_de.dart';
 import 'app_localizations_en.dart';
+import 'app_localizations_es.dart';
+import 'app_localizations_fr.dart';
+import 'app_localizations_it.dart';
+import 'app_localizations_nb.dart';
 import 'app_localizations_pl.dart';
+import 'app_localizations_pt.dart';
+import 'app_localizations_ro.dart';
+import 'app_localizations_sk.dart';
+import 'app_localizations_sv.dart';
 
 // ignore_for_file: type=lint
 
@@ -94,8 +104,19 @@ abstract class AppLocalizations {
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
+    Locale('cs'),
+    Locale('de'),
     Locale('en'),
+    Locale('en', 'US'),
+    Locale('es'),
+    Locale('fr'),
+    Locale('it'),
+    Locale('nb'),
     Locale('pl'),
+    Locale('pt'),
+    Locale('ro'),
+    Locale('sk'),
+    Locale('sv'),
   ];
 
   /// No description provided for @restoreOriginal.
@@ -341,7 +362,7 @@ abstract class AppLocalizations {
   /// No description provided for @appDescription.
   ///
   /// In pl, this message translates to:
-  /// **'Sedno upraszcza i poprawia polskie i angielskie teksty.'**
+  /// **'Sedno upraszcza i poprawia teksty w obsługiwanych językach.'**
   String get appDescription;
 
   /// No description provided for @appAudience.
@@ -1777,6 +1798,18 @@ abstract class AppLocalizations {
   /// In pl, this message translates to:
   /// **'Wersja: {date}'**
   String policyVersion(String date);
+
+  /// No description provided for @speechModelDownloading.
+  ///
+  /// In pl, this message translates to:
+  /// **'Model mowy jest pobierany. Spróbuj później.'**
+  String get speechModelDownloading;
+
+  /// No description provided for @speechLanguageUnsupported.
+  ///
+  /// In pl, this message translates to:
+  /// **'Silnik mowy w tym telefonie nie obsługuje lokalnego dyktowania w tym języku. Możesz wpisać tekst lub użyć aparatu.'**
+  String get speechLanguageUnsupported;
 }
 
 class _AppLocalizationsDelegate
@@ -1789,20 +1822,64 @@ class _AppLocalizationsDelegate
   }
 
   @override
-  bool isSupported(Locale locale) =>
-      <String>['en', 'pl'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>[
+    'cs',
+    'de',
+    'en',
+    'es',
+    'fr',
+    'it',
+    'nb',
+    'pl',
+    'pt',
+    'ro',
+    'sk',
+    'sv',
+  ].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
-  // Lookup logic when only language code is specified.
+  // Lookup logic when language+country codes are specified.
   switch (locale.languageCode) {
     case 'en':
+      {
+        switch (locale.countryCode) {
+          case 'US':
+            return AppLocalizationsEnUs();
+        }
+        break;
+      }
+  }
+
+  // Lookup logic when only language code is specified.
+  switch (locale.languageCode) {
+    case 'cs':
+      return AppLocalizationsCs();
+    case 'de':
+      return AppLocalizationsDe();
+    case 'en':
       return AppLocalizationsEn();
+    case 'es':
+      return AppLocalizationsEs();
+    case 'fr':
+      return AppLocalizationsFr();
+    case 'it':
+      return AppLocalizationsIt();
+    case 'nb':
+      return AppLocalizationsNb();
     case 'pl':
       return AppLocalizationsPl();
+    case 'pt':
+      return AppLocalizationsPt();
+    case 'ro':
+      return AppLocalizationsRo();
+    case 'sk':
+      return AppLocalizationsSk();
+    case 'sv':
+      return AppLocalizationsSv();
   }
 
   throw FlutterError(

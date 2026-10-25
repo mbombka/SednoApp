@@ -1,5 +1,8 @@
 # Serwer Sedno
 
+23.10.2026: wdrożono **sedno-api-00014-mmh** z 13 wariantami językowymi i przygotowano
+**AAB 0.2.0 (17)**. [Aktualny raport wdrożenia i pakietu](../docs/backend-deployment-2026-10-23-multilingual.pl.md).
+
 Serwer obsługuje uproszczenia AI, logowanie, limity, zakupy i usuwanie konta.
 C# / .NET 10 LTS, Cloud Firestore **Standard, Native mode**, baza `(default)`.
 Dostęp do bazy ma wyłącznie backend przez IAM; aplikacja Flutter korzysta z API.
@@ -254,7 +257,9 @@ dziennie bez zakupu. Datę sprawdza transakcja limitu; użycie nie jest zerowane
 
 ## Język tekstu
 
-`POST /v1/simplifications` przyjmuje opcjonalne `language: pl | en` (domyślnie `pl`).
-Oba tryby mają osobne prompty polskie i angielskie w `Prompts/`; angielski używa
-pisowni brytyjskiej. Języki korzystają ze wspólnego limitu i ustawień modelu.
+`POST /v1/simplifications` przyjmuje opcjonalne `language` (domyślnie `pl`):
+`pl`, `en` (UK), `en-US`, `fr`, `de`, `it`, `es`, `pt` (Portugalia), `sk`, `cs`,
+`ro`, `nb` (Bokmål), `sv`. `TextLanguages` wybiera osobne prompty obu trybów.
+Języki korzystają ze wspólnego limitu i ustawień modelu.
+[Rozszerzenie kodu i kolejność wydania](../docs/multilingual-13-languages.pl.md).
 [Opis zgodności, wdrożenia i rozszerzania](../docs/multilingual-app.pl.md).

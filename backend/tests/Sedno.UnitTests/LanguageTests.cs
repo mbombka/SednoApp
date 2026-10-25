@@ -12,13 +12,14 @@ public sealed class LanguageTests
     public void LegacyRequestsRemainPolishAndUnsupportedLanguagesAreRejected()
     {
         Assert.Equal("pl", new SimplificationInput("legacy", "Tekst").Language);
-        foreach (var language in new[] { "de", "en-GB", "", "EN" })
+        foreach (var language in new[] { "xx", "en-GB", "", "EN", "pt-BR", "nn" })
         {
             var error = Assert.Throws<InputValidationException>(() =>
                 SimplificationService.Validate(new("request", "Text", Language: language)));
             Assert.Equal("invalid_language", error.Code);
         }
-        SimplificationService.Validate(new("english", "Text", Language: "en"));
+        foreach (var language in TextLanguages.All)
+            SimplificationService.Validate(new("request", "Text", Language: language));
     }
 
     [Fact]
@@ -31,19 +32,26 @@ public sealed class LanguageTests
         Assert.Contains("British English", SimplificationPrompt.ForLanguage("en"));
         Assert.Contains("British English", CorrectionPrompt.ForLanguage("en"));
         Assert.NotEqual(SimplificationPrompt.ForLanguage("en"), CorrectionPrompt.ForLanguage("en"));
-        Assert.Throws<ArgumentException>(() => SimplificationPrompt.ForLanguage("de"));
+        foreach (var language in TextLanguages.All)
+        {
+            var variant = TextLanguages.PromptVariant(language);
+            Assert.Equal(ReadEmbeddedPrompt($"simplify.{variant}.txt"), SimplificationPrompt.ForLanguage(language));
+            Assert.Equal(ReadEmbeddedPrompt($"correct.{variant}.txt"), CorrectionPrompt.ForLanguage(language));
+        }
+        Assert.Throws<ArgumentException>(() => SimplificationPrompt.ForLanguage("xx"));
     }
 
+    public static IEnumerable<object[]> LanguageModes => TextLanguages.All.SelectMany(language => new[] { new object[] { language, false }, new object[] { language, true } });
+
     [Theory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public async Task EnglishUsesTheSelectedPromptAndPreservesProductionPrivacySettings(bool correct)
+    [MemberData(nameof(LanguageModes))]
+    public async Task SelectedLanguageUsesItsPromptAndPreservesProductionPrivacySettings(string language, bool correct)
     {
         using var client = new HttpClient(new CaptureHandler(async request =>
         {
             using var json = JsonDocument.Parse(await request.Content!.ReadAsStringAsync());
             var root = json.RootElement;
-            Assert.Equal(correct ? CorrectionPrompt.ForLanguage("en") : SimplificationPrompt.ForLanguage("en"),
+            Assert.Equal(correct ? CorrectionPrompt.ForLanguage(language) : SimplificationPrompt.ForLanguage(language),
                 root.GetProperty("instructions").GetString());
             Assert.False(root.GetProperty("store").GetBoolean());
             Assert.Equal(4096, root.GetProperty("max_output_tokens").GetInt32());
@@ -58,8 +66,8 @@ public sealed class LanguageTests
         }));
         var model = new OpenAiModelProvider(client, new() { ApiKey = "synthetic-test-key" });
         var result = correct
-            ? await model.CorrectAsync("Text", "en", CancellationToken.None)
-            : await model.SimplifyAsync("Text", "en", CancellationToken.None);
+            ? await model.CorrectAsync("Text", language, CancellationToken.None)
+            : await model.SimplifyAsync("Text", language, CancellationToken.None);
         Assert.Equal("Clear text.", result);
     }
 

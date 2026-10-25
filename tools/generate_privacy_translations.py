@@ -25,7 +25,7 @@ def generate():
             dart += f'  static const {key} = {literal(policy[key])};\n'
         dart += '  static const sections = <PrivacySection>[\n'
         sections = policy['sections'] + [{
-            'title': 'Sources and provider terms',
+            'title': policy.get('sourcesTitle', 'Sources and provider terms'),
             'paragraphs': [item['title'] + ': ' + item['url'] for item in policy['sources']],
         }]
         for section in sections:
@@ -39,7 +39,7 @@ def generate():
             subprocess.run(['dart', 'format', str(temporary)], check=True, stdout=subprocess.DEVNULL)
             dart = temporary.read_text()
         documents[f'mobile/lib/features/privacy/domain/privacy_policy_{language}.dart'] = dart
-        markdown = f"# {policy['title']}\n\nVersion: {policy['versionLabel']}\n\n"
+        markdown = f"# {policy['title']}\n\n{policy.get('versionPrefix', 'Version')}: {policy['versionLabel']}\n\n"
         for section in sections:
             markdown += f"## {section['title']}\n\n" + '\n\n'.join(section['paragraphs']) + '\n\n'
         documents[f'docs/privacy-policy.{language}.md'] = markdown

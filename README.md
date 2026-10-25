@@ -1,22 +1,28 @@
 # Sedno
 
-Sedno to aplikacja na Androida, która upraszcza i poprawia polskie i angielskie teksty. Można wpisać
+23.10.2026: wdrożono **sedno-api-00014-mmh** z 13 wariantami językowymi i przygotowano
+**AAB 0.2.0 (17)**. [Aktualny raport wdrożenia i pakietu](docs/backend-deployment-2026-10-23-multilingual.pl.md).
+
+Sedno to aplikacja na Androida, która upraszcza i poprawia teksty w obsługiwanych językach. Można wpisać
 tekst, wkleić go, odczytać ze zdjęcia lub podyktować (Android 13+ z lokalnym
-modelem języka polskiego). Zdjęcia i dźwięk pozostają na telefonie.
+modelem wybranego języka). Zdjęcia i dźwięk pozostają na telefonie.
 Wynik przygotowuje AI, dlatego trzeba go sprawdzić. Przełącznik nad przyciskiem
 wybiera „Uprość” lub „Popraw”. Oba tryby korzystają ze wspólnego limitu dziennego.
 Wynik zastępuje tekst w edytorze; jego nagłówek i systemowy Wstecz przywracają
 oryginał. Gumka, zmiana trybu i rozpoczęcie nagrywania lub zdjęcia czyszczą pole.
 [Lista zadań i opis nowego trybu](docs/popraw-zadania.md).
 
+Kod rozszerzono do [13 wariantów językowych](docs/multilingual-13-languages.pl.md),
+w tym portugalskiego z Portugalii i norweskiego Bokmål. Backend z obsługą tych języków jest wdrożony; przygotowano nowy AAB.
+
 ## Obecny stan
 
 Serwer uruchomiono 19.10.2026. Przed udostępnieniem aplikacji pozostają
 [pozostałe kontrole i przygotowanie Google Play](Tasks.md).
 Obsługę płatności włączono na istniejącym serwerze do testów; zakupów nie odebrano
-jeszcze na telefonie. Przygotowano [podpisany AAB 16](mobile/docs/google_play_release_16.md)
-z polskim i angielskim (UK), wyborem języka oraz osobnymi promptami obu trybów.
-Backend z aktualnymi promptami wdrożono 23.10.2026 jako `sedno-api-00013-8x6`,
+jeszcze na telefonie. Przygotowano [podpisany AAB 0.2.0 (17)](mobile/docs/google_play_release_17.md)
+z 13 wariantami językowymi, wyborem języka i osobnymi promptami obu trybów.
+Backend z aktualnymi promptami wdrożono 23.10.2026 jako `sedno-api-00014-mmh`,
 ze współbieżnością 80 żądań na instancję.
 [Raport wdrożenia](docs/backend-deployment-2026-10-23.pl.md).
 Obsługę usuwania konta przez e-mail właściciel potwierdził 20.10.2026.

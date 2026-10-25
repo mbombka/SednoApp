@@ -1,0 +1,21 @@
+<svg xml:lang="cs" xmlns="http://www.w3.org/2000/svg" width="640" height="840" viewBox="0 0 640 840">
+  <title>Změna termínu návštěvy</title>
+  <defs>
+    <linearGradient id="desk" x2="1" y2="1"><stop stop-color="#9e795b"/><stop offset=".45" stop-color="#b89572"/><stop offset="1" stop-color="#79583e"/></linearGradient>
+    <linearGradient id="paper" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fffef9"/><stop offset=".65" stop-color="#f7f5ec"/><stop offset="1" stop-color="#e6e0d1"/></linearGradient>
+    <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency=".012 .22" numOctaves="3" seed="8"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope=".14"/></feComponentTransfer><feBlend in="SourceGraphic" mode="soft-light"/></filter>
+    <filter id="paper-grain"><feTurbulence type="fractalNoise" baseFrequency=".65" numOctaves="3" seed="4"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope=".06"/></feComponentTransfer><feBlend in="SourceGraphic" mode="multiply"/></filter>
+    <filter id="shadow" x="-30%" y="-20%" width="170%" height="160%"><feDropShadow dx="12" dy="19" stdDeviation="15" flood-color="#302317" flood-opacity=".45"/></filter>
+  </defs>
+  <rect width="640" height="840" fill="url(#desk)" filter="url(#grain)"/>
+  <g fill="none" stroke="#6b492f" opacity=".22"><path d="M65 0Q48 210 68 420T64 840M246 0Q230 190 245 460T240 840M456 0Q470 210 454 420T464 840" stroke-width="3"/><path d="M73 0Q58 230 75 430T74 840M252 0Q244 220 253 450T250 840M460 0Q482 220 466 450T473 840"/></g>
+  <g transform="rotate(-5 320 420)">
+    <path d="M88 110H537L544 718Q330 728 83 716Z" fill="url(#paper)" filter="url(#shadow)"/>
+    <path d="M88 110H537L544 718Q330 728 83 716Z" fill="url(#paper)" filter="url(#paper-grain)"/>
+    <g fill="#363b40" font-family="Georgia, serif">
+      <text x="133" y="218" font-size="25" font-weight="bold"><tspan x="133" dy="0">Změna termínu návštěvy</tspan></text><text x="133" y="284" font-size="23"><tspan x="133" dy="0">Za účelem změny termínu</tspan><tspan x="133" dy="37">návštěvy vás žádáme o</tspan><tspan x="133" dy="37">telefonický kontakt.</tspan></text>
+    </g>
+    <path d="M131 431H489" stroke="#d2cbbb"/>
+    <path d="M88 110H537" stroke="#fff" stroke-width="3" opacity=".8"/>
+  </g>
+<defs><mask id="selection-window"><rect width="640" height="840" fill="white"/><rect x="118" y="258" width="415" height="202" fill="black"/></mask></defs><rect width="640" height="840" fill="#000" opacity=".4" mask="url(#selection-window)"/><rect x="118" y="258" width="415" height="202" fill="none" stroke="black" stroke-width="8"/><rect x="118" y="258" width="415" height="202" fill="none" stroke="white" stroke-width="4"/><circle cx="118" cy="258" r="15" fill="#0057b7" stroke="white" stroke-width="4"/><circle cx="533" cy="258" r="15" fill="#0057b7" stroke="white" stroke-width="4"/><circle cx="118" cy="460" r="15" fill="#0057b7" stroke="white" stroke-width="4"/><circle cx="533" cy="460" r="15" fill="#0057b7" stroke="white" stroke-width="4"/></svg>

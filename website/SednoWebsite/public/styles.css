@@ -134,12 +134,12 @@ dd { margin: 7px 0 0; color: var(--muted); font-size: .92rem; }
 .walkthrough-intro { max-width: 650px; margin-bottom: 24px; color: var(--muted); }
 .walkthrough-frames { display: flex; align-items: stretch; gap: 28px; padding: 0; margin: 0; list-style: none; }
 .walkthrough-step { position: relative; display: flex; flex-direction: column; flex: 0 0 259px; min-width: 0; }
-.walkthrough-step + .walkthrough-step::before { content: '→'; position: absolute; bottom: 13rem; left: -25px; color: var(--blue); font-size: 1.5rem; }
+.walkthrough-step + .walkthrough-step::before { content: '→'; position: absolute; bottom: 17rem; left: -25px; color: var(--blue); font-size: 1.5rem; }
 .walkthrough-step h4 { font-size: 1.125rem; line-height: 1.5; margin: 0 0 8px; }
 .instruction-number { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; background: var(--ink); color: white; font-size: 1rem; }
 .walkthrough-step > p { margin-bottom: 20px; color: var(--muted); }
 .diagram { margin-top: auto; width: 100%; }
-.phone-picture, .sound-picture { width: 100%; height: max(448px, 28rem); }
+.phone-picture, .sound-picture { width: 100%; height: max(576px, 36rem); }
 .phone-picture { display: flex; flex-direction: column; border: 2px solid #a9b7c9; border-radius: 24px; background: #f5f7fb; padding: 0 0 20px; box-shadow: 0 8px 24px #172c4508; color: #14243a; }
 .phone-heading { display: flex; align-items: center; gap: 10px; flex-shrink: 0; min-height: 4.25rem; padding: 12px; background: white; border-radius: 22px 22px 0 0; font-weight: 600; line-height: 1.4; }
 .phone-heading > span { flex: 1; min-width: 0; }
@@ -155,23 +155,17 @@ dd { margin: 7px 0 0; color: var(--muted); font-size: .92rem; }
 .actions-picture svg { width: 22px; height: 22px; }
 .side-picture, .side-placeholder { width: 38px; height: 38px; flex-shrink: 0; }
 .side-picture { border-radius: 50%; background: #c2e7ff; }
-.primary-picture { width: 5em; min-height: 5em; padding: 8px; border-radius: 50%; background: #0057b7; color: white; font-weight: 600; }
+.primary-picture { width: 9em; min-height: 9em; padding: 6px; font-size: .75rem; white-space: nowrap; border-radius: 50%; background: #0057b7; color: white; font-weight: 600; }
 .photo-phone { padding-bottom: 16px; background: white; }
 .photo-phone .phone-heading { font-size: .95rem; }
 .photo-preview { position: relative; flex: 1; min-height: 0; margin: 0 10px; background: #27313c; }
-.photo-preview img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.photo-preview img { display: block; width: 100%; height: 100%; object-fit: contain; }
 .photo-action { padding: 20px 16px 0; }
 .capture-picture { display: flex; width: 100%; min-height: 48px; padding: 10px 12px; border-radius: 28px; background: #0057b7; color: white; font-weight: 600; text-align: center; line-height: 1.4; }
 .capture-picture svg { flex-shrink: 0; }
 .crop-hint { margin: 0 12px 12px; font-size: .8rem; line-height: 1.5; }
 .crop-preview { margin: 6px 16px; }
-.selection-frame { position: absolute; inset: 28% 12% 43%; border: 2px solid white; outline: 2px solid black; box-shadow: 0 0 0 100vmax #0006; clip-path: inset(-100% -16% -150%); }
-.selection-frame span { position: absolute; width: 16px; height: 16px; border: 2px solid white; border-radius: 50%; background: #0057b7; transform: translate(-50%, -50%); }
-.selection-frame span:nth-child(1) { top: 0; left: 0; }
-.selection-frame span:nth-child(2) { top: 0; left: 100%; }
-.selection-frame span:nth-child(3) { top: 100%; left: 0; }
-.selection-frame span:nth-child(4) { top: 100%; left: 100%; }
-.crop-preview { overflow: hidden; }
+.crop-preview { background: white; }
 .sound-picture { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; padding: 24px 16px; border-radius: 24px; background: #edf3ff; border: 1px solid #d4e2ff; text-align: center; }
 .sound-symbol { display: flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: 50%; color: #0057b7; background: white; }
 .sound-symbol svg { width: 32px; height: 32px; }
@@ -194,4 +188,29 @@ dd { margin: 7px 0 0; color: var(--muted); font-size: .92rem; }
 @media (forced-colors: active) {
   .marked { outline-color: Highlight; }
   .primary-picture, .instruction-number, .phone-picture, .capture-picture, .sound-picture { border: 1px solid ButtonText; }
+}
+
+/* Native details/summary keeps language selection usable without JavaScript. */
+.header { flex-wrap: wrap; }
+.main-nav { margin-left: auto; }
+.language-menu { position: relative; z-index: 2; max-width: 100%; }
+.language-menu summary { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; min-height: 48px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 7px; color: var(--ink); background: white; cursor: pointer; list-style: none; font-size: .875rem; }
+.language-menu summary::-webkit-details-marker { display: none; }
+.language-menu summary::after { content: '⌄'; font-size: 1.2rem; }
+.language-menu summary:focus-visible { outline: 3px solid var(--blue); outline-offset: 4px; }
+.language-options { position: absolute; right: 0; top: calc(100% + 8px); display: grid; gap: 0; width: min(300px, calc(100vw - 40px)); max-height: 65vh; overflow-y: auto; padding: 8px; background: white; border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 12px 32px #172c4520; }
+.language-options a { padding: 8px 12px; border-radius: 5px; }
+.language-options a[aria-current="page"], .language-links a[aria-current="page"] { background: #edf3ff; color: #1943aa; font-weight: 700; }
+.language-section { padding-block: 48px; border-bottom: 1px solid var(--line); }
+.language-section > p:not(.eyebrow) { max-width: 740px; margin-block: 20px; color: var(--muted); }
+.language-links { display: flex; flex-wrap: wrap; gap: 8px; }
+.language-links a { min-height: 48px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 7px; background: white; }
+@media (max-width: 680px) {
+  .header { padding-block: 16px; gap: 8px 16px; }
+  .header .main-nav { order: 3; flex-basis: 100%; justify-content: center; margin-left: 0; }
+  .language-menu { margin-left: auto; }
+  .language-menu summary { max-width: 230px; }
+}
+@media (forced-colors: active) {
+  .language-menu summary, .language-options, .language-links a { border-color: ButtonText; }
 }

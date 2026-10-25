@@ -18,7 +18,7 @@ public sealed class SimplificationService(IUsageStore usage, IModelProvider mode
             throw new InputValidationException("invalid_request_id", "Nieprawidłowy identyfikator żądania.");
         if (input.Mode is not ("simplify" or "correct"))
             throw new InputValidationException("invalid_mode", "Nieprawidłowy tryb tekstu.");
-        if (input.Language is not ("pl" or "en"))
+        if (!TextLanguages.IsSupported(input.Language))
             throw new InputValidationException("invalid_language", "Unsupported text language.");
         if (string.IsNullOrWhiteSpace(input.Text))
             throw new InputValidationException("empty_text", "Wpisz tekst.");

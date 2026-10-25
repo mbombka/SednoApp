@@ -1,0 +1,78 @@
+# Confidentialité et données
+
+Version: 2026-10-23
+
+## Responsable et public
+
+Responsable : Mariusz Bąbka, particulier, ul. Słowiańska 91, Modlniczka, Pologne. Contact : contact@sedno.xyz. Aucun délégué à la protection des données n’a été désigné. Cette politique concerne Sedno et son assistance. La Pologne est le premier marché choisi. L’application est destinée aux personnes de 13 ans et plus ; de 13 à 17 ans, l’autorisation d’un parent ou tuteur est recommandée. Sedno ne vérifie pas l’âge et ne collecte pas de date de naissance. La politique polonaise est sur https://sedno.xyz/prywatnosc/, le résumé sur https://sedno.xyz/#prywatnosc et les instructions de suppression sur https://sedno.xyz/usun-konto. Le serveur fonctionne depuis le 19 octobre 2026.
+
+## Texte et intelligence artificielle
+
+Votre texte est envoyé par le serveur Sedno à OpenAI pour le simplifier ou le corriger. Ne saisissez pas de données que vous ne souhaitez pas transmettre. Les photos et le son restent sur votre appareil. Seul le texte est envoyé à l’IA. La lecture utilise une voix locale téléchargée. L’IA peut faire des erreurs. Vérifiez le résultat.
+
+Les modes Simplifier et Corriger utilisent OpenAI Responses API. Sedno traite le texte en mémoire, sans enregistrer l’original ni le résultat dans la base ou les journaux. L’historique complet et les photos ne sont pas envoyés. La désactivation du stockage API ne signifie pas une absence de conservation chez OpenAI. Les données API ne servent pas par défaut à entraîner les modèles. Les journaux de sécurité peuvent conserver du contenu jusqu’à 30 jours, sauf exceptions du fournisseur ; des caches peuvent conserver un état temporaire. Nous ne promettons ni conservation nulle ni traitement exclusivement dans l’UE. N’envoyez pas de données de santé, de handicap ou d’autres données sensibles. Retirez les données personnelles inutiles, y compris celles d’autrui. Utiliser Sedno ne vaut pas consentement à tout traitement.
+
+## Suppression du compte et des données
+
+Nous supprimerons le compte Sedno, ses données sur le serveur et l’historique local de cet appareil. Cette action est irréversible. Elle n’annule pas l’abonnement. Pour arrêter les paiements : Google Play → Paiements et abonnements → Abonnements → Sedno → Annuler l’abonnement.
+
+Dans l’application : Compte → Supprimer le compte → Supprimer le compte et les données. Après réussite, nous supprimons l’identité Firebase de Sedno, les sessions, installations liées, métadonnées de requêtes et achats de la base Sedno, mais pas votre compte Google. Sans l’application, écrivez à contact@sedno.xyz avec l’objet « Suppression du compte Sedno » et votre adresse de connexion. N’envoyez ni mot de passe, code, jeton, pièce d’identité, photo ni texte. L’envoi seul ne supprime pas le compte : nous vérifierons que vous le contrôlez et ne demanderons que les informations nécessaires. La suppression à distance ne supprime pas l’historique d’autres appareils. Supprimez-le dans Historique ou effacez les données Android. Nous n’y avons aucun accès distant. Les achats et données conservés par Google suivent ses règles.
+
+## Photos, voix et stockage local
+
+La prise de photo, le recadrage et l’OCR sont locaux. Les photos ne sont envoyées ni au serveur ni à l’IA. Le texte reconnu part directement en simplification ; il reste modifiable après erreur ou annulation. L’application tente de supprimer les copies de travail après lecture, erreur ou annulation ; un arrêt brutal peut interrompre ce nettoyage. Les copies d’une autre application photo restent sous votre contrôle.
+
+La reconnaissance vocale est locale sur les appareils compatibles Android 13 ou plus avec le modèle téléchargé de la langue choisie. Le son reste en mémoire, sans fichier ni envoi à Sedno ou OpenAI. Fin après 1,5 seconde de silence après la parole ou au plus 60 secondes. Le texte reconnu suit le même parcours vers l’IA ; Arrêter annule la session. La lecture en mode Corriger utilise une voix locale hors connexion et ne démarre pas si elle manque. Télécharger modèles ou voix peut nécessiter Internet et relève du fournisseur vocal. Caméra et microphone sont facultatifs : vous pouvez saisir ou coller le texte.
+
+L’historique contient l’original, le résultat, le mode, la langue et la date. Il est chiffré, local et exclu des sauvegardes Android. Les entrées expirent après 7 jours et ne sont plus affichées ; nettoyage à la lecture, au démarrage et à la reprise, donc au prochain événement si l’application est fermée. Suppression manuelle possible ; déconnexion = suppression de tout l’historique. L’appareil conserve aussi une session protégée, un identifiant aléatoire d’installation et le choix manuel de langue. Supprimer le compte ne retire pas cet identifiant local ; effacez les données de l’application pour le supprimer.
+
+## Compte, limites et abonnement
+
+Le compte est facultatif. Firebase Authentication gère Google ou e-mail et mot de passe. Sedno conserve UID Firebase, méthode de connexion et date de création ; il ne reçoit pas les mots de passe Google ou Firebase. Google peut traiter e-mail, profil, IP et données de connexion. Pour la sécurité et les limites, Sedno conserve des identifiants pseudonymes d’installation, session et requête, dates, états et empreinte HMAC du texte, pas une copie. L’identifiant d’installation n’est pas anonyme. La connexion ne renouvelle pas le quota gratuit. L’IP sert à limiter les requêtes, n’est pas un champ de la base Sedno mais peut être traitée par l’infrastructure. Play Integrity vérifie l’application et l’appareil sans texte ni photo. Google Play gère les paiements : Sedno ne reçoit ni carte ni compte bancaire. Il conserve un jeton d’achat chiffré, son empreinte, le lien au compte, l’état, l’échéance et les données de vérification. Les identifiants de notification empêchent les doublons.
+
+## Fournisseurs et données techniques
+
+OpenAI traite le texte et les données de sécurité selon ses conditions ; le contrat standard d’un client polonais désigne OpenAI Ireland Ltd. Google fournit Firebase Authentication, Google Sign-In, ML Kit, Play Integrity et Google Play, avec Google Ireland Limited et Google LLC selon les produits. OVHcloud fournit l’e-mail sedno.xyz. ML Kit peut transmettre des métriques techniques et d’usage : identifiants d’installation, modèle d’appareil, version, erreurs et durées, sans photo ni texte reconnu. L’OCR local ne signifie pas une absence de télémétrie. Aucune publicité, Firebase Analytics ou Crashlytics n’est intégré. Infrastructure : Cloud Run, Firestore Standard europe-central2 (Varsovie), Firebase Hosting. Le contrat Google Cloud standard avec adresse de facturation polonaise désigne Google Cloud Poland Sp. z o.o. Un serveur actif ne prouve pas que tous les accords et contrôles avant publication sont terminés.
+
+## Finalités et bases juridiques
+
+Simplification, correction, compte et droits d’abonnement : article 6(1)(b) RGPD, exécution du service ou demande de l’utilisateur. Sécurité, lutte contre les abus et limites : article 6(1)(f), intérêt légitime à protéger le service, avec métadonnées minimales et sans publicité ; vous pouvez vous y opposer, selon votre situation. Assistance ordinaire : article 6(1)(f). Droits sur les données : article 6(1)(c) et articles 12–22 ; preuve minimale de traitement des demandes : articles 5(2) et 24. Installation, avis IA et permission caméra ne sont pas un consentement général. L’évaluation d’un éventuel consentement distinct pour les diagnostics SDK doit précéder leur utilisation en production ; cette politique ne le remplace pas. Texte et données techniques nécessaires sont requis pour le service, compte et achat seulement pour ces fonctions. Aucun profilage publicitaire ni décision à effet juridique fondée sur le résultat. Signalez au responsable tout blocage erroné.
+
+## Données hors Espace économique européen
+
+Google et OpenAI peuvent traiter hors EEE, notamment aux États-Unis ; Firebase Authentication utilise une infrastructure américaine. La base à Varsovie ne garantit pas que toutes les données restent en Pologne ou dans l’EEE. La production nécessite des accords de traitement et garanties de transfert adaptés. Les fournisseurs décrivent clauses contractuelles types et décisions d’adéquation pour les destinataires concernés ; leur marque ne garantit pas un mécanisme pour chaque transfert. Demandez au responsable les conditions et une copie des garanties appliquées. Les conditions publiques sont citées ci-dessous.
+
+## Conservation dans Sedno
+
+Le serveur ne sauvegarde ni texte ni résultat ; usage en mémoire pendant la requête. Historique local : 7 jours. Un travail horaire indépendant du trafic supprime les métadonnées et empreintes HMAC de plus de 8 jours ; compteurs et réservations restent jusqu’à 8 jours. Sessions de compte : 7 jours, d’invité : 90 jours ; une session expirée est refusée avant même sa suppression horaire. Une identité invitée non liée de plus de 90 jours est supprimée lorsqu’elle n’a plus de session ni requête, éventuellement après le 90e jour. Compte, installations liées et achats Sedno restent jusqu’à suppression du compte ; aucun nettoyage automatique des comptes inactifs ou achats expirés. Les identifiants techniques de notifications Play n’ont pas de suppression automatique ; ils ne contiennent ni jeton d’achat ni lien au compte. Nous ne déclarons pas de délais non mis en œuvre.
+
+## Règles opérationnelles de conservation
+
+Règles adoptées pour la production : journaux techniques et sauvegardes jusqu’à 30 jours ; correspondance jusqu’à 90 jours après clôture ; preuve minimale des demandes de droits jusqu’à 12 mois, avec seulement date, type et résultat. Le journal principal est réglé à 30 jours. Les anciennes sauvegardes SQL ne couvrent pas Firestore ; nouvelles sauvegardes et restauration nécessitent configuration distincte et ne sont pas présumées actives. Si activées : maximum 30 jours. Autres stockages, exports et gestion des e-mails nécessitent contrôle et application avant publication. Les sauvegardes servent à la reprise, pas à réutiliser des comptes supprimés ; réappliquez les suppressions avant accès après restauration. Obligation légale ou litige : seulement données et durée nécessaires. Les règles Sedno ne remplacent pas celles des fournisseurs : Firebase décrit plusieurs semaines pour les IP de connexion et les autres données d’authentification jusqu’à demande de suppression, puis jusqu’à 180 jours pour les systèmes actifs et sauvegardes. Google gère ses données de paiement et métriques ; OpenAI est décrit plus haut.
+
+## Vos droits et contact
+
+Selon les conditions et exceptions du RGPD, vous pouvez demander accès et copie, rectification, effacement, limitation, portabilité, vous opposer à l’intérêt légitime et retirer un consentement sans affecter le traitement antérieur. Écrivez à contact@sedno.xyz. Réponse sans retard injustifié, normalement sous un mois ; prolongation possible de deux mois dans les cas du RGPD, avec motif annoncé le premier mois. En cas de doute raisonnable sur l’identité, seule une confirmation nécessaire est demandée, sans pièce d’identité systématique. Réclamation possible auprès du président de l’autorité polonaise UODO : https://uodo.gov.pl. Un message concernant les données ne nécessite pas vos textes à simplifier.
+
+## Modifications
+
+Chaque version est datée. Les changements importants seront annoncés sur la page de confidentialité et dans les informations de mise à jour avant tout nouveau traitement. Une modification du document ne remplace pas un consentement requis. Fournisseur, finalité ou conservation doivent être mis à jour dans l’information et dans la configuration réelle du service.
+
+## Sources et conditions des fournisseurs
+
+commission.europa.eu: https://commission.europa.eu/law/law-topic/data-protection/information-business-and-organisations/legal-grounds-processing-data_en
+
+developers.openai.com: https://developers.openai.com/api/docs/guides/your-data
+
+openai.com: https://openai.com/policies/services-agreement/
+
+firebase.google.com: https://firebase.google.com/support/privacy
+
+developers.google.com: https://developers.google.com/ml-kit/android-data-disclosure
+
+cloud.google.com: https://cloud.google.com/terms/google-entity
+
+cloud.google.com: https://cloud.google.com/terms/data-processing-addendum
+
+policies.google.com: https://policies.google.com/privacy/frameworks?hl=en
+

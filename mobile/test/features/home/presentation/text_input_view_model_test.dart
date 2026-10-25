@@ -3,6 +3,10 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sedno_app/features/home/presentation/text_input_view_model.dart';
 import 'package:sedno_app/features/simplification/domain/input_text.dart';
+import 'package:sedno_app/features/simplification/domain/text_mode.dart';
+import 'package:sedno_app/features/simplification/data/http_simplification_repository.dart';
+import 'package:sedno_app/features/shared/data/development_mocks.dart';
+import 'package:sedno_app/l10n/localization.dart';
 
 void main() {
   test('starts idle and counts visible Unicode characters', () {
@@ -139,6 +143,80 @@ void main() {
     expect(model.status, TextInputStatus.idle);
     expect(model.errorMessage, isNull);
   });
+
+  for (final mode in TextMode.values) {
+    final strings = polishStrings();
+    final correcting = mode == TextMode.correct;
+    final failures = <(Object, String)>[
+      (
+        const SubmissionUnavailableException(),
+        correcting
+            ? strings.correctionUnavailable
+            : strings.simplificationUnavailable,
+      ),
+      (TimeoutException('private details'), strings.requestTimeout),
+      (const QuotaExceededException(), strings.quotaUsed),
+      (
+        StateError('private details'),
+        correcting ? strings.correctionFailed : strings.simplificationFailed,
+      ),
+      for (final kind in SimplificationFailure.values)
+        (
+          SimplificationApiException(kind),
+          switch (kind) {
+            SimplificationFailure.offline => strings.offline,
+            SimplificationFailure.timeout => strings.requestTimeout,
+            SimplificationFailure.unauthorized => strings.sessionExpired,
+            SimplificationFailure.rateLimited => strings.quotaExhausted,
+            SimplificationFailure.unavailable => strings.serviceUnavailable,
+            SimplificationFailure.rejected =>
+              correcting
+                  ? strings.correctionRejected
+                  : strings.simplificationRejected,
+          },
+        ),
+    ];
+    for (var i = 0; i < failures.length; i++) {
+      for (final action in ['clear', 'edit', 'retry']) {
+        test(
+          '$mode failure $i clears on $action and preserves input until then',
+          () async {
+            final pending = Completer<void>();
+            var calls = 0;
+            final model = TextInputViewModel(
+              onSubmit: (input) {
+                expect(input.value, 'Zachowaj tekst');
+                if (calls++ == 0) return Future.error(failures[i].$1);
+                return pending.future;
+              },
+            );
+            addTearDown(model.dispose);
+            model.setMode(mode);
+            model.setText('Zachowaj tekst');
+            await model.submit();
+            expect(model.status, TextInputStatus.error);
+            expect(model.errorMessage, startsWith(failures[i].$2));
+            expect(model.errorMessage, isNot(contains('private details')));
+            expect(model.characterCount, 'Zachowaj tekst'.length);
+            if (action == 'clear') {
+              model.clear();
+              expect(model.characterCount, 0);
+            } else if (action == 'edit') {
+              model.setText('Edytowany tekst');
+            } else {
+              final retry = model.submit();
+              expect(model.status, TextInputStatus.loading);
+              expect(model.errorMessage, isNull);
+              pending.complete();
+              await retry;
+              expect(model.status, TextInputStatus.success);
+            }
+            expect(model.errorMessage, isNull);
+          },
+        );
+      }
+    }
+  }
 
   test('ignores a response after the view model is disposed', () async {
     final pending = Completer<void>();

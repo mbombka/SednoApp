@@ -1,0 +1,78 @@
+# Privacidad y datos
+
+Versión: 2026-10-23
+
+## Responsable y destinatarios
+
+Responsable: Mariusz Bąbka, persona física, ul. Słowiańska 91, Modlniczka, Polonia. Contacto: contact@sedno.xyz. No se ha nombrado delegado de protección de datos. La política cubre Sedno y su asistencia; Polonia es el primer mercado elegido. La aplicación es para mayores de 13 años; entre 13 y 17 años se recomienda permiso de padre, madre o tutor. No se comprueba la edad ni se recogen fechas de nacimiento. Política polaca: https://sedno.xyz/prywatnosc/, resumen: https://sedno.xyz/#prywatnosc, eliminación: https://sedno.xyz/usun-konto. El servidor funciona desde el 19 de octubre de 2026.
+
+## Texto e inteligencia artificial
+
+Tu texto se envía a través del servidor Sedno a OpenAI para simplificarlo o corregirlo. No escribas datos que no quieras compartir. Las fotos y el audio permanecen en el dispositivo. Solo el texto se envía a la IA. La lectura usa una voz local descargada. La IA puede equivocarse. Comprueba el resultado.
+
+Simplificar y Corregir usan OpenAI Responses API. Sedno procesa en memoria sin guardar original ni resultado en su base de datos o registros. No envía fotos ni todo el historial. Desactivar el almacenamiento de la API no significa que el proveedor no conserve datos. Los datos API no se usan para entrenar modelos por defecto. Los registros de seguridad pueden contener textos hasta 30 días, con excepciones del proveedor; las cachés pueden guardar estados temporales. No prometemos retención cero ni tratamiento solo en la UE. No envíes datos de salud, discapacidad ni otros especialmente protegidos. Quita datos personales innecesarios propios y ajenos. Usar la aplicación no equivale a consentimiento general.
+
+## Eliminar cuenta y datos
+
+Eliminaremos la cuenta Sedno, sus datos en el servidor y el historial local de este dispositivo. Es irreversible. Eliminar la cuenta no cancela la suscripción. Para detener los cobros: Google Play → Pagos y suscripciones → Suscripciones → Sedno → Cancelar suscripción.
+
+En la aplicación: Cuenta → Eliminar cuenta → Eliminar cuenta y datos. Tras completarlo, eliminamos la identidad Firebase de Sedno, sesiones, instalaciones vinculadas, metadatos de solicitudes y compras de la base Sedno, no tu cuenta Google. Sin la aplicación, escribe a contact@sedno.xyz con asunto «Eliminación de cuenta Sedno» y el correo de acceso. No envíes contraseñas, códigos, tokens, documentos, fotos o textos. El correo por sí solo no elimina la cuenta; verificaremos que la controlas y solo pediremos información necesaria. La eliminación remota no borra historiales de otros dispositivos. Bórralos en Historial o en los datos de la aplicación Android. No tenemos acceso remoto. Los datos conservados por Google siguen sus normas.
+
+## Fotos, voz y almacenamiento local
+
+Las fotos, el recorte y el OCR se procesan en el dispositivo. No enviamos fotos al servidor ni a la IA. El texto reconocido se envía directamente para simplificarlo y queda editable tras error o cancelación. La aplicación intenta borrar copias de trabajo tras lectura, error o cancelación; un cierre brusco puede impedirlo. Las copias de otras aplicaciones de cámara siguen bajo tu control.
+
+La voz se reconoce localmente en dispositivos compatibles con Android 13 o posterior y modelo descargado del idioma elegido. El audio queda en memoria, sin archivo ni envío a Sedno u OpenAI. Termina tras 1,5 segundos de silencio después de hablar o a los 60 segundos como máximo. El texto sigue la misma ruta hacia la IA; Parar cancela. La lectura en Corregir usa una voz local sin red; si falta, no se inicia. Descargar voces o modelos puede necesitar Internet y depende del proveedor vocal. Cámara y micrófono son opcionales: puedes escribir o pegar texto.
+
+El historial contiene original, resultado, modo, idioma y fecha. Está cifrado, es local y se excluye de las copias de Android. Las entradas caducan a los 7 días y no se muestran; limpieza al leer, iniciar y reanudar, o en el siguiente evento si la aplicación está cerrada. Puedes borrarlas antes; cerrar sesión borra todo el historial. También se guardan una sesión protegida, un identificador aleatorio de instalación y la elección manual de idioma. Eliminar la cuenta no borra ese identificador local; borra los datos de la aplicación Android.
+
+## Cuenta, límites y suscripción
+
+La cuenta es opcional. Firebase Authentication gestiona Google o correo y contraseña. Sedno guarda UID Firebase, método de acceso y fecha de creación, pero no recibe contraseñas Google ni Firebase. Google puede tratar correo, perfil, IP y conexión. Para seguridad y límites guardamos identificadores seudónimos de instalación, sesión y solicitud, fechas, estados y huella HMAC del texto, no una copia. El identificador no es anónimo. Iniciar sesión no renueva la cuota gratuita. La IP limita solicitudes; no es un campo de la base Sedno, pero la infraestructura puede tratarla. Play Integrity verifica aplicación y dispositivo sin texto ni foto. Google Play gestiona pagos. Sedno no recibe tarjeta ni cuenta bancaria; guarda token de compra cifrado, huella, vínculo al usuario, estado, vencimiento y verificación. Los identificadores de notificación evitan duplicados.
+
+## Proveedores y datos técnicos
+
+OpenAI trata el texto y datos de seguridad según sus condiciones; el contrato estándar para clientes polacos nombra OpenAI Ireland Ltd. Google proporciona Firebase Authentication, Google Sign-In, ML Kit, Play Integrity y Google Play mediante Google Ireland Limited y Google LLC según el producto. OVHcloud presta el correo sedno.xyz. ML Kit puede enviar identificadores de instalación, modelo, versión, errores y tiempos a Google, sin fotos ni textos reconocidos en esa telemetría. OCR local no significa ausencia de comunicación. No integramos publicidad, Firebase Analytics ni Crashlytics. Infraestructura: Cloud Run, Firestore Standard europe-central2 (Varsovia) y Firebase Hosting. Para facturación polaca, el contrato estándar de Cloud nombra Google Cloud Poland Sp. z o.o. Tener servicios activos no confirma acuerdos ni revisiones previas a publicación terminados.
+
+## Finalidades y bases jurídicas
+
+Texto, cuenta y derechos de suscripción: artículo 6(1)(b) RGPD, contrato o actuaciones solicitadas. Seguridad, abusos y límites: artículo 6(1)(f), interés legítimo en proteger el servicio, con metadatos necesarios y sin publicidad; las oposiciones se valoran según el caso. Asistencia ordinaria: artículo 6(1)(f). Derechos sobre datos: artículo 6(1)(c) y artículos 12–22; constancia mínima de su atención: artículos 5(2) y 24. Instalación, aviso IA y permiso de cámara no son consentimiento general. Debe evaluarse y aplicarse cualquier consentimiento separado necesario para diagnóstico SDK antes de producción; la política no lo sustituye. Texto y datos técnicos necesarios son imprescindibles para procesar; cuenta y compra solo para esas funciones. No hay perfiles publicitarios ni decisiones con efectos jurídicos basadas en el resultado. Puedes comunicar bloqueos erróneos al responsable.
+
+## Datos fuera del Espacio Económico Europeo
+
+Google y OpenAI pueden tratar fuera del EEE, incluidos los Estados Unidos; Firebase Authentication usa infraestructura estadounidense. La base en Varsovia no garantiza que todos los datos permanezcan en Polonia o el EEE. Antes de producción se requieren acuerdos de tratamiento y garantías de transferencia adecuados. Los proveedores describen cláusulas contractuales tipo y decisiones de adecuación para destinatarios cubiertos; su marca no garantiza cada transferencia. Puedes pedir al responsable las condiciones y copia de las garantías aplicadas. Las condiciones públicas se citan abajo.
+
+## Conservación en Sedno
+
+El servidor usa texto y resultado solo en memoria. Historial local: 7 días. Una tarea horaria independiente del tráfico elimina metadatos y huellas HMAC de más de 8 días; contadores y reservas diarios permanecen hasta 8 días. Sesión de cuenta: 7 días, invitado: 90; las sesiones caducadas se rechazan antes incluso de borrarlas físicamente. Las identidades invitadas no vinculadas de más de 90 días se eliminan cuando no tienen sesiones ni solicitudes, quizá después del día 90. Cuenta, instalaciones vinculadas y compras Sedno permanecen hasta eliminar la cuenta. No se borran automáticamente cuentas inactivas ni compras caducadas. Los identificadores técnicos de notificaciones Play no tienen eliminación automática y no contienen token de compra ni vínculo al usuario. No declaramos plazos no implementados.
+
+## Reglas operativas de conservación
+
+Reglas adoptadas para producción: registros técnicos y copias hasta 30 días; correspondencia hasta 90 días tras cerrar el caso; constancia mínima de derechos hasta 12 meses, solo fecha, tipo y resultado. El registro principal está configurado a 30 días. Las copias SQL antiguas no cubren Firestore. Nuevas copias y recuperación necesitan configuración independiente y no se presuponen activas; si se activan, máximo 30 días. Otros almacenes, exportaciones y correo requieren revisión y aplicación antes de publicar. Las copias son para recuperación, no para reutilizar cuentas eliminadas; después de restaurar se deben repetir las eliminaciones antes del acceso. Por obligación legal o litigio, solo datos y tiempo necesarios. Los plazos de proveedores son independientes: Firebase describe varias semanas para IP de acceso, otros datos de autenticación hasta solicitar borrado y después hasta 180 días en sistemas activos y copias. Datos de pago y métricas Google siguen sus reglas; OpenAI se explica arriba.
+
+## Tus derechos y contacto
+
+Según las condiciones y excepciones del RGPD puedes pedir acceso y copia, rectificación, supresión, limitación y portabilidad, oponerte al interés legítimo y retirar consentimiento sin efectos sobre el tratamiento anterior. Escribe a contact@sedno.xyz. Respondemos sin demora indebida, normalmente en un mes; la ampliación legal de dos meses se explica en el primero. Ante dudas razonables de identidad pedimos solo la confirmación necesaria, sin documentos de identidad rutinarios. Puedes reclamar ante la autoridad polaca UODO: https://uodo.gov.pl. No necesitas enviar textos para consultar sobre tus datos.
+
+## Cambios
+
+Cada versión tiene fecha. Los cambios importantes se anunciarán en la página de privacidad y en la información de actualización antes de nuevos tratamientos. Cambiar el documento no sustituye un consentimiento necesario. Proveedor, finalidad o conservación deben actualizarse en la información y en la configuración real del servicio.
+
+## Fuentes y condiciones de proveedores
+
+commission.europa.eu: https://commission.europa.eu/law/law-topic/data-protection/information-business-and-organisations/legal-grounds-processing-data_en
+
+developers.openai.com: https://developers.openai.com/api/docs/guides/your-data
+
+openai.com: https://openai.com/policies/services-agreement/
+
+firebase.google.com: https://firebase.google.com/support/privacy
+
+developers.google.com: https://developers.google.com/ml-kit/android-data-disclosure
+
+cloud.google.com: https://cloud.google.com/terms/google-entity
+
+cloud.google.com: https://cloud.google.com/terms/data-processing-addendum
+
+policies.google.com: https://policies.google.com/privacy/frameworks?hl=en
+

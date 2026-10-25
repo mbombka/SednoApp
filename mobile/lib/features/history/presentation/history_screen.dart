@@ -321,7 +321,15 @@ abstract final class HistoryDates {
       _date(createdAt.add(const Duration(days: 7)).toLocal(), strings);
 
   static String _date(DateTime local, AppLocalizations? strings) {
-    final separator = strings?.localeName.startsWith('en') == true ? '/' : '.';
+    final locale = (strings?.localeName ?? 'pl').replaceAll('-', '_');
+    if (locale == 'en_US') return '${_two(local.month)}/${_two(local.day)}';
+    if (locale.startsWith('sv')) {
+      return '${_two(local.month)}-${_two(local.day)}';
+    }
+    final separator =
+        const ['en', 'fr', 'it', 'es', 'pt'].contains(locale.split('_').first)
+        ? '/'
+        : '.';
     return '${_two(local.day)}$separator${_two(local.month)}';
   }
 

@@ -1,3 +1,5 @@
+import 'package:sedno_app/app/app_language.dart';
+import 'package:sedno_app/l10n/app_localizations.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sedno_app/features/speech/data/android_speech_service.dart';
@@ -22,9 +24,42 @@ void main() {
     expect(calls, ['listen', 'cancel']);
   });
 
+  test('model availability statuses use each language catalogue', () async {
+    for (final language in AppLanguage.values) {
+      final strings = lookupAppLocalizations(language.locale);
+      final localized = AndroidSpeechService(
+        language: () => language,
+        localizations: () => strings,
+      );
+      for (final entry in {
+        'language_download': strings.speechModelMissing,
+        'language_downloading': strings.speechModelDownloading,
+        'language_unsupported': strings.speechLanguageUnsupported,
+      }.entries) {
+        messenger.setMockMethodCallHandler(
+          channel,
+          (_) async => throw PlatformException(code: entry.key),
+        );
+        await expectLater(
+          localized.listen(),
+          throwsA(
+            isA<SpeechException>().having(
+              (e) => e.message,
+              'localized message',
+              entry.value,
+            ),
+          ),
+        );
+      }
+    }
+  });
+
   for (final code in [
     'permission',
     'language',
+    'language_download',
+    'language_downloading',
+    'language_unsupported',
     'unavailable',
     'no_speech',
     'timeout',

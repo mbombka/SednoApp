@@ -12,9 +12,7 @@ AppLocalizations polishStrings() => AppLocalizationsPl();
 extension LocalizedContext on BuildContext {
   AppLanguage get language =>
       LanguageScope.maybeOf(this)?.language ??
-      AppLanguage.fromCode(
-        AppLocalizations.of(this)?.localeName.split('_').first,
-      );
+      AppLanguage.resolve([AppLocalizations.of(this)?.localeName ?? 'pl']);
   AppLocalizations get l10n => AppLocalizations.of(this) ?? polishStrings();
 }
 

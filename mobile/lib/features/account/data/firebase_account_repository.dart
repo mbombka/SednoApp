@@ -1,3 +1,4 @@
+import 'package:sedno_app/features/shared/domain/app_language.dart';
 import 'package:sedno_app/l10n/localization.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase;
 import 'package:flutter/foundation.dart';
@@ -122,14 +123,18 @@ class FirebaseAccountRepository
     if (user == null || !_requiresVerification(user)) {
       throw AccountActionException(strings.signInToVerify);
     }
-    await auth.setLanguageCode(strings.localeName.split('_').first);
+    await auth.setLanguageCode(
+      AppLanguage.resolve([strings.localeName]).firebaseLanguage,
+    );
     await user.sendEmailVerification();
   });
 
   @override
   Future<void> sendPasswordResetEmail(String email) =>
       _firebaseOperation(() async {
-        await auth.setLanguageCode(strings.localeName.split('_').first);
+        await auth.setLanguageCode(
+          AppLanguage.resolve([strings.localeName]).firebaseLanguage,
+        );
         try {
           await auth.sendPasswordResetEmail(email: email.trim());
         } on firebase.FirebaseAuthException catch (error) {

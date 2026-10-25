@@ -27,8 +27,11 @@ public sealed class LanguageTests(BackendFixture fixture)
         }
     }
 
-    [Fact]
-    public async Task LanguagesShareQuotaAndCannotReuseAnIdForAnotherLanguage()
+    public static IEnumerable<object[]> AddedLanguages => TextLanguages.All.Where(language => language != "pl").Select(language => new object[] { language });
+
+    [Theory]
+    [MemberData(nameof(AddedLanguages))]
+    public async Task LanguagesShareQuotaAndCannotReuseAnIdForAnotherLanguage(string language)
     {
         var model = new Model();
         await using var factory = fixture.Factory.WithWebHostBuilder(web => web.ConfigureTestServices(services =>
@@ -41,20 +44,20 @@ public sealed class LanguageTests(BackendFixture fixture)
         client.DefaultRequestHeaders.Authorization = new("Bearer", guest!.AccessToken);
         var legacy = await client.PostAsJsonAsync("/v1/simplifications", new { requestId = "same-id", text = "Text" });
         Assert.Equal(HttpStatusCode.OK, legacy.StatusCode);
-        var conflict = await client.PostAsJsonAsync("/v1/simplifications", new { requestId = "same-id", text = "Text", language = "en" });
+        var conflict = await client.PostAsJsonAsync("/v1/simplifications", new { requestId = "same-id", text = "Text", language });
         Assert.Equal(HttpStatusCode.Conflict, conflict.StatusCode);
         foreach (var mode in new[] { "simplify", "correct" })
         {
-            using var response = await client.PostAsJsonAsync("/v1/simplifications", new { requestId = "en-" + mode, text = "Text", language = "en", mode });
+            using var response = await client.PostAsJsonAsync("/v1/simplifications", new { requestId = language + "-" + mode, text = "Text", language, mode });
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var result = await response.Content.ReadFromJsonAsync<SimplificationResponseDto>();
-            Assert.Equal("en", result!.Result.Language);
+            Assert.Equal(language, result!.Result.Language);
             Assert.Equal(mode, result.Result.Mode);
         }
         var quota = await client.GetFromJsonAsync<QuotaDto>("/v1/quota");
         Assert.Equal(3, quota!.Used);
-        Assert.Equal(new[] { ("pl", false), ("en", false), ("en", true) }, model.Calls);
-        using var rejected = await client.PostAsJsonAsync("/v1/simplifications", new { requestId = "unsupported", text = "Text", language = "de" });
+        Assert.Equal(new[] { ("pl", false), (language, false), (language, true) }, model.Calls);
+        using var rejected = await client.PostAsJsonAsync("/v1/simplifications", new { requestId = "unsupported", text = "Text", language = "xx" });
         Assert.Equal(HttpStatusCode.BadRequest, rejected.StatusCode);
         Assert.Contains("invalid_language", await rejected.Content.ReadAsStringAsync());
         Assert.Equal(3, model.Calls.Count);

@@ -1,0 +1,416 @@
+{
+  "@@locale": "nb",
+  "restoreOriginal": "Gjenopprett originalteksten",
+  "userMenu": "Brukermeny",
+  "speechNotRecognised": "Ingen tale gjenkjent. Prøv igjen.",
+  "speechFailed": "Kunne ikke gjenkjenne talen. Prøv igjen.",
+  "microphonePermission": "Tillat mikrofonen i appinnstillingene.",
+  "speechRequirements": "Lokal talegjenkjenning krever Android 13 eller nyere og en kompatibel talemotor.",
+  "speechModelMissing": "Last ned den norske talemodellen i Androids innstillinger for talegjenkjenning.",
+  "speechTimeout": "Talegjenkjenningen tok for lang tid. Prøv igjen.",
+  "speechAndroidOnly": "Lokal talegjenkjenning er tilgjengelig fra Android 13.",
+  "historyClearFailed": "Kunne ikke slette hele historikken. Prøv igjen.",
+  "deleteHistoryEntryTitle": "Slette denne teksten fra historikken?",
+  "cannotUndo": "Dette kan ikke angres.",
+  "delete": "Slett",
+  "historyEntryDeleted": "Teksten er slettet.",
+  "deleteHistoryTitle": "Slette hele historikken?",
+  "deleteHistoryNotice": "Alle lagrede tekster slettes fra denne telefonen. Dette kan ikke angres.",
+  "deleteAllHistory": "Slett hele historikken",
+  "historyDeleted": "Historikken er slettet.",
+  "historyLocalNotice": "Tekster lagres bare på denne telefonen.",
+  "historyRetentionNotice": "Hver tekst slettes automatisk etter 7 dager.",
+  "historySignOutNotice": "Når du logger ut, slettes hele historikken.",
+  "deleteHistoryNow": "Slett hele historikken nå",
+  "deletingHistory": "Sletter historikken",
+  "loadingHistory": "Laster historikken",
+  "historyLoadFailed": "Kunne ikke laste historikken.",
+  "tryAgain": "Prøv igjen",
+  "historyEmpty": "Du har ingen lagrede tekster ennå.",
+  "historyEmptyNotice": "Forenklede og rettede tekster vises her.",
+  "correctedVersion": "Rettet versjon",
+  "simplifiedVersion": "Enkel versjon",
+  "originalText": "Originaltekst",
+  "hideOriginal": "Skjul originalen",
+  "showOriginal": "Vis originalen",
+  "today": "I dag",
+  "readTextFailed": "Kunne ikke lese teksten. Prøv igjen.",
+  "voiceMissing": "Sjekk at en norsk stemme for opplesning uten internett er lastet ned på telefonen.",
+  "playbackAndroidOnly": "Opplesning er tilgjengelig på Android.",
+  "about": "Om appen",
+  "back": "Tilbake",
+  "appPurpose": "Hva Sedno gjør",
+  "appDescription": "Sedno forenkler og retter tekster på støttede språk.",
+  "appAudience": "For personer med nedsatt hørsel og personer som synes komplekse tekster er vanskelige å forstå.",
+  "appAge": "Appen er for personer fra 13 år.",
+  "howItWorks": "Slik fungerer det",
+  "typingInstructions": "Skriv eller lim inn tekst. Velg Forenkle eller Rett.",
+  "captureInstructions": "I modusen Forenkle kan du også ta bilde av tekst eller diktere.",
+  "captureSubmitInstructions": "Marker teksten på bildet og velg Forenkle. Diktert tekst forenkles automatisk.",
+  "localMediaNotice": "Bilder og lyd blir på telefonen. Bare tekst sendes til KI.",
+  "speechModelRequirements": "Diktering krever Android 13 eller nyere og en nedlastet norsk talemodell.",
+  "playbackRequirements": "I modusen Rett leser høyttaleren teksten høyt. Du trenger en nedlastet norsk stemme som virker uten internett.",
+  "restoreInstructions": "Resultatet vises i samme felt. Trykk på overskriften eller Tilbake for å gjenopprette originalen.",
+  "inputLimitNotice": "Teksten kan ha opptil 4000 tegn.",
+  "guestNotice": "Du kan begynne uten å opprette en konto.",
+  "dailyLimit": "Dagsgrense",
+  "freeAllowance": "Uten abonnement: 5 tekster per dag.",
+  "paidAllowance": "Med abonnement: 400 tekster per dag.",
+  "sharedAllowance": "Forenkling og retting deler samme grense.",
+  "subscriptionPriceNotice": "Prisen på abonnementet vises under Konto og i Google Play.",
+  "important": "Viktig",
+  "aiErrorNotice": "KI kan gjøre feil.",
+  "checkResult": "Sjekk resultatet før du bruker det.",
+  "author": "Utvikler: Mariusz Bąbka",
+  "privacy": "Personvern og data",
+  "websiteOpenFailed": "Kunne ikke åpne nettsiden. Sjekk nettleseren.",
+  "website": "Sednos nettside",
+  "photoNoText": "Ingen tekst funnet. Ta et tydeligere bilde.",
+  "cameraPermission": "Tillat kameraet i telefoninnstillingene.",
+  "cameraStartFailed": "Kunne ikke starte kameraet. Prøv igjen.",
+  "photoCaptureFailed": "Kunne ikke ta bildet. Prøv igjen.",
+  "selectText": "Marker tekst",
+  "cropInstructions": "Flytt hjørnene på rammen for å markere teksten. ",
+  "cropWholePhotoNotice": "Uten endringer forenkles teksten fra hele bildet.",
+  "openingPhoto": "Åpner bildet",
+  "simplify": "Forenkle",
+  "cropTopLeft": "Øvre venstre hjørne av rammen",
+  "cropTopRight": "Øvre høyre hjørne av rammen",
+  "cropBottomLeft": "Nedre venstre hjørne av rammen",
+  "cropBottomRight": "Nedre høyre hjørne av rammen",
+  "smallerSelection": "Mindre utvalg",
+  "largerSelection": "Større utvalg",
+  "cropResizeHint": "Øk for å gjøre utvalget mindre. Reduser for å gjøre det større.",
+  "takeTextPhoto": "Ta bilde av tekst",
+  "startingCamera": "Starter kameraet",
+  "takingPhoto": "Tar bilde…",
+  "takePhoto": "Ta bilde",
+  "photoOpenFailed": "Kunne ikke åpne bildet. Ta et nytt.",
+  "photoPrepareFailed": "Kunne ikke klargjøre bildet. Prøv igjen.",
+  "simplifyHeading": "forenkle tekst",
+  "simplifiedText": "Forenklet tekst",
+  "correctedText": "Rettet tekst",
+  "emptyText": "Teksten kan ikke være tom.",
+  "textTooLong": "Teksten kan ha opptil 4000 tegn.",
+  "subscriptionActive": "Abonnementet ditt er aktivt.",
+  "subscriptionAllowance": "Du kan forenkle opptil 400 tekster per dag.",
+  "manageSubscriptionNotice": "Åpne Google Play for å endre betalingen eller avslutte abonnementet.",
+  "manageSubscription": "Administrer abonnement i Google Play",
+  "testerAccessNotice": "Du har gratis testtilgang.",
+  "restorePurchases": "Gjenopprett kjøp",
+  "refreshAccess": "Oppdater tilgang",
+  "subscriptionBenefits": "Opptil 400 tekster per dag med abonnement, 5 uten.",
+  "subscriptionSignInNotice": "Logg inn på Sedno for å kjøpe eller gjenopprette et abonnement.",
+  "buySubscription": "Kjøp abonnement",
+  "refreshSubscription": "Oppdater abonnement",
+  "subscriptionRenewalNotice": "Abonnementet fornyes automatisk hver måned.",
+  "subscriptionCancelNotice": "Du kan avslutte det når som helst i Google Play.",
+  "paymentReadFailed": "Kunne ikke lese betalinger. Prøv å gjenopprette kjøp.",
+  "signInBeforePurchase": "Logg inn før kjøpet.",
+  "subscriptionAlreadyActive": "Abonnementet ditt er allerede aktivt.",
+  "signInBeforeRestore": "Logg inn før du gjenoppretter et kjøp.",
+  "purchasesChecked": "Kjøp er kontrollert. Bekreftelsen kan ta litt tid.",
+  "playOpenFailed": "Kunne ikke åpne Google Play. Åpne butikken og velg Betalinger og abonnementer → Abonnementer.",
+  "paymentPending": "Betalingen venter på bekreftelse. Grensen endres ikke.",
+  "purchaseCancelled": "Kjøpet ble avbrutt.",
+  "purchaseFailed": "Kunne ikke kjøpe abonnementet. Prøv igjen.",
+  "subscriptionInactive": "Abonnementet ditt er ikke aktivt.",
+  "subscriptionVerifyFailed": "Kan ikke bekrefte abonnementet. Logg inn, sjekk tilkoblingen og gjenopprett kjøp.",
+  "subscriptionCheckFailed": "Kan ikke sjekke abonnementet. Logg inn og prøv igjen.",
+  "hideConfirmedPassword": "Skjul gjentatt passord",
+  "showConfirmedPassword": "Vis gjentatt passord",
+  "hidePassword": "Skjul passord",
+  "showPassword": "Vis passord",
+  "enterEmail": "Skriv inn e-postadressen din.",
+  "enterValidEmail": "Skriv inn en gyldig e-postadresse.",
+  "passwordResetSent": "Hvis det finnes en konto med denne adressen, får du en lenke for å endre passordet. Sjekk også søppelpost.",
+  "emailSendFailed": "Kunne ikke sende e-posten. Prøv igjen.",
+  "accountLoadFailed": "Kunne ikke laste kontoen eller fullføre sletting av data. Prøv igjen.",
+  "verificationEmailSent": "Vi har sendt en e-post med en lenke. Sjekk innboksen og søppelpost.",
+  "emailNotVerified": "Adressen er ikke bekreftet ennå. Åpne lenken i e-posten og prøv igjen.",
+  "signInFailed": "Kunne ikke logge inn. Sjekk opplysningene og prøv igjen.",
+  "signOutFailed": "Kunne ikke logge ut. Prøv igjen.",
+  "deleteAccountTitle": "Slette kontoen?",
+  "deleteAccountIdentity": "Bekreft identiteten din for å slette kontoen.",
+  "password": "Passord",
+  "keepAccount": "Behold kontoen",
+  "deleteAccountAndData": "Slett konto og data",
+  "accountDeleted": "Kontoen og dataene er slettet. Avslutt abonnementet separat i Google Play.",
+  "accountDeleteIncomplete": "Kunne ikke fullføre slettingen. Prøv igjen.",
+  "emailAccountMethod": " (e-post og passord)",
+  "finishDataCleanup": "Oppdater kontoen og fullfør oppryddingen",
+  "accountNotConfigured": "Kontoalternativer vises her.",
+  "signOut": "Logg ut",
+  "deleteAccount": "Slett konto",
+  "emailVerified": "E-postadresse bekreftet",
+  "checkInbox": "Sjekk e-posten din",
+  "finishAccountLinkNotice": "Adressen er bekreftet. Du må fortsatt koble til Sedno-kontoen. Du trenger ikke åpne e-postlenken igjen.",
+  "verifyEmailInstructions": "Åpne lenken i e-posten fra Sedno for å fullføre kontoen. Sjekk også søppelpost. Kom tilbake og velg «Sjekk bekreftelse».",
+  "guestWhileVerifying": "I mellomtiden kan du bruke appen uten konto.",
+  "finishSignIn": "Fullfør innlogging",
+  "checkVerification": "Sjekk bekreftelse",
+  "resendEmail": "Send e-post på nytt",
+  "signOutUseGuest": "Logg ut og bruk uten konto",
+  "signIn": "Logg inn",
+  "newAccount": "Ny konto",
+  "recoverAccess": "Gjenopprett tilgang",
+  "guestSignInNotice": "Du kan bruke appen uten å logge inn.",
+  "signInGoogle": "Logg inn med Google",
+  "emailAddress": "E-postadresse",
+  "enterPassword": "Skriv inn passordet.",
+  "passwordMinLength": "Bruk minst 6 tegn.",
+  "repeatPassword": "Gjenta passord",
+  "enterRepeatedPassword": "Gjenta passordet.",
+  "passwordMismatch": "Passordene må være like.",
+  "verificationEmailNotice": "Vi sender en e-post med en lenke for å bekrefte adressen.",
+  "passwordResetInstructions": "Skriv inn kontoens e-postadresse. Vi sender en lenke for å endre passordet.",
+  "signInEmail": "Logg inn med e-post",
+  "createAccount": "Opprett konto",
+  "sendResetLink": "Send lenke for å endre passord",
+  "forgotPassword": "Glemt passord",
+  "createAccountLink": "Ingen konto? Opprett en",
+  "backToSignIn": "Tilbake til innlogging",
+  "testerAccess": "Testtilgang",
+  "testerAllowance": "Du kan behandle opptil 400 tekster per dag.",
+  "testerExpiryNotice": "Tilgangen er gratis og utløper automatisk.",
+  "testerHasSubscription": "Du har også et aktivt Google Play-abonnement.",
+  "testerExpired": "Testtilgangen har utløpt.",
+  "subscriptionStillActive": "Google Play-abonnementet ditt gir fortsatt en høyere grense.",
+  "freeLimitRestored": "Gratisgrensen på 5 tekster per dag gjelder. Dagens bruk endres ikke.",
+  "closeMenu": "Lukk menyen",
+  "welcome": "Velkommen til Sedno",
+  "inApp": "I appen",
+  "accountCreatedEmailFailed": "Kontoen ble opprettet, men e-posten kunne ikke sendes. Prøv å sende den på nytt.",
+  "signInToVerify": "Logg inn med e-post for å bekrefte adressen.",
+  "signInToCheckAccount": "Logg inn igjen for å sjekke kontostatus.",
+  "weakPassword": "Passordet er for svakt. Bruk minst 6 tegn.",
+  "checkEmailAddress": "Sjekk e-postadressen du skrev inn.",
+  "emailAlreadyUsed": "Adressen er allerede i bruk. Logg inn på den eksisterende kontoen.",
+  "tooManyAttempts": "For mange forsøk. Vent litt og prøv igjen.",
+  "checkInternet": "Ingen tilkobling. Sjekk internett og prøv igjen.",
+  "chooseSameAccount": "Velg kontoen du vil slette.",
+  "signInToDelete": "Logg inn igjen for å slette kontoen.",
+  "invalidCredentials": "Kunne ikke logge inn. Sjekk e-post og passord.",
+  "actionFailed": "Handlingen mislyktes. Prøv igjen.",
+  "accountLinkFailed": "Kunne ikke koble til Sedno-kontoen. Sjekk tilkoblingen og prøv igjen.",
+  "passwordToDelete": "Skriv inn passordet for å bekrefte sletting.",
+  "finishLocalDeletion": "Fullfør sletting av data på denne enheten.",
+  "installationRejected": "Serveren kunne ikke bekrefte installasjonen. Prøv igjen eller installer Sedno fra Google Play.",
+  "sessionStartFailed": "Kan ikke starte økten. Prøv igjen.",
+  "signInToLink": "Logg inn igjen for å koble til kontoen.",
+  "cannotLinkAccount": "Kan ikke koble til kontoen. Prøv igjen.",
+  "signInAgain": "Logg inn igjen.",
+  "sessionExpiredSignIn": "Økten har utløpt. Logg inn igjen.",
+  "cannotDeleteAccount": "Kan ikke slette kontoen. Prøv igjen.",
+  "cannotSignOut": "Kan ikke logge ut. Prøv igjen.",
+  "correctionUnavailable": "Tekstretting er ikke tilgjengelig ennå.",
+  "simplificationUnavailable": "Tekstforenkling er ikke tilgjengelig ennå.",
+  "requestTimeout": "Tidsfristen er overskredet. Prøv igjen.",
+  "offline": "Ingen internettilkobling. Prøv igjen.",
+  "sessionExpired": "Økten har utløpt. Sjekk kontoen og prøv igjen.",
+  "quotaExhausted": "Dagens grense er brukt opp. Sjekk når den fornyes.",
+  "serviceUnavailable": "Tjenesten er midlertidig utilgjengelig. Prøv igjen.",
+  "correctionRejected": "Kan ikke rette denne teksten. Sjekk den og prøv igjen.",
+  "simplificationRejected": "Kan ikke forenkle denne teksten. Sjekk den og prøv igjen.",
+  "correctionFailed": "Kunne ikke rette teksten. Prøv igjen.",
+  "simplificationFailed": "Kunne ikke forenkle teksten. Prøv igjen.",
+  "checkConnection": "Sjekk tilkoblingen",
+  "quotaCheckFailed": "Kan ikke sjekke grensen. Sjekk tilkoblingen.",
+  "subscriptionInAccount": "Abonnementet og prisen finner du under Konto.",
+  "beforeCorrection": "Før du retter tekst",
+  "beforeSimplification": "Før du forenkler tekst",
+  "acceptAndSend": "Jeg forstår, send",
+  "cameraUnavailable": "Kameraet blir snart tilgjengelig.",
+  "aiWarning": "KI kan ta feil",
+  "listeningNotice": "Lytter… Snakk norsk. Slutter etter 1,5 sekunders stillhet eller 60 sekunder. Stoppknappen avbryter opptaket.",
+  "correctionSubmitted": "Teksten er sendt til retting.",
+  "simplificationSubmitted": "Teksten er sendt til forenkling.",
+  "textForCorrection": "Tekst som skal rettes",
+  "textForSimplification": "Tekst som skal forenkles",
+  "inputHint": "Skriv eller lim inn tekst",
+  "switchToCorrection": "Bytt til tekstretting",
+  "switchToSimplification": "Bytt til tekstforenkling",
+  "clearText": "Tøm teksten",
+  "stopPlayback": "Stopp opplesning",
+  "readAloud": "Les teksten høyt",
+  "cancelRecording": "Avbryt opptak",
+  "simplifySpeech": "Forenkle tale",
+  "cancel": "Avbryt",
+  "history": "Historikk",
+  "account": "Konto",
+  "start": "Hjem",
+  "contact": "Kontakt",
+  "close": "Lukk",
+  "continueAction": "Fortsett",
+  "correct": "Rett",
+  "correctHeading": "rett tekst",
+  "correcting": "Retter…",
+  "simplifying": "Forenkler…",
+  "reading": "Leser…",
+  "camera": "Kamera",
+  "preparing": "Klargjør…",
+  "subscription": "Abonnement",
+  "yesterday": "I går",
+  "signedIn": "Logget inn.",
+  "googleAccountMethod": " (Google-konto)",
+  "language": "Språk",
+  "systemLanguage": "Telefonens språk",
+  "polish": "Polsk",
+  "english": "Engelsk (Storbritannia)",
+  "languageNotice": "Språket gjelder menyer, forenkling, retting og tale. Velg tekstens språk. Sedno oversetter ikke tekster.",
+  "languageSaveFailed": "Kunne ikke lagre språket. Prøv igjen.",
+  "resetDaily": "Grensen fornyes hver dag kl. {time}.",
+  "@resetDaily": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "resetAbout": "Grensen fornyes hver dag kl. {time} (00:00 UTC).",
+  "@resetAbout": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "resetAt": "Grensen fornyes kl. {time}.",
+  "@resetAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "quotaUsed": "Dagens grense er brukt opp.",
+  "quotaOneSimplification": "Du har 1 forenkling igjen.",
+  "quotaOneUse": "Du har 1 KI-bruk igjen.",
+  "quotaUsedDialog": "Dagsgrensen er brukt opp.",
+  "resetWithRemaining": "Grensen fornyes kl. {time} ({remaining}).",
+  "@resetWithRemaining": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "timeRemaining": "om {hours} t {minutes} min",
+  "@timeRemaining": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "monthlyPrice": "{price} per måned",
+  "@monthlyPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "historyExpires": "Slettes {date}.",
+  "@historyExpires": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteSavedText": "Slett tekst lagret {date}",
+  "@deleteSavedText": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "contactAddress": "Kontakt: {email}",
+  "@contactAddress": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "signedInAs": "Logget inn som {email}{method}",
+  "@signedInAs": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      },
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+  "accountEmail": "E-postadresse: {email}",
+  "@accountEmail": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "emailToVerify": "Adresse som skal bekreftes: {email}",
+  "@emailToVerify": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "resendAfter": "Send på nytt om {seconds} s",
+  "@resendAfter": {
+    "placeholders": {
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "testerUntil": "Testtilgang til {date} (lokal tid).",
+  "@testerUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "cropPosition": "Vannrett {horizontal} %, loddrett {vertical} %",
+  "@cropPosition": {
+    "placeholders": {
+      "horizontal": {
+        "type": "String"
+      },
+      "vertical": {
+        "type": "String"
+      }
+    }
+  },
+  "welcomeName": "Velkommen til {name}",
+  "@welcomeName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "policyVersion": "Versjon: {date}",
+  "@policyVersion": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "speechModelDownloading": "Talemodellen lastes ned. Prøv igjen senere.",
+  "speechLanguageUnsupported": "Talemotoren på denne telefonen tilbyr ikke lokal diktering på dette språket. Du kan skrive eller bruke kameraet."
+}

@@ -142,7 +142,7 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get appDescription =>
-      'Sedno upraszcza i poprawia polskie i angielskie teksty.';
+      'Sedno upraszcza i poprawia teksty w obsługiwanych językach.';
 
   @override
   String get appAudience =>
@@ -973,4 +973,12 @@ class AppLocalizationsPl extends AppLocalizations {
   String policyVersion(String date) {
     return 'Wersja: $date';
   }
+
+  @override
+  String get speechModelDownloading =>
+      'Model mowy jest pobierany. Spróbuj później.';
+
+  @override
+  String get speechLanguageUnsupported =>
+      'Silnik mowy w tym telefonie nie obsługuje lokalnego dyktowania w tym języku. Możesz wpisać tekst lub użyć aparatu.';
 }

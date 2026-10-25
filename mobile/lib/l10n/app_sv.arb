@@ -1,0 +1,416 @@
+{
+  "@@locale": "sv",
+  "restoreOriginal": "Återställ originaltexten",
+  "userMenu": "Användarmeny",
+  "speechNotRecognised": "Inget tal kunde identifieras. Försök igen.",
+  "speechFailed": "Taligenkänningen misslyckades. Försök igen.",
+  "microphonePermission": "Tillåt mikrofonen i appens inställningar.",
+  "speechRequirements": "Lokal taligenkänning kräver Android 13 eller senare och en kompatibel talmotor.",
+  "speechModelMissing": "Ladda ned den svenska talmodellen i Androids inställningar för taligenkänning.",
+  "speechTimeout": "Taligenkänningen tog för lång tid. Försök igen.",
+  "speechAndroidOnly": "Lokal taligenkänning finns från Android 13.",
+  "historyClearFailed": "Det gick inte att radera hela historiken. Försök igen.",
+  "deleteHistoryEntryTitle": "Radera den här texten från historiken?",
+  "cannotUndo": "Detta går inte att ångra.",
+  "delete": "Radera",
+  "historyEntryDeleted": "Texten har raderats.",
+  "deleteHistoryTitle": "Radera hela historiken?",
+  "deleteHistoryNotice": "Alla sparade texter raderas från den här telefonen. Detta går inte att ångra.",
+  "deleteAllHistory": "Radera hela historiken",
+  "historyDeleted": "Historiken har raderats.",
+  "historyLocalNotice": "Texter sparas bara på den här telefonen.",
+  "historyRetentionNotice": "Varje text raderas automatiskt efter 7 dagar.",
+  "historySignOutNotice": "När du loggar ut raderas hela historiken.",
+  "deleteHistoryNow": "Radera hela historiken nu",
+  "deletingHistory": "Raderar historiken",
+  "loadingHistory": "Läser in historiken",
+  "historyLoadFailed": "Det gick inte att läsa in historiken.",
+  "tryAgain": "Försök igen",
+  "historyEmpty": "Du har inga sparade texter än.",
+  "historyEmptyNotice": "Förenklade och rättade texter visas här.",
+  "correctedVersion": "Rättad version",
+  "simplifiedVersion": "Enkel version",
+  "originalText": "Originaltext",
+  "hideOriginal": "Dölj originalet",
+  "showOriginal": "Visa originalet",
+  "today": "I dag",
+  "readTextFailed": "Det gick inte att läsa texten. Försök igen.",
+  "voiceMissing": "Kontrollera att en svensk röst för uppläsning utan internet är nedladdad på telefonen.",
+  "playbackAndroidOnly": "Uppläsning finns på Android.",
+  "about": "Om appen",
+  "back": "Tillbaka",
+  "appPurpose": "Vad Sedno gör",
+  "appDescription": "Sedno förenklar och rättar texter på de språk som stöds.",
+  "appAudience": "För personer med hörselnedsättning och personer som har svårt att förstå komplicerade texter.",
+  "appAge": "Appen är för personer från 13 år.",
+  "howItWorks": "Så fungerar det",
+  "typingInstructions": "Skriv eller klistra in en text. Välj Förenkla eller Rätta.",
+  "captureInstructions": "I läget Förenkla kan du också fotografera text eller diktera.",
+  "captureSubmitInstructions": "Markera texten i bilden och välj Förenkla. Dikterad text förenklas automatiskt.",
+  "localMediaNotice": "Bilder och ljud stannar på telefonen. Bara text skickas till AI.",
+  "speechModelRequirements": "Diktering kräver Android 13 eller senare och en nedladdad svensk talmodell.",
+  "playbackRequirements": "I läget Rätta läser högtalaren texten högt. Du behöver en nedladdad svensk röst som fungerar utan internet.",
+  "restoreInstructions": "Resultatet visas i samma fält. Tryck på rubriken eller Tillbaka för att återställa originalet.",
+  "inputLimitNotice": "Texten får ha högst 4000 tecken.",
+  "guestNotice": "Du kan börja utan att skapa ett konto.",
+  "dailyLimit": "Daglig gräns",
+  "freeAllowance": "Utan prenumeration: 5 texter per dag.",
+  "paidAllowance": "Med prenumeration: 400 texter per dag.",
+  "sharedAllowance": "Förenkling och rättning delar samma gräns.",
+  "subscriptionPriceNotice": "Priset visas under Konto och i Google Play.",
+  "important": "Viktigt",
+  "aiErrorNotice": "AI kan göra fel.",
+  "checkResult": "Kontrollera resultatet innan du använder det.",
+  "author": "Utvecklare: Mariusz Bąbka",
+  "privacy": "Integritet och data",
+  "websiteOpenFailed": "Det gick inte att öppna webbplatsen. Kontrollera webbläsaren.",
+  "website": "Sednos webbplats",
+  "photoNoText": "Ingen text hittades. Ta en tydligare bild.",
+  "cameraPermission": "Tillåt kameran i telefonens inställningar.",
+  "cameraStartFailed": "Det gick inte att starta kameran. Försök igen.",
+  "photoCaptureFailed": "Det gick inte att ta bilden. Försök igen.",
+  "selectText": "Markera text",
+  "cropInstructions": "Flytta ramens hörn för att markera texten. ",
+  "cropWholePhotoNotice": "Utan ändring förenklas texten från hela bilden.",
+  "openingPhoto": "Öppnar bilden",
+  "simplify": "Förenkla",
+  "cropTopLeft": "Ramens övre vänstra hörn",
+  "cropTopRight": "Ramens övre högra hörn",
+  "cropBottomLeft": "Ramens nedre vänstra hörn",
+  "cropBottomRight": "Ramens nedre högra hörn",
+  "smallerSelection": "Mindre markering",
+  "largerSelection": "Större markering",
+  "cropResizeHint": "Öka för att minska markeringen. Minska för att göra den större.",
+  "takeTextPhoto": "Fotografera text",
+  "startingCamera": "Startar kameran",
+  "takingPhoto": "Tar bild…",
+  "takePhoto": "Ta bild",
+  "photoOpenFailed": "Det gick inte att öppna bilden. Ta en ny.",
+  "photoPrepareFailed": "Det gick inte att förbereda bilden. Försök igen.",
+  "simplifyHeading": "förenkla text",
+  "simplifiedText": "Förenklad text",
+  "correctedText": "Rättad text",
+  "emptyText": "Texten får inte vara tom.",
+  "textTooLong": "Texten får ha högst 4000 tecken.",
+  "subscriptionActive": "Din prenumeration är aktiv.",
+  "subscriptionAllowance": "Du kan förenkla upp till 400 texter per dag.",
+  "manageSubscriptionNotice": "Öppna Google Play för att ändra betalningen eller avsluta prenumerationen.",
+  "manageSubscription": "Hantera prenumeration i Google Play",
+  "testerAccessNotice": "Du har kostnadsfri teståtkomst.",
+  "restorePurchases": "Återställ köp",
+  "refreshAccess": "Uppdatera åtkomst",
+  "subscriptionBenefits": "Upp till 400 texter per dag med prenumeration, 5 utan.",
+  "subscriptionSignInNotice": "Logga in på Sedno för att köpa eller återställa en prenumeration.",
+  "buySubscription": "Köp prenumeration",
+  "refreshSubscription": "Uppdatera prenumeration",
+  "subscriptionRenewalNotice": "Prenumerationen förnyas automatiskt varje månad.",
+  "subscriptionCancelNotice": "Du kan avsluta den när som helst i Google Play.",
+  "paymentReadFailed": "Det gick inte att läsa betalningar. Försök återställa köp.",
+  "signInBeforePurchase": "Logga in före köpet.",
+  "subscriptionAlreadyActive": "Din prenumeration är redan aktiv.",
+  "signInBeforeRestore": "Logga in innan du återställer köp.",
+  "purchasesChecked": "Köpen har kontrollerats. Bekräftelsen kan ta en stund.",
+  "playOpenFailed": "Det gick inte att öppna Google Play. Öppna butiken och välj Betalningar och prenumerationer → Prenumerationer.",
+  "paymentPending": "Betalningen väntar på bekräftelse. Gränsen ändras inte.",
+  "purchaseCancelled": "Köpet avbröts.",
+  "purchaseFailed": "Det gick inte att köpa prenumerationen. Försök igen.",
+  "subscriptionInactive": "Din prenumeration är inte aktiv.",
+  "subscriptionVerifyFailed": "Det går inte att bekräfta prenumerationen. Logga in, kontrollera anslutningen och återställ köp.",
+  "subscriptionCheckFailed": "Det går inte att kontrollera prenumerationen. Logga in och försök igen.",
+  "hideConfirmedPassword": "Dölj upprepat lösenord",
+  "showConfirmedPassword": "Visa upprepat lösenord",
+  "hidePassword": "Dölj lösenord",
+  "showPassword": "Visa lösenord",
+  "enterEmail": "Ange din e-postadress.",
+  "enterValidEmail": "Ange en giltig e-postadress.",
+  "passwordResetSent": "Om ett konto med adressen finns får du en länk för att återställa lösenordet. Kontrollera även skräppost.",
+  "emailSendFailed": "Det gick inte att skicka e-post. Försök igen.",
+  "accountLoadFailed": "Det gick inte att läsa in kontot eller slutföra raderingen av data. Försök igen.",
+  "verificationEmailSent": "Vi har skickat ett mejl med en länk. Kontrollera inkorgen och skräppost.",
+  "emailNotVerified": "Adressen är inte bekräftad än. Öppna länken i mejlet och försök igen.",
+  "signInFailed": "Det gick inte att logga in. Kontrollera uppgifterna och försök igen.",
+  "signOutFailed": "Det gick inte att logga ut. Försök igen.",
+  "deleteAccountTitle": "Radera kontot?",
+  "deleteAccountIdentity": "Bekräfta din identitet för att radera kontot.",
+  "password": "Lösenord",
+  "keepAccount": "Behåll kontot",
+  "deleteAccountAndData": "Radera konto och data",
+  "accountDeleted": "Kontot och data har raderats. Avsluta prenumerationen separat i Google Play.",
+  "accountDeleteIncomplete": "Det gick inte att slutföra raderingen. Försök igen.",
+  "emailAccountMethod": " (e-post och lösenord)",
+  "finishDataCleanup": "Uppdatera kontot och slutför rensningen",
+  "accountNotConfigured": "Kontoalternativ visas här.",
+  "signOut": "Logga ut",
+  "deleteAccount": "Radera konto",
+  "emailVerified": "E-postadressen bekräftad",
+  "checkInbox": "Kontrollera din e-post",
+  "finishAccountLinkNotice": "Adressen är bekräftad. Du behöver fortfarande ansluta Sedno-kontot. Du behöver inte öppna mejllänken igen.",
+  "verifyEmailInstructions": "Öppna länken i mejlet från Sedno för att skapa kontot färdigt. Kontrollera även skräppost. Kom sedan tillbaka och välj ”Kontrollera bekräftelse”.",
+  "guestWhileVerifying": "Under tiden kan du använda appen utan konto.",
+  "finishSignIn": "Slutför inloggningen",
+  "checkVerification": "Kontrollera bekräftelse",
+  "resendEmail": "Skicka mejlet igen",
+  "signOutUseGuest": "Logga ut och använd utan konto",
+  "signIn": "Logga in",
+  "newAccount": "Nytt konto",
+  "recoverAccess": "Återställ åtkomst",
+  "guestSignInNotice": "Du kan använda appen utan att logga in.",
+  "signInGoogle": "Logga in med Google",
+  "emailAddress": "E-postadress",
+  "enterPassword": "Ange lösenordet.",
+  "passwordMinLength": "Använd minst 6 tecken.",
+  "repeatPassword": "Upprepa lösenord",
+  "enterRepeatedPassword": "Upprepa lösenordet.",
+  "passwordMismatch": "Lösenorden måste vara lika.",
+  "verificationEmailNotice": "Vi skickar ett mejl med en länk för att bekräfta adressen.",
+  "passwordResetInstructions": "Ange kontots e-postadress. Vi skickar en länk för att byta lösenord.",
+  "signInEmail": "Logga in med e-post",
+  "createAccount": "Skapa konto",
+  "sendResetLink": "Skicka länk för att återställa lösenord",
+  "forgotPassword": "Glömt lösenord",
+  "createAccountLink": "Inget konto? Skapa ett",
+  "backToSignIn": "Tillbaka till inloggningen",
+  "testerAccess": "Teståtkomst",
+  "testerAllowance": "Du kan bearbeta upp till 400 texter per dag.",
+  "testerExpiryNotice": "Åtkomsten är gratis och upphör automatiskt.",
+  "testerHasSubscription": "Du har också en aktiv Google Play-prenumeration.",
+  "testerExpired": "Teståtkomsten har upphört.",
+  "subscriptionStillActive": "Din Google Play-prenumeration ger fortfarande en högre gräns.",
+  "freeLimitRestored": "Gratisgränsen på 5 texter per dag gäller. Dagens användning ändras inte.",
+  "closeMenu": "Stäng menyn",
+  "welcome": "Välkommen till Sedno",
+  "inApp": "I appen",
+  "accountCreatedEmailFailed": "Kontot skapades, men mejlet kunde inte skickas. Försök skicka det igen.",
+  "signInToVerify": "Logga in med e-post för att bekräfta adressen.",
+  "signInToCheckAccount": "Logga in igen för att kontrollera kontots status.",
+  "weakPassword": "Lösenordet är för svagt. Använd minst 6 tecken.",
+  "checkEmailAddress": "Kontrollera e-postadressen du angav.",
+  "emailAlreadyUsed": "Adressen används redan. Logga in på det befintliga kontot.",
+  "tooManyAttempts": "För många försök. Vänta en stund och försök igen.",
+  "checkInternet": "Ingen anslutning. Kontrollera internet och försök igen.",
+  "chooseSameAccount": "Välj kontot du vill radera.",
+  "signInToDelete": "Logga in igen för att radera kontot.",
+  "invalidCredentials": "Det gick inte att logga in. Kontrollera e-post och lösenord.",
+  "actionFailed": "Åtgärden misslyckades. Försök igen.",
+  "accountLinkFailed": "Det gick inte att ansluta Sedno-kontot. Kontrollera anslutningen och försök igen.",
+  "passwordToDelete": "Ange lösenordet för att bekräfta raderingen.",
+  "finishLocalDeletion": "Slutför raderingen av data på den här enheten.",
+  "installationRejected": "Servern kunde inte verifiera installationen. Försök igen eller installera Sedno från Google Play.",
+  "sessionStartFailed": "Det går inte att starta sessionen. Försök igen.",
+  "signInToLink": "Logga in igen för att ansluta kontot.",
+  "cannotLinkAccount": "Det går inte att ansluta kontot. Försök igen.",
+  "signInAgain": "Logga in igen.",
+  "sessionExpiredSignIn": "Sessionen har gått ut. Logga in igen.",
+  "cannotDeleteAccount": "Det går inte att radera kontot. Försök igen.",
+  "cannotSignOut": "Det går inte att logga ut. Försök igen.",
+  "correctionUnavailable": "Texträttning är inte tillgänglig än.",
+  "simplificationUnavailable": "Textförenkling är inte tillgänglig än.",
+  "requestTimeout": "Tidsgränsen har överskridits. Försök igen.",
+  "offline": "Ingen internetanslutning. Försök igen.",
+  "sessionExpired": "Sessionen har gått ut. Kontrollera kontot och försök igen.",
+  "quotaExhausted": "Dagens gräns är förbrukad. Kontrollera när den förnyas.",
+  "serviceUnavailable": "Tjänsten är tillfälligt otillgänglig. Försök igen.",
+  "correctionRejected": "Det går inte att rätta texten. Kontrollera den och försök igen.",
+  "simplificationRejected": "Det går inte att förenkla texten. Kontrollera den och försök igen.",
+  "correctionFailed": "Det gick inte att rätta texten. Försök igen.",
+  "simplificationFailed": "Det gick inte att förenkla texten. Försök igen.",
+  "checkConnection": "Kontrollera anslutningen",
+  "quotaCheckFailed": "Det går inte att kontrollera gränsen. Kontrollera anslutningen.",
+  "subscriptionInAccount": "Prenumerationen och priset finns under Konto.",
+  "beforeCorrection": "Innan du rättar text",
+  "beforeSimplification": "Innan du förenklar text",
+  "acceptAndSend": "Jag förstår, skicka",
+  "cameraUnavailable": "Kameran blir snart tillgänglig.",
+  "aiWarning": "AI kan ha fel",
+  "listeningNotice": "Lyssnar… Tala svenska. Slutar efter 1,5 sekunders tystnad eller 60 sekunder. Stoppknappen avbryter inspelningen.",
+  "correctionSubmitted": "Texten har skickats för rättning.",
+  "simplificationSubmitted": "Texten har skickats för förenkling.",
+  "textForCorrection": "Text att rätta",
+  "textForSimplification": "Text att förenkla",
+  "inputHint": "Skriv eller klistra in text",
+  "switchToCorrection": "Byt till texträttning",
+  "switchToSimplification": "Byt till textförenkling",
+  "clearText": "Rensa texten",
+  "stopPlayback": "Stoppa uppläsningen",
+  "readAloud": "Läs texten högt",
+  "cancelRecording": "Avbryt inspelning",
+  "simplifySpeech": "Förenkla tal",
+  "cancel": "Avbryt",
+  "history": "Historik",
+  "account": "Konto",
+  "start": "Hem",
+  "contact": "Kontakt",
+  "close": "Stäng",
+  "continueAction": "Fortsätt",
+  "correct": "Rätta",
+  "correctHeading": "rätta text",
+  "correcting": "Rättar…",
+  "simplifying": "Förenklar…",
+  "reading": "Läser…",
+  "camera": "Kamera",
+  "preparing": "Förbereder…",
+  "subscription": "Prenumeration",
+  "yesterday": "I går",
+  "signedIn": "Inloggad.",
+  "googleAccountMethod": " (Google-konto)",
+  "language": "Språk",
+  "systemLanguage": "Telefonens språk",
+  "polish": "Polska",
+  "english": "Engelska (Storbritannien)",
+  "languageNotice": "Språket gäller menyer, förenkling, rättning och tal. Välj textens språk. Sedno översätter inte texter.",
+  "languageSaveFailed": "Det gick inte att spara språket. Försök igen.",
+  "resetDaily": "Gränsen förnyas varje dag kl. {time}.",
+  "@resetDaily": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "resetAbout": "Gränsen förnyas varje dag kl. {time} (00:00 UTC).",
+  "@resetAbout": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "resetAt": "Gränsen förnyas kl. {time}.",
+  "@resetAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "quotaUsed": "Dagens gräns är förbrukad.",
+  "quotaOneSimplification": "Du har 1 förenkling kvar.",
+  "quotaOneUse": "Du har 1 AI-användning kvar.",
+  "quotaUsedDialog": "Dagsgränsen är förbrukad.",
+  "resetWithRemaining": "Gränsen förnyas kl. {time} ({remaining}).",
+  "@resetWithRemaining": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "timeRemaining": "om {hours} tim {minutes} min",
+  "@timeRemaining": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "monthlyPrice": "{price} per månad",
+  "@monthlyPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "historyExpires": "Raderas {date}.",
+  "@historyExpires": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteSavedText": "Radera text sparad {date}",
+  "@deleteSavedText": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "contactAddress": "Kontakt: {email}",
+  "@contactAddress": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "signedInAs": "Inloggad som {email}{method}",
+  "@signedInAs": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      },
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+  "accountEmail": "E-postadress: {email}",
+  "@accountEmail": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "emailToVerify": "Adress att bekräfta: {email}",
+  "@emailToVerify": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "resendAfter": "Skicka igen om {seconds} s",
+  "@resendAfter": {
+    "placeholders": {
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "testerUntil": "Teståtkomst till {date} (lokal tid).",
+  "@testerUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "cropPosition": "Vågrätt {horizontal} %, lodrätt {vertical} %",
+  "@cropPosition": {
+    "placeholders": {
+      "horizontal": {
+        "type": "String"
+      },
+      "vertical": {
+        "type": "String"
+      }
+    }
+  },
+  "welcomeName": "Välkommen till {name}",
+  "@welcomeName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "policyVersion": "Version: {date}",
+  "@policyVersion": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "speechModelDownloading": "Talmodellen laddas ned. Försök igen senare.",
+  "speechLanguageUnsupported": "Talmotorn på den här telefonen erbjuder inte lokal diktering på det här språket. Du kan skriva eller använda kameran."
+}

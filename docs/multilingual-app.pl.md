@@ -1,5 +1,8 @@
 # Języki aplikacji Sedno
 
+Aktualny kod rozszerzono do [13 wariantów językowych](multilingual-13-languages.pl.md).
+Poniższy raport opisuje pierwotne przygotowanie PL i UK oraz ówczesne testy.
+
 Na branchu `feature/multilingual-app` przygotowano polski i angielski (UK).
 Jedna aplikacja, backend, baza i wspólne limity obsługują oba języki.
 

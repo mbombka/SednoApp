@@ -39,9 +39,9 @@ public sealed class OpenAiModelProvider : IModelProvider
         options.Validate();
         ResponsesClient Create(string prompt) => new(client, options.ApiKey, options.Model, prompt,
             options.ReasoningEffort, options.ServiceTier, clock, options.MaxOutputTokens, options.TimeoutSeconds, timings);
-        _simplifiers = new[] { "pl", "en" }.ToDictionary(language => language,
+        _simplifiers = TextLanguages.All.ToDictionary(language => language,
             language => Create(SimplificationPrompt.ForLanguage(language)));
-        _correctors = new[] { "pl", "en" }.ToDictionary(language => language,
+        _correctors = TextLanguages.All.ToDictionary(language => language,
             language => Create(CorrectionPrompt.ForLanguage(language)));
     }
     public Task<string> SimplifyAsync(string text, CancellationToken cancellationToken) =>

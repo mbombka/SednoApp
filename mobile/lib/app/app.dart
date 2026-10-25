@@ -1,3 +1,4 @@
+import 'package:sedno_app/features/privacy/domain/ai_notice_repository.dart';
 import 'package:sedno_app/app/app_language.dart';
 import 'package:sedno_app/l10n/localization.dart';
 import 'package:sedno_app/features/account/presentation/user_menu_screen.dart';
@@ -29,6 +30,7 @@ import 'package:sedno_app/features/simplification/domain/simplification_reposito
 class SednoApp extends StatefulWidget {
   const SednoApp({
     this.languageController,
+    this.aiNoticeRepository,
     this.simplificationRepository,
     this.historyRepository,
     this.accountRepository,
@@ -37,6 +39,7 @@ class SednoApp extends StatefulWidget {
   });
 
   final LanguageController? languageController;
+  final AiNoticeRepository? aiNoticeRepository;
   final SimplificationRepository? simplificationRepository;
   final HistoryRepository? historyRepository;
   final AccountRepository? accountRepository;
@@ -72,6 +75,7 @@ class _SednoAppState extends State<SednoApp> {
         theme: AppTheme.light,
         themeMode: ThemeMode.light,
         home: _AppNavigation(
+          aiNoticeRepository: widget.aiNoticeRepository,
           simplificationRepository: widget.simplificationRepository,
           historyRepository: widget.historyRepository,
           accountRepository: widget.accountRepository,
@@ -84,12 +88,14 @@ class _SednoAppState extends State<SednoApp> {
 
 class _AppNavigation extends StatefulWidget {
   const _AppNavigation({
+    this.aiNoticeRepository,
     this.simplificationRepository,
     this.historyRepository,
     this.accountRepository,
     this.subscriptionModel,
   });
 
+  final AiNoticeRepository? aiNoticeRepository;
   final SimplificationRepository? simplificationRepository;
   final HistoryRepository? historyRepository;
   final AccountRepository? accountRepository;
@@ -296,6 +302,7 @@ class _AppNavigationState extends State<_AppNavigation>
                 HomeScreen(
                   key: ValueKey('home-$_dataRevision'),
                   appName: SednoApp.displayName,
+                  aiNoticeRepository: widget.aiNoticeRepository,
                   editorResult: _editorResult,
                   onModeChanged: (mode) => setState(() => _mode = mode),
                   isActive: _selectedPage == 0 && !_showingMenu,

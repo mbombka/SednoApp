@@ -41,13 +41,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
             ListTile(
               key: ValueKey('language-${choice?.code ?? 'system'}'),
               minVerticalPadding: 16,
-              title: Text(
-                choice == null
-                    ? context.l10n.systemLanguage
-                    : choice == AppLanguage.polish
-                    ? 'Polski'
-                    : 'English (UK)',
-              ),
+              title: Text(choice?.nativeName ?? context.l10n.systemLanguage),
               selected: widget.controller.selected == choice,
               trailing: widget.controller.selected == choice
                   ? const Icon(Icons.check)
