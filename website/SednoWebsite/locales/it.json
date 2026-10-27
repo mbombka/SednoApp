@@ -119,5 +119,31 @@
   "deletionRequest": "Richiedi l’eliminazione dell’account via e-mail",
   "deletionSubject": "Eliminazione account Sedno",
   "versionPrefix": "Versione",
-  "sourcesTitle": "Fonti e condizioni dei fornitori"
+  "sourcesTitle": "Fonti e condizioni dei fornitori",
+  "accountGuideTitle": "Come creare un account",
+  "accountGuideIntro": "Apri Sedno sul telefono. Segui questi passi in ordine.",
+  "accountGuideNote": "Il cerchio rosso mostra dove toccare. Queste schermate vengono dall’app. L’email è un esempio.",
+  "accountGuideTap": "Tocca qui",
+  "accountGuideSteps": [
+    "Apri il menu",
+    "Scegli «{account}»",
+    "Scegli di creare un account",
+    "Inserisci email e password",
+    "Apri la tua posta",
+    "Torna a Sedno",
+    "Fatto!"
+  ],
+  "accountGuideDescriptions": [
+    "Tocca l’icona della persona in alto a destra.",
+    "Tocca il pulsante nel cerchio rosso.",
+    "Tocca «{createAccountLink}». Se non vedi il pulsante, scorri verso l’alto.",
+    "Inserisci il tuo indirizzo email. Scegli una password di almeno 6 caratteri. Scrivi di nuovo la stessa password nel campo sotto. Tocca «{createAccount}».",
+    "Trova l’email di Sedno. Controlla anche la cartella Spam. Apri il messaggio e tocca il link per confermare il tuo indirizzo email.",
+    "Apri di nuovo Sedno. Se vedi ancora questa schermata, tocca «{checkVerification}».",
+    "Vedi il tuo indirizzo email. Il tuo account è pronto."
+  ],
+  "accountGuideMailTitle": "Email di esempio",
+  "accountGuideMailBody": "Conferma il tuo indirizzo email in Sedno.",
+  "accountGuideMailLink": "Conferma email",
+  "accountGuideHelp": "Nessun messaggio? Torna a Sedno. Aspetta che appaia «{resendEmail}» e toccalo. Poi controlla di nuovo la posta."
 }

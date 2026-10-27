@@ -119,5 +119,31 @@
   "deletionRequest": "Wyślij prośbę o usunięcie konta",
   "deletionSubject": "Usunięcie konta Sedno",
   "versionPrefix": "Wersja",
-  "sourcesTitle": "Źródła i warunki dostawców"
+  "sourcesTitle": "Źródła i warunki dostawców",
+  "accountGuideTitle": "Jak założyć konto",
+  "accountGuideIntro": "Otwórz Sedno na telefonie. Zrób po kolei te kroki.",
+  "accountGuideNote": "Czerwone kółko pokazuje, gdzie nacisnąć. Ekrany pochodzą z aplikacji. E-mail jest przykładowy.",
+  "accountGuideTap": "Kliknij tu",
+  "accountGuideSteps": [
+    "Otwórz menu",
+    "Wybierz „{account}”",
+    "Wybierz założenie konta",
+    "Wpisz e-mail i hasło",
+    "Otwórz swoją pocztę",
+    "Wróć do Sedna",
+    "Gotowe!"
+  ],
+  "accountGuideDescriptions": [
+    "Naciśnij ikonę osoby u góry, po prawej.",
+    "Naciśnij przycisk w czerwonym kółku.",
+    "Naciśnij „{createAccountLink}”. Jeśli nie widzisz przycisku, przesuń ekran w górę.",
+    "Wpisz swój e-mail. Wymyśl hasło: co najmniej 6 znaków. Niżej wpisz to samo hasło jeszcze raz. Naciśnij „{createAccount}”.",
+    "Znajdź wiadomość od Sedna. Sprawdź też folder Spam. Otwórz wiadomość i naciśnij link, aby potwierdzić e-mail.",
+    "Otwórz znów Sedno. Jeśli ten ekran nadal jest widoczny, naciśnij „{checkVerification}”.",
+    "Widzisz swój e-mail. Twoje konto jest gotowe."
+  ],
+  "accountGuideMailTitle": "Przykładowy e-mail",
+  "accountGuideMailBody": "Potwierdź swój adres e-mail w Sednie.",
+  "accountGuideMailLink": "Potwierdź e-mail",
+  "accountGuideHelp": "Nie ma wiadomości? Wróć do Sedna. Poczekaj, aż pojawi się przycisk „{resendEmail}”, i naciśnij go. Potem znów sprawdź pocztę."
 }

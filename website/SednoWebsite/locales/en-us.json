@@ -119,5 +119,31 @@
   "deletionRequest": "Request account deletion by email",
   "deletionSubject": "Sedno account deletion",
   "versionPrefix": "Version",
-  "sourcesTitle": "Sources and provider terms"
+  "sourcesTitle": "Sources and provider terms",
+  "accountGuideTitle": "How to create an account",
+  "accountGuideIntro": "Open Sedno on your phone. Follow these steps in order.",
+  "accountGuideNote": "The red circle shows where to tap. These screens come from the app. The email is an example.",
+  "accountGuideTap": "Tap here",
+  "accountGuideSteps": [
+    "Open the menu",
+    "Choose “{account}”",
+    "Choose to create an account",
+    "Enter your email and password",
+    "Open your email",
+    "Go back to Sedno",
+    "Done!"
+  ],
+  "accountGuideDescriptions": [
+    "Tap the person icon at the top right.",
+    "Tap the button in the red circle.",
+    "Tap “{createAccountLink}”. If you cannot see it, swipe up.",
+    "Enter your email address. Choose a password with at least 6 characters. Enter the same password again below. Tap “{createAccount}”.",
+    "Find the email from Sedno. Check Spam too. Open the email and tap the link to confirm your email address.",
+    "Open Sedno again. If you still see this screen, tap “{checkVerification}”.",
+    "You can see your email address. Your account is ready."
+  ],
+  "accountGuideMailTitle": "Example email",
+  "accountGuideMailBody": "Confirm your email address in Sedno.",
+  "accountGuideMailLink": "Confirm email",
+  "accountGuideHelp": "No email? Go back to Sedno. Wait for “{resendEmail}” to appear and tap it. Then check your email again."
 }

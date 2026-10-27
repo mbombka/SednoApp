@@ -119,5 +119,31 @@
   "deletionRequest": "Pedir a eliminação da conta por e-mail",
   "deletionSubject": "Eliminar conta Sedno",
   "versionPrefix": "Versão",
-  "sourcesTitle": "Fontes e condições dos fornecedores"
+  "sourcesTitle": "Fontes e condições dos fornecedores",
+  "accountGuideTitle": "Como criar uma conta",
+  "accountGuideIntro": "Abre o Sedno no teu telemóvel. Segue estes passos por ordem.",
+  "accountGuideNote": "O círculo vermelho mostra onde tocar. Estes ecrãs são da aplicação. O e-mail é um exemplo.",
+  "accountGuideTap": "Toca aqui",
+  "accountGuideSteps": [
+    "Abre o menu",
+    "Escolhe «{account}»",
+    "Escolhe criar uma conta",
+    "Escreve o e-mail e a palavra-passe",
+    "Abre o teu e-mail",
+    "Volta ao Sedno",
+    "Já está!"
+  ],
+  "accountGuideDescriptions": [
+    "Toca no ícone da pessoa no canto superior direito.",
+    "Toca no botão dentro do círculo vermelho.",
+    "Toca em «{createAccountLink}». Se não vires o botão, desliza para cima.",
+    "Escreve o teu endereço de e-mail. Escolhe uma palavra-passe com pelo menos 6 caracteres. Escreve a mesma palavra-passe outra vez no campo abaixo. Toca em «{createAccount}».",
+    "Procura a mensagem do Sedno. Vê também a pasta Spam. Abre a mensagem e toca na ligação para confirmar o teu e-mail.",
+    "Abre o Sedno outra vez. Se ainda vires este ecrã, toca em «{checkVerification}».",
+    "Vês o teu endereço de e-mail. A tua conta está pronta."
+  ],
+  "accountGuideMailTitle": "E-mail de exemplo",
+  "accountGuideMailBody": "Confirma o teu endereço de e-mail no Sedno.",
+  "accountGuideMailLink": "Confirmar e-mail",
+  "accountGuideHelp": "Não há mensagem? Volta ao Sedno. Espera até aparecer «{resendEmail}» e toca nesse botão. Depois volta a ver o teu e-mail."
 }

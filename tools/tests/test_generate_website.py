@@ -75,7 +75,7 @@ class WebsiteTests(unittest.TestCase):
 
     def test_language_switches_stay_on_the_same_document(self):
         for locale in site.LOCALES:
-            for kind in ('home', 'privacy', 'deletion'):
+            for kind in ('home', 'privacy', 'deletion', 'account'):
                 source = site.page_path(locale, kind)
                 page = self.pages[site.PUBLIC / source]
                 languages = [attrs for tag, attrs in page.tags if tag == 'html']
@@ -113,6 +113,34 @@ class WebsiteTests(unittest.TestCase):
                 if suffix:
                     self.assertIsNotNone(paper.find('.//{http://www.w3.org/2000/svg}mask'))
 
+
+    def test_account_guide_covers_registration_and_confirmation(self):
+        for locale in site.LOCALES:
+            c, app, _ = site.load(locale)
+            source = site.page_path(locale, 'account')
+            content = self.documents['website/SednoWebsite/public/' + source.as_posix()]
+            page = self.pages[site.PUBLIC / source]
+            visible = ''.join(page.text)
+            self.assertEqual(len(c['accountGuideSteps']), 7)
+            self.assertEqual(len(c['accountGuideDescriptions']), 7)
+            self.assertEqual(content.count('class="guide-step"'), 7)
+            for key in ('createAccountLink', 'createAccount', 'checkVerification', 'resendEmail'):
+                self.assertIn(app[key], visible, (locale['slug'], key))
+            images = [attrs for tag, attrs in page.tags if tag == 'img' and '/account/' in attrs.get('src', '')]
+            self.assertEqual(len(images), 6)
+            for attrs in images:
+                self.assertTrue(attrs['alt'].strip())
+                path = (site.PUBLIC / source.parent / attrs['src']).resolve()
+                data = path.read_bytes()
+                self.assertEqual(data[:8], b'\x89PNG\r\n\x1a\n')
+                self.assertEqual(int.from_bytes(data[16:20], 'big'), 824)
+                self.assertEqual(int.from_bytes(data[20:24], 'big'), 1830)
+            # The simulated email cannot submit data or open a fake verification URL.
+            self.assertFalse(any(tag in ('form', 'input', 'button') for tag, _ in page.tags))
+            self.assertIn(site.public_url(locale, 'account'), self.documents['website/SednoWebsite/public/sitemap.xml'])
+        alias = self.pages[site.PUBLIC / 'konto/index.html']
+        self.assertIn(('link', {'rel': 'canonical', 'href': 'https://sedno.xyz/konto/'}), alias.tags)
+        self.assertEqual(site.public_url(site.LOCALES[0], 'account'), 'https://sedno.xyz/konto/')
 
     def test_document_contains_full_versioned_policy(self):
         for locale in site.LOCALES:

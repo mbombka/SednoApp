@@ -119,5 +119,31 @@
   "deletionRequest": "Begär kontoradering via e-post",
   "deletionSubject": "Radera Sedno-konto",
   "versionPrefix": "Version",
-  "sourcesTitle": "Källor och leverantörsvillkor"
+  "sourcesTitle": "Källor och leverantörsvillkor",
+  "accountGuideTitle": "Så skapar du ett konto",
+  "accountGuideIntro": "Öppna Sedno på telefonen. Följ de här stegen i ordning.",
+  "accountGuideNote": "Den röda cirkeln visar var du ska trycka. Skärmbilderna kommer från appen. Mejlet är ett exempel.",
+  "accountGuideTap": "Tryck här",
+  "accountGuideSteps": [
+    "Öppna menyn",
+    "Välj ”{account}”",
+    "Välj att skapa ett konto",
+    "Skriv e-post och lösenord",
+    "Öppna din e-post",
+    "Gå tillbaka till Sedno",
+    "Klart!"
+  ],
+  "accountGuideDescriptions": [
+    "Tryck på personikonen uppe till höger.",
+    "Tryck på knappen i den röda cirkeln.",
+    "Tryck på ”{createAccountLink}”. Svep uppåt om du inte ser knappen.",
+    "Skriv din e-postadress. Välj ett lösenord med minst 6 tecken. Skriv samma lösenord en gång till i fältet under. Tryck på ”{createAccount}”.",
+    "Leta efter mejlet från Sedno. Titta också i skräpposten. Öppna mejlet och tryck på länken för att bekräfta din e-postadress.",
+    "Öppna Sedno igen. Om du fortfarande ser den här skärmen, tryck på ”{checkVerification}”.",
+    "Du ser din e-postadress. Ditt konto är klart."
+  ],
+  "accountGuideMailTitle": "Exempel på mejl",
+  "accountGuideMailBody": "Bekräfta din e-postadress i Sedno.",
+  "accountGuideMailLink": "Bekräfta e-post",
+  "accountGuideHelp": "Inget mejl? Gå tillbaka till Sedno. Vänta tills ”{resendEmail}” visas och tryck på den. Titta sedan i e-posten igen."
 }

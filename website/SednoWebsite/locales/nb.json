@@ -119,5 +119,31 @@
   "deletionRequest": "Be om kontosletting på e-post",
   "deletionSubject": "Sletting av Sedno-konto",
   "versionPrefix": "Versjon",
-  "sourcesTitle": "Kilder og leverandørvilkår"
+  "sourcesTitle": "Kilder og leverandørvilkår",
+  "accountGuideTitle": "Slik lager du en konto",
+  "accountGuideIntro": "Åpne Sedno på telefonen. Følg disse trinnene i rekkefølge.",
+  "accountGuideNote": "Den røde sirkelen viser hvor du skal trykke. Skjermbildene er fra appen. E-posten er et eksempel.",
+  "accountGuideTap": "Trykk her",
+  "accountGuideSteps": [
+    "Åpne menyen",
+    "Velg «{account}»",
+    "Velg å lage en konto",
+    "Skriv inn e-post og passord",
+    "Åpne e-posten din",
+    "Gå tilbake til Sedno",
+    "Ferdig!"
+  ],
+  "accountGuideDescriptions": [
+    "Trykk på personikonet øverst til høyre.",
+    "Trykk på knappen i den røde sirkelen.",
+    "Trykk på «{createAccountLink}». Sveip opp hvis du ikke ser knappen.",
+    "Skriv inn e-postadressen din. Velg et passord med minst 6 tegn. Skriv det samme passordet en gang til i feltet under. Trykk på «{createAccount}».",
+    "Finn e-posten fra Sedno. Se også i søppelpost. Åpne meldingen og trykk på lenken for å bekrefte e-postadressen din.",
+    "Åpne Sedno igjen. Hvis du fortsatt ser denne skjermen, trykk på «{checkVerification}».",
+    "Du ser e-postadressen din. Kontoen din er klar."
+  ],
+  "accountGuideMailTitle": "Eksempel på e-post",
+  "accountGuideMailBody": "Bekreft e-postadressen din i Sedno.",
+  "accountGuideMailLink": "Bekreft e-post",
+  "accountGuideHelp": "Ingen e-post? Gå tilbake til Sedno. Vent til «{resendEmail}» vises, og trykk på den. Sjekk deretter e-posten igjen."
 }

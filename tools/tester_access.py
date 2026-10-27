@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Interactive tester administration. Uses existing gcloud credentials and HTTPS APIs."""
 import argparse
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import hashlib
 import json
 import os
@@ -23,11 +23,14 @@ class AdminError(Exception):
 
 
 def parse_expiry(value, now):
-    """Accept Warsaw wall time, rejecting nonexistent/ambiguous DST times."""
+    """Accept an inclusive Warsaw date or an explicit Warsaw expiry time."""
     try:
-        wall = datetime.strptime(value, "%Y-%m-%d %H:%M")
-    except ValueError:
-        raise AdminError("Podaj datę w formacie RRRR-MM-DD GG:MM.") from None
+        if re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
+            wall = datetime.strptime(value, "%Y-%m-%d") + timedelta(days=1)
+        else:
+            wall = datetime.strptime(value, "%Y-%m-%d %H:%M")
+    except (ValueError, OverflowError):
+        raise AdminError("Podaj datę w formacie RRRR-MM-DD (opcjonalnie z godziną GG:MM).") from None
     candidates = {
         wall.replace(tzinfo=WARSAW, fold=fold).astimezone(UTC)
         for fold in (0, 1)
@@ -58,13 +61,16 @@ def gcloud_token():
 
 
 class GoogleApi:
-    def __init__(self, token):
+    def __init__(self, token, project):
         self.token = token
+        self.project = project
 
     def request(self, method, url, body=None, *, missing_ok=False):
         payload = None if body is None else json.dumps(body).encode("utf-8")
         request = Request(url, data=payload, method=method, headers={
             "Authorization": "Bearer " + self.token, "Content-Type": "application/json",
+            # User OAuth tokens otherwise fall back to gcloud's shared project.
+            "X-Goog-User-Project": self.project,
         })
         try:
             with urlopen(request, timeout=30) as response:
@@ -155,8 +161,9 @@ def interactive(admin, *, read=input, output=print, clock=lambda: datetime.now(U
         raise AdminError("Nieznana opcja. Nie zapisano zmian.")
     expiry = None
     if action == "1":
-        expiry = parse_expiry(read("Ważny do (RRRR-MM-DD GG:MM, Europe/Warsaw): ").strip(), clock())
-        output("Nowa data: " + timestamp(expiry) + " (UTC). Limit: 400 operacji dziennie łącznie.")
+        expiry = parse_expiry(read("Ważny do końca dnia (RRRR-MM-DD; opcjonalnie GG:MM, Europe/Warsaw): ").strip(), clock())
+        output("Wygaśnięcie: " + expiry.astimezone(WARSAW).strftime("%Y-%m-%d %H:%M %Z")
+               + " (" + timestamp(expiry) + "). Limit: 400 operacji dziennie łącznie.")
     else:
         output("Zostanie usunięte wyłącznie uprawnienie testerskie. Subskrypcja i liczniki pozostaną bez zmian.")
     if read(f"Zapisać zmianę dla {email}? Wpisz TAK: ").strip() != "TAK":
@@ -181,7 +188,7 @@ def main():
         parser.error("To narzędzie administruje prawdziwą bazą. Usuń FIRESTORE_EMULATOR_HOST.")
     print(f"Projekt: {args.project}, baza: (default).")
     try:
-        interactive(TesterAdmin(GoogleApi(gcloud_token()), args.project))
+        interactive(TesterAdmin(GoogleApi(gcloud_token(), args.project), args.project))
     except (EOFError, KeyboardInterrupt):
         print("\nPrzerwano. Jeśli przerwano zapis, uruchom skrypt ponownie, aby sprawdzić status.")
         return 130

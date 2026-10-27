@@ -56,11 +56,12 @@ Każdy katalog zawiera:
 index.html                 — strona główna z lokalnymi instrukcjami
 privacy/index.html         — pełna polityka w danym języku
 delete-account/index.html  — usuwanie konta w danym języku
+account/index.html         — obrazkowa instrukcja zakładania konta
 ```
 
 Przełącznik języka używa `details` i zwykłych linków. Działa bez JavaScriptu,
 z klawiaturą i po otwarciu lokalnych plików. Zachowuje rodzaj strony: polityka
-prowadzi do polityki, a usuwanie konta do usuwania konta. Strona nie wymusza
+prowadzi do polityki, a usuwanie konta do usuwania konta. Instrukcja konta zachowuje ten sam poradnik po zmianie języka. Strona nie wymusza
 przekierowania na podstawie języka przeglądarki. Nie używa ciasteczek ani pamięci
 lokalnej. Nazwy języków są podane w ich własnym języku.
 
@@ -126,3 +127,46 @@ przycisków i wysokości ekranów wszystkie scenariusze przeszły. Sprawdzono te
 wizualnie stronę, grafiki i rozwinięty przełącznik. Te kontrole nie zastępują
 odbioru tłumaczeń przez osoby znające dany język ani testu opublikowanej domeny.
 W tym kroku nie publikowano strony, nie zmieniano aplikacji ani backendu.
+
+## Instrukcja zakładania konta — 27.10.2026
+
+Prosty polski adres do wysłania testerom po publikacji: **https://sedno.xyz/konto/**.
+Wersje językowe: `/pl/account/`, `/en/account/`, `/en-us/account/`,
+`/fr/account/`, `/de/account/`, `/it/account/`, `/es/account/`, `/pt/account/`,
+`/sk/account/`, `/cs/account/`, `/ro/account/`, `/nb/account/`, `/sv/account/`.
+Link do instrukcji znajduje się także w menu strony. Każda wersja ma siedem
+kroków: menu, Konto, wybór rejestracji, formularz z powtórzeniem hasła,
+potwierdzenie e-maila, powrót do aplikacji i gotowe konto.
+
+Treść pochodzi ze wspólnych katalogów `locales/*.json`; nazwy przycisków
+pobiera generator z aplikacji. Przykładowy e-mail jest rysunkiem HTML/CSS,
+bez aktywnego linku potwierdzającego. Czerwone kółka są częścią zrzutów.
+Obrazy można otworzyć osobno, naciskając je. Pełne opisy kroków są również
+zapisane tekstem, niezależnie od obrazków.
+
+Zrzuty PNG w `public/img/account/` są generowane z rzeczywistych widoków Fluttera,
+w 13 wariantach językowych. Narzędzie używa wyłącznie przykładowego konta
+`anna@example.com` i lokalnego repozytorium bez sieci. Nie wykonuje rejestracji
+w Firebase ani nie wysyła wiadomości. Po zmianach wyglądu aplikacji odśwież zrzuty:
+
+```sh
+cd mobile
+flutter test tool/account_guide_screenshots_test.dart --run-skipped \
+  --dart-define=GUIDE_FONT_DIR=/sciezka/do/flutter/bin/cache/artifacts/material_fonts
+cd ..
+python3 tools/generate_website.py
+python3 tools/generate_website.py --check
+python3 -m unittest tools/tests/test_generate_website.py -v
+```
+
+Do podglądu przed publikacją służy `public/konto/index.html`.
+Publikacja przebiega tak samo jak wcześniej: prześlij całą zawartość `public/`
+na hosting OVH. Sam zapis zmian w repozytorium nie aktualizuje domeny.
+
+Weryfikacja 27.10.2026: 7 testów generatora i kontrola `--check` przeszły.
+Narzędzie Fluttera wygenerowało 78 zrzutów; przeszło 14 istniejących testów ekranu
+konta oraz `flutter analyze`. W lokalnym Firefoxie sprawdzono 42 widoki:
+13 wersji i polski alias przy 1440 px, 390 px oraz 320 px z tekstem 200%.
+Wszystkie obrazy załadowały się; nie wykryto przewijania w poziomie.
+Sprawdzono też wizualnie polski podgląd. Testy lokalne nie potwierdzają
+aktualizacji hostingu ani dostarczania rzeczywistych e-maili.

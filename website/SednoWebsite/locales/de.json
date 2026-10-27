@@ -119,5 +119,31 @@
   "deletionRequest": "Kontolöschung per E-Mail anfragen",
   "deletionSubject": "Sedno-Konto löschen",
   "versionPrefix": "Version",
-  "sourcesTitle": "Quellen und Anbieterbedingungen"
+  "sourcesTitle": "Quellen und Anbieterbedingungen",
+  "accountGuideTitle": "So erstellst du ein Konto",
+  "accountGuideIntro": "Öffne Sedno auf deinem Handy. Folge diesen Schritten der Reihe nach.",
+  "accountGuideNote": "Der rote Kreis zeigt, wo du tippen sollst. Diese Bilder stammen aus der App. Die E-Mail ist ein Beispiel.",
+  "accountGuideTap": "Hier tippen",
+  "accountGuideSteps": [
+    "Öffne das Menü",
+    "Wähle „{account}“",
+    "Wähle ein neues Konto",
+    "Gib E-Mail und Passwort ein",
+    "Öffne dein E-Mail-Postfach",
+    "Gehe zurück zu Sedno",
+    "Fertig!"
+  ],
+  "accountGuideDescriptions": [
+    "Tippe oben rechts auf das Personen-Symbol.",
+    "Tippe auf die Schaltfläche im roten Kreis.",
+    "Tippe auf „{createAccountLink}“. Siehst du die Schaltfläche nicht? Wische nach oben.",
+    "Gib deine E-Mail-Adresse ein. Wähle ein Passwort mit mindestens 6 Zeichen. Gib darunter dasselbe Passwort noch einmal ein. Tippe auf „{createAccount}“.",
+    "Suche die E-Mail von Sedno. Sieh auch im Spam-Ordner nach. Öffne die E-Mail und tippe auf den Link, um deine E-Mail-Adresse zu bestätigen.",
+    "Öffne Sedno wieder. Wenn du diesen Bildschirm noch siehst, tippe auf „{checkVerification}“.",
+    "Du siehst deine E-Mail-Adresse. Dein Konto ist bereit."
+  ],
+  "accountGuideMailTitle": "Beispiel-E-Mail",
+  "accountGuideMailBody": "Bestätige deine E-Mail-Adresse in Sedno.",
+  "accountGuideMailLink": "E-Mail bestätigen",
+  "accountGuideHelp": "Keine E-Mail? Gehe zurück zu Sedno. Warte, bis „{resendEmail}“ erscheint, und tippe darauf. Sieh dann wieder in deinem Postfach nach."
 }

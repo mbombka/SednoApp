@@ -27,6 +27,12 @@ Domyślny projekt to `sednoapp-79241`, baza zawsze `(default)`.
 Inny projekt można jawnie wskazać przez `--project IDENTYFIKATOR`.
 Narzędzie odmawia pracy z ustawionym `FIRESTORE_EMULATOR_HOST`.
 
+Skrypt wskazuje wybrany projekt także w nagłówku `X-Goog-User-Project`, aby
+Google rozliczało limity API w projekcie Sedno. Bez tego nagłówka token konta
+użytkownika może powodować HTTP 403 `SERVICE_DISABLED` dla wspólnego projektu
+Google Cloud CLI, mimo poprawnego logowania i uprawnień do Sedno.
+Opis mechanizmu: [uwierzytelnianie REST Google](https://docs.cloud.google.com/docs/authentication/rest#set-quota-project).
+
 Przebieg:
 
 1. Podaj e-mail konta testera.
@@ -38,15 +44,19 @@ Przebieg:
    nie status płatności Google Play.
 4. Wybierz `1`, aby nadać/przedłużyć dostęp, albo `2`, aby usunąć atrybut testera.
    Enter kończy bez zmian.
-5. Dla opcji `1` wpisz dokładną datę końcową, np. `2026-11-15 20:00`.
-   Jest to czas **Europe/Warsaw**, niezależny od strefy terminala. Skrypt pokaże
-   odpowiadającą datę UTC. Odrzuca daty przeszłe i niejednoznaczne/nieistniejące
-   godziny podczas zmiany czasu. W przykładzie dostęp wygasa o 20:00,
-   a nie na końcu tego dnia.
+5. Dla opcji `1` wpisz datę końcową, np. `2026-11-15`. Dostęp będzie ważny
+   przez cały wskazany dzień i wygaśnie **16 listopada o 00:00**.
+   Jest to czas **Europe/Warsaw**, niezależny od strefy terminala.
+   Opcjonalnie możesz nadal podać dokładną godzinę, np. `2026-11-15 20:00`;
+   wtedy dostęp wygaśnie dokładnie o 20:00. Skrypt pokaże termin lokalny i UTC.
+   Odrzuca terminy, które już minęły, oraz niejednoznaczne/nieistniejące godziny
+   podczas zmiany czasu. Możesz podać dzisiejszą datę, aby nadać dostęp do końca dnia.
 6. Wpisz `TAK`, aby zapisać. Inna odpowiedź anuluje zmianę.
 
 Narzędzie wymaga uprawnienia IAM `firebaseauth.users.get` oraz odczytu i aktualizacji
 istniejących dokumentów Firestore (`datastore.entities.get`, `datastore.entities.update`).
+Wymaga również `serviceusage.services.use` w wybranym projekcie (np. rola
+Service Usage Consumer), aby wskazać go jako projekt limitów API.
 Przykładowe role standardowe to Firebase Authentication Viewer i Cloud Datastore User;
 administrator projektu może mieć te uprawnienia przez szerszą rolę. Reguł dostępu
 aplikacji mobilnej nie należy otwierać. Skrypt używa OAuth/IAM, a nie reguł klienta.

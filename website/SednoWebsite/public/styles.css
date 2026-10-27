@@ -214,3 +214,46 @@ dd { margin: 7px 0 0; color: var(--muted); font-size: .92rem; }
 @media (forced-colors: active) {
   .language-menu summary, .language-options, .language-links a { border-color: ButtonText; }
 }
+
+/* Account guide: one action at a time, real localized app captures. */
+.main-nav { flex-wrap: wrap; gap: 8px 24px; }
+.account-guide { max-width: 940px; padding-block: 56px 24px; }
+.guide-intro { max-width: 760px; margin-bottom: 40px; }
+.guide-intro > p { margin-top: 20px; font-size: 1.125rem; }
+.guide-intro .diagram-note { font-size: 1rem; }
+.guide-steps { list-style: none; padding: 0; margin: 0; }
+.guide-step { display: grid; grid-template-columns: 1fr minmax(0, 360px); align-items: start; gap: 40px; padding-block: 40px; border-top: 1px solid var(--line); }
+.guide-copy { padding-top: 12px; }
+.guide-copy h2 { font-size: clamp(1.5rem, 3vw, 2rem); line-height: 1.35; letter-spacing: -.025em; }
+.guide-number { display: inline-flex; justify-content: center; align-items: center; min-width: 48px; min-height: 48px; padding: 4px; border-radius: 50%; background: var(--ink); color: white; margin-right: 8px; }
+.guide-copy > p { margin-top: 20px; font-size: 1.25rem; }
+.guide-copy .guide-tap { color: #b5141b; font-weight: 700; }
+.guide-step figure { min-width: 0; }
+.guide-image-link { display: block; border: 2px solid #a9b7c9; border-radius: 16px; overflow: hidden; background: white; }
+.guide-image-link img { display: block; width: 100%; height: auto; }
+.guide-mail { border: 2px solid #a9b7c9; border-radius: 16px; background: white; padding: 28px 24px; font-size: 1.25rem; }
+.guide-mail > p { margin-bottom: 24px; }
+.guide-mail .guide-mail-label { font-size: 1rem; color: var(--muted); border-bottom: 1px solid var(--line); padding-bottom: 16px; }
+.guide-envelope { display: block; color: var(--blue); font-size: 4rem; line-height: 1; margin-bottom: 24px; }
+.guide-mail-confirm { display: block; padding: 16px 10px; margin: 12px 0; text-align: center; color: var(--blue); text-decoration: underline; border: 5px solid #d71920; border-radius: 50%; font-weight: 700; }
+.guide-help { padding: 28px; background: #edf3ff; border-radius: 12px; margin-top: 24px; }
+.guide-help h2 { font-size: 1.5rem; margin-bottom: 16px; }
+.guide-help p { font-size: 1.125rem; }
+@media (max-width: 680px) {
+  .main-nav { gap: 4px 16px; }
+  .account-guide { padding-top: 36px; }
+  .guide-step { grid-template-columns: minmax(0, 1fr); gap: 24px; padding-block: 32px; }
+  .guide-step figure { width: 100%; max-width: 412px; margin-inline: auto; }
+  .guide-copy { padding-top: 0; }
+}
+@media print {
+  .header, .footer, .skip-link { display: none; }
+  .guide-step { break-inside: avoid; }
+  .guide-image-link { max-width: 260px; }
+}
+.guide-fields { padding-left: 28px; margin-block: 20px 0; font-size: 1.25rem; }
+.guide-fields li { margin-block: 12px; padding-left: 4px; }
+.guide-tap::before { content: '→ '; }
+@media (max-width: 680px) {
+  .guide-tap::before { content: '↓ '; }
+}

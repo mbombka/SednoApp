@@ -119,5 +119,31 @@
   "deletionRequest": "Solicită ștergerea contului prin e-mail",
   "deletionSubject": "Ștergere cont Sedno",
   "versionPrefix": "Versiune",
-  "sourcesTitle": "Surse și condițiile furnizorilor"
+  "sourcesTitle": "Surse și condițiile furnizorilor",
+  "accountGuideTitle": "Cum creezi un cont",
+  "accountGuideIntro": "Deschide Sedno pe telefon. Urmează acești pași în ordine.",
+  "accountGuideNote": "Cercul roșu arată unde să apeși. Aceste ecrane sunt din aplicație. E-mailul este un exemplu.",
+  "accountGuideTap": "Apasă aici",
+  "accountGuideSteps": [
+    "Deschide meniul",
+    "Alege „{account}”",
+    "Alege să creezi un cont",
+    "Scrie e-mailul și parola",
+    "Deschide e-mailul",
+    "Revino în Sedno",
+    "Gata!"
+  ],
+  "accountGuideDescriptions": [
+    "Apasă pe simbolul persoanei din dreapta sus.",
+    "Apasă pe butonul din cercul roșu.",
+    "Apasă pe „{createAccountLink}”. Dacă nu vezi butonul, glisează în sus.",
+    "Scrie adresa ta de e-mail. Alege o parolă cu cel puțin 6 caractere. Scrie aceeași parolă încă o dată în câmpul de mai jos. Apasă pe „{createAccount}”.",
+    "Caută mesajul de la Sedno. Verifică și folderul Spam. Deschide mesajul și apasă pe link pentru a confirma adresa de e-mail.",
+    "Deschide din nou Sedno. Dacă încă vezi acest ecran, apasă pe „{checkVerification}”.",
+    "Vezi adresa ta de e-mail. Contul tău este gata."
+  ],
+  "accountGuideMailTitle": "Exemplu de e-mail",
+  "accountGuideMailBody": "Confirmă adresa ta de e-mail în Sedno.",
+  "accountGuideMailLink": "Confirmă e-mailul",
+  "accountGuideHelp": "Nu ai primit mesajul? Revino în Sedno. Așteaptă să apară „{resendEmail}” și apasă pe acest buton. Apoi verifică din nou e-mailul."
 }

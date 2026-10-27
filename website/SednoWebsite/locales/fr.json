@@ -119,5 +119,31 @@
   "deletionRequest": "Demander la suppression du compte par e-mail",
   "deletionSubject": "Suppression du compte Sedno",
   "versionPrefix": "Version",
-  "sourcesTitle": "Sources et conditions des prestataires"
+  "sourcesTitle": "Sources et conditions des prestataires",
+  "accountGuideTitle": "Comment créer un compte",
+  "accountGuideIntro": "Ouvrez Sedno sur votre téléphone. Suivez ces étapes dans cet ordre.",
+  "accountGuideNote": "Le cercle rouge montre où appuyer. Ces écrans viennent de l’application. L’e-mail est un exemple.",
+  "accountGuideTap": "Appuyez ici",
+  "accountGuideSteps": [
+    "Ouvrez le menu",
+    "Choisissez « {account} »",
+    "Choisissez de créer un compte",
+    "Entrez votre e-mail et un mot de passe",
+    "Ouvrez votre messagerie",
+    "Revenez dans Sedno",
+    "C’est prêt !"
+  ],
+  "accountGuideDescriptions": [
+    "Appuyez sur l’icône de personne en haut à droite.",
+    "Appuyez sur le bouton dans le cercle rouge.",
+    "Appuyez sur « {createAccountLink} ». Si le bouton n’est pas visible, faites glisser l’écran vers le haut.",
+    "Entrez votre adresse e-mail. Choisissez un mot de passe d’au moins 6 caractères. Entrez le même mot de passe une deuxième fois en dessous. Appuyez sur « {createAccount} ».",
+    "Trouvez le message de Sedno. Regardez aussi dans les courriers indésirables. Ouvrez le message et appuyez sur le lien pour confirmer votre adresse e-mail.",
+    "Ouvrez à nouveau Sedno. Si cet écran est encore visible, appuyez sur « {checkVerification} ».",
+    "Vous voyez votre adresse e-mail. Votre compte est prêt."
+  ],
+  "accountGuideMailTitle": "Exemple d’e-mail",
+  "accountGuideMailBody": "Confirmez votre adresse e-mail dans Sedno.",
+  "accountGuideMailLink": "Confirmer l’e-mail",
+  "accountGuideHelp": "Pas de message ? Revenez dans Sedno. Attendez que « {resendEmail} » apparaisse et appuyez dessus. Puis regardez à nouveau votre messagerie."
 }

@@ -119,5 +119,31 @@
   "deletionRequest": "Požiadať o odstránenie účtu e-mailom",
   "deletionSubject": "Odstránenie účtu Sedno",
   "versionPrefix": "Verzia",
-  "sourcesTitle": "Zdroje a podmienky poskytovateľov"
+  "sourcesTitle": "Zdroje a podmienky poskytovateľov",
+  "accountGuideTitle": "Ako si vytvoriť účet",
+  "accountGuideIntro": "Otvor Sedno v telefóne. Postupuj podľa týchto krokov.",
+  "accountGuideNote": "Červený krúžok ukazuje, kam ťuknúť. Tieto obrazovky sú z aplikácie. E-mail je príklad.",
+  "accountGuideTap": "Ťukni sem",
+  "accountGuideSteps": [
+    "Otvor menu",
+    "Vyber „{account}“",
+    "Vyber vytvorenie účtu",
+    "Zadaj e-mail a heslo",
+    "Otvor svoju e-mailovú schránku",
+    "Vráť sa do Sedna",
+    "Hotovo!"
+  ],
+  "accountGuideDescriptions": [
+    "Ťukni na ikonu osoby vpravo hore.",
+    "Ťukni na tlačidlo v červenom krúžku.",
+    "Ťukni na „{createAccountLink}“. Ak tlačidlo nevidíš, potiahni prstom nahor.",
+    "Zadaj svoju e-mailovú adresu. Vymysli heslo s aspoň 6 znakmi. Nižšie zadaj to isté heslo ešte raz. Ťukni na „{createAccount}“.",
+    "Nájdi správu od Sedna. Pozri sa aj do priečinka Spam. Otvor správu a ťukni na odkaz na potvrdenie e-mailu.",
+    "Znova otvor Sedno. Ak stále vidíš túto obrazovku, ťukni na „{checkVerification}“.",
+    "Vidíš svoju e-mailovú adresu. Tvoj účet je pripravený."
+  ],
+  "accountGuideMailTitle": "Príklad e-mailu",
+  "accountGuideMailBody": "Potvrď svoju e-mailovú adresu v Sedne.",
+  "accountGuideMailLink": "Potvrdiť e-mail",
+  "accountGuideHelp": "Správa neprišla? Vráť sa do Sedna. Počkaj na tlačidlo „{resendEmail}“ a ťukni naň. Potom znova skontroluj poštu."
 }
