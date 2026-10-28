@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:sedno_app/features/privacy/domain/localized_privacy_policy.dart';
 import 'package:sedno_app/l10n/localization.dart';
 
@@ -289,6 +291,76 @@ class _AccountScreenState extends State<AccountScreen>
     }
   }
 
+  Future<void> _linkApple() => _linkProvider(apple: true);
+  Future<void> _linkGoogle() => _linkProvider(apple: false);
+
+  Future<void> _linkProvider({required bool apple}) async {
+    final repository = widget.repository;
+    if (repository is! AppleAccountRepository ||
+        !(apple
+            ? (repository as AppleAccountRepository).canLinkApple
+            : (repository as AppleAccountRepository).canLinkGoogle)) {
+      return;
+    }
+    String? password;
+    final needsPassword = _account?.provider == IdentityProvider.email;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(apple ? context.l10n.linkApple : context.l10n.linkGoogle),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                apple
+                    ? context.l10n.confirmAccountLink
+                    : context.l10n.confirmGoogleAccountLink,
+              ),
+              if (needsPassword) ...[
+                const SizedBox(height: 12),
+                Text(
+                  apple
+                      ? context.l10n.passwordToLink
+                      : context.l10n.passwordToLinkGoogle,
+                ),
+                TextField(
+                  onChanged: (value) => password = value,
+                  obscureText: true,
+                  autocorrect: false,
+                  enableSuggestions: false,
+                  decoration: InputDecoration(labelText: context.l10n.password),
+                ),
+              ],
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(
+              apple ? context.l10n.linkApple : context.l10n.linkGoogle,
+            ),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    await _run(
+      () => apple
+          ? (repository as AppleAccountRepository).linkApple(password: password)
+          : (repository as AppleAccountRepository).linkGoogle(
+              password: password,
+            ),
+    );
+    password = null;
+  }
+
   Future<void> _deleteAccount() async {
     var password = '';
     final confirmed = await showDialog<bool>(
@@ -336,7 +408,9 @@ class _AccountScreenState extends State<AccountScreen>
       if (mounted) {
         setState(() {
           _account = Account(id: 'guest', provider: IdentityProvider.guest);
-          _message = context.l10n.accountDeleted;
+          _message = Platform.isIOS
+              ? context.l10n.appleAccountDeleted
+              : context.l10n.accountDeleted;
         });
       }
     } on AccountActionException catch (error) {
@@ -377,6 +451,7 @@ class _AccountScreenState extends State<AccountScreen>
       IdentityProvider.google => context.l10n.googleAccountMethod,
       IdentityProvider.email => context.l10n.emailAccountMethod,
       IdentityProvider.guest => '',
+      IdentityProvider.apple => context.l10n.appleAccountMethod,
     };
     return context.l10n.signedInAs(email, method);
   }
@@ -420,6 +495,18 @@ class _AccountScreenState extends State<AccountScreen>
           if (repository != null && signedIn) ...[
             Text(_signedInLabel(_account!)),
             const SizedBox(height: 16),
+            if (repository is AppleAccountRepository &&
+                (repository as AppleAccountRepository).canLinkApple)
+              OutlinedButton(
+                onPressed: _busy ? null : _linkApple,
+                child: Text(context.l10n.linkApple),
+              ),
+            if (repository is AppleAccountRepository &&
+                (repository as AppleAccountRepository).canLinkGoogle)
+              OutlinedButton(
+                onPressed: _busy ? null : _linkGoogle,
+                child: Text(context.l10n.linkGoogle),
+              ),
             OutlinedButton(
               onPressed: _busy ? null : _signOut,
               child: Text(context.l10n.signOut),
@@ -497,6 +584,20 @@ class _AccountScreenState extends State<AccountScreen>
                     : () => _run(repository.signInWithGoogle),
                 child: Text(context.l10n.signInGoogle),
               ),
+              if (repository is AppleAccountRepository &&
+                  (repository as AppleAccountRepository)
+                      .appleSignInAvailable) ...[
+                const SizedBox(height: 12),
+                FilledButton(
+                  onPressed: _busy
+                      ? null
+                      : () => _run(
+                          (repository as AppleAccountRepository)
+                              .signInWithApple,
+                        ),
+                  child: Text(context.l10n.signInApple),
+                ),
+              ],
               const SizedBox(height: 16),
             ],
             Form(

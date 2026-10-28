@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:sedno_app/l10n/localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sedno_app/app/app_information.dart';
@@ -45,7 +47,11 @@ class AboutScreen extends StatelessWidget {
           Text(context.l10n.captureInstructions),
           Text(context.l10n.captureSubmitInstructions),
           Text(context.l10n.localMediaNotice),
-          Text(context.l10n.speechModelRequirements),
+          Text(
+            (Platform.isIOS
+                ? context.l10n.localSpeechUnavailable
+                : context.l10n.speechModelRequirements),
+          ),
           Text(context.l10n.playbackRequirements),
           Text(context.l10n.restoreInstructions),
           Text(context.l10n.inputLimitNotice),
@@ -54,7 +60,11 @@ class AboutScreen extends StatelessWidget {
           Text(context.l10n.freeAllowance),
           Text(context.l10n.paidAllowance),
           Text(context.l10n.sharedAllowance),
-          Text(context.l10n.subscriptionPriceNotice),
+          Text(
+            (Platform.isIOS
+                ? context.l10n.appleSubscriptionPriceNotice
+                : context.l10n.subscriptionPriceNotice),
+          ),
           // Local clock time first; UTC for users comparing with other sources.
           Text(context.l10n.resetAbout(QuotaReset.localTime())),
           _Heading(context.l10n.important),

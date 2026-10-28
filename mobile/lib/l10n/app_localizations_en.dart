@@ -977,6 +977,99 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get speechLanguageUnsupported =>
       'The speech engine on this phone does not support on-device dictation in this language. You can type or use the camera.';
+
+  @override
+  String get signInApple => 'Sign in with Apple';
+
+  @override
+  String get appleAccountMethod => 'Apple';
+
+  @override
+  String get signInCancelled => 'Sign-in cancelled.';
+
+  @override
+  String get accountMethodConflict =>
+      'This account uses another sign-in method. Use your existing method.';
+
+  @override
+  String get localSpeechUnavailable =>
+      'On-device speech recognition is unavailable for this language on this device.';
+
+  @override
+  String get localSpeechModelMissing =>
+      'Install the local speech model for your language in device settings.';
+
+  @override
+  String get deviceFeatureUnavailable =>
+      'This feature is unavailable on this device.';
+
+  @override
+  String get subscriptionOtherStore =>
+      'This subscription was purchased in another store. Manage it in the store where you bought it.';
+
+  @override
+  String get storeOpenFailed =>
+      'Subscription settings could not be opened. Try again.';
+
+  @override
+  String get appleManageSubscriptionNotice =>
+      'To change your payment or cancel your subscription, go to App Store.';
+
+  @override
+  String get appleManageSubscription => 'Manage subscription in App Store';
+
+  @override
+  String get appleSubscriptionCancelNotice =>
+      'You can cancel it at any time in App Store.';
+
+  @override
+  String get appleAccountDeleted =>
+      'Your account and data have been deleted. Cancel your subscription separately in App Store.';
+
+  @override
+  String get appleTesterHasSubscription =>
+      'You also have an active App Store subscription.';
+
+  @override
+  String get appleSubscriptionStillActive =>
+      'Your App Store subscription still gives you a higher limit.';
+
+  @override
+  String get appleInstallationRejected =>
+      'The server could not verify this app installation. Try again or install Sedno from App Store.';
+
+  @override
+  String get appleSubscriptionPriceNotice =>
+      'You can see the subscription price in Account and in App Store.';
+
+  @override
+  String get privacyIosSupplementTitle => 'Additional information for iPhone';
+
+  @override
+  String get privacyIosSupplementBody =>
+      'References below to Android, Google Play and Play Integrity apply only to Android. On iPhone you can sign in with Apple and hide your email address. Firebase also handles authentication. Apple handles subscriptions bought in the App Store; Sedno does not receive card details. Deleting your account does not cancel a subscription.\n\nApp Attest verifies the app’s authenticity. It does not send text, results or photos to Apple. The server stores pseudonymous installation and public key data. Challenges are valid for 5 minutes and keys for 90 days after the last successful session verification. Purchase notifications are kept for 30 days. A server job removes expired records. Purchase metadata is kept until account deletion.\n\nHistory is encrypted, stays on the device, is excluded from backups and expires after 7 days. Photos and audio stay on the device. Dictation and speech playback run locally only when supported by the device and language. You send recognised text to OpenAI through Sedno after accepting the AI notice.\n\nThe other information below, including controller details, purposes, legal bases and OpenAI practices, also applies to iPhone. Apple’s privacy policy: https://www.apple.com/legal/privacy/';
+
+  @override
+  String get linkApple => 'Link Apple account';
+
+  @override
+  String get confirmAccountLink =>
+      'Confirm your current account again. Then choose an Apple account to sign in to the same Sedno account.';
+
+  @override
+  String get passwordToLink =>
+      'Enter your current account password to link Apple.';
+
+  @override
+  String get linkGoogle => 'Link Google account';
+
+  @override
+  String get confirmGoogleAccountLink =>
+      'Confirm your current account again. Then choose a Google account to sign in to the same Sedno account.';
+
+  @override
+  String get passwordToLinkGoogle =>
+      'Enter your current account password to link Google.';
 }
 
 /// The translations for English, as used in the United States (`en_US`).
@@ -1951,4 +2044,97 @@ class AppLocalizationsEnUs extends AppLocalizationsEn {
   @override
   String get speechLanguageUnsupported =>
       'The speech engine on this phone does not support on-device dictation in this language. You can type or use the camera.';
+
+  @override
+  String get signInApple => 'Sign in with Apple';
+
+  @override
+  String get appleAccountMethod => 'Apple';
+
+  @override
+  String get signInCancelled => 'Sign-in canceled.';
+
+  @override
+  String get accountMethodConflict =>
+      'This account uses another sign-in method. Use your existing method.';
+
+  @override
+  String get localSpeechUnavailable =>
+      'On-device speech recognition is unavailable for this language on this device.';
+
+  @override
+  String get localSpeechModelMissing =>
+      'Install the local speech model for your language in device settings.';
+
+  @override
+  String get deviceFeatureUnavailable =>
+      'This feature is unavailable on this device.';
+
+  @override
+  String get subscriptionOtherStore =>
+      'This subscription was purchased in another store. Manage it in the store where you bought it.';
+
+  @override
+  String get storeOpenFailed =>
+      'Subscription settings could not be opened. Try again.';
+
+  @override
+  String get appleManageSubscriptionNotice =>
+      'To change your payment or cancel your subscription, go to App Store.';
+
+  @override
+  String get appleManageSubscription => 'Manage subscription in App Store';
+
+  @override
+  String get appleSubscriptionCancelNotice =>
+      'You can cancel it at any time in App Store.';
+
+  @override
+  String get appleAccountDeleted =>
+      'Your account and data have been deleted. Cancel your subscription separately in App Store.';
+
+  @override
+  String get appleTesterHasSubscription =>
+      'You also have an active App Store subscription.';
+
+  @override
+  String get appleSubscriptionStillActive =>
+      'Your App Store subscription still gives you a higher limit.';
+
+  @override
+  String get appleInstallationRejected =>
+      'The server could not verify this app installation. Try again or install Sedno from App Store.';
+
+  @override
+  String get appleSubscriptionPriceNotice =>
+      'You can see the subscription price in Account and in App Store.';
+
+  @override
+  String get privacyIosSupplementTitle => 'Additional information for iPhone';
+
+  @override
+  String get privacyIosSupplementBody =>
+      'References below to Android, Google Play and Play Integrity apply only to Android. On iPhone you can sign in with Apple and hide your email address. Firebase also handles authentication. Apple handles subscriptions bought in the App Store; Sedno does not receive card details. Deleting your account does not cancel a subscription.\n\nApp Attest verifies the app’s authenticity. It does not send text, results or photos to Apple. The server stores pseudonymous installation and public key data. Challenges are valid for 5 minutes and keys for 90 days after the last successful session verification. Purchase notifications are kept for 30 days. A server job removes expired records. Purchase metadata is kept until account deletion.\n\nHistory is encrypted, stays on the device, is excluded from backups and expires after 7 days. Photos and audio stay on the device. Dictation and speech playback run locally only when supported by the device and language. You send recognized text to OpenAI through Sedno after accepting the AI notice.\n\nThe other information below, including controller details, purposes, legal bases and OpenAI practices, also applies to iPhone. Apple’s privacy policy: https://www.apple.com/legal/privacy/';
+
+  @override
+  String get linkApple => 'Link Apple account';
+
+  @override
+  String get confirmAccountLink =>
+      'Confirm your current account again. Then choose an Apple account to sign in to the same Sedno account.';
+
+  @override
+  String get passwordToLink =>
+      'Enter your current account password to link Apple.';
+
+  @override
+  String get linkGoogle => 'Link Google account';
+
+  @override
+  String get confirmGoogleAccountLink =>
+      'Confirm your current account again. Then choose a Google account to sign in to the same Sedno account.';
+
+  @override
+  String get passwordToLinkGoogle =>
+      'Enter your current account password to link Google.';
 }

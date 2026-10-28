@@ -8,86 +8,92 @@ import 'package:sedno_app/features/shared/data/development_mocks.dart';
 import '../helpers.dart';
 
 void main() {
-  for (final language in AppLanguage.values) {
-    for (final mode in TextMode.values) {
-      for (final scale in [1.0, 2.5]) {
-        testWidgets(
-          'main flow meets Android accessibility guidelines at $scale in ${mode.name} (${language.code})',
-          (tester) async {
-            final semantics = tester.ensureSemantics();
-            tester.view.physicalSize = const Size(412, 892);
-            tester.view.devicePixelRatio = 1;
-            addTearDown(tester.view.resetPhysicalSize);
-            addTearDown(tester.view.resetDevicePixelRatio);
-            final languages = LanguageController(
-              deviceLocales: [language.locale],
-            );
-            addTearDown(languages.dispose);
-            final strings = languages.strings;
-            final now = DateTime.utc(2026, 10, 16);
-            final history = MockHistoryRepository(clock: () => now);
-            final quota = MockQuotaRepository(clock: () => now);
-            await tester.pumpWidget(
-              MediaQuery(
-                data: MediaQueryData(textScaler: TextScaler.linear(scale)),
-                child: SednoApp(
-                  languageController: languages,
-                  historyRepository: history,
-                  simplificationRepository: MockSimplificationRepository(
-                    quota: quota,
-                    clock: () => now,
+  for (final platform in [TargetPlatform.android, TargetPlatform.iOS]) {
+    for (final language in AppLanguage.values) {
+      for (final mode in TextMode.values) {
+        for (final scale in [1.0, 2.5]) {
+          testWidgets(
+            'main flow meets accessibility guidelines on ${platform.name} at $scale in ${mode.name} (${language.code})',
+            (tester) async {
+              final semantics = tester.ensureSemantics();
+              tester.view.physicalSize = const Size(412, 892);
+              tester.view.devicePixelRatio = 1;
+              addTearDown(tester.view.resetPhysicalSize);
+              addTearDown(tester.view.resetDevicePixelRatio);
+              final languages = LanguageController(
+                deviceLocales: [language.locale],
+              );
+              addTearDown(languages.dispose);
+              final strings = languages.strings;
+              final now = DateTime.utc(2026, 10, 16);
+              final history = MockHistoryRepository(clock: () => now);
+              final quota = MockQuotaRepository(clock: () => now);
+              await tester.pumpWidget(
+                MediaQuery(
+                  data: MediaQueryData(textScaler: TextScaler.linear(scale)),
+                  child: SednoApp(
+                    languageController: languages,
+                    historyRepository: history,
+                    simplificationRepository: MockSimplificationRepository(
+                      quota: quota,
+                      clock: () => now,
+                    ),
                   ),
                 ),
-              ),
-            );
-            await tester.pumpAndSettle();
-
-            Future<void> audit() async {
-              expect(tester.takeException(), isNull);
-              await expectLater(
-                tester,
-                meetsGuideline(androidTapTargetGuideline),
               );
-              await expectLater(
-                tester,
-                meetsGuideline(labeledTapTargetGuideline),
-              );
-              await expectLater(tester, meetsGuideline(textContrastGuideline));
-            }
-
-            if (mode == TextMode.correct) {
-              await tester.tap(find.byKey(const Key('modeSwitch')));
               await tester.pumpAndSettle();
-            }
-            await audit();
-            await tester.enterText(
-              find.byType(TextField),
-              'Tekst do uproszczenia.',
-            );
-            tester.testTextInput.hide();
-            await tester.tap(find.byKey(const Key('simplifyButton')));
-            await tester.pumpAndSettle();
-            await audit(); // First-submission AI processing notice.
-            await tester.tap(find.text(strings.acceptAndSend));
-            await tester.pumpAndSettle();
-            await audit(); // Result and its actions.
-            await tester.binding.handlePopRoute();
-            await tester.pumpAndSettle();
-            await navigateTo(
-              tester,
-              strings.history,
-              menuTooltip: strings.userMenu,
-            );
-            await audit(); // Retained local entry and delete action.
-            await navigateTo(
-              tester,
-              strings.account,
-              menuTooltip: strings.userMenu,
-            );
-            await audit();
-            semantics.dispose();
-          },
-        );
+
+              Future<void> audit() async {
+                expect(tester.takeException(), isNull);
+                await expectLater(
+                  tester,
+                  meetsGuideline(androidTapTargetGuideline),
+                );
+                await expectLater(
+                  tester,
+                  meetsGuideline(labeledTapTargetGuideline),
+                );
+                await expectLater(
+                  tester,
+                  meetsGuideline(textContrastGuideline),
+                );
+              }
+
+              if (mode == TextMode.correct) {
+                await tester.tap(find.byKey(const Key('modeSwitch')));
+                await tester.pumpAndSettle();
+              }
+              await audit();
+              await tester.enterText(
+                find.byType(TextField),
+                'Tekst do uproszczenia.',
+              );
+              tester.testTextInput.hide();
+              await tester.tap(find.byKey(const Key('simplifyButton')));
+              await tester.pumpAndSettle();
+              await audit(); // First-submission AI processing notice.
+              await tester.tap(find.text(strings.acceptAndSend));
+              await tester.pumpAndSettle();
+              await audit(); // Result and its actions.
+              await tester.binding.handlePopRoute();
+              await tester.pumpAndSettle();
+              await navigateTo(
+                tester,
+                strings.history,
+                menuTooltip: strings.userMenu,
+              );
+              await audit(); // Retained local entry and delete action.
+              await navigateTo(
+                tester,
+                strings.account,
+                menuTooltip: strings.userMenu,
+              );
+              await audit();
+              semantics.dispose();
+            },
+            variant: TargetPlatformVariant({platform}),
+          );
+        }
       }
     }
   }

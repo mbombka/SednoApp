@@ -981,4 +981,97 @@ class AppLocalizationsPl extends AppLocalizations {
   @override
   String get speechLanguageUnsupported =>
       'Silnik mowy w tym telefonie nie obsługuje lokalnego dyktowania w tym języku. Możesz wpisać tekst lub użyć aparatu.';
+
+  @override
+  String get signInApple => 'Zaloguj się przez Apple';
+
+  @override
+  String get appleAccountMethod => 'Apple';
+
+  @override
+  String get signInCancelled => 'Logowanie anulowane.';
+
+  @override
+  String get accountMethodConflict =>
+      'To konto używa innej metody logowania. Zaloguj się dotychczasową metodą.';
+
+  @override
+  String get localSpeechUnavailable =>
+      'Lokalne rozpoznawanie mowy nie jest dostępne dla tego języka na tym urządzeniu.';
+
+  @override
+  String get localSpeechModelMissing =>
+      'Zainstaluj lokalny model mowy wybranego języka w ustawieniach urządzenia.';
+
+  @override
+  String get deviceFeatureUnavailable =>
+      'Ta funkcja nie jest dostępna na tym urządzeniu.';
+
+  @override
+  String get subscriptionOtherStore =>
+      'Ta subskrypcja została kupiona w innym sklepie. Zarządzaj nią w sklepie, w którym ją kupiono.';
+
+  @override
+  String get storeOpenFailed =>
+      'Nie można otworzyć ustawień subskrypcji. Spróbuj ponownie.';
+
+  @override
+  String get appleManageSubscriptionNotice =>
+      'Aby zmienić płatność lub anulować subskrypcję, przejdź do App Store.';
+
+  @override
+  String get appleManageSubscription => 'Zarządzaj subskrypcją w App Store';
+
+  @override
+  String get appleSubscriptionCancelNotice =>
+      'Możesz ją anulować w każdej chwili w App Store.';
+
+  @override
+  String get appleAccountDeleted =>
+      'Konto i dane zostały usunięte. Subskrypcję anuluj osobno w App Store.';
+
+  @override
+  String get appleTesterHasSubscription =>
+      'Masz też aktywną subskrypcję App Store.';
+
+  @override
+  String get appleSubscriptionStillActive =>
+      'Twoja subskrypcja App Store nadal zapewnia większy limit.';
+
+  @override
+  String get appleInstallationRejected =>
+      'Serwer nie potwierdził instalacji aplikacji. Spróbuj ponownie lub zainstaluj Sedno z App Store.';
+
+  @override
+  String get appleSubscriptionPriceNotice =>
+      'Cenę subskrypcji zobaczysz w menu Konto i w App Store.';
+
+  @override
+  String get privacyIosSupplementTitle => 'Dodatkowe informacje dla iPhone’a';
+
+  @override
+  String get privacyIosSupplementBody =>
+      'Odniesienia poniżej do Androida, Google Play i Play Integrity dotyczą wyłącznie Androida. Na iPhonie możesz zalogować się przez Apple z ukrytym adresem e-mail. Logowanie obsługuje także Firebase. Subskrypcje kupione w App Store rozlicza Apple; Sedno nie otrzymuje danych karty. Usunięcie konta nie anuluje subskrypcji.\n\nApp Attest potwierdza autentyczność aplikacji. Nie przekazuje Apple tekstu, wyniku ani zdjęć. Serwer zapisuje pseudonimowe dane instalacji i klucza publicznego. Wyzwania są ważne 5 minut, klucze 90 dni od ostatniej udanej weryfikacji sesji, a powiadomienia o zakupach przechowujemy 30 dni. Wygasłe rekordy usuwa zadanie serwera. Metadane zakupów przechowujemy do usunięcia konta.\n\nHistoria jest szyfrowana, lokalna, wyłączona z kopii zapasowych i wygasa po 7 dniach. Zdjęcia i dźwięk pozostają na urządzeniu. Dyktowanie i odczyt działają wyłącznie lokalnie, gdy urządzenie i język je obsługują. Rozpoznany tekst wysyłasz do OpenAI przez serwer Sedno po zaakceptowaniu komunikatu o AI.\n\nPozostałe informacje poniżej, w tym dane administratora, cele, podstawy i zasady OpenAI, dotyczą także iPhone’a. Zasady Apple: https://www.apple.com/legal/privacy/';
+
+  @override
+  String get linkApple => 'Połącz z Apple';
+
+  @override
+  String get confirmAccountLink =>
+      'Ponownie potwierdź obecne konto. Następnie wybierz konto Apple, aby logować się do tego samego konta Sedno.';
+
+  @override
+  String get passwordToLink =>
+      'Wpisz hasło obecnego konta, aby połączyć je z Apple.';
+
+  @override
+  String get linkGoogle => 'Połącz z Google';
+
+  @override
+  String get confirmGoogleAccountLink =>
+      'Ponownie potwierdź obecne konto. Następnie wybierz konto Google, aby logować się do tego samego konta Sedno.';
+
+  @override
+  String get passwordToLinkGoogle =>
+      'Wpisz hasło obecnego konta, aby połączyć je z Google.';
 }

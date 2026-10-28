@@ -69,3 +69,11 @@ Zasady pracy nad kodem opisuje [AGENTS.md](AGENTS.md).
 ## Dostęp dla testerów
 
 [Instrukcja czasowego dostępu testerskiego i skryptu administracyjnego](docs/tester-access.pl.md).
+
+## Przygotowanie wersji iPhone
+
+Wspólny projekt Flutter rozszerzono o kod iOS oraz adaptery Apple we wspólnym
+backendzie. Wersja wymaga jeszcze kompilacji na Macu i odbioru na urządzeniu.
+[Plan i stan zadań](IphoneVersion.md),
+[raport implementacji](docs/ios-implementation-2026-10-28.pl.md),
+[brakujące informacje](missing-information.md).

@@ -12,8 +12,8 @@ abstract interface class HistoryDocumentStore {
   Future<void> clear();
 }
 
-class AndroidHistoryDocumentStore implements HistoryDocumentStore {
-  const AndroidHistoryDocumentStore();
+class PlatformHistoryDocumentStore implements HistoryDocumentStore {
+  const PlatformHistoryDocumentStore();
 
   static const _channel = MethodChannel('pl.sedno/history');
 
@@ -26,6 +26,16 @@ class AndroidHistoryDocumentStore implements HistoryDocumentStore {
 
   @override
   Future<void> clear() => _channel.invokeMethod<void>('clear');
+}
+
+/// Android implements the document contract using Keystore and no-backup files.
+class AndroidHistoryDocumentStore extends PlatformHistoryDocumentStore {
+  const AndroidHistoryDocumentStore();
+}
+
+/// The iOS host implements the same document contract using CryptoKit and Keychain.
+class IosHistoryDocumentStore extends PlatformHistoryDocumentStore {
+  const IosHistoryDocumentStore();
 }
 
 class EncryptedHistoryRepository implements HistoryRepository {

@@ -972,4 +972,97 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get speechLanguageUnsupported =>
       'Il motore vocale di questo telefono non offre la dettatura locale in questa lingua. Puoi scrivere o usare la fotocamera.';
+
+  @override
+  String get signInApple => 'Accedi con Apple';
+
+  @override
+  String get appleAccountMethod => 'Apple';
+
+  @override
+  String get signInCancelled => 'Accesso annullato.';
+
+  @override
+  String get accountMethodConflict =>
+      'Questo account usa un altro metodo di accesso. Usa il metodo abituale.';
+
+  @override
+  String get localSpeechUnavailable =>
+      'Il riconoscimento vocale locale non è disponibile per questa lingua su questo dispositivo.';
+
+  @override
+  String get localSpeechModelMissing =>
+      'Installa il modello vocale locale nelle impostazioni del dispositivo.';
+
+  @override
+  String get deviceFeatureUnavailable =>
+      'Questa funzione non è disponibile su questo dispositivo.';
+
+  @override
+  String get subscriptionOtherStore =>
+      'Questo abbonamento è stato acquistato in un altro negozio. Gestiscilo nel negozio in cui lo hai acquistato.';
+
+  @override
+  String get storeOpenFailed =>
+      'Impossibile aprire le impostazioni dell’abbonamento. Riprova.';
+
+  @override
+  String get appleManageSubscriptionNotice =>
+      'Per modificare il pagamento o annullare l’abbonamento, apri App Store.';
+
+  @override
+  String get appleManageSubscription => 'Gestisci abbonamento su App Store';
+
+  @override
+  String get appleSubscriptionCancelNotice =>
+      'Puoi annullarlo in qualsiasi momento su App Store.';
+
+  @override
+  String get appleAccountDeleted =>
+      'Account e dati eliminati. Annulla separatamente l’abbonamento su App Store.';
+
+  @override
+  String get appleTesterHasSubscription =>
+      'Hai anche un abbonamento App Store attivo.';
+
+  @override
+  String get appleSubscriptionStillActive =>
+      'L’abbonamento App Store continua a offrire un limite maggiore.';
+
+  @override
+  String get appleInstallationRejected =>
+      'Il server non ha verificato l’installazione. Riprova o installa Sedno da App Store.';
+
+  @override
+  String get appleSubscriptionPriceNotice =>
+      'Il prezzo dell’abbonamento è in Account e su App Store.';
+
+  @override
+  String get privacyIosSupplementTitle => 'Informazioni aggiuntive per iPhone';
+
+  @override
+  String get privacyIosSupplementBody =>
+      'I riferimenti seguenti ad Android, Google Play e Play Integrity riguardano solo Android. Su iPhone puoi accedere con Apple e nascondere il tuo indirizzo e-mail. Anche Firebase gestisce l’accesso. Apple addebita gli abbonamenti acquistati nell’App Store; Sedno non riceve i dati della carta. Eliminare l’account non annulla l’abbonamento.\n\nApp Attest verifica l’autenticità dell’app senza inviare ad Apple testi, risultati o foto. Il server conserva dati pseudonimi dell’installazione e della chiave pubblica. Le richieste di verifica valgono 5 minuti e le chiavi 90 giorni dall’ultima verifica di sessione riuscita. Le notifiche di acquisto restano 30 giorni. Un processo del server elimina i dati scaduti. I metadati di acquisto restano fino all’eliminazione dell’account.\n\nLa cronologia è cifrata, locale, esclusa dai backup e scade dopo 7 giorni. Foto e audio restano sul dispositivo. Dettatura e lettura vocale funzionano solo localmente, se dispositivo e lingua lo consentono. Invii il testo riconosciuto a OpenAI tramite Sedno dopo aver accettato l’avviso sull’IA.\n\nLe altre informazioni seguenti, inclusi titolare, finalità, basi giuridiche e pratiche OpenAI, valgono anche per iPhone. Privacy Apple: https://www.apple.com/legal/privacy/';
+
+  @override
+  String get linkApple => 'Collega account Apple';
+
+  @override
+  String get confirmAccountLink =>
+      'Conferma di nuovo il tuo account attuale. Poi scegli un account Apple per accedere allo stesso account Sedno.';
+
+  @override
+  String get passwordToLink =>
+      'Inserisci la password del tuo account attuale per collegarlo ad Apple.';
+
+  @override
+  String get linkGoogle => 'Collega un account Google';
+
+  @override
+  String get confirmGoogleAccountLink =>
+      'Conferma di nuovo il tuo account attuale. Poi scegli un account Google per accedere allo stesso account Sedno.';
+
+  @override
+  String get passwordToLinkGoogle =>
+      'Inserisci la password del tuo account attuale per collegare Google.';
 }

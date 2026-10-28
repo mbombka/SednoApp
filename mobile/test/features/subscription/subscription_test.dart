@@ -43,6 +43,7 @@ class Store implements SubscriptionStore {
 
 class Backend implements SubscriptionRepository {
   bool active = false;
+  String storeSource = 'google_play';
   bool fail = false;
   int verifications = 0;
   int reads = 0;
@@ -53,6 +54,7 @@ class Backend implements SubscriptionRepository {
       active: active,
       state: active ? 'ACTIVE' : 'none',
       accountBinding: 'server-binding',
+      store: storeSource,
     );
   }
 
@@ -91,17 +93,63 @@ void main() {
     await Future<void>.delayed(Duration.zero);
   }
 
+  test('active purchase in the other store prevents another purchase and wrong management', () async {
+    backend.active = true;
+    backend.storeSource = 'app_store';
+    await model.start();
+    expect(model.managedElsewhere, isTrue);
+    await model.buy();
+    expect(store.binding, isNull);
+    await model.manage();
+    expect(store.manages, 0);
+    expect(model.message, contains('sklepie'));
+  });
+
   test(
-    'manage opens Google Play and explains the manual path on failure',
+    'StoreKit finishes only after successful backend verification',
     () async {
-      await model.manage();
-      expect(store.manages, 1);
-      expect(model.message, isNull);
-      store.manageFails = true;
-      await model.manage();
-      expect(model.message, contains('Płatności i subskrypcje'));
+      await model.start();
+      var finishes = 0;
+      backend.fail = true;
+      store.events.add([
+        StorePurchase(
+          'monthly',
+          '123',
+          StorePurchaseState.purchased,
+          source: 'app_store',
+          complete: () async {
+            finishes++;
+          },
+        ),
+      ]);
+      await Future<void>.delayed(Duration.zero);
+      expect(finishes, 0);
+      backend.fail = false;
+      backend.active = true;
+      store.events.add([
+        StorePurchase(
+          'monthly',
+          '123',
+          StorePurchaseState.restored,
+          source: 'app_store',
+          complete: () async {
+            finishes++;
+          },
+        ),
+      ]);
+      await Future<void>.delayed(Duration.zero);
+      expect(finishes, 1);
     },
   );
+
+  test('manage opens the store and explains a failure', () async {
+    await model.manage();
+    expect(store.manages, 1);
+    expect(model.message, isNull);
+    store.manageFails = true;
+    await model.manage();
+    expect(model.message, contains('ustawień subskrypcji'));
+  });
 
   testWidgets('account screen shows subscription below sign-in controls', (
     tester,

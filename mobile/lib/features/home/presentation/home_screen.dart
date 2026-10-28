@@ -1,8 +1,13 @@
 import 'package:sedno_app/features/privacy/domain/ai_notice_repository.dart';
 import 'package:sedno_app/features/privacy/domain/localized_privacy_policy.dart';
 import 'package:sedno_app/l10n/localization.dart';
+import 'package:sedno_app/features/shared/domain/app_language.dart';
 
 import 'dart:async';
+import 'dart:io';
+
+import 'package:sedno_app/features/speech/data/ios_speech_service.dart';
+import 'package:sedno_app/features/speech_output/data/ios_text_playback_service.dart';
 
 import 'package:sedno_app/features/home/presentation/eraser_icon.dart';
 
@@ -35,6 +40,7 @@ class HomeScreen extends StatefulWidget {
     required this.textController,
     this.onSubmit,
     this.aiNoticeRepository,
+    this.subscriptionAvailable,
     this.editorResult,
     this.onModeChanged,
     this.playbackService,
@@ -49,6 +55,7 @@ class HomeScreen extends StatefulWidget {
   });
 
   final AiNoticeRepository? aiNoticeRepository;
+  final bool Function()? subscriptionAvailable;
   final String appName;
   final EditorResultViewModel? editorResult;
   final ValueChanged<TextMode>? onModeChanged;
@@ -89,14 +96,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     _editorResult = widget.editorResult ?? EditorResultViewModel();
     _playbackViewModel = TextPlaybackViewModel(
       widget.playbackService ??
-          AndroidTextPlaybackService(
+          _platformPlayback(
             localizations: () => context.l10n,
             language: () => context.language,
           ),
     );
     _speechViewModel = SpeechInputViewModel(
       widget.speechService ??
-          AndroidSpeechService(
+          _platformSpeech(
             localizations: () => context.l10n,
             language: () => context.language,
           ),
@@ -260,7 +267,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             content: Text(
               quota.remaining == 1
                   ? '${_mode == TextMode.correct ? context.l10n.quotaOneUse : context.l10n.quotaOneSimplification}\n${context.l10n.resetWithRemaining(QuotaReset.localTime(resetAt: quota.resetAt), _timeUntilReset(quota))}'
-                  : '${context.l10n.quotaUsedDialog}\n${context.l10n.resetWithRemaining(QuotaReset.localTime(resetAt: quota.resetAt), _timeUntilReset(quota))}\n${context.l10n.subscriptionInAccount}',
+                  : '${context.l10n.quotaUsedDialog}\n${context.l10n.resetWithRemaining(QuotaReset.localTime(resetAt: quota.resetAt), _timeUntilReset(quota))}${widget.subscriptionAvailable?.call() == true ? '\n${context.l10n.subscriptionInAccount}' : ''}',
               key: const Key('quotaMessage'),
             ),
             actions: [
@@ -407,7 +414,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       _playbackViewModel.dispose();
       _playbackViewModel = TextPlaybackViewModel(
         widget.playbackService ??
-            AndroidTextPlaybackService(
+            _platformPlayback(
               localizations: () => context.l10n,
               language: () => context.language,
             ),
@@ -422,7 +429,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       _speechViewModel.dispose();
       _speechViewModel = SpeechInputViewModel(
         widget.speechService ??
-            AndroidSpeechService(
+            _platformSpeech(
               localizations: () => context.l10n,
               language: () => context.language,
             ),
@@ -879,3 +886,19 @@ class _EditorNotice extends StatelessWidget {
     ),
   );
 }
+
+SpeechService _platformSpeech({
+  required AppLocalizations Function() localizations,
+  required AppLanguage Function() language,
+}) => Platform.isIOS
+    ? IosSpeechService(localizations: localizations, language: language)
+    : AndroidSpeechService(localizations: localizations, language: language);
+TextPlaybackService _platformPlayback({
+  required AppLocalizations Function() localizations,
+  required AppLanguage Function() language,
+}) => Platform.isIOS
+    ? IosTextPlaybackService(localizations: localizations, language: language)
+    : AndroidTextPlaybackService(
+        localizations: localizations,
+        language: language,
+      );

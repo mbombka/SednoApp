@@ -14,6 +14,101 @@ servers:
 security:
   - sessionBearer: []
 paths:
+  /v1/ios/attestation/challenges:
+    post:
+      operationId: createAppleAppAttestChallenge
+      security: []
+      description: >-
+        Issues a random one-time 5-minute challenge, bound to installation, key
+        and purpose. AppleAppAttest must be explicitly enabled. No simulator or
+        unsigned fallback. All binary fields use standard padded base64.
+        clientDataHash is SHA256 of UTF8 of
+        "sedno:app-attest:v1:{purpose}:{installationId}:{keyId}:{challengeId}:{challenge}".
+        Pass the resulting 32 bytes to attestKey or generateAssertion.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [installationId, keyId, purpose]
+              properties:
+                installationId: { type: string, minLength: 1, maxLength: 200, pattern: '^[A-Za-z0-9_-]+={0,2}$' }
+                keyId: { type: string, minLength: 44, maxLength: 44, description: Standard padded base64 of 32-byte key identifier. }
+                purpose: { type: string, enum: [register, session] }
+      responses:
+        '200':
+          description: Challenge; not an access credential.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [challengeId, challenge, expiresAt]
+                properties:
+                  challengeId: { type: string, pattern: '^[a-f0-9]{32}$' }
+                  challenge: { type: string, description: Standard padded base64 of 32 random bytes. }
+                  expiresAt: { type: string, format: date-time }
+        '400': { $ref: '#/components/responses/Problem' }
+        '429': { $ref: '#/components/responses/Problem' }
+        '503': { $ref: '#/components/responses/Problem' }
+  /v1/ios/attestation/keys:
+    post:
+      operationId: registerAppleAppAttestKey
+      security: []
+      description: >-
+        Verifies the Apple certificate chain against a pinned App Attestation
+        Root CA, nonce, App ID, environment and credential key. Atomically
+        consumes a register challenge and stores the verified key. Retrying
+        the exact same registration is idempotent without resetting counters.
+        No raw attestation is stored. Keys expire after 90 days of inactivity.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [installationId, keyId, challengeId, attestation]
+              properties:
+                installationId: { type: string, minLength: 1, maxLength: 200, pattern: '^[A-Za-z0-9_-]+={0,2}$' }
+                keyId: { type: string, minLength: 44, maxLength: 44 }
+                challengeId: { type: string, pattern: '^[a-f0-9]{32}$' }
+                attestation: { type: string, maxLength: 90000, description: Base64 CBOR attestation from attestKey. }
+      responses:
+        '204': { description: Key registered or identical registration already accepted. }
+        '403': { $ref: '#/components/responses/Problem' }
+        '429': { $ref: '#/components/responses/Problem' }
+        '503': { $ref: '#/components/responses/Problem' }
+  /v1/ios/guest-sessions:
+    post:
+      operationId: createAppleGuestSession
+      security: []
+      description: >-
+        Verifies an assertion over a session challenge with the registered key.
+        Counter advance and one-time challenge consumption share a Firestore
+        transaction across replicas. Creates a normal Sedno guest session with
+        existing shared quotas. Returns app_attest_key_unknown for an absent or
+        expired key so the client can perform a bounded key rotation.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [installationId, keyId, challengeId, assertion]
+              properties:
+                installationId: { type: string, minLength: 1, maxLength: 200, pattern: '^[A-Za-z0-9_-]+={0,2}$' }
+                keyId: { type: string, minLength: 44, maxLength: 44 }
+                challengeId: { type: string, pattern: '^[a-f0-9]{32}$' }
+                assertion: { type: string, maxLength: 90000, description: Base64 CBOR assertion from generateAssertion. }
+      responses:
+        '200':
+          description: Guest session.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Session' }
+        '403': { $ref: '#/components/responses/Problem' }
+        '429': { $ref: '#/components/responses/Problem' }
+        '503': { $ref: '#/components/responses/Problem' }
   /v1/guest-sessions:
     post:
       operationId: createGuestSession
@@ -168,6 +263,72 @@ paths:
         '401': { $ref: '#/components/responses/Problem' }
         '403': { $ref: '#/components/responses/Problem' }
         '503': { $ref: '#/components/responses/Problem' }
+  /v1/subscription/apple:
+    get:
+      operationId: getAppleSubscription
+      description: >-
+        Requires a signed-in Sedno account and explicitly enabled Apple billing.
+        Returns a verified Apple subscription, or active Google subscription if no
+        Apple subscription is active. accountBinding remains an Apple UUID.
+        Subscription usage is shared across platforms and resets at 00:00 UTC.
+      responses:
+        '200':
+          description: Account subscription status.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Subscription' }
+        '401': { $ref: '#/components/responses/Problem' }
+        '403': { $ref: '#/components/responses/Problem' }
+        '503': { $ref: '#/components/responses/Problem' }
+    post:
+      operationId: verifyOrRestoreAppleSubscription
+      description: >-
+        Resolves the transaction through App Store Server API and verifies signed
+        transaction/renewal data, bundle, product, environment and appAccountToken.
+        Ownership is transactional and cannot be reassigned to another account.
+        Does not accept a Google token or trust client-supplied entitlement.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [transactionId]
+              properties:
+                transactionId: { type: string, minLength: 1, maxLength: 128, pattern: '^[0-9]+$' }
+      responses:
+        '200':
+          description: Verified subscription.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Subscription' }
+        '400': { $ref: '#/components/responses/Problem' }
+        '401': { $ref: '#/components/responses/Problem' }
+        '403': { $ref: '#/components/responses/Problem' }
+        '503': { $ref: '#/components/responses/Problem' }
+  /notifications/apple:
+    post:
+      operationId: appleSubscriptionNotification
+      security: []
+      description: >-
+        App Store Server Notifications V2. Access is authenticated by the Apple
+        signedPayload certificate chain and signature, not a Sedno bearer. Separate
+        bounded traffic bucket from Google RTDN. Repeated notifications are
+        idempotent; delayed notifications trigger current-state verification.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [signedPayload]
+              properties:
+                signedPayload: { type: string, minLength: 1, maxLength: 120000 }
+      responses:
+        '204': { description: Authenticated notification processed or safely ignored. }
+        '400': { description: Invalid payload or signed data. }
+        '429': { $ref: '#/components/responses/Problem' }
+        '503': { description: Apple billing disabled or unavailable. }
   /notifications/google-play:
     post:
       operationId: googlePlayNotification
@@ -311,10 +472,16 @@ components:
       type: object
       required: [state, active, accountBinding]
       properties:
-        state: { type: string, description: Google subscriptionState, none, or revoked. }
+        state: { type: string, description: Store subscription state, none, or revoked. }
+        store: { type: string, enum: [google_play, app_store], description: Store owning the active subscription. May differ from the endpoint used. }
         active: { type: boolean }
         expiresAt: { type: string, format: date-time, nullable: true }
-        accountBinding: { type: string, minLength: 64, maxLength: 64 }
+        accountBinding:
+          type: string
+          description: Binding for purchases in the endpoint's store; 64-character Google binding or UUID Apple appAccountToken.
+          oneOf:
+            - { pattern: '^[A-Fa-f0-9]{64}$' }
+            - { pattern: '^[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}$' }
     Problem:
       type: object
       required: [status, title, code]
@@ -329,7 +496,7 @@ components:
       required: [id, provider]
       properties:
         id: { type: string, format: uuid }
-        provider: { type: string, enum: [guest, google, email] }
+        provider: { type: string, enum: [guest, google, email, apple] }
     Session:
       type: object
       required: [accessToken, account, quota]

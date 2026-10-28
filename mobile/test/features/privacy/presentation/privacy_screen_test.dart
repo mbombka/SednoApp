@@ -5,6 +5,53 @@ import 'package:sedno_app/features/privacy/presentation/privacy_screen.dart';
 
 void main() {
   testWidgets(
+    'iPhone supplement preserves common policy and opens Apple privacy',
+    (tester) async {
+      final opened = <Uri>[];
+      await tester.pumpWidget(
+        MaterialApp(
+          home: PrivacyScreen(
+            openUrl: (uri) async {
+              opened.add(uri);
+              return true;
+            },
+          ),
+        ),
+      );
+      expect(find.text('Dodatkowe informacje dla iPhone’a'), findsOneWidget);
+      expect(
+        find.textContaining('Administrator: Mariusz Bąbka'),
+        findsOneWidget,
+      );
+      expect(find.textContaining('App Attest'), findsOneWidget);
+      expect(
+        find.textContaining(
+          'Metadane zakupów przechowujemy do usunięcia konta',
+        ),
+        findsOneWidget,
+      );
+      final apple = find.textRange.ofSubstring(
+        'https://www.apple.com/legal/privacy/',
+      );
+      await tester.ensureVisible(
+        find.textContaining('https://www.apple.com/legal/privacy/'),
+      );
+      await tester.pumpAndSettle();
+      await tester.tapOnText(apple);
+      expect(opened, [Uri.parse('https://www.apple.com/legal/privacy/')]);
+    },
+    variant: TargetPlatformVariant({TargetPlatform.iOS}),
+  );
+
+  testWidgets('Android does not show the iPhone privacy supplement', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const MaterialApp(home: PrivacyScreen()));
+    expect(find.text('Dodatkowe informacje dla iPhone’a'), findsNothing);
+    expect(find.textContaining('Administrator: Mariusz Bąbka'), findsOneWidget);
+  }, variant: TargetPlatformVariant({TargetPlatform.android}));
+
+  testWidgets(
     'privacy contains controller, legal bases, retention and deployment status',
     (tester) async {
       await tester.pumpWidget(const MaterialApp(home: PrivacyScreen()));

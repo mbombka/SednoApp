@@ -1,0 +1,4 @@
+/* System permission descriptions use iOS localisation. App content uses shared Dart localisation. */
+"NSCameraUsageDescription" = "Sedno používa fotoaparát na čítanie textu z fotografií. Fotografie zostávajú vo vašom zariadení.";
+"NSMicrophoneUsageDescription" = "Sedno používa mikrofón na diktovanie v zariadení. Zvuk sa neukladá ani neodosiela.";
+"NSSpeechRecognitionUsageDescription" = "Sedno rozpoznáva reč iba vo vašom zariadení, ak je vybraný jazyk podporovaný.";

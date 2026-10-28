@@ -1,3 +1,4 @@
+import 'package:sedno_app/l10n/localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -32,6 +33,40 @@ QuotaState _quota(int used, {int day = 14}) => QuotaState(
 );
 
 void main() {
+  for (final available in [false, true]) {
+    testWidgets(
+      'exhausted quota offers a subscription only when available: $available',
+      (tester) async {
+        final repository = _ServerQuotaRepository()..state.value = _quota(5);
+        final controller = TextEditingController(text: 'Tekst');
+        addTearDown(controller.dispose);
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: HomeScreen(
+                appName: 'Sedno',
+                textController: controller,
+                simplificationRepository: repository,
+                subscriptionAvailable: () => available,
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Uprość'));
+        await tester.pumpAndSettle();
+        expect(
+          find.textContaining(polishStrings().subscriptionInAccount),
+          available ? findsOneWidget : findsNothing,
+        );
+        expect(
+          find.textContaining('Wykorzystano dzienny limit'),
+          findsOneWidget,
+        );
+      },
+    );
+  }
+
   testWidgets(
     'server quota warns only at one, blocks at zero, and reopens after reset',
     (tester) async {

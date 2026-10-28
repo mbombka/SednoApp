@@ -1,3 +1,10 @@
+import 'dart:io';
+
+import 'package:sedno_app/app/ios_installation_initializer.dart';
+
+import 'package:sedno_app/features/account/data/apple_app_attest.dart';
+import 'package:sedno_app/features/subscription/data/apple_subscription_store.dart';
+import 'package:sedno_app/features/subscription/domain/apple_subscription_configuration.dart';
 import 'package:sedno_app/features/privacy/data/local_ai_notice_repository.dart';
 import 'package:sedno_app/app/app_language.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -19,7 +26,23 @@ import 'package:sedno_app/features/subscription/presentation/subscription_view_m
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  const preferences = FlutterSecureStorage();
+  const preferences = FlutterSecureStorage(
+    iOptions: IOSOptions(
+      accessibility: KeychainAccessibility.unlocked_this_device,
+      synchronizable: false,
+    ),
+  );
+  if (Platform.isIOS) {
+    await const IosInstallationInitializer().initialize(() async {
+      await preferences.deleteAll();
+      // Firebase has a separate Keychain namespace. Keep this marker until its
+      // surviving credentials are cleared, even across failed startup attempts.
+      await preferences.write(
+        key: 'ios_firebase_signout_pending',
+        value: 'true',
+      );
+    });
+  }
   final languages = LanguageController(
     read: () => preferences.read(key: 'app_language'),
     write: (value) => value == null
@@ -28,14 +51,20 @@ Future<void> main() async {
   );
   await languages.load();
   const apiKey = String.fromEnvironment('FIREBASE_API_KEY');
-  const appId = String.fromEnvironment('FIREBASE_APP_ID');
+  const androidAppId = String.fromEnvironment('FIREBASE_APP_ID');
+  const iosAppId = String.fromEnvironment('FIREBASE_IOS_APP_ID');
+  const iosClientId = String.fromEnvironment('GOOGLE_IOS_CLIENT_ID');
+  const iosBundleId = String.fromEnvironment('IOS_BUNDLE_ID');
+  final appId = Platform.isIOS ? iosAppId : androidAppId;
   const projectId = String.fromEnvironment('FIREBASE_PROJECT_ID');
   const senderId = String.fromEnvironment('FIREBASE_SENDER_ID');
   const backendUrl = String.fromEnvironment('BACKEND_BASE_URL');
   const webClientId = String.fromEnvironment('GOOGLE_WEB_CLIENT_ID');
   const playProjectNumber = int.fromEnvironment('PLAY_CLOUD_PROJECT_NUMBER');
   final history = EncryptedHistoryRepository(
-    store: const AndroidHistoryDocumentStore(),
+    store: Platform.isIOS
+        ? const IosHistoryDocumentStore()
+        : const AndroidHistoryDocumentStore(),
     clock: DateTime.now,
   );
   AccountRepository? accounts;
@@ -44,8 +73,15 @@ Future<void> main() async {
     sessions = BackendSessionGateway(
       baseUrl: Uri.parse(backendUrl),
       client: http.Client(),
-      storage: const SecureSessionStorage(FlutterSecureStorage()),
+      storage: const SecureSessionStorage(preferences),
       integrity: const AndroidIntegrityTokenSource(playProjectNumber),
+      guestAdmission: Platform.isIOS
+          ? AppleAppAttestAdmission(
+              baseUrl: Uri.parse(backendUrl),
+              client: http.Client(),
+              storage: const SecureSessionStorage(preferences),
+            )
+          : null,
     );
   }
   if (sessions != null) sessions.localizations = () => languages.strings;
@@ -56,35 +92,57 @@ Future<void> main() async {
       senderId.isNotEmpty &&
       webClientId.isNotEmpty) {
     await Firebase.initializeApp(
-      options: const FirebaseOptions(
+      options: FirebaseOptions(
         apiKey: apiKey,
         appId: appId,
         messagingSenderId: senderId,
         projectId: projectId,
+        iosClientId: Platform.isIOS ? iosClientId : null,
+        iosBundleId: Platform.isIOS ? iosBundleId : null,
       ),
     );
-    await GoogleSignIn.instance.initialize(serverClientId: webClientId);
+    if (Platform.isIOS &&
+        await preferences.read(key: 'ios_firebase_signout_pending') == 'true') {
+      await FirebaseAuth.instance.signOut();
+      await preferences.delete(key: 'ios_firebase_signout_pending');
+    }
+    await GoogleSignIn.instance.initialize(
+      serverClientId: webClientId,
+      clientId: Platform.isIOS ? iosClientId : null,
+    );
     accounts = FirebaseAccountRepository(
       auth: FirebaseAuth.instance,
       google: GoogleSignIn.instance,
       sessions: sessions,
       clearHistory: history.clear,
+      appleSignInAvailable: Platform.isIOS,
     )..localizations = () => languages.strings;
   }
-  const productId = PlaySubscriptionConfiguration.productId;
+  final productId = Platform.isIOS
+      ? AppleSubscriptionConfiguration.productId
+      : PlaySubscriptionConfiguration.productId;
+  final billingEnabled = Platform.isIOS
+      ? AppleSubscriptionConfiguration.enabled
+      : PlaySubscriptionConfiguration.enabled;
   final subscription =
       sessions == null ||
-          !PlaySubscriptionConfiguration.enabled ||
+          !billingEnabled ||
           productId.isEmpty ||
-          PlaySubscriptionConfiguration.basePlanId.isEmpty
+          (!Platform.isIOS && PlaySubscriptionConfiguration.basePlanId.isEmpty)
       ? null
       : SubscriptionViewModel(
-          store: GooglePlayStore(
-            productId: productId,
-            basePlanId: PlaySubscriptionConfiguration.basePlanId,
+          store: Platform.isIOS
+              ? AppleSubscriptionStore(productId: productId)
+              : GooglePlayStore(
+                  productId: productId,
+                  basePlanId: PlaySubscriptionConfiguration.basePlanId,
+                ),
+          repository: BackendSubscriptionRepository(
+            sessions,
+            apple: Platform.isIOS,
           ),
-          repository: BackendSubscriptionRepository(sessions),
           productId: productId,
+          storeSource: Platform.isIOS ? 'app_store' : 'google_play',
         );
   if (subscription != null) {
     subscription.localizations = () => languages.strings;

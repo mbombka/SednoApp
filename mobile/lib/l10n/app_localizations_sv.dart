@@ -969,4 +969,97 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get speechLanguageUnsupported =>
       'Talmotorn på den här telefonen erbjuder inte lokal diktering på det här språket. Du kan skriva eller använda kameran.';
+
+  @override
+  String get signInApple => 'Logga in med Apple';
+
+  @override
+  String get appleAccountMethod => 'Apple';
+
+  @override
+  String get signInCancelled => 'Inloggning avbruten.';
+
+  @override
+  String get accountMethodConflict =>
+      'Kontot använder en annan inloggningsmetod. Använd din vanliga metod.';
+
+  @override
+  String get localSpeechUnavailable =>
+      'Lokal taligenkänning är inte tillgänglig för detta språk på den här enheten.';
+
+  @override
+  String get localSpeechModelMissing =>
+      'Installera den lokala talmodellen i enhetens inställningar.';
+
+  @override
+  String get deviceFeatureUnavailable =>
+      'Den här funktionen är inte tillgänglig på den här enheten.';
+
+  @override
+  String get subscriptionOtherStore =>
+      'Den här prenumerationen köptes i en annan butik. Hantera den i butiken där du köpte den.';
+
+  @override
+  String get storeOpenFailed =>
+      'Det gick inte att öppna prenumerationsinställningarna. Försök igen.';
+
+  @override
+  String get appleManageSubscriptionNotice =>
+      'Öppna App Store för att ändra betalningen eller avsluta prenumerationen.';
+
+  @override
+  String get appleManageSubscription => 'Hantera prenumeration i App Store';
+
+  @override
+  String get appleSubscriptionCancelNotice =>
+      'Du kan avsluta den när som helst i App Store.';
+
+  @override
+  String get appleAccountDeleted =>
+      'Kontot och data har raderats. Avsluta prenumerationen separat i App Store.';
+
+  @override
+  String get appleTesterHasSubscription =>
+      'Du har också en aktiv App Store-prenumeration.';
+
+  @override
+  String get appleSubscriptionStillActive =>
+      'Din App Store-prenumeration ger fortfarande en högre gräns.';
+
+  @override
+  String get appleInstallationRejected =>
+      'Servern kunde inte verifiera installationen. Försök igen eller installera Sedno från App Store.';
+
+  @override
+  String get appleSubscriptionPriceNotice =>
+      'Priset visas under Konto och i App Store.';
+
+  @override
+  String get privacyIosSupplementTitle => 'Ytterligare information för iPhone';
+
+  @override
+  String get privacyIosSupplementBody =>
+      'Hänvisningarna nedan till Android, Google Play och Play Integrity gäller bara Android. På iPhone kan du logga in med Apple och dölja din e-postadress. Firebase hanterar också inloggning. Apple debiterar prenumerationer köpta i App Store; Sedno får inga kortuppgifter. Att radera kontot avslutar inte prenumerationen.\n\nApp Attest kontrollerar appens äkthet utan att skicka text, resultat eller foton till Apple. Servern lagrar pseudonyma installationsuppgifter och offentliga nycklar. Utmaningar gäller i 5 minuter och nycklar i 90 dagar efter den senaste lyckade sessionskontrollen. Köpmeddelanden sparas i 30 dagar. Ett serverjobb raderar utgångna poster. Köpmetadata sparas tills kontot raderas.\n\nHistoriken är krypterad, lokal, undantagen från säkerhetskopior och går ut efter 7 dagar. Foton och ljud stannar på enheten. Diktering och uppläsning sker bara lokalt när enheten och språket stöder det. Du skickar igenkänd text till OpenAI via Sedno efter att ha godkänt AI-informationen.\n\nÖvrig information nedan, inklusive personuppgiftsansvarig, ändamål, rättsliga grunder och OpenAI:s rutiner, gäller även iPhone. Apples integritetspolicy: https://www.apple.com/legal/privacy/';
+
+  @override
+  String get linkApple => 'Länka Apple-konto';
+
+  @override
+  String get confirmAccountLink =>
+      'Bekräfta ditt nuvarande konto igen. Välj sedan ett Apple-konto för att logga in på samma Sedno-konto.';
+
+  @override
+  String get passwordToLink =>
+      'Ange lösenordet för ditt nuvarande konto för att länka det till Apple.';
+
+  @override
+  String get linkGoogle => 'Länka Google-konto';
+
+  @override
+  String get confirmGoogleAccountLink =>
+      'Bekräfta ditt nuvarande konto igen. Välj sedan ett Google-konto för att logga in på samma Sedno-konto.';
+
+  @override
+  String get passwordToLinkGoogle =>
+      'Ange lösenordet för ditt nuvarande konto för att länka Google.';
 }

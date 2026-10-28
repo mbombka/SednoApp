@@ -132,9 +132,11 @@ class _AppNavigationState extends State<_AppNavigation>
     _editorResult.addListener(_onEditorResultChanged);
     _historyRepository =
         widget.historyRepository ??
-        (Platform.isAndroid
+        (Platform.isAndroid || Platform.isIOS
             ? EncryptedHistoryRepository(
-                store: const AndroidHistoryDocumentStore(),
+                store: Platform.isIOS
+                    ? const IosHistoryDocumentStore()
+                    : const AndroidHistoryDocumentStore(),
                 clock: DateTime.now,
               )
             : MockHistoryRepository(clock: DateTime.now));
@@ -303,6 +305,8 @@ class _AppNavigationState extends State<_AppNavigation>
                   key: ValueKey('home-$_dataRevision'),
                   appName: SednoApp.displayName,
                   aiNoticeRepository: widget.aiNoticeRepository,
+                  subscriptionAvailable: () =>
+                      widget.subscriptionModel?.offer != null,
                   editorResult: _editorResult,
                   onModeChanged: (mode) => setState(() => _mode = mode),
                   isActive: _selectedPage == 0 && !_showingMenu,

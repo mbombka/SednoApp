@@ -1,0 +1,4 @@
+/* System permission descriptions use iOS localisation. App content uses shared Dart localisation. */
+"NSCameraUsageDescription" = "Sedno använder kameran för att läsa text från foton. Fotona stannar på din enhet.";
+"NSMicrophoneUsageDescription" = "Sedno använder mikrofonen för diktering på din enhet. Ljud sparas eller skickas inte.";
+"NSSpeechRecognitionUsageDescription" = "Sedno känner igen tal endast på din enhet, om det valda språket stöds.";

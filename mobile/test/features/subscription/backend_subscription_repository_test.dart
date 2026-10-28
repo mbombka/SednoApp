@@ -23,6 +23,38 @@ void main() {
   });
 
   test(
+    'Apple sends transaction ID to its store-specific backend route',
+    () async {
+      final storage = MemorySessionStorage();
+      await storage.write('account_token', 'test-bearer');
+      await storage.write(
+        'account_json',
+        jsonEncode({'id': 'account-id', 'provider': 'apple'}),
+      );
+      final sessions = BackendSessionGateway(
+        baseUrl: Uri.parse('https://sedno.test'),
+        storage: storage,
+        integrity: CapturingIntegrity(),
+        client: MockClient((request) async {
+          expect(request.url.path, '/v1/subscription/apple');
+          expect(jsonDecode(request.body), {'transactionId': '123'});
+          return http.Response(
+            jsonEncode({
+              'active': true,
+              'state': 'active',
+              'accountBinding': 'uuid',
+              'store': 'app_store',
+            }),
+            200,
+          );
+        }),
+      );
+      final repository = BackendSubscriptionRepository(sessions, apple: true);
+      expect((await repository.verify('123')).store, 'app_store');
+    },
+  );
+
+  test(
     'verification refreshes quota without changing authentication revision',
     () async {
       final storage = MemorySessionStorage();

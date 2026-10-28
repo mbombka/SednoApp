@@ -27,6 +27,9 @@ public sealed class MetadataCleanup(FirestoreStore db, TimeProvider clock, Accou
                 if (sessions.Count == 0 && requests.Count == 0) transaction.Delete(candidate.Reference);
             }, cancellationToken: ct);
         // Crashed callers leave bounded leases; do not retain coordination metadata forever.
+        await DeleteAsync(db.Database.Collection("apple_notifications").WhereLessThan("ProcessedAt", FirestoreStore.Date(now.AddDays(-30))), ct);
+        await DeleteAsync(db.Database.Collection("apple_attest_challenges").WhereLessThanOrEqualTo("ExpiresAt", FirestoreStore.Date(now)), ct);
+        await DeleteAsync(db.Database.Collection("apple_attest_keys").WhereLessThanOrEqualTo("ExpiresAt", FirestoreStore.Date(now)), ct);
         await DeleteAsync(db.Leases.WhereLessThan("ExpiresAt", FirestoreStore.Date(now)), ct);
     }
 

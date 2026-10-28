@@ -1,6 +1,6 @@
 import 'package:sedno_app/features/shared/domain/json_values.dart';
 
-enum IdentityProvider { guest, google, email }
+enum IdentityProvider { guest, google, email, apple }
 
 class Account {
   Account({

@@ -1810,6 +1810,156 @@ abstract class AppLocalizations {
   /// In pl, this message translates to:
   /// **'Silnik mowy w tym telefonie nie obsługuje lokalnego dyktowania w tym języku. Możesz wpisać tekst lub użyć aparatu.'**
   String get speechLanguageUnsupported;
+
+  /// No description provided for @signInApple.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zaloguj się przez Apple'**
+  String get signInApple;
+
+  /// No description provided for @appleAccountMethod.
+  ///
+  /// In pl, this message translates to:
+  /// **'Apple'**
+  String get appleAccountMethod;
+
+  /// No description provided for @signInCancelled.
+  ///
+  /// In pl, this message translates to:
+  /// **'Logowanie anulowane.'**
+  String get signInCancelled;
+
+  /// No description provided for @accountMethodConflict.
+  ///
+  /// In pl, this message translates to:
+  /// **'To konto używa innej metody logowania. Zaloguj się dotychczasową metodą.'**
+  String get accountMethodConflict;
+
+  /// No description provided for @localSpeechUnavailable.
+  ///
+  /// In pl, this message translates to:
+  /// **'Lokalne rozpoznawanie mowy nie jest dostępne dla tego języka na tym urządzeniu.'**
+  String get localSpeechUnavailable;
+
+  /// No description provided for @localSpeechModelMissing.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zainstaluj lokalny model mowy wybranego języka w ustawieniach urządzenia.'**
+  String get localSpeechModelMissing;
+
+  /// No description provided for @deviceFeatureUnavailable.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ta funkcja nie jest dostępna na tym urządzeniu.'**
+  String get deviceFeatureUnavailable;
+
+  /// No description provided for @subscriptionOtherStore.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ta subskrypcja została kupiona w innym sklepie. Zarządzaj nią w sklepie, w którym ją kupiono.'**
+  String get subscriptionOtherStore;
+
+  /// No description provided for @storeOpenFailed.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nie można otworzyć ustawień subskrypcji. Spróbuj ponownie.'**
+  String get storeOpenFailed;
+
+  /// No description provided for @appleManageSubscriptionNotice.
+  ///
+  /// In pl, this message translates to:
+  /// **'Aby zmienić płatność lub anulować subskrypcję, przejdź do App Store.'**
+  String get appleManageSubscriptionNotice;
+
+  /// No description provided for @appleManageSubscription.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zarządzaj subskrypcją w App Store'**
+  String get appleManageSubscription;
+
+  /// No description provided for @appleSubscriptionCancelNotice.
+  ///
+  /// In pl, this message translates to:
+  /// **'Możesz ją anulować w każdej chwili w App Store.'**
+  String get appleSubscriptionCancelNotice;
+
+  /// No description provided for @appleAccountDeleted.
+  ///
+  /// In pl, this message translates to:
+  /// **'Konto i dane zostały usunięte. Subskrypcję anuluj osobno w App Store.'**
+  String get appleAccountDeleted;
+
+  /// No description provided for @appleTesterHasSubscription.
+  ///
+  /// In pl, this message translates to:
+  /// **'Masz też aktywną subskrypcję App Store.'**
+  String get appleTesterHasSubscription;
+
+  /// No description provided for @appleSubscriptionStillActive.
+  ///
+  /// In pl, this message translates to:
+  /// **'Twoja subskrypcja App Store nadal zapewnia większy limit.'**
+  String get appleSubscriptionStillActive;
+
+  /// No description provided for @appleInstallationRejected.
+  ///
+  /// In pl, this message translates to:
+  /// **'Serwer nie potwierdził instalacji aplikacji. Spróbuj ponownie lub zainstaluj Sedno z App Store.'**
+  String get appleInstallationRejected;
+
+  /// No description provided for @appleSubscriptionPriceNotice.
+  ///
+  /// In pl, this message translates to:
+  /// **'Cenę subskrypcji zobaczysz w menu Konto i w App Store.'**
+  String get appleSubscriptionPriceNotice;
+
+  /// No description provided for @privacyIosSupplementTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Dodatkowe informacje dla iPhone’a'**
+  String get privacyIosSupplementTitle;
+
+  /// No description provided for @privacyIosSupplementBody.
+  ///
+  /// In pl, this message translates to:
+  /// **'Odniesienia poniżej do Androida, Google Play i Play Integrity dotyczą wyłącznie Androida. Na iPhonie możesz zalogować się przez Apple z ukrytym adresem e-mail. Logowanie obsługuje także Firebase. Subskrypcje kupione w App Store rozlicza Apple; Sedno nie otrzymuje danych karty. Usunięcie konta nie anuluje subskrypcji.\n\nApp Attest potwierdza autentyczność aplikacji. Nie przekazuje Apple tekstu, wyniku ani zdjęć. Serwer zapisuje pseudonimowe dane instalacji i klucza publicznego. Wyzwania są ważne 5 minut, klucze 90 dni od ostatniej udanej weryfikacji sesji, a powiadomienia o zakupach przechowujemy 30 dni. Wygasłe rekordy usuwa zadanie serwera. Metadane zakupów przechowujemy do usunięcia konta.\n\nHistoria jest szyfrowana, lokalna, wyłączona z kopii zapasowych i wygasa po 7 dniach. Zdjęcia i dźwięk pozostają na urządzeniu. Dyktowanie i odczyt działają wyłącznie lokalnie, gdy urządzenie i język je obsługują. Rozpoznany tekst wysyłasz do OpenAI przez serwer Sedno po zaakceptowaniu komunikatu o AI.\n\nPozostałe informacje poniżej, w tym dane administratora, cele, podstawy i zasady OpenAI, dotyczą także iPhone’a. Zasady Apple: https://www.apple.com/legal/privacy/'**
+  String get privacyIosSupplementBody;
+
+  /// No description provided for @linkApple.
+  ///
+  /// In pl, this message translates to:
+  /// **'Połącz z Apple'**
+  String get linkApple;
+
+  /// No description provided for @confirmAccountLink.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ponownie potwierdź obecne konto. Następnie wybierz konto Apple, aby logować się do tego samego konta Sedno.'**
+  String get confirmAccountLink;
+
+  /// No description provided for @passwordToLink.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wpisz hasło obecnego konta, aby połączyć je z Apple.'**
+  String get passwordToLink;
+
+  /// No description provided for @linkGoogle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Połącz z Google'**
+  String get linkGoogle;
+
+  /// No description provided for @confirmGoogleAccountLink.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ponownie potwierdź obecne konto. Następnie wybierz konto Google, aby logować się do tego samego konta Sedno.'**
+  String get confirmGoogleAccountLink;
+
+  /// No description provided for @passwordToLinkGoogle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wpisz hasło obecnego konta, aby połączyć je z Google.'**
+  String get passwordToLinkGoogle;
 }
 
 class _AppLocalizationsDelegate

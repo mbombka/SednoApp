@@ -41,6 +41,8 @@ public sealed class AuthenticationTests
         var verifier = new FirebaseTokenVerifier(client, "test-project", new Clock());
         var valid = Token(rsa, 1791982800); // 2026-10-14 13:00 UTC
         Assert.Equal("google", (await verifier.VerifyAsync(valid, default))?.Provider);
+        Assert.Equal("apple", (await verifier.VerifyAsync(Token(rsa, 1791982800, "apple.com"), default))?.Provider);
+        Assert.Null(await verifier.VerifyAsync(Token(rsa, 1791982800, "unknown.com"), default));
         Assert.Null(await verifier.VerifyAsync(Token(rsa, 1791975600), default)); // expired
         using var attacker = RSA.Create(2048);
         Assert.Null(await verifier.VerifyAsync(Token(attacker, 1791982800), default));

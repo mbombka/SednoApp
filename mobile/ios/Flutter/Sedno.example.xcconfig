@@ -1,0 +1,7 @@
+// Copy to Sedno.local.xcconfig (ignored by Git). Use IDs from your Apple/Firebase accounts.
+// Signing uses the existing Sedno Firebase project, not a separate backend.
+SEDNO_BUNDLE_IDENTIFIER =
+DEVELOPMENT_TEAM =
+GOOGLE_REVERSED_CLIENT_ID =
+// App Attest environment is set by Xcode target configuration:
+// Debug = development; Profile/Release (including TestFlight) = production.

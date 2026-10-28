@@ -1,10 +1,26 @@
-# Aplikacja Android
+# Aplikacja Android i iOS
 
 23.10.2026: wdrożono **sedno-api-00014-mmh** z 13 wariantami językowymi i przygotowano
 **AAB 0.2.0 (17)**. [Aktualny raport wdrożenia i pakietu](../docs/backend-deployment-2026-10-23-multilingual.pl.md).
 
 Potrzebujesz Fluttera z Dartem zgodnym z [pubspec.yaml](pubspec.yaml), Android SDK
 oraz emulatora lub telefonu. Wszystkie polecenia poniżej wykonuj w `mobile/`.
+
+## Wersja iPhone
+
+Kod iOS jest przygotowywany we wspólnym projekcie, bez osobnej aplikacji Flutter.
+Instrukcja Xcode, podpisywania i odbioru: [ios/README.md](ios/README.md).
+Skopiuj `config/ios.example.json` do ignorowanego `config/ios.local.json`
+i uzupełnij identyfikatory z istniejącego projektu Firebase oraz konta Apple.
+Osobno uzupełnij `ios/Flutter/Sedno.local.xcconfig` według szablonu.
+Nie używaj androidowego Firebase App ID jako iOS App ID.
+
+App Attest i zakupy wymagają skonfigurowanego backendu; nie ma automatycznego
+obejścia weryfikacji na symulatorze. Apple billing jest domyślnie wyłączony.
+[Próby zakupów](docs/apple_subscription_sandbox.md),
+[brakujące dostępy](../missing-information.md),
+[stan implementacji i testów](../docs/ios-implementation-2026-10-28.pl.md).
+Nie wykonano jeszcze kompilacji ani odbioru na iPhonie.
 
 ## Uruchomienie
 

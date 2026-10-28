@@ -75,7 +75,7 @@ builder.Services.AddScoped<SimplificationTimings>();
 builder.Services.AddScoped<IUsageStore, UsageStore>();
 var dataProtection = builder.Services.AddDataProtection().SetApplicationName("Sedno");
 builder.Services.AddScoped<SubscriptionService>();
-builder.Services.AddScoped<IEntitlementResolver>(sp => sp.GetRequiredService<SubscriptionService>());
+
 builder.Services.AddScoped<MetadataCleanup>();
 builder.Services.AddHttpClient();
 var credentialProvider = builder.Configuration["Google:CredentialProvider"] ?? "file";
@@ -125,8 +125,24 @@ if (billingEnabled)
 else
 {
     builder.Services.AddSingleton<IPlayBillingClient, DisabledPlayBillingClient>();
-    builder.Services.AddScoped<IEntitlementResolver, FreeEntitlementResolver>();
+
 }
+var appleBilling = builder.Configuration.GetSection("AppleBilling").Get<AppleBillingOptions>() ?? new();
+appleBilling.Validate();
+builder.Services.AddSingleton(appleBilling);
+builder.Services.AddHttpClient("apple-billing", client => client.Timeout = TimeSpan.FromSeconds(15)).RemoveAllLoggers();
+if (appleBilling.Enabled)
+{
+    builder.Services.AddSingleton<IAppleSignedDataVerifier, AppleSignedDataVerifier>();
+    builder.Services.AddSingleton<IAppleBillingClient>(sp => new AppleBillingClient(
+        sp.GetRequiredService<IHttpClientFactory>().CreateClient("apple-billing"),
+        sp.GetRequiredService<IAppleSignedDataVerifier>(), appleBilling, sp.GetRequiredService<TimeProvider>()));
+}
+else builder.Services.AddSingleton<IAppleBillingClient, DisabledAppleBillingClient>();
+builder.Services.AddScoped<AppleSubscriptionService>();
+builder.Services.AddScoped<IEntitlementResolver>(sp => new StoreEntitlementResolver(
+    sp.GetRequiredService<SubscriptionService>(), sp.GetRequiredService<AppleSubscriptionService>(), appleBilling, billingEnabled));
+
 var firebaseProject = builder.Configuration["Firebase:ProjectId"];
 if (!builder.Environment.IsDevelopment() && string.IsNullOrWhiteSpace(firebaseProject))
     throw new InvalidOperationException("Firebase:ProjectId is required.");
@@ -177,6 +193,13 @@ builder.Services.AddScoped<IGuestStore>(sp => sp.GetRequiredService<GuestStore>(
 builder.Services.AddScoped<SimplificationService>(sp => new(sp.GetRequiredService<IUsageStore>(),
     sp.GetRequiredService<IModelProvider>(), sp.GetRequiredService<TimeProvider>(), fingerprintKey, sp.GetRequiredService<SimplificationTimings>()));
 builder.Services.AddSednoModel(builder.Configuration, builder.Environment.IsDevelopment());
+
+var appAttestOptions = builder.Configuration.GetSection("AppleAppAttest").Get<AppAttestOptions>() ?? new();
+appAttestOptions.Validate(builder.Environment.IsDevelopment());
+builder.Services.AddSingleton(appAttestOptions);
+builder.Services.AddSingleton<AppAttestVerifier>();
+builder.Services.AddScoped<AppAttestService>(sp => new(sp.GetRequiredService<FirestoreStore>(),
+    sp.GetRequiredService<AppAttestVerifier>(), appAttestOptions, sp.GetRequiredService<TimeProvider>(), credentialKey));
 
 builder.Services.AddTrafficLimiting(builder.Configuration, cloudRun);
 
@@ -262,7 +285,10 @@ app.Use(async (context, next) =>
         return;
     }
     if (context.Request.Path.StartsWithSegments("/v1") &&
-        !string.Equals(context.Request.Path.Value, "/v1/guest-sessions", StringComparison.OrdinalIgnoreCase))
+        !string.Equals(context.Request.Path.Value, "/v1/guest-sessions", StringComparison.OrdinalIgnoreCase) &&
+        !string.Equals(context.Request.Path.Value, "/v1/ios/attestation/challenges", StringComparison.OrdinalIgnoreCase) &&
+        !string.Equals(context.Request.Path.Value, "/v1/ios/attestation/keys", StringComparison.OrdinalIgnoreCase) &&
+        !string.Equals(context.Request.Path.Value, "/v1/ios/guest-sessions", StringComparison.OrdinalIgnoreCase))
     {
         using var authentication = context.Request.Path == "/v1/simplifications"
             ? context.RequestServices.GetRequiredService<SimplificationTimings>().Measure(SimplificationStage.Authentication) : null;
@@ -319,12 +345,18 @@ app.MapDelete("/v1/account", async (HttpContext context, AccountDeletionService 
         return Problem(context, 403, "reauthentication_required", "Zaloguj się ponownie, aby usunąć konto.");
     return Results.NoContent();
 });
-app.MapGet("/v1/subscription", async (HttpContext context, SubscriptionService subscriptions, CancellationToken ct) =>
+app.MapGet("/v1/subscription", async (HttpContext context, SubscriptionService subscriptions, AppleSubscriptionService appleSubscriptions, CancellationToken ct) =>
 {
     var session = (SessionIdentity)context.Items["session"]!;
     if (session.AccountId is null) return Problem(context, 403, "account_required", "Zaloguj się, aby korzystać z subskrypcji.");
     if (!billingEnabled) return Problem(context, 503, "billing_unavailable", "Płatności są niedostępne.");
-    return Results.Ok(await subscriptions.CurrentAsync(session.AccountId.Value, ct));
+    var status = await subscriptions.CurrentAsync(session.AccountId.Value, ct);
+    if (!status.Active && appleBilling.Enabled)
+    {
+        var other = await appleSubscriptions.CurrentAsync(session.AccountId.Value, ct);
+        if (other.Active) status = other with { AccountBinding = status.AccountBinding };
+    }
+    return Results.Ok(status);
 });
 app.MapPost("/v1/subscription", async (PurchaseInput input, HttpContext context, SubscriptionService subscriptions, CancellationToken ct) =>
 {
@@ -335,6 +367,38 @@ app.MapPost("/v1/subscription", async (PurchaseInput input, HttpContext context,
         return Problem(context, 400, "invalid_purchase", "Nieprawidłowy zakup.");
     return Results.Ok(await subscriptions.VerifyAsync(session.AccountId.Value, input.PurchaseToken, ct));
 });
+app.MapGet("/v1/subscription/apple", async (HttpContext context, AppleSubscriptionService subscriptions, SubscriptionService playSubscriptions, CancellationToken ct) =>
+{
+    var session = (SessionIdentity)context.Items["session"]!;
+    if (session.AccountId is null) return Problem(context, 403, "account_required", "Zaloguj się, aby korzystać z subskrypcji.");
+    if (!appleBilling.Enabled) return Problem(context, 503, "billing_unavailable", "Płatności są niedostępne.");
+    var status = await subscriptions.CurrentAsync(session.AccountId.Value, ct);
+    if (!status.Active && billingEnabled)
+    {
+        var other = await playSubscriptions.CurrentAsync(session.AccountId.Value, ct);
+        if (other.Active) status = other with { AccountBinding = status.AccountBinding };
+    }
+    return Results.Ok(status);
+});
+app.MapPost("/v1/subscription/apple", async (ApplePurchaseInput input, HttpContext context, AppleSubscriptionService subscriptions, CancellationToken ct) =>
+{
+    var session = (SessionIdentity)context.Items["session"]!;
+    if (session.AccountId is null) return Problem(context, 403, "account_required", "Zaloguj się, aby kupić subskrypcję.");
+    if (!appleBilling.Enabled) return Problem(context, 503, "billing_unavailable", "Płatności są niedostępne.");
+    if (string.IsNullOrWhiteSpace(input.TransactionId) || input.TransactionId.Length > 128 || !input.TransactionId.All(char.IsAsciiDigit))
+        return Problem(context, 400, "invalid_purchase", "Nieprawidłowy zakup.");
+    try { return Results.Ok(await subscriptions.VerifyAsync(session.AccountId.Value, input.TransactionId, ct)); }
+    catch (InvalidOperationException) { return Problem(context, 403, "purchase_rejected", "Nie można potwierdzić zakupu."); }
+});
+app.MapPost("/notifications/apple", async (AppleNotificationInput input, HttpContext context, AppleSubscriptionService subscriptions, CancellationToken ct) =>
+{
+    if (!appleBilling.Enabled) return Results.StatusCode(503);
+    if (string.IsNullOrWhiteSpace(input.SignedPayload) || input.SignedPayload.Length > 120000) return Results.BadRequest();
+    try { await subscriptions.NotifyAsync(input.SignedPayload, ct); return Results.NoContent(); }
+    catch (Exception ex) when (ex is InvalidOperationException or System.Security.Cryptography.CryptographicException or JsonException or FormatException or KeyNotFoundException or ArgumentException)
+    { return Results.BadRequest(); }
+}).WithMetadata(new NotificationTraffic("apple"));
+
 app.MapPost("/notifications/google-play", async (PubSubEnvelope envelope, HttpContext context,
     SubscriptionService subscriptions, CancellationToken ct) =>
 {
@@ -366,6 +430,26 @@ app.MapHealthChecks("/health/live", new() { Predicate = _ => false });
 app.MapGet("/health/ready", async (FirestoreStore db, CancellationToken ct) =>
     await db.ReadyAsync(ct) ? Results.Ok(new { status = "ready" }) : Results.StatusCode(503));
 
+app.MapPost("/v1/ios/attestation/challenges", async (AppAttestChallengeInput input, HttpContext context, AppAttestService attest, CancellationToken ct) =>
+{
+    if (!appAttestOptions.Enabled) return Problem(context, 503, "app_attest_unavailable", "Weryfikacja aplikacji jest niedostępna.");
+    if (!AppAttestService.ValidInput(input.InstallationId, input.KeyId) || input.Purpose is not ("register" or "session"))
+        return Problem(context, 400, "invalid_request", "Nieprawidłowe dane.");
+    return Results.Ok(await attest.CreateChallengeAsync(input.InstallationId, input.KeyId, input.Purpose, ct));
+});
+app.MapPost("/v1/ios/attestation/keys", async (AppAttestRegistrationInput input, HttpContext context, AppAttestService attest, CancellationToken ct) =>
+{
+    if (!appAttestOptions.Enabled) return Problem(context, 503, "app_attest_unavailable", "Weryfikacja aplikacji jest niedostępna.");
+    return await attest.RegisterAsync(input.InstallationId, input.KeyId, input.ChallengeId, input.Attestation, ct)
+        ? Results.NoContent() : Problem(context, 403, "integrity_failed", "Nie można potwierdzić instalacji.");
+});
+app.MapPost("/v1/ios/guest-sessions", async (AppAttestSessionInput input, HttpContext context, AppAttestService attest, IGuestStore guests, CancellationToken ct) =>
+{
+    if (!appAttestOptions.Enabled) return Problem(context, 503, "app_attest_unavailable", "Weryfikacja aplikacji jest niedostępna.");
+    var result = await attest.AssertAsync(input.InstallationId, input.KeyId, input.ChallengeId, input.Assertion, ct);
+    if (result != "verified") return Problem(context, 403, result == "unknown_key" ? "app_attest_key_unknown" : "integrity_failed", "Nie można potwierdzić instalacji.");
+    return Results.Ok(await guests.CreateAsync(input.InstallationId, ct));
+});
 app.MapPost("/v1/guest-sessions", async (HttpContext context, IGuestStore guests, IIntegrityVerifier integrity) =>
 {
     GuestInput? request;
@@ -457,3 +541,10 @@ public partial class Program { }
 public sealed record PurchaseInput(string PurchaseToken);
 public sealed record PubSubMessage(string Data, string MessageId);
 public sealed record PubSubEnvelope(PubSubMessage? Message);
+
+public sealed record AppAttestChallengeInput(string InstallationId, string KeyId, string Purpose);
+public sealed record AppAttestRegistrationInput(string InstallationId, string KeyId, string ChallengeId, string Attestation);
+public sealed record AppAttestSessionInput(string InstallationId, string KeyId, string ChallengeId, string Assertion);
+
+public sealed record ApplePurchaseInput(string TransactionId);
+public sealed record AppleNotificationInput(string SignedPayload);

@@ -964,4 +964,97 @@ class AppLocalizationsSk extends AppLocalizations {
   @override
   String get speechLanguageUnsupported =>
       'Rozpoznávač v tomto telefóne nepodporuje miestne diktovanie v tomto jazyku. Môžete písať alebo použiť fotoaparát.';
+
+  @override
+  String get signInApple => 'Prihlásiť sa cez Apple';
+
+  @override
+  String get appleAccountMethod => 'Apple';
+
+  @override
+  String get signInCancelled => 'Prihlásenie zrušené.';
+
+  @override
+  String get accountMethodConflict =>
+      'Tento účet používa iný spôsob prihlásenia. Použi svoj pôvodný spôsob.';
+
+  @override
+  String get localSpeechUnavailable =>
+      'Miestne rozpoznávanie reči nie je pre tento jazyk na tomto zariadení dostupné.';
+
+  @override
+  String get localSpeechModelMissing =>
+      'Nainštaluj miestny hlasový model v nastaveniach zariadenia.';
+
+  @override
+  String get deviceFeatureUnavailable =>
+      'Táto funkcia nie je na tomto zariadení dostupná.';
+
+  @override
+  String get subscriptionOtherStore =>
+      'Toto predplatné bolo zakúpené v inom obchode. Spravuj ho v obchode, kde bolo zakúpené.';
+
+  @override
+  String get storeOpenFailed =>
+      'Nastavenia predplatného sa nedajú otvoriť. Skús to znova.';
+
+  @override
+  String get appleManageSubscriptionNotice =>
+      'Zmenu platby alebo zrušenie predplatného vykonáte v App Store.';
+
+  @override
+  String get appleManageSubscription => 'Spravovať predplatné v App Store';
+
+  @override
+  String get appleSubscriptionCancelNotice =>
+      'Kedykoľvek ho môžete zrušiť v App Store.';
+
+  @override
+  String get appleAccountDeleted =>
+      'Účet a údaje boli odstránené. Predplatné zrušte samostatne v App Store.';
+
+  @override
+  String get appleTesterHasSubscription =>
+      'Máte aj aktívne predplatné App Store.';
+
+  @override
+  String get appleSubscriptionStillActive =>
+      'Predplatné App Store vám naďalej poskytuje vyšší limit.';
+
+  @override
+  String get appleInstallationRejected =>
+      'Server neoveril inštaláciu. Skúste to znova alebo nainštalujte Sedno z App Store.';
+
+  @override
+  String get appleSubscriptionPriceNotice =>
+      'Cenu predplatného nájdete v časti Účet a v App Store.';
+
+  @override
+  String get privacyIosSupplementTitle => 'Ďalšie informácie pre iPhone';
+
+  @override
+  String get privacyIosSupplementBody =>
+      'Odkazy nižšie na Android, Google Play a Play Integrity platia len pre Android. Na iPhone sa môžete prihlásiť cez Apple a skryť svoju e-mailovú adresu. Prihlásenie spracúva aj Firebase. Predplatné zakúpené v App Store účtuje Apple; Sedno nedostáva údaje karty. Odstránenie účtu nezruší predplatné.\n\nApp Attest overuje pravosť aplikácie bez odosielania textov, výsledkov či fotografií spoločnosti Apple. Server ukladá pseudonymné údaje inštalácie a verejného kľúča. Výzvy platia 5 minút a kľúče 90 dní od posledného úspešného overenia relácie. Oznámenia o nákupe uchovávame 30 dní. Úloha servera odstraňuje záznamy po uplynutí platnosti. Metadáta nákupov uchovávame do odstránenia účtu.\n\nHistória je šifrovaná, miestna, vylúčená zo záloh a platí 7 dní. Fotografie a zvuk zostávajú v zariadení. Diktovanie a čítanie fungujú iba miestne, ak ich zariadenie a jazyk podporujú. Rozpoznaný text posielate OpenAI cez Sedno po prijatí oznámenia o AI.\n\nOstatné informácie nižšie vrátane prevádzkovateľa, účelov, právnych základov a postupov OpenAI platia aj pre iPhone. Súkromie Apple: https://www.apple.com/legal/privacy/';
+
+  @override
+  String get linkApple => 'Prepojiť účet Apple';
+
+  @override
+  String get confirmAccountLink =>
+      'Znova potvrďte svoj aktuálny účet. Potom vyberte účet Apple na prihlásenie do toho istého účtu Sedno.';
+
+  @override
+  String get passwordToLink =>
+      'Zadajte heslo aktuálneho účtu, aby ste ho prepojili s Apple.';
+
+  @override
+  String get linkGoogle => 'Prepojiť účet Google';
+
+  @override
+  String get confirmGoogleAccountLink =>
+      'Znova potvrďte svoj aktuálny účet. Potom vyberte účet Google na prihlásenie do toho istého účtu Sedno.';
+
+  @override
+  String get passwordToLinkGoogle =>
+      'Zadajte heslo svojho aktuálneho účtu na prepojenie s Google.';
 }

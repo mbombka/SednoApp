@@ -263,3 +263,15 @@ dziennie bez zakupu. Datę sprawdza transakcja limitu; użycie nie jest zerowane
 Języki korzystają ze wspólnego limitu i ustawień modelu.
 [Rozszerzenie kodu i kolejność wydania](../docs/multilingual-13-languages.pl.md).
 [Opis zgodności, wdrożenia i rozszerzania](../docs/multilingual-app.pl.md).
+
+## Wersja iPhone — równoległa obsługa Apple
+
+Istniejący `sedno-api` obsługuje przygotowane adaptery iOS obok Androida:
+[App Attest](docs/apple-app-attest.md), [zakupy Apple](docs/apple-billing.md).
+Oba mechanizmy Apple są domyślnie wyłączone. Dotychczasowe Play Integrity,
+Google Play i transakcyjne limity pozostają wspólne z nową ścieżką iOS.
+Nowe endpointy i pola są w `contracts/openapi.yaml` w katalogu głównym.
+
+Konfiguracja wymaga rzeczywistych danych Apple; patrz
+[braki](../missing-information.md). Lokalna implementacja i testy nie potwierdzają
+konfiguracji Apple ani odbioru na urządzeniu. Nie wdrożono tych zmian na produkcję.

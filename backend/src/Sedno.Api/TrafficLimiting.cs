@@ -18,11 +18,11 @@ public static class TrafficLimiting
             options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
             {
                 // RTDN has its own bounded bucket. Its JWT is still verified by the endpoint.
-                var notification = context.GetEndpoint()?.Metadata.GetMetadata<NotificationTraffic>() is not null;
-                var key = notification ? "notifications" : PublicKey(context, cloudRun);
+                var notification = context.GetEndpoint()?.Metadata.GetMetadata<NotificationTraffic>();
+                var key = notification is not null ? "notifications:" + notification.Store : PublicKey(context, cloudRun);
                 return RateLimitPartition.GetFixedWindowLimiter(key, _ => new FixedWindowRateLimiterOptions
                 {
-                    PermitLimit = notification ? notificationLimit : publicLimit,
+                    PermitLimit = notification is not null ? notificationLimit : publicLimit,
                     Window = TimeSpan.FromMinutes(1), QueueLimit = 0
                 });
             });
@@ -61,4 +61,7 @@ public static class TrafficLimiting
         (address.IsIPv4MappedToIPv6 ? address.MapToIPv4() : address).ToString();
 }
 
-public sealed class NotificationTraffic;
+public sealed class NotificationTraffic(string store = "google-play")
+{
+    public string Store { get; } = store;
+}

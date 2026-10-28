@@ -1,6 +1,7 @@
 import 'package:sedno_app/features/privacy/domain/localized_privacy_policy.dart';
 import 'package:sedno_app/l10n/localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:sedno_app/features/shared/presentation/link_text.dart';
 import 'package:sedno_app/features/shared/presentation/website_information.dart';
 import 'package:sedno_app/features/privacy/domain/privacy_policy.dart';
@@ -40,6 +41,15 @@ class PrivacyScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             WebsiteInformation(opener: openUrl),
+            if (defaultTargetPlatform == TargetPlatform.iOS) ...[
+              const SizedBox(height: 24),
+              _Heading(context.l10n.privacyIosSupplementTitle),
+              for (final paragraph
+                  in context.l10n.privacyIosSupplementBody.split('\n\n')) ...[
+                LinkText(paragraph, opener: openUrl),
+                const SizedBox(height: 16),
+              ],
+            ],
             for (final section in LocalizedPrivacyPolicy.sections(
               context.language,
             )) ...[

@@ -41,7 +41,7 @@ public sealed class FirebaseTokenVerifier(HttpClient client, string projectId, T
                 Decode(pieces[2]), HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1)) return null;
             var provider = p.GetProperty("firebase").GetProperty("sign_in_provider").GetString() switch
             {
-                "google.com" => "google", "password" => "email", _ => null
+                "google.com" => "google", "password" => "email", "apple.com" => "apple", _ => null
             };
             return provider is null ? null : new(uid, provider,
                 p.TryGetProperty("email_verified", out var emailVerified) && emailVerified.ValueKind == JsonValueKind.True, p.GetProperty("auth_time").GetInt64());

@@ -961,4 +961,97 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get speechLanguageUnsupported =>
       'Rozpoznávač v tomto telefonu nepodporuje místní diktování v tomto jazyce. Můžete psát nebo použít fotoaparát.';
+
+  @override
+  String get signInApple => 'Přihlásit se přes Apple';
+
+  @override
+  String get appleAccountMethod => 'Apple';
+
+  @override
+  String get signInCancelled => 'Přihlášení zrušeno.';
+
+  @override
+  String get accountMethodConflict =>
+      'Tento účet používá jiný způsob přihlášení. Použij svůj původní způsob.';
+
+  @override
+  String get localSpeechUnavailable =>
+      'Místní rozpoznávání řeči není pro tento jazyk na tomto zařízení dostupné.';
+
+  @override
+  String get localSpeechModelMissing =>
+      'Nainstaluj místní hlasový model v nastavení zařízení.';
+
+  @override
+  String get deviceFeatureUnavailable =>
+      'Tato funkce není na tomto zařízení dostupná.';
+
+  @override
+  String get subscriptionOtherStore =>
+      'Toto předplatné bylo zakoupeno v jiném obchodě. Spravuj ho v obchodě, kde bylo zakoupeno.';
+
+  @override
+  String get storeOpenFailed =>
+      'Nastavení předplatného nelze otevřít. Zkus to znovu.';
+
+  @override
+  String get appleManageSubscriptionNotice =>
+      'Platbu změníte nebo předplatné zrušíte v App Store.';
+
+  @override
+  String get appleManageSubscription => 'Spravovat předplatné v App Store';
+
+  @override
+  String get appleSubscriptionCancelNotice =>
+      'Kdykoli ho můžete zrušit v App Store.';
+
+  @override
+  String get appleAccountDeleted =>
+      'Účet a údaje byly odstraněny. Předplatné zrušte samostatně v App Store.';
+
+  @override
+  String get appleTesterHasSubscription =>
+      'Máte i aktivní předplatné App Store.';
+
+  @override
+  String get appleSubscriptionStillActive =>
+      'Předplatné App Store vám stále poskytuje vyšší limit.';
+
+  @override
+  String get appleInstallationRejected =>
+      'Server neověřil instalaci. Zkuste to znovu nebo nainstalujte Sedno z App Store.';
+
+  @override
+  String get appleSubscriptionPriceNotice =>
+      'Cenu předplatného najdete v části Účet a v App Store.';
+
+  @override
+  String get privacyIosSupplementTitle => 'Další informace pro iPhone';
+
+  @override
+  String get privacyIosSupplementBody =>
+      'Odkazy níže na Android, Google Play a Play Integrity platí pouze pro Android. Na iPhonu se můžete přihlásit přes Apple a skrýt svou e-mailovou adresu. Přihlášení zpracovává také Firebase. Předplatné zakoupené v App Storu účtuje Apple; Sedno nedostává údaje karty. Smazání účtu nezruší předplatné.\n\nApp Attest ověřuje pravost aplikace bez odesílání textů, výsledků nebo fotografií společnosti Apple. Server ukládá pseudonymní údaje instalace a veřejného klíče. Výzvy platí 5 minut a klíče 90 dní od posledního úspěšného ověření relace. Oznámení o nákupu uchováváme 30 dní. Úloha serveru odstraňuje záznamy po uplynutí platnosti. Metadata nákupů uchováváme do smazání účtu.\n\nHistorie je šifrovaná, místní, vyloučená ze záloh a platí 7 dní. Fotografie a zvuk zůstávají v zařízení. Diktování a čtení fungují jen místně, pokud je zařízení a jazyk podporují. Rozpoznaný text posíláte OpenAI přes Sedno po přijetí oznámení o AI.\n\nOstatní informace níže včetně správce, účelů, právních základů a postupů OpenAI platí také pro iPhone. Soukromí Apple: https://www.apple.com/legal/privacy/';
+
+  @override
+  String get linkApple => 'Propojit účet Apple';
+
+  @override
+  String get confirmAccountLink =>
+      'Znovu potvrďte svůj aktuální účet. Poté vyberte účet Apple pro přihlášení ke stejnému účtu Sedno.';
+
+  @override
+  String get passwordToLink =>
+      'Zadejte heslo svého aktuálního účtu, abyste jej propojili s Apple.';
+
+  @override
+  String get linkGoogle => 'Propojit účet Google';
+
+  @override
+  String get confirmGoogleAccountLink =>
+      'Znovu potvrďte svůj současný účet. Potom vyberte účet Google pro přihlášení ke stejnému účtu Sedno.';
+
+  @override
+  String get passwordToLinkGoogle =>
+      'Zadejte heslo svého současného účtu pro propojení s Google.';
 }

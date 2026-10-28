@@ -50,7 +50,7 @@ public sealed class GuestStore(FirestoreStore db, IUsageStore usage, TimeProvide
 
     public async Task<AuthenticatedSessionDto?> LinkAsync(SessionIdentity guest, VerifiedIdentity verified, CancellationToken ct)
     {
-        if ((verified.Provider == "email" && !verified.EmailVerified) || guest.AccountId is not null || verified.Uid.Length is < 1 or > 128 || verified.Provider is not ("google" or "email")) return null;
+        if ((verified.Provider == "email" && !verified.EmailVerified) || guest.AccountId is not null || verified.Uid.Length is < 1 or > 128 || verified.Provider is not ("google" or "email" or "apple")) return null;
         await using var lease = await FirestoreLease.AcquireAsync(db, "uid:" + verified.Uid, clock, ct);
         if (!(await accountAccess.GetFreshAsync(verified.Uid, ct)).Allows(verified.AuthTime)) return null;
         var secret = Base64Url(RandomNumberGenerator.GetBytes(32));

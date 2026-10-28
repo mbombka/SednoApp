@@ -30,6 +30,7 @@ public sealed class TrafficLimitingTests
         app.MapPost("/notifications/google-play", (HttpContext context) =>
             // Signature verification remains in the real endpoint; this harness has no credentials.
             Results.Unauthorized()).WithMetadata(new NotificationTraffic());
+        app.MapPost("/notifications/apple", () => Results.BadRequest()).WithMetadata(new NotificationTraffic("apple"));
         await app.StartAsync();
         return app;
     }
@@ -107,6 +108,21 @@ public sealed class TrafficLimitingTests
             Assert.Equal(HttpStatusCode.Unauthorized, await Send(client, "198.51.100.1", notification: true));
         Assert.Equal(HttpStatusCode.TooManyRequests, await Send(client, "198.51.100.2", notification: true));
         Assert.Equal(HttpStatusCode.Unauthorized, await Send(client, "198.51.100.2"));
+    }
+
+    [Fact]
+    public async Task InvalidAppleNotificationsCannotExhaustGoogleNotificationBucket()
+    {
+        await using var app = await Start();
+        using var client = app.GetTestClient();
+        for (var i = 0; i < 3; i++)
+        {
+            using var response = await client.PostAsync("/notifications/apple", null);
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+        using var limited = await client.PostAsync("/notifications/apple", null);
+        Assert.Equal(HttpStatusCode.TooManyRequests, limited.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, await Send(client, "198.51.100.1", notification: true));
     }
 
     [Fact]

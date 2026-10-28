@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:sedno_app/l10n/localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -43,12 +45,24 @@ class SubscriptionPanel extends StatelessWidget {
             _Benefit(context.l10n.subscriptionAllowance),
             _Benefit(resetTime),
             const SizedBox(height: 16),
-            Text(context.l10n.manageSubscriptionNotice),
+            if (model.managedElsewhere)
+              Text(context.l10n.subscriptionOtherStore)
+            else
+              Text(
+                (Platform.isIOS
+                    ? context.l10n.appleManageSubscriptionNotice
+                    : context.l10n.manageSubscriptionNotice),
+              ),
             const SizedBox(height: 8),
-            TextButton(
-              onPressed: model.busy ? null : model.manage,
-              child: Text(context.l10n.manageSubscription),
-            ),
+            if (!model.managedElsewhere)
+              TextButton(
+                onPressed: model.busy ? null : model.manage,
+                child: Text(
+                  (Platform.isIOS
+                      ? context.l10n.appleManageSubscription
+                      : context.l10n.manageSubscription),
+                ),
+              ),
           ] else if (tester) ...[
             Text(context.l10n.testerAccessNotice),
             OutlinedButton(
@@ -91,7 +105,11 @@ class SubscriptionPanel extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(context.l10n.subscriptionRenewalNotice),
-            Text(context.l10n.subscriptionCancelNotice),
+            Text(
+              (Platform.isIOS
+                  ? context.l10n.appleSubscriptionCancelNotice
+                  : context.l10n.subscriptionCancelNotice),
+            ),
           ],
           if (model.busy) const Center(child: CircularProgressIndicator()),
           if (model.message != null)

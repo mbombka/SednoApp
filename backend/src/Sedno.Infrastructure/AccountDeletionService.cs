@@ -108,11 +108,15 @@ public sealed class AccountDeletionService(FirestoreStore db, IIdentityAccountDe
         }
         await DeleteQueryAsync(db.Sessions.WhereEqualTo("AccountId", accountId.ToString()), ct);
         await DeleteQueryAsync(db.Purchases.WhereEqualTo("AccountId", accountId.ToString()), ct);
+        await DeleteQueryAsync(db.Database.Collection("apple_purchases").WhereEqualTo("AccountId", accountId.ToString()), ct);
+        await DeleteQueryAsync(db.Database.Collection("apple_notifications").WhereEqualTo("AccountId", accountId.ToString()), ct);
         // Shared installation ledgers may also contain another account's usage.
         // Remove only the deleted identities, retaining other users' allowances.
         var ids = identities.Select(x => FirestoreStore.Id(x.Id)).ToHashSet();
         foreach (var hash in account.InstallationHashes)
         {
+            await DeleteQueryAsync(db.Database.Collection("apple_attest_keys").WhereEqualTo("InstallationHash", hash), ct);
+            await DeleteQueryAsync(db.Database.Collection("apple_attest_challenges").WhereEqualTo("InstallationHash", hash), ct);
             var days = await db.DailyUsage.WhereEqualTo("InstallationHash", hash).GetSnapshotAsync(ct);
             foreach (var day in days.Documents)
                 await db.Database.RunTransactionAsync(async transaction =>

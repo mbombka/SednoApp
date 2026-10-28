@@ -15,6 +15,10 @@ abstract interface class IntegrityTokenSource {
   Future<String?> tokenFor(String requestHash);
 }
 
+abstract interface class GuestSessionAdmission {
+  Future<http.Response> create(String installationId);
+}
+
 abstract interface class SessionStorage {
   Future<String?> read(String key);
   Future<void> write(String key, String value);
@@ -65,6 +69,7 @@ class BackendSessionGateway {
     required this.client,
     required this.storage,
     required this.integrity,
+    this.guestAdmission,
   }) {
     if (baseUrl.scheme != 'https' &&
         (kReleaseMode ||
@@ -78,6 +83,8 @@ class BackendSessionGateway {
   final http.Client client;
   final SessionStorage storage;
   final IntegrityTokenSource integrity;
+  final GuestSessionAdmission? guestAdmission;
+  Future<String>? _creatingGuest;
   Future<void> Function()? onSessionRejected;
   bool sessionRejected = false;
   final ValueNotifier<int> sessionRevision = ValueNotifier(0);
@@ -116,29 +123,27 @@ class BackendSessionGateway {
     final random = Random.secure();
     final id = base64UrlEncode(
       List<int>.generate(32, (_) => random.nextInt(256)),
-    );
+    ).replaceAll('=', '');
     await storage.write(_installationKey, id);
     return id;
   }
 
-  Future<String> _guestToken() async {
+  Future<String> _guestToken() => _creatingGuest ??= _createGuestToken()
+      .whenComplete(() => _creatingGuest = null);
+
+  Future<String> _createGuestToken() async {
     final stored = await storage.read(_guestKey);
     if (stored != null) return stored;
     final installationId = await _installationId();
-    final hash = base64UrlEncode(
-      sha256.convert(utf8.encode('guest-session:$installationId')).bytes,
-    ).replaceAll('=', '');
-    final integrityToken = await integrity.tokenFor(hash);
-    final response = await client.post(
-      baseUrl.resolve('/v1/guest-sessions'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'installationId': installationId,
-        'integrityToken': integrityToken,
-      }),
-    );
+    final response = guestAdmission != null
+        ? await guestAdmission!.create(installationId)
+        : await _androidGuestSession(installationId);
     if (response.statusCode == 403) {
-      throw AccountActionException(strings.installationRejected);
+      throw AccountActionException(
+        guestAdmission == null
+            ? strings.installationRejected
+            : strings.appleInstallationRejected,
+      );
     }
     if (response.statusCode != 200) {
       throw StateError(strings.sessionStartFailed);
@@ -148,6 +153,21 @@ class BackendSessionGateway {
             as String;
     await storage.write(_guestKey, token);
     return token;
+  }
+
+  Future<http.Response> _androidGuestSession(String installationId) async {
+    final hash = base64UrlEncode(
+      sha256.convert(utf8.encode('guest-session:$installationId')).bytes,
+    ).replaceAll('=', '');
+    final integrityToken = await integrity.tokenFor(hash);
+    return client.post(
+      baseUrl.resolve('/v1/guest-sessions'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'installationId': installationId,
+        'integrityToken': integrityToken,
+      }),
+    );
   }
 
   Future<Account> link(String firebaseIdToken) async {

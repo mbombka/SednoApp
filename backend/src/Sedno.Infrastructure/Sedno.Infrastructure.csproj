@@ -3,5 +3,6 @@
   <ItemGroup><FrameworkReference Include="Microsoft.AspNetCore.App" /></ItemGroup>
   <ItemGroup><PackageReference Include="Google.Cloud.Firestore" Version="4.5.0" /><ProjectReference Include="../Sedno.Application/Sedno.Application.csproj" /></ItemGroup>
   <ItemGroup><EmbeddedResource Include="Prompts/simplify.*.txt" WithCulture="false" /><EmbeddedResource Include="Prompts/correct.*.txt" WithCulture="false" /></ItemGroup>
+  <ItemGroup><EmbeddedResource Include="Certificates/*.pem" /></ItemGroup>
   <ItemGroup><Compile Remove="Migrations/**/*.cs" /></ItemGroup>
 </Project>

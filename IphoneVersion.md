@@ -1,7 +1,26 @@
 # Sedno na iPhone — zadania dla agentów
 
-Plan z 25.10.2026. Dokument opisuje przyszłe prace; żadne z poniższych zadań
-nie jest wykonane przez samo przygotowanie tej listy.
+Plan z 25.10.2026; implementacja rozpoczęta 28.10.2026 na branchu `iPhoneVersion`.
+Stan kodu i weryfikacji opisuje [raport](docs/ios-implementation-2026-10-28.pl.md).
+Brakujące dostępy: [missing-information.md](missing-information.md).
+Checkboxy kryteriów wymagających urządzenia pozostają otwarte do rzeczywistego odbioru.
+
+## Postęp implementacji — 28.10.2026
+
+| Zadania | Stan kodu | Pozostały odbiór |
+| --- | --- | --- |
+| IOS-01 | Kontrakty i decyzje w `docs/ios-architecture.pl.md` | Zgodność rzeczywistej konfiguracji Apple |
+| IOS-02, IOS-05, IOS-06, IOS-08 | Projekt Xcode, Swift, historia, aparat/OCR i lokalna mowa przygotowane | Kompilacja na Macu, XCTest, aparat, modele i głosy na iPhonie |
+| IOS-03, IOS-04 | App Attest klient/serwer, współbieżność i retencja przygotowane | Prawdziwy dowód z iPhone'a/TestFlight i pomiary produkcyjne |
+| IOS-07 | Apple/Firebase, świeża reautoryzacja, łączenie metod i odwołanie Apple przy usuwaniu | Konfiguracja dostawcy, rzeczywisty przebieg konta/ukrytego e-maila |
+| IOS-09, IOS-10 | Adaptery Apple, wspólne 400, StoreKit2 i obsługa powiadomień przygotowane | Produkt, certyfikaty, dostęp Apple API/OCSP, prawdziwe zakupy sandbox |
+| IOS-11 | Lokalizacje, komunikaty platformowe i testy widgetów | VoiceOver i gesty na urządzeniu |
+| IOS-12 | Dodatek prywatności i lista kontroli sklepu | Audyt SDK/App Privacy, finalna polityka i materiały App Store |
+| IOS-13 | Testy Dart/.NET i emulatora; wyniki w raporcie | Kompilacja/regresja Android na urządzeniu i pełny odbiór iOS |
+| IOS-14 | Instrukcje konfiguracji i wydania | Brak Maca, iPhone'a i Apple Developer; bez wdrożenia/publikacji |
+
+Kod nie oznacza odebranej wersji iOS. Ustawienia Apple pozostają wyłączone;
+nie zmieniono infrastruktury, produkcyjnego modelu ani promptów.
 
 ## Uzgodniony kierunek
 

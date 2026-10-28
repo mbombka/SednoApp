@@ -987,4 +987,98 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get speechLanguageUnsupported =>
       'Die Sprachsoftware dieses Telefons bietet diese Sprache nicht für lokale Diktate an. Du kannst Text eingeben oder die Kamera nutzen.';
+
+  @override
+  String get signInApple => 'Mit Apple anmelden';
+
+  @override
+  String get appleAccountMethod => 'Apple';
+
+  @override
+  String get signInCancelled => 'Anmeldung abgebrochen.';
+
+  @override
+  String get accountMethodConflict =>
+      'Dieses Konto verwendet eine andere Anmeldemethode. Verwende deine bisherige Methode.';
+
+  @override
+  String get localSpeechUnavailable =>
+      'Die lokale Spracherkennung ist für diese Sprache auf diesem Gerät nicht verfügbar.';
+
+  @override
+  String get localSpeechModelMissing =>
+      'Installiere das lokale Sprachmodell in den Geräteeinstellungen.';
+
+  @override
+  String get deviceFeatureUnavailable =>
+      'Diese Funktion ist auf diesem Gerät nicht verfügbar.';
+
+  @override
+  String get subscriptionOtherStore =>
+      'Dieses Abo wurde in einem anderen Store gekauft. Verwalte es dort, wo du es gekauft hast.';
+
+  @override
+  String get storeOpenFailed =>
+      'Die Aboeinstellungen konnten nicht geöffnet werden. Versuche es erneut.';
+
+  @override
+  String get appleManageSubscriptionNotice =>
+      'Öffne App Store, um die Zahlung zu ändern oder das Abo zu kündigen.';
+
+  @override
+  String get appleManageSubscription => 'Abo in App Store verwalten';
+
+  @override
+  String get appleSubscriptionCancelNotice =>
+      'Du kannst es jederzeit in App Store kündigen.';
+
+  @override
+  String get appleAccountDeleted =>
+      'Konto und Daten wurden gelöscht. Kündige das Abo separat in App Store.';
+
+  @override
+  String get appleTesterHasSubscription =>
+      'Du hast auch ein aktives Google-Play-Abo.';
+
+  @override
+  String get appleSubscriptionStillActive =>
+      'Dein Google-Play-Abo bietet dir weiterhin ein höheres Limit.';
+
+  @override
+  String get appleInstallationRejected =>
+      'Der Server konnte die Installation nicht prüfen. Versuche es erneut oder installiere Sedno über App Store.';
+
+  @override
+  String get appleSubscriptionPriceNotice =>
+      'Den Abopreis siehst du unter Konto und in App Store.';
+
+  @override
+  String get privacyIosSupplementTitle =>
+      'Zusätzliche Informationen für das iPhone';
+
+  @override
+  String get privacyIosSupplementBody =>
+      'Die folgenden Verweise auf Android, Google Play und Play Integrity gelten nur für Android. Auf dem iPhone können Sie sich mit Apple anmelden und Ihre E-Mail-Adresse verbergen. Auch Firebase verarbeitet die Anmeldung. Apple rechnet im App Store gekaufte Abonnements ab; Sedno erhält keine Kartendaten. Das Löschen des Kontos kündigt kein Abonnement.\n\nApp Attest prüft die Echtheit der App, ohne Texte, Ergebnisse oder Fotos an Apple zu senden. Der Server speichert pseudonyme Installationsdaten und öffentliche Schlüssel. Prüfaufgaben gelten 5 Minuten, Schlüssel 90 Tage nach der letzten erfolgreichen Sitzungsprüfung. Kaufbenachrichtigungen werden 30 Tage gespeichert. Ein Serverauftrag entfernt abgelaufene Einträge. Kaufmetadaten bleiben bis zur Kontolöschung.\n\nDer Verlauf ist verschlüsselt, lokal, von Sicherungen ausgeschlossen und verfällt nach 7 Tagen. Fotos und Audio bleiben auf dem Gerät. Diktieren und Vorlesen funktionieren ausschließlich lokal, wenn Gerät und Sprache dies unterstützen. Erkannten Text senden Sie nach Zustimmung zum KI-Hinweis über Sedno an OpenAI.\n\nDie übrigen Angaben unten, darunter Verantwortlicher, Zwecke, Rechtsgrundlagen und OpenAI-Praktiken, gelten auch für das iPhone. Apple-Datenschutz: https://www.apple.com/legal/privacy/';
+
+  @override
+  String get linkApple => 'Apple-Konto verknüpfen';
+
+  @override
+  String get confirmAccountLink =>
+      'Bestätigen Sie Ihr aktuelles Konto erneut. Wählen Sie dann ein Apple-Konto, um sich bei demselben Sedno-Konto anzumelden.';
+
+  @override
+  String get passwordToLink =>
+      'Geben Sie das Passwort Ihres aktuellen Kontos ein, um es mit Apple zu verknüpfen.';
+
+  @override
+  String get linkGoogle => 'Google-Konto verknüpfen';
+
+  @override
+  String get confirmGoogleAccountLink =>
+      'Bestätigen Sie Ihr aktuelles Konto erneut. Wählen Sie dann ein Google-Konto, um sich beim selben Sedno-Konto anzumelden.';
+
+  @override
+  String get passwordToLinkGoogle =>
+      'Geben Sie das Passwort Ihres aktuellen Kontos ein, um Google zu verknüpfen.';
 }

@@ -13,6 +13,16 @@ abstract interface class AccountRepository {
   Future<void> deleteAccount({String? password});
 }
 
+/// Optional capability: Android/test repositories need not implement Apple login.
+abstract interface class AppleAccountRepository {
+  bool get appleSignInAvailable;
+  Future<Account> signInWithApple();
+  bool get canLinkApple;
+  Future<Account> linkApple({String? password});
+  bool get canLinkGoogle;
+  Future<Account> linkGoogle({String? password});
+}
+
 abstract interface class AccountStateSource {
   ValueListenable<int> get accountRevision;
 }

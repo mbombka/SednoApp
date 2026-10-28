@@ -985,4 +985,98 @@ class AppLocalizationsRo extends AppLocalizations {
   @override
   String get speechLanguageUnsupported =>
       'Motorul vocal al acestui telefon nu oferă dictare locală în această limbă. Poți scrie sau folosi camera.';
+
+  @override
+  String get signInApple => 'Conectează-te cu Apple';
+
+  @override
+  String get appleAccountMethod => 'Apple';
+
+  @override
+  String get signInCancelled => 'Conectare anulată.';
+
+  @override
+  String get accountMethodConflict =>
+      'Acest cont folosește altă metodă de conectare. Folosește metoda obișnuită.';
+
+  @override
+  String get localSpeechUnavailable =>
+      'Recunoașterea vocală locală nu este disponibilă pentru această limbă pe acest dispozitiv.';
+
+  @override
+  String get localSpeechModelMissing =>
+      'Instalează modelul vocal local în setările dispozitivului.';
+
+  @override
+  String get deviceFeatureUnavailable =>
+      'Această funcție nu este disponibilă pe acest dispozitiv.';
+
+  @override
+  String get subscriptionOtherStore =>
+      'Acest abonament a fost cumpărat din alt magazin. Gestionează-l în magazinul de unde l-ai cumpărat.';
+
+  @override
+  String get storeOpenFailed =>
+      'Setările abonamentului nu au putut fi deschise. Încearcă din nou.';
+
+  @override
+  String get appleManageSubscriptionNotice =>
+      'Pentru a schimba plata sau a anula abonamentul, deschide App Store.';
+
+  @override
+  String get appleManageSubscription => 'Gestionează abonamentul în App Store';
+
+  @override
+  String get appleSubscriptionCancelNotice =>
+      'Îl poți anula oricând în App Store.';
+
+  @override
+  String get appleAccountDeleted =>
+      'Contul și datele au fost șterse. Anulează abonamentul separat în App Store.';
+
+  @override
+  String get appleTesterHasSubscription =>
+      'Ai și un abonament App Store activ.';
+
+  @override
+  String get appleSubscriptionStillActive =>
+      'Abonamentul App Store îți oferă în continuare o limită mai mare.';
+
+  @override
+  String get appleInstallationRejected =>
+      'Serverul nu a verificat instalarea. Încearcă din nou sau instalează Sedno din App Store.';
+
+  @override
+  String get appleSubscriptionPriceNotice =>
+      'Prețul abonamentului apare în Cont și în App Store.';
+
+  @override
+  String get privacyIosSupplementTitle =>
+      'Informații suplimentare pentru iPhone';
+
+  @override
+  String get privacyIosSupplementBody =>
+      'Referirile de mai jos la Android, Google Play și Play Integrity se aplică doar pentru Android. Pe iPhone vă puteți autentifica prin Apple și vă puteți ascunde adresa de e-mail. Firebase gestionează și autentificarea. Apple facturează abonamentele cumpărate în App Store; Sedno nu primește datele cardului. Ștergerea contului nu anulează abonamentul.\n\nApp Attest verifică autenticitatea aplicației fără a trimite către Apple texte, rezultate sau fotografii. Serverul păstrează date pseudonime despre instalare și cheia publică. Provocările sunt valabile 5 minute, iar cheile 90 de zile de la ultima verificare reușită a sesiunii. Notificările de cumpărare sunt păstrate 30 de zile. O sarcină a serverului șterge înregistrările expirate. Metadatele cumpărăturilor rămân până la ștergerea contului.\n\nIstoricul este criptat, local, exclus din copiile de siguranță și expiră după 7 zile. Fotografiile și sunetul rămân pe dispozitiv. Dictarea și citirea funcționează doar local, dacă dispozitivul și limba le acceptă. Trimiteți textul recunoscut către OpenAI prin Sedno după acceptarea informării despre IA.\n\nCelelalte informații de mai jos, inclusiv operatorul, scopurile, temeiurile juridice și practicile OpenAI, se aplică și pentru iPhone. Confidențialitate Apple: https://www.apple.com/legal/privacy/';
+
+  @override
+  String get linkApple => 'Asociază un cont Apple';
+
+  @override
+  String get confirmAccountLink =>
+      'Confirmați din nou contul actual. Apoi alegeți un cont Apple pentru a vă autentifica în același cont Sedno.';
+
+  @override
+  String get passwordToLink =>
+      'Introduceți parola contului actual pentru a-l asocia cu Apple.';
+
+  @override
+  String get linkGoogle => 'Conectează contul Google';
+
+  @override
+  String get confirmGoogleAccountLink =>
+      'Confirmă din nou contul actual. Apoi alege un cont Google pentru a te conecta la același cont Sedno.';
+
+  @override
+  String get passwordToLinkGoogle =>
+      'Introdu parola contului actual pentru a conecta Google.';
 }

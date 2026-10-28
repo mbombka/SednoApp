@@ -4,7 +4,8 @@ import 'package:sedno_app/features/account/data/backend_session_gateway.dart';
 import 'package:sedno_app/features/subscription/domain/subscription_repository.dart';
 
 class BackendSubscriptionRepository implements SubscriptionRepository {
-  BackendSubscriptionRepository(this.sessions);
+  BackendSubscriptionRepository(this.sessions, {this.apple = false});
+  final bool apple;
   final BackendSessionGateway sessions;
 
   Future<SubscriptionStatus> _request(String? token) async {
@@ -21,7 +22,9 @@ class BackendSubscriptionRepository implements SubscriptionRepository {
     if (revision != sessions.sessionRevision.value) {
       throw StateError('Sesja uległa zmianie.');
     }
-    final url = sessions.baseUrl.resolve('/v1/subscription');
+    final url = sessions.baseUrl.resolve(
+      apple ? '/v1/subscription/apple' : '/v1/subscription',
+    );
     final headers = {
       'Authorization': 'Bearer $bearer',
       'Content-Type': 'application/json',
@@ -32,7 +35,9 @@ class BackendSubscriptionRepository implements SubscriptionRepository {
                 : sessions.client.post(
                     url,
                     headers: headers,
-                    body: jsonEncode({'purchaseToken': token}),
+                    body: jsonEncode({
+                      apple ? 'transactionId' : 'purchaseToken': token,
+                    }),
                   ))
             .timeout(const Duration(seconds: 30));
     if (revision != sessions.sessionRevision.value) {
@@ -50,6 +55,7 @@ class BackendSubscriptionRepository implements SubscriptionRepository {
       active: data['active'] as bool,
       state: data['state'] as String,
       accountBinding: data['accountBinding'] as String,
+      store: data['store'] as String? ?? (apple ? 'app_store' : 'google_play'),
     );
   }
 

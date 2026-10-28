@@ -13,10 +13,14 @@ class SubscriptionViewModel extends ChangeNotifier {
     required this.store,
     required this.repository,
     required this.productId,
+    this.storeSource = 'google_play',
   });
   final SubscriptionStore store;
   final SubscriptionRepository repository;
   final String productId;
+  final String storeSource;
+  bool get managedElsewhere =>
+      status?.active == true && status?.store != storeSource;
   StreamSubscription<List<StorePurchase>>? _listener;
   Future<void> _queue = Future.value();
   bool _disposed = false;
@@ -82,10 +86,15 @@ class SubscriptionViewModel extends ChangeNotifier {
   });
 
   Future<void> manage() async {
+    if (managedElsewhere) {
+      message = strings.subscriptionOtherStore;
+      _notify();
+      return;
+    }
     try {
       await store.manage();
     } catch (_) {
-      message = strings.playOpenFailed;
+      message = strings.storeOpenFailed;
       _notify();
     }
   }
@@ -104,6 +113,9 @@ class SubscriptionViewModel extends ChangeNotifier {
         case StorePurchaseState.restored:
           await _run(() async {
             status = await repository.verify(item.token);
+            // Never finish a failed verification: StoreKit can redeliver it after
+            // reconnecting or signing back into the purchase owner account.
+            await item.complete?.call();
             message = status!.active
                 ? strings.subscriptionActive
                 : strings.subscriptionInactive;

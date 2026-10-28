@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:sedno_app/l10n/localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -34,12 +36,18 @@ class TesterAccessPanel extends StatelessWidget {
             Text(context.l10n.testerAllowance),
             Text(context.l10n.testerExpiryNotice),
             if (value.tier == QuotaTier.subscription)
-              Text(context.l10n.testerHasSubscription),
+              Text(
+                (Platform.isIOS
+                    ? context.l10n.appleTesterHasSubscription
+                    : context.l10n.testerHasSubscription),
+              ),
           ] else ...[
             Text(context.l10n.testerExpired),
             Text(
               value.tier == QuotaTier.subscription
-                  ? context.l10n.subscriptionStillActive
+                  ? (Platform.isIOS
+                        ? context.l10n.appleSubscriptionStillActive
+                        : context.l10n.subscriptionStillActive)
                   : context.l10n.freeLimitRestored,
             ),
           ],

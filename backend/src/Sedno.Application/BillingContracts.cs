@@ -6,7 +6,7 @@ public record PlaySubscription(string State, DateTimeOffset? ExpiresAt, bool Ack
     public bool Entitled(DateTimeOffset now) => ExpiresAt > now &&
         State is "SUBSCRIPTION_STATE_ACTIVE" or "SUBSCRIPTION_STATE_IN_GRACE_PERIOD" or "SUBSCRIPTION_STATE_CANCELED";
 }
-public record SubscriptionDto(string State, bool Active, DateTimeOffset? ExpiresAt, string AccountBinding);
+public record SubscriptionDto(string State, bool Active, DateTimeOffset? ExpiresAt, string AccountBinding, string Store = "google_play");
 public interface IPlayBillingClient
 {
     Task<PlaySubscription> GetAsync(string token, CancellationToken ct);
