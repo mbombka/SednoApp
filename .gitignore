@@ -34,6 +34,27 @@ migrate_working_dir/
 /mobile/build/
 /coverage/
 
+# Generated iOS files must stay ignored even on branches without mobile/ios/.gitignore.
+# Keep the iOS project, Swift sources, assets and configuration templates tracked.
+/mobile/ios/Flutter/Generated.xcconfig
+/mobile/ios/Flutter/flutter_export_environment.sh
+/mobile/ios/Flutter/ephemeral/
+/mobile/ios/Flutter/App.framework
+/mobile/ios/Flutter/Flutter.framework
+/mobile/ios/Flutter/Flutter.podspec
+/mobile/ios/Flutter/flutter_assets/
+/mobile/ios/Flutter/app.flx
+/mobile/ios/Flutter/app.zip
+/mobile/ios/Runner/GeneratedPluginRegistrant.*
+/mobile/ios/**/Pods/
+/mobile/ios/**/.symlinks/
+/mobile/ios/**/DerivedData/
+/mobile/ios/**/xcuserdata/
+/mobile/ios/Flutter/Sedno.local.xcconfig
+/mobile/ios/Runner/GoogleService-Info.plist
+/mobile/ios/**/*.mobileprovision
+/mobile/ios/**/*.p12
+
 # Symbolication related
 app.*.symbols
 
