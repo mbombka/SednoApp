@@ -50,6 +50,8 @@ To protect the service and track limits, we store pseudonymous installation, ses
 
 Google Play handles payments and subscriptions. Sedno does not receive your card number or bank account details. The Sedno database stores an encrypted purchase token, its hash, its account link, entitlement status and expiry, and verification data. Separate purchase notification identifiers prevent events from being processed twice.
 
+When you buy a pack, Sedno stores a hash of the purchase token, its status, its link to your account and the number of uses left. Deleting your account removes these data and any unused uses. Hashes of refunds with no account link may be kept to prevent duplicate credit.
+
 ## Providers and technical data
 
 OpenAI handles text simplification and correction through its API. For a standard customer agreement in Poland, OpenAI's terms name OpenAI Ireland Ltd as the contracting entity. The provider processes content to deliver the service and data needed for safety under its terms.

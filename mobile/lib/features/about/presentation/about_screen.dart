@@ -57,6 +57,9 @@ class AboutScreen extends StatelessWidget {
           Text(context.l10n.subscriptionPriceNotice),
           // Local clock time first; UTC for users comparing with other sources.
           Text(context.l10n.resetAbout(QuotaReset.localTime())),
+          _Heading(context.l10n.packTitle),
+          Text(context.l10n.packDescription),
+          Text(context.l10n.paidOptionsInAccount),
           _Heading(context.l10n.important),
           Text(context.l10n.aiErrorNotice),
           Text(context.l10n.checkResult),

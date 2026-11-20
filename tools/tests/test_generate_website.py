@@ -5,7 +5,7 @@ from pathlib import Path
 import re
 import sys
 import unittest
-from urllib.parse import unquote, urlsplit
+from urllib.parse import unquote, urljoin, urlsplit
 import xml.etree.ElementTree as ET
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -55,6 +55,14 @@ class WebsiteTests(unittest.TestCase):
             self.assertEqual(len(catalog['frameTitles']), 13)
             self.assertEqual(len(catalog['frameDescriptions']), 13)
 
+    def test_home_explains_the_one_time_pack_in_every_locale(self):
+        for locale in site.LOCALES:
+            _, app, _ = site.load(locale)
+            page = self.pages[site.PUBLIC / site.page_path(locale)]
+            content = ' '.join(page.text)
+            for key in ('packTitle', 'packDescription', 'paidOptionsInAccount'):
+                self.assertIn(app[key], content, locale['slug'])
+
     def test_relative_links_and_anchors_resolve_for_every_page(self):
         for path, page in self.pages.items():
             self.assertEqual(len(page.ids), len(set(page.ids)), path)
@@ -68,6 +76,8 @@ class WebsiteTests(unittest.TestCase):
                         continue
                     target = (path.parent / unquote(url.path)).resolve() if url.path else path
                     self.assertTrue(target.is_relative_to(site.PUBLIC), (path, target))
+                    if url.path.endswith('/'):
+                        target /= 'index.html'
                     self.assertTrue(target.is_file(), (path, target))
                     if url.fragment:
                         target_page = self.pages.get(target) or Page(target.read_text())
@@ -84,11 +94,36 @@ class WebsiteTests(unittest.TestCase):
                 self.assertEqual({a['hreflang'] for a in alternates}, {l['lang'] for l in site.LOCALES} | {'x-default'})
                 links = [attrs for tag, attrs in page.tags if tag == 'a' and 'hreflang' in attrs]
                 for other in site.LOCALES:
-                    expected = site.relative(source, site.page_path(other, kind))
+                    expected = site.page_href(source, other, kind)
                     self.assertTrue(any(a['href'] == expected and a['hreflang'] == other['lang'] for a in links))
                 current = [a for a in links if a.get('aria-current') == 'page']
                 self.assertTrue(current)
                 self.assertTrue(all(a['hreflang'] == locale['lang'] for a in current))
+
+    def test_sitemap_hreflang_and_internal_links_point_to_canonical_urls(self):
+        sitemap = ET.fromstring(self.documents['website/SednoWebsite/public/sitemap.xml'])
+        urls = [node.text for node in sitemap.findall('.//{*}loc')]
+        self.assertEqual(len(urls), 13 * 4)
+        self.assertEqual(len(urls), len(set(urls)))
+        self.assertNotIn('https://sedno.xyz/pl/', urls)
+        self.assertNotIn('https://sedno.xyz/pl/account/', urls)
+
+        robots = (site.PUBLIC / 'robots.txt').read_text()
+        self.assertIn('Sitemap: https://sedno.xyz/sitemap.xml', robots)
+        for url in urls:
+            source = site.PUBLIC / urlsplit(url).path.lstrip('/') / 'index.html'
+            page = self.pages[source]
+            canonicals = [attrs['href'] for tag, attrs in page.tags
+                          if tag == 'link' and attrs.get('rel') == 'canonical']
+            self.assertEqual(canonicals, [url])
+            for tag, attrs in page.tags:
+                href = attrs.get('href', '')
+                if tag == 'link' and attrs.get('rel') == 'alternate':
+                    self.assertIn(href, urls)
+                target = urlsplit(urljoin(url, href))
+                if (tag == 'a' and target.hostname in ('sedno.xyz', 'www.sedno.xyz') and
+                        Path(target.path).suffix in ('', '.html')):
+                    self.assertIn(target._replace(fragment='').geturl(), urls)
 
     def test_diagrams_use_app_labels_and_localized_paper(self):
         for locale in site.LOCALES:

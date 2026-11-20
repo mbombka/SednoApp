@@ -729,9 +729,6 @@ class AppLocalizationsSk extends AppLocalizations {
       'Limit sa nedá overiť. Skontrolujte pripojenie.';
 
   @override
-  String get subscriptionInAccount => 'Predplatné a cenu nájdete v časti Účet.';
-
-  @override
   String get beforeCorrection => 'Pred opravou textu';
 
   @override
@@ -964,4 +961,37 @@ class AppLocalizationsSk extends AppLocalizations {
   @override
   String get speechLanguageUnsupported =>
       'Rozpoznávač v tomto telefóne nepodporuje miestne diktovanie v tomto jazyku. Môžete písať alebo použiť fotoaparát.';
+
+  @override
+  String get packTitle => 'Balík 1 000 použití';
+
+  @override
+  String get packDescription =>
+      'Jednorazový nákup 1 000 použití pre režimy Zjednodušiť a Opraviť. Najprv použiješ balík, po jeho vyčerpaní sa vrátiš k dennému limitu. Balík nemá dátum platnosti a neobnovuje sa automaticky.';
+
+  @override
+  String get buyPack => 'Kúpiť balík';
+
+  @override
+  String get packSignIn => 'Prihlás sa do účtu Sedno a kúp alebo obnov balík.';
+
+  @override
+  String packBalance(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Zostávajúce použitia v balíku: $countString';
+  }
+
+  @override
+  String get packCredited => 'Balík bol pridaný do tvojho účtu.';
+
+  @override
+  String get packReserved =>
+      'Zostávajúce použitia sú rezervované. Skús to znova o chvíľu.';
+
+  @override
+  String get paidOptionsInAccount =>
+      'Balík a predplatné nájdeš v časti Účet. Ceny zobrazuje Google Play.';
 }

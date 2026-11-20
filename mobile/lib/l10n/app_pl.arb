@@ -216,7 +216,6 @@
   "simplificationFailed": "Nie udało się uprościć tekstu. Spróbuj ponownie.",
   "checkConnection": "Sprawdź połączenie",
   "quotaCheckFailed": "Nie można sprawdzić limitu. Sprawdź połączenie.",
-  "subscriptionInAccount": "Subskrypcję i jej cenę znajdziesz w menu Konto.",
   "beforeCorrection": "Zanim poprawisz tekst",
   "beforeSimplification": "Zanim uprościsz tekst",
   "acceptAndSend": "Rozumiem, wyślij",
@@ -412,5 +411,21 @@
     }
   },
   "speechModelDownloading": "Model mowy jest pobierany. Spróbuj później.",
-  "speechLanguageUnsupported": "Silnik mowy w tym telefonie nie obsługuje lokalnego dyktowania w tym języku. Możesz wpisać tekst lub użyć aparatu."
+  "speechLanguageUnsupported": "Silnik mowy w tym telefonie nie obsługuje lokalnego dyktowania w tym języku. Możesz wpisać tekst lub użyć aparatu.",
+  "packTitle": "Pakiet 1000 użyć",
+  "packDescription": "Jednorazowy zakup 1000 użyć w trybach Uprość i Popraw. Najpierw korzystasz z pakietu, a po jego wyczerpaniu wracasz do limitu dziennego. Pakiet nie wygasa ani nie odnawia się automatycznie.",
+  "buyPack": "Kup pakiet",
+  "packSignIn": "Zaloguj się na konto Sedno, aby kupić lub przywrócić pakiet.",
+  "packBalance": "Użycia pozostałe w pakiecie: {count}",
+  "packCredited": "Pakiet został dodany do Twojego konta.",
+  "packReserved": "Pozostałe użycia z pakietu są już zarezerwowane. Spróbuj za chwilę.",
+  "paidOptionsInAccount": "Pakiet i subskrypcję znajdziesz w menu Konto. Ceny pokazuje Google Play.",
+  "@packBalance": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

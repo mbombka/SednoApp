@@ -749,10 +749,6 @@ class AppLocalizationsFr extends AppLocalizations {
       'Impossible de vérifier la limite. Vérifiez la connexion.';
 
   @override
-  String get subscriptionInAccount =>
-      'L’abonnement et son prix se trouvent dans Compte.';
-
-  @override
   String get beforeCorrection => 'Avant de corriger le texte';
 
   @override
@@ -986,4 +982,38 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get speechLanguageUnsupported =>
       'Le moteur vocal de ce téléphone ne propose pas la dictée locale dans cette langue. Vous pouvez saisir le texte ou utiliser l’appareil photo.';
+
+  @override
+  String get packTitle => 'Pack de 1 000 utilisations';
+
+  @override
+  String get packDescription =>
+      'Achat unique de 1 000 utilisations pour Simplifier et Corriger. Le pack est utilisé en premier, puis votre limite quotidienne s’applique. Le pack n’expire pas et ne se renouvelle pas automatiquement.';
+
+  @override
+  String get buyPack => 'Acheter le pack';
+
+  @override
+  String get packSignIn =>
+      'Connectez-vous à votre compte Sedno pour acheter ou restaurer le pack.';
+
+  @override
+  String packBalance(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Utilisations restantes dans le pack : $countString';
+  }
+
+  @override
+  String get packCredited => 'Le pack a été ajouté à votre compte.';
+
+  @override
+  String get packReserved =>
+      'Les utilisations restantes sont réservées. Réessayez dans un instant.';
+
+  @override
+  String get paidOptionsInAccount =>
+      'Retrouvez le pack et l’abonnement dans Compte. Google Play affiche les prix.';
 }

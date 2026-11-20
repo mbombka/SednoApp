@@ -216,7 +216,6 @@
   "simplificationFailed": "Could not simplify the text. Please try again.",
   "checkConnection": "Check your connection",
   "quotaCheckFailed": "Cannot check your allowance. Check your connection.",
-  "subscriptionInAccount": "You can find the subscription and its price in Account.",
   "beforeCorrection": "Before you correct text",
   "beforeSimplification": "Before you simplify text",
   "acceptAndSend": "I understand, send",
@@ -412,5 +411,21 @@
     }
   },
   "speechModelDownloading": "The speech model is downloading. Try again later.",
-  "speechLanguageUnsupported": "The speech engine on this phone does not support on-device dictation in this language. You can type or use the camera."
+  "speechLanguageUnsupported": "The speech engine on this phone does not support on-device dictation in this language. You can type or use the camera.",
+  "packTitle": "1,000-use pack",
+  "packDescription": "A one-time purchase of 1,000 uses for Simplify and Correct. You use the pack first, then return to your daily allowance when it runs out. The pack does not expire or renew automatically.",
+  "buyPack": "Buy pack",
+  "packSignIn": "Sign in to your Sedno account to buy or restore the pack.",
+  "packBalance": "Uses left in the pack: {count}",
+  "packCredited": "The pack has been added to your account.",
+  "packReserved": "The remaining uses are reserved. Try again shortly.",
+  "paidOptionsInAccount": "Find the pack and subscription under Account. Google Play shows the prices.",
+  "@packBalance": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

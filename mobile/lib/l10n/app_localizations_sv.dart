@@ -733,10 +733,6 @@ class AppLocalizationsSv extends AppLocalizations {
       'Det går inte att kontrollera gränsen. Kontrollera anslutningen.';
 
   @override
-  String get subscriptionInAccount =>
-      'Prenumerationen och priset finns under Konto.';
-
-  @override
   String get beforeCorrection => 'Innan du rättar text';
 
   @override
@@ -969,4 +965,38 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get speechLanguageUnsupported =>
       'Talmotorn på den här telefonen erbjuder inte lokal diktering på det här språket. Du kan skriva eller använda kameran.';
+
+  @override
+  String get packTitle => 'Paket med 1 000 användningar';
+
+  @override
+  String get packDescription =>
+      'Ett engångsköp av 1 000 användningar för Förenkla och Rätta. Du använder paketet först och återgår till dagsgränsen när det tar slut. Paketet upphör inte att gälla och förnyas inte automatiskt.';
+
+  @override
+  String get buyPack => 'Köp paket';
+
+  @override
+  String get packSignIn =>
+      'Logga in på ditt Sedno-konto för att köpa eller återställa paketet.';
+
+  @override
+  String packBalance(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Återstående användningar i paketet: $countString';
+  }
+
+  @override
+  String get packCredited => 'Paketet har lagts till på ditt konto.';
+
+  @override
+  String get packReserved =>
+      'De återstående användningarna är reserverade. Försök igen om en stund.';
+
+  @override
+  String get paidOptionsInAccount =>
+      'Du hittar paketet och abonnemanget under Konto. Google Play visar priserna.';
 }

@@ -168,6 +168,37 @@ paths:
         '401': { $ref: '#/components/responses/Problem' }
         '403': { $ref: '#/components/responses/Problem' }
         '503': { $ref: '#/components/responses/Problem' }
+  /v1/purchases/simplifications:
+    post:
+      operationId: verifySimplificationPack
+      description: >-
+        Requires an account bearer. Verifies the Google Play product simplifications_1000
+        and its obfuscated account binding. Each paid unit adds 1,000 uses to the account
+        once per token. The server consumes the purchase after committing the grant.
+        Read the account balance from /v1/quota.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [purchaseToken]
+              properties:
+                purchaseToken: { type: string, minLength: 1, maxLength: 8192 }
+      responses:
+        '200':
+          description: Purchase state. Credited also covers an already delivered purchase.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [state]
+                properties:
+                  state: { type: string, enum: [credited, pending, invalid] }
+        '400': { $ref: '#/components/responses/Problem' }
+        '401': { $ref: '#/components/responses/Problem' }
+        '403': { $ref: '#/components/responses/Problem' }
+        '503': { $ref: '#/components/responses/Problem' }
   /notifications/google-play:
     post:
       operationId: googlePlayNotification
@@ -177,9 +208,9 @@ paths:
         Authenticated Pub/Sub push only. Verifies Google's RS256 OIDC signature,
         issuer, expiry, exact audience and verified service-account email. Data is
         a base64 Google Play RTDN payload for the configured package. Subscription
-        and voided-purchase events trigger a fresh Google lookup; event ordering is
-        not trusted. Message IDs are deduplicated transactionally after processing.
-        Unknown owners and transient failures return non-2xx so Pub/Sub can retry.
+        events are deduplicated by message ID. Pack events use the purchase token's
+        receipt to deduplicate grants and refunds. A full pack refund removes the
+        remaining uses from that purchase. Transient failures allow Pub/Sub retries.
       requestBody:
         required: true
         content:
@@ -315,6 +346,10 @@ components:
         active: { type: boolean }
         expiresAt: { type: string, format: date-time, nullable: true }
         accountBinding: { type: string, minLength: 64, maxLength: 64 }
+        packPurchasesEnabled:
+          type: boolean
+          default: false
+          description: The API can accept and verify purchases of the one-time pack.
     Problem:
       type: object
       required: [status, title, code]
@@ -345,11 +380,23 @@ components:
         remaining excludes active reservations. Subscription and tester limits include free usage.
         Subscription takes precedence over tester access. Tester access expires according to server time;
         grants and expiry never reset usage, so used may exceed the current limit.
+        Pack uses take priority over the daily allowance in both text modes.
+        When all remaining pack uses are reserved, submissions return 429 pack_reserved.
       properties:
         tier: { type: string, enum: [free, subscription, tester] }
         limit: { type: integer, enum: [5, 400] }
         used: { type: integer, minimum: 0 }
         remaining: { type: integer, minimum: 0 }
+        packRemaining:
+          type: integer
+          minimum: 0
+          default: 0
+          description: Purchased uses available for new requests, excluding active reservations.
+        packBalance:
+          type: integer
+          minimum: 0
+          default: 0
+          description: Unspent purchased uses, including active reservations. The balance has no daily reset.
         serverTime: { type: string, format: date-time }
         resetAt: { type: string, format: date-time }
         testerAccessExpiresAt:

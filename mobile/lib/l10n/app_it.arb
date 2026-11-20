@@ -216,7 +216,6 @@
   "simplificationFailed": "Semplificazione non riuscita. Riprova.",
   "checkConnection": "Controlla la connessione",
   "quotaCheckFailed": "Impossibile verificare il limite. Controlla la connessione.",
-  "subscriptionInAccount": "Abbonamento e prezzo sono in Account.",
   "beforeCorrection": "Prima di correggere il testo",
   "beforeSimplification": "Prima di semplificare il testo",
   "acceptAndSend": "Ho capito, invia",
@@ -412,5 +411,21 @@
     }
   },
   "speechModelDownloading": "Download del modello vocale in corso. Riprova più tardi.",
-  "speechLanguageUnsupported": "Il motore vocale di questo telefono non offre la dettatura locale in questa lingua. Puoi scrivere o usare la fotocamera."
+  "speechLanguageUnsupported": "Il motore vocale di questo telefono non offre la dettatura locale in questa lingua. Puoi scrivere o usare la fotocamera.",
+  "packTitle": "Pacchetto da 1.000 utilizzi",
+  "packDescription": "Acquisto una tantum di 1.000 utilizzi per Semplifica e Correggi. Usi prima il pacchetto e, quando finisce, torni al limite giornaliero. Il pacchetto non scade e non si rinnova automaticamente.",
+  "buyPack": "Acquista il pacchetto",
+  "packSignIn": "Accedi al tuo account Sedno per acquistare o ripristinare il pacchetto.",
+  "packBalance": "Utilizzi rimasti nel pacchetto: {count}",
+  "packCredited": "Il pacchetto è stato aggiunto al tuo account.",
+  "packReserved": "Gli utilizzi rimanenti sono riservati. Riprova tra poco.",
+  "paidOptionsInAccount": "Trovi il pacchetto e l’abbonamento in Account. Google Play mostra i prezzi.",
+  "@packBalance": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

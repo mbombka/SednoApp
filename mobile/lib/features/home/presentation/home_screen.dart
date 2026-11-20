@@ -250,6 +250,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         return;
       }
       if (quota != null &&
+          quota.packBalance == 0 &&
           quota.tier == QuotaTier.free &&
           quota.remaining < 2) {
         final proceed = await showDialog<bool>(
@@ -260,7 +261,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             content: Text(
               quota.remaining == 1
                   ? '${_mode == TextMode.correct ? context.l10n.quotaOneUse : context.l10n.quotaOneSimplification}\n${context.l10n.resetWithRemaining(QuotaReset.localTime(resetAt: quota.resetAt), _timeUntilReset(quota))}'
-                  : '${context.l10n.quotaUsedDialog}\n${context.l10n.resetWithRemaining(QuotaReset.localTime(resetAt: quota.resetAt), _timeUntilReset(quota))}\n${context.l10n.subscriptionInAccount}',
+                  : '${context.l10n.quotaUsedDialog}\n${context.l10n.resetWithRemaining(QuotaReset.localTime(resetAt: quota.resetAt), _timeUntilReset(quota))}\n${context.l10n.paidOptionsInAccount}',
               key: const Key('quotaMessage'),
             ),
             actions: [
@@ -321,7 +322,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         await widget.aiNoticeRepository?.accept();
       }
       if (!mounted) return;
-      if (_quotaSource?.quotaListenable.value?.remaining == 0) return;
+      final latestQuota = _quotaSource?.quotaListenable.value;
+      if (latestQuota?.packBalance == 0 && latestQuota?.remaining == 0) return;
       await _inputViewModel.submit();
     } finally {
       _confirmingSubmission = false;
@@ -523,7 +525,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             _inputViewModel.isLoading ||
             _speechViewModel.busy ||
             (_photoViewModel?.isLoading ?? false);
+        final quota = _quotaSource?.quotaListenable.value;
         final messages = <Widget>[
+          if (quota != null && quota.packBalance > 0)
+            _EditorNotice(context.l10n.packBalance(quota.packBalance)),
           if (_cameraUnavailable)
             _EditorNotice(
               context.l10n.cameraUnavailable,

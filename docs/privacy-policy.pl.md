@@ -50,6 +50,8 @@ Do ochrony usługi i rozliczania limitów zapisujemy pseudonimowe dane instalacj
 
 Google Play obsługuje płatność i subskrypcję. Sedno nie otrzymuje numeru karty ani danych konta bankowego. Baza Sedno przechowuje szyfrowany token zakupu, jego skrót, powiązanie z kontem, stan i termin uprawnienia oraz dane weryfikacji. Osobne identyfikatory powiadomień zakupowych zapobiegają powtórnej obsłudze zdarzeń.
 
+Przy zakupie pakietu Sedno zapisuje skrót tokenu zakupu, jego stan, powiązanie z kontem i pozostałą liczbę użyć. Usunięcie konta usuwa te dane i niewykorzystane użycia. Skróty zwrotów bez powiązania z kontem mogą pozostać, aby zapobiec ponownemu naliczeniu.
+
 ## Dostawcy i dane techniczne
 
 OpenAI obsługuje upraszczanie i poprawianie tekstu przez API. Dla standardowej umowy klienta z Polski podmiotem umownym wskazanym w warunkach OpenAI jest OpenAI Ireland Ltd. Dostawca przetwarza treść na potrzeby wykonania usługi oraz dane niezbędne do bezpieczeństwa zgodnie ze swoimi warunkami.

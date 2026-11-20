@@ -75,6 +75,7 @@ builder.Services.AddScoped<SimplificationTimings>();
 builder.Services.AddScoped<IUsageStore, UsageStore>();
 var dataProtection = builder.Services.AddDataProtection().SetApplicationName("Sedno");
 builder.Services.AddScoped<SubscriptionService>();
+builder.Services.AddScoped<PackPurchaseService>();
 builder.Services.AddScoped<IEntitlementResolver>(sp => sp.GetRequiredService<SubscriptionService>());
 builder.Services.AddScoped<MetadataCleanup>();
 builder.Services.AddHttpClient();
@@ -113,18 +114,21 @@ if (billingEnabled)
     var email = builder.Configuration["Billing:PushServiceAccountEmail"];
     if (new[] { billingPackage, billingProduct, serviceIdentity ? "service-identity" : path, audience, email }.Any(string.IsNullOrWhiteSpace))
         throw new InvalidOperationException("Complete Google Play Billing configuration is required.");
-    builder.Services.AddSingleton<IPlayBillingClient>(sp =>
+    builder.Services.AddSingleton(sp =>
     {
         var client = sp.GetRequiredService<IHttpClientFactory>().CreateClient("play-billing");
         return new PlayBillingClient(client, GoogleTokens(sp, client, path, "https://www.googleapis.com/auth/androidpublisher"),
             new(billingPackage, billingProduct));
     });
+    builder.Services.AddSingleton<IPlayBillingClient>(sp => sp.GetRequiredService<PlayBillingClient>());
+    builder.Services.AddSingleton<IPlayPackClient>(sp => sp.GetRequiredService<PlayBillingClient>());
     builder.Services.AddSingleton<INotificationVerifier>(sp => new PubSubTokenVerifier(
         sp.GetRequiredService<IHttpClientFactory>().CreateClient("play-billing"), audience!, email!, sp.GetRequiredService<TimeProvider>()));
 }
 else
 {
     builder.Services.AddSingleton<IPlayBillingClient, DisabledPlayBillingClient>();
+    builder.Services.AddSingleton<IPlayPackClient, DisabledPlayBillingClient>();
     builder.Services.AddScoped<IEntitlementResolver, FreeEntitlementResolver>();
 }
 var firebaseProject = builder.Configuration["Firebase:ProjectId"];
@@ -324,7 +328,7 @@ app.MapGet("/v1/subscription", async (HttpContext context, SubscriptionService s
     var session = (SessionIdentity)context.Items["session"]!;
     if (session.AccountId is null) return Problem(context, 403, "account_required", "Zaloguj się, aby korzystać z subskrypcji.");
     if (!billingEnabled) return Problem(context, 503, "billing_unavailable", "Płatności są niedostępne.");
-    return Results.Ok(await subscriptions.CurrentAsync(session.AccountId.Value, ct));
+    return Results.Ok((await subscriptions.CurrentAsync(session.AccountId.Value, ct)) with { PackPurchasesEnabled = true });
 });
 app.MapPost("/v1/subscription", async (PurchaseInput input, HttpContext context, SubscriptionService subscriptions, CancellationToken ct) =>
 {
@@ -333,10 +337,19 @@ app.MapPost("/v1/subscription", async (PurchaseInput input, HttpContext context,
     if (!billingEnabled) return Problem(context, 503, "billing_unavailable", "Płatności są niedostępne.");
     if (string.IsNullOrWhiteSpace(input.PurchaseToken) || input.PurchaseToken.Length > 8192)
         return Problem(context, 400, "invalid_purchase", "Nieprawidłowy zakup.");
-    return Results.Ok(await subscriptions.VerifyAsync(session.AccountId.Value, input.PurchaseToken, ct));
+    return Results.Ok((await subscriptions.VerifyAsync(session.AccountId.Value, input.PurchaseToken, ct)) with { PackPurchasesEnabled = true });
+});
+app.MapPost("/v1/purchases/simplifications", async (PurchaseInput input, HttpContext context, PackPurchaseService packs, CancellationToken ct) =>
+{
+    var session = (SessionIdentity)context.Items["session"]!;
+    if (session.AccountId is null) return Problem(context, 403, "account_required", "Zaloguj się, aby kupić pakiet.");
+    if (!billingEnabled) return Problem(context, 503, "billing_unavailable", "Płatności są niedostępne.");
+    if (string.IsNullOrWhiteSpace(input.PurchaseToken) || input.PurchaseToken.Length > 8192)
+        return Problem(context, 400, "invalid_purchase", "Nieprawidłowy zakup.");
+    return Results.Ok(await packs.VerifyAsync(session.AccountId.Value, input.PurchaseToken, ct));
 });
 app.MapPost("/notifications/google-play", async (PubSubEnvelope envelope, HttpContext context,
-    SubscriptionService subscriptions, CancellationToken ct) =>
+    SubscriptionService subscriptions, PackPurchaseService packs, CancellationToken ct) =>
 {
     if (!billingEnabled) return Results.StatusCode(503);
     var header = context.Request.Headers.Authorization.ToString();
@@ -352,10 +365,18 @@ app.MapPost("/notifications/google-play", async (PubSubEnvelope envelope, HttpCo
         if (p.GetProperty("packageName").GetString() != billingPackage) return Results.BadRequest();
         if (p.TryGetProperty("testNotification", out _)) return Results.NoContent();
         var revoked = p.TryGetProperty("voidedPurchaseNotification", out var notification);
-        if (!revoked && !p.TryGetProperty("subscriptionNotification", out notification)) return Results.NoContent();
+        var oneTime = revoked
+            ? notification.TryGetProperty("productType", out var type) && type.GetInt32() == 2
+            : p.TryGetProperty("oneTimeProductNotification", out notification);
+        if (!revoked && !oneTime && !p.TryGetProperty("subscriptionNotification", out notification)) return Results.NoContent();
+        if (oneTime && !revoked && notification.GetProperty("sku").GetString() != IPlayPackClient.ProductId)
+            return Results.NoContent();
         var token = notification.GetProperty("purchaseToken").GetString();
         if (string.IsNullOrWhiteSpace(token) || token.Length > 8192) return Results.BadRequest();
-        await subscriptions.NotifyAsync(message.MessageId, token, ct);
+        if (oneTime)
+            await packs.NotifyAsync(token, revoked && notification.GetProperty("refundType").GetInt32() == 1, ct);
+        else
+            await subscriptions.NotifyAsync(message.MessageId, token, ct);
         return Results.NoContent();
     }
     catch (Exception ex) when (ex is JsonException or FormatException or KeyNotFoundException)
@@ -422,6 +443,8 @@ app.MapPost("/v1/simplifications", async (HttpContext context, SimplificationSer
                 new { status = "processing", quota = outcome.Quota }),
             "key_conflict" => Problem(context, 409, "key_conflict", "Identyfikator żądania jest już użyty."),
             "result_unavailable" => Problem(context, 409, "result_unavailable", "Wynik tego żądania nie jest już dostępny. Użyj nowego identyfikatora."),
+            "pack_reserved" =>
+                Problem(context, 429, "pack_reserved", "Pozostałe użycia z pakietu są zarezerwowane.", outcome.Quota),
             "quota_exceeded" => Problem(context, 429, "quota_exceeded", "Wykorzystano dzienny limit.", outcome.Quota),
             "expired" => Problem(context, 409, "reservation_expired", "Czas tego żądania minął. Użyj nowego identyfikatora."),
             "failed" => Problem(context, 409, "request_failed", "Poprzednia próba nie powiodła się. Użyj nowego identyfikatora."),

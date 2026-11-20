@@ -726,9 +726,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get quotaCheckFailed => 'Limit nelze ověřit. Zkontrolujte připojení.';
 
   @override
-  String get subscriptionInAccount => 'Předplatné a cenu najdete v části Účet.';
-
-  @override
   String get beforeCorrection => 'Před opravou textu';
 
   @override
@@ -961,4 +958,37 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get speechLanguageUnsupported =>
       'Rozpoznávač v tomto telefonu nepodporuje místní diktování v tomto jazyce. Můžete psát nebo použít fotoaparát.';
+
+  @override
+  String get packTitle => 'Balíček 1 000 použití';
+
+  @override
+  String get packDescription =>
+      'Jednorázový nákup 1 000 použití pro režimy Zjednodušit a Opravit. Nejprve využiješ balíček a po jeho vyčerpání se vrátíš k dennímu limitu. Balíček nevyprší ani se automaticky neobnovuje.';
+
+  @override
+  String get buyPack => 'Koupit balíček';
+
+  @override
+  String get packSignIn => 'Přihlas se k účtu Sedno a kup nebo obnov balíček.';
+
+  @override
+  String packBalance(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Zbývající použití v balíčku: $countString';
+  }
+
+  @override
+  String get packCredited => 'Balíček byl přidán na tvůj účet.';
+
+  @override
+  String get packReserved =>
+      'Zbývající použití jsou rezervována. Zkus to za chvíli znovu.';
+
+  @override
+  String get paidOptionsInAccount =>
+      'Balíček a předplatné najdeš v části Účet. Ceny zobrazuje Google Play.';
 }

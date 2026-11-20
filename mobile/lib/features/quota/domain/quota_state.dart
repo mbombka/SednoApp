@@ -11,9 +11,13 @@ class QuotaState {
     required this.serverTime,
     required this.resetAt,
     this.testerAccessExpiresAt,
+    this.packRemaining = 0,
+    this.packBalance = 0,
   }) {
     if (limit != (tier == QuotaTier.free ? 5 : 400) ||
         used < 0 ||
+        packRemaining < 0 ||
+        packBalance < packRemaining ||
         remaining < 0 ||
         remaining > (limit - used).clamp(0, limit) ||
         (testerAccessExpiresAt != null && !testerAccessExpiresAt!.isUtc) ||
@@ -37,6 +41,8 @@ class QuotaState {
   final int limit;
   final int used;
   final int remaining;
+  final int packRemaining;
+  final int packBalance;
   final DateTime serverTime;
   final DateTime resetAt;
   final DateTime? testerAccessExpiresAt;
@@ -46,6 +52,8 @@ class QuotaState {
     'limit': limit,
     'used': used,
     'remaining': remaining,
+    'packRemaining': packRemaining,
+    'packBalance': packBalance,
     'serverTime': serverTime.toIso8601String(),
     'resetAt': resetAt.toIso8601String(),
     'testerAccessExpiresAt': testerAccessExpiresAt?.toIso8601String(),
@@ -60,6 +68,12 @@ class QuotaState {
       limit: requiredInt(json, 'limit'),
       used: requiredInt(json, 'used'),
       remaining: requiredInt(json, 'remaining'),
+      packRemaining: json.containsKey('packRemaining')
+          ? requiredInt(json, 'packRemaining')
+          : 0,
+      packBalance: json.containsKey('packBalance')
+          ? requiredInt(json, 'packBalance')
+          : 0,
       serverTime: requiredUtcDate(json, 'serverTime'),
       resetAt: requiredUtcDate(json, 'resetAt'),
       testerAccessExpiresAt: json['testerAccessExpiresAt'] == null

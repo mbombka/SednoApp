@@ -15,37 +15,27 @@ void main() {
       MaterialApp(theme: AppTheme.light, home: const AboutScreen()),
     );
     expect(find.textContaining('osób słabosłyszących'), findsOneWidget);
-    await tester.scrollUntilVisible(find.textContaining('4000 znaków'), 100);
-    expect(find.textContaining('4000 znaków'), findsOneWidget);
-    // Prices depend on the Google Play country; the screen names none.
+    Future<void> show(Finder target) async {
+      await tester.scrollUntilVisible(target, 75);
+      await tester.pumpAndSettle();
+      expect(target, findsOneWidget);
+    }
+
+    await show(find.textContaining('4000 znaków'));
+    // Prices depend on the Google Play country.
     expect(find.textContaining(RegExp(r'\d,\d\d')), findsNothing);
-    await tester.scrollUntilVisible(
-      find.text('Z subskrypcją: 400 tekstów dziennie.'),
-      150,
-    );
-    expect(find.text('Z subskrypcją: 400 tekstów dziennie.'), findsOneWidget);
-    await tester.scrollUntilVisible(
-      find.textContaining('Nowy limit codziennie'),
-      150,
-    );
-    expect(
+    await show(find.text('Z subskrypcją: 400 tekstów dziennie.'));
+    await show(
       find.text(
         'Nowy limit codziennie o ${QuotaReset.localTime()} (00:00 UTC).',
       ),
-      findsOneWidget,
     );
-    await tester.scrollUntilVisible(
-      find.textContaining('AI może popełniać błędy'),
-      150,
-    );
-    expect(find.textContaining('AI może popełniać błędy'), findsOneWidget);
-    await tester.scrollUntilVisible(
-      find.text('Kontakt: ${AppInformation.contact}'),
-      200,
-    );
-    expect(find.text('Kontakt: ${AppInformation.contact}'), findsOneWidget);
-    expect(find.text(AppInformation.website), findsOneWidget);
-    await tester.scrollUntilVisible(find.text('Prywatność i dane'), 200);
+    await show(find.text('Pakiet 1000 użyć'));
+    await show(find.textContaining('Najpierw korzystasz z pakietu'));
+    await show(find.textContaining('AI może popełniać błędy'));
+    await show(find.text('Kontakt: ${AppInformation.contact}'));
+    await show(find.text(AppInformation.website));
+    await show(find.text('Prywatność i dane'));
     await tester.tap(find.text('Prywatność i dane'));
     await tester.pumpAndSettle();
     expect(find.byType(PrivacyScreen), findsOneWidget);

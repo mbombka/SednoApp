@@ -13,6 +13,8 @@ public sealed class VerifiedAccount
     public DateTimeOffset? TesterAccessExpiresAt { get; set; }
     public List<string> InstallationHashes { get; set; } = [];
     public bool Deleting { get; set; }
+    public Dictionary<string, int> PackCredits { get; set; } = [];
+    public Dictionary<string, PackReservation> PackReservations { get; set; } = [];
     public Guid Id { get; set; }
     public string FirebaseUid { get; set; } = "";
     public string Provider { get; set; } = "email";
@@ -43,9 +45,23 @@ public sealed class SimplificationRecord
     public string Fingerprint { get; set; } = "";
     public RequestState State { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
+    public string? PackTokenHash { get; set; }
     public DateOnly ReservationDay { get; set; }
     public DateTimeOffset ReservationExpiresAt { get; set; }
     public DateTimeOffset? FinishedAt { get; set; }
+}
+
+public sealed class PackReservation
+{
+    public string TokenHash { get; set; } = "";
+    public DateTimeOffset ExpiresAt { get; set; }
+}
+
+public sealed class PlayPackPurchase
+{
+    public Guid AccountId { get; set; }
+    public int Quantity { get; set; }
+    public bool Revoked { get; set; }
 }
 
 public sealed class PlayPurchase

@@ -15,6 +15,18 @@ class Store implements SubscriptionStore {
   final events = StreamController<List<StorePurchase>>.broadcast(sync: true);
   String? binding;
   bool restored = false;
+  String? packBinding;
+  List<StorePurchase> unfinishedPacks = [];
+  @override
+  Future<SubscriptionOffer> packOffer() async =>
+      const SubscriptionOffer('€1.23');
+  @override
+  Future<void> buyPack(String accountBinding) async {
+    packBinding = accountBinding;
+  }
+
+  @override
+  Future<List<StorePurchase>> pendingPacks() async => unfinishedPacks;
   Completer<SubscriptionOffer>? delayedOffer;
   @override
   Stream<List<StorePurchase>> get purchases => events.stream;
@@ -45,6 +57,13 @@ class Backend implements SubscriptionRepository {
   bool active = false;
   bool fail = false;
   int verifications = 0;
+  final packTokens = <String>[];
+  @override
+  Future<String> verifyPack(String token) async {
+    packTokens.add(token);
+    return 'credited';
+  }
+
   int reads = 0;
   @override
   Future<SubscriptionStatus> current() async {
@@ -53,6 +72,7 @@ class Backend implements SubscriptionRepository {
       active: active,
       state: active ? 'ACTIVE' : 'none',
       accountBinding: 'server-binding',
+      packPurchasesEnabled: true,
     );
   }
 
@@ -124,6 +144,55 @@ void main() {
     expect(subscription, greaterThan(signIn));
     expect(find.text('Kup subskrypcję', skipOffstage: false), findsOneWidget);
   });
+
+  for (final textScale in [1.0, 2.0]) {
+    testWidgets(
+      'account subscription notices stay above system navigation at text scale $textScale',
+      (tester) async {
+        tester.view.physicalSize = const Size(320, 640);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        const navigationHeight = 48.0;
+        await tester.pumpWidget(
+          MaterialApp(
+            home: MediaQuery(
+              data: MediaQueryData(
+                padding: const EdgeInsets.only(bottom: navigationHeight),
+                textScaler: TextScaler.linear(textScale),
+              ),
+              child: Scaffold(
+                body: AccountScreen(
+                  repository: MockAccountRepository(
+                    history: MockHistoryRepository(clock: DateTime.now),
+                  ),
+                  subscriptionModel: model,
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        await tester.fling(
+          find.byType(SingleChildScrollView),
+          const Offset(0, -3000),
+          3000,
+        );
+        await tester.pumpAndSettle();
+        for (final notice in [
+          'Subskrypcja odnawia się automatycznie co miesiąc.',
+          'Możesz ją anulować w każdej chwili w Google Play.',
+        ]) {
+          await tester.ensureVisible(find.text(notice));
+          await tester.pumpAndSettle();
+          final rect = tester.getRect(find.text(notice));
+          expect(rect.top, greaterThanOrEqualTo(0));
+          expect(rect.bottom, lessThanOrEqualTo(640 - navigationHeight));
+        }
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
 
   testWidgets('reset time comes from the server quota as local time', (
     tester,
@@ -276,13 +345,80 @@ void main() {
       expect(backend.verifications, 2);
     },
   );
+  test(
+    'pack uses account binding and is recovered separately from subscriptions',
+    () async {
+      await model.start();
+      await model.buyPack();
+      expect(store.packBinding, 'server-binding');
+      await event(StorePurchaseState.pending, product: packProductId);
+      expect(backend.packTokens, isEmpty);
+      await event(StorePurchaseState.purchased, product: packProductId);
+      expect(backend.packTokens, ['token']);
+      expect(model.message, 'Pakiet został dodany do Twojego konta.');
+
+      store.unfinishedPacks = [
+        const StorePurchase(
+          packProductId,
+          'recovered',
+          StorePurchaseState.restored,
+        ),
+      ];
+      await model.refresh();
+      expect(backend.packTokens, ['token', 'recovered']);
+      expect(backend.verifications, 0);
+    },
+  );
+
+  testWidgets('the account shows the Play pack price and account balance', (
+    tester,
+  ) async {
+    await model.start();
+    final quota = ValueNotifier<QuotaState?>(
+      QuotaState(
+        tier: QuotaTier.free,
+        limit: 5,
+        used: 5,
+        remaining: 0,
+        serverTime: DateTime.utc(2026, 10, 20, 12),
+        resetAt: DateTime.utc(2026, 10, 21),
+        packRemaining: 990,
+        packBalance: 991,
+      ),
+    );
+    addTearDown(quota.dispose);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SingleChildScrollView(
+            child: SubscriptionPanel(
+              model: model,
+              signedIn: true,
+              quota: quota,
+            ),
+          ),
+        ),
+      ),
+    );
+    expect(find.text('Pakiet 1000 użyć'), findsOneWidget);
+    expect(find.text('€1.23'), findsOneWidget);
+    expect(find.text('Użycia pozostałe w pakiecie: 991'), findsOneWidget);
+    final buy = find.text('Kup pakiet');
+    await tester.ensureVisible(buy);
+    await tester.tap(buy);
+    await tester.pumpAndSettle();
+    expect(store.packBinding, 'server-binding');
+  });
+
   testWidgets('shows localized store price and purchase/restore controls', (
     tester,
   ) async {
     await model.start();
     await tester.pumpWidget(
       MaterialApp(
-        home: Scaffold(body: SubscriptionPanel(model: model)),
+        home: Scaffold(
+          body: SingleChildScrollView(child: SubscriptionPanel(model: model)),
+        ),
       ),
     );
     expect(find.text('12,34 zł miesięcznie'), findsOneWidget);

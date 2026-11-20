@@ -108,6 +108,7 @@ public sealed class AccountDeletionService(FirestoreStore db, IIdentityAccountDe
         }
         await DeleteQueryAsync(db.Sessions.WhereEqualTo("AccountId", accountId.ToString()), ct);
         await DeleteQueryAsync(db.Purchases.WhereEqualTo("AccountId", accountId.ToString()), ct);
+        await DeleteQueryAsync(db.PackPurchases.WhereEqualTo("AccountId", accountId.ToString()), ct);
         // Shared installation ledgers may also contain another account's usage.
         // Remove only the deleted identities, retaining other users' allowances.
         var ids = identities.Select(x => FirestoreStore.Id(x.Id)).ToHashSet();

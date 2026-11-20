@@ -9,6 +9,7 @@ class _Billing extends Fake implements InAppPurchase {
   List<ProductDetails> products = [];
   Set<String>? requestedIds;
   PurchaseParam? purchase;
+  bool? autoConsume;
 
   @override
   Future<bool> isAvailable() async => true;
@@ -19,6 +20,16 @@ class _Billing extends Fake implements InAppPurchase {
   ) async {
     requestedIds = identifiers;
     return ProductDetailsResponse(productDetails: products, notFoundIDs: []);
+  }
+
+  @override
+  Future<bool> buyConsumable({
+    required PurchaseParam purchaseParam,
+    bool autoConsume = true,
+  }) async {
+    purchase = purchaseParam;
+    this.autoConsume = autoConsume;
+    return true;
   }
 
   @override
@@ -94,6 +105,33 @@ void main() {
       expect(purchase.productDetails.id, 'subscription_full');
       expect(purchase.offerToken, 'monthly-base');
       expect(purchase.applicationUserName, 'account-binding');
+    },
+  );
+
+  test(
+    'uses the one-time Play price and leaves consumption to the server',
+    () async {
+      billing.products = GooglePlayProductDetails.fromProductDetails(
+        const ProductDetailsWrapper(
+          description: '1,000 uses',
+          name: 'Sedno',
+          productId: 'simplifications_1000',
+          productType: ProductType.inapp,
+          oneTimePurchaseOfferDetails: OneTimePurchaseOfferDetailsWrapper(
+            formattedPrice: '€1.23',
+            priceAmountMicros: 1230000,
+            priceCurrencyCode: 'EUR',
+          ),
+          title: 'Sedno',
+        ),
+      );
+      expect((await store.packOffer()).price, '€1.23');
+      expect(billing.requestedIds, {'simplifications_1000'});
+      await store.buyPack('account-binding');
+      final purchase = billing.purchase! as GooglePlayPurchaseParam;
+      expect(purchase.productDetails.id, 'simplifications_1000');
+      expect(purchase.applicationUserName, 'account-binding');
+      expect(billing.autoConsume, false);
     },
   );
 

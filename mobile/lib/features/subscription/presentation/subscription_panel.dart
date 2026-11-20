@@ -93,6 +93,39 @@ class SubscriptionPanel extends StatelessWidget {
             Text(context.l10n.subscriptionRenewalNotice),
             Text(context.l10n.subscriptionCancelNotice),
           ],
+          const SizedBox(height: 24),
+          const Divider(),
+          const SizedBox(height: 16),
+          Text(context.l10n.packTitle, style: textTheme.titleLarge),
+          const SizedBox(height: 8),
+          if (model.packOffer case final offer?)
+            Text(
+              offer.price,
+              style: textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          Text(context.l10n.packDescription),
+          if (signedIn)
+            if (quota?.value case final value?)
+              Text(context.l10n.packBalance(value.packBalance)),
+          if (!signedIn) Text(context.l10n.packSignIn),
+          const SizedBox(height: 8),
+          FilledButton(
+            onPressed:
+                signedIn &&
+                    !model.busy &&
+                    model.status?.packPurchasesEnabled == true &&
+                    model.packOffer != null
+                ? model.buyPack
+                : null,
+            child: Text(context.l10n.buyPack),
+          ),
+          if (active && signedIn)
+            OutlinedButton(
+              onPressed: model.busy ? null : model.restore,
+              child: Text(context.l10n.restorePurchases),
+            ),
           if (model.busy) const Center(child: CircularProgressIndicator()),
           if (model.message != null)
             Text(model.message!, semanticsLabel: model.message),

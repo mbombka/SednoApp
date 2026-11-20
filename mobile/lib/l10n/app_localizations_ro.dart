@@ -749,9 +749,6 @@ class AppLocalizationsRo extends AppLocalizations {
       'Limita nu poate fi verificată. Verifică conexiunea.';
 
   @override
-  String get subscriptionInAccount => 'Abonamentul și prețul sunt în Cont.';
-
-  @override
   String get beforeCorrection => 'Înainte de corectarea textului';
 
   @override
@@ -985,4 +982,38 @@ class AppLocalizationsRo extends AppLocalizations {
   @override
   String get speechLanguageUnsupported =>
       'Motorul vocal al acestui telefon nu oferă dictare locală în această limbă. Poți scrie sau folosi camera.';
+
+  @override
+  String get packTitle => 'Pachet cu 1.000 de utilizări';
+
+  @override
+  String get packDescription =>
+      'O singură plată pentru 1.000 de utilizări în modurile Simplifică și Corectează. Folosești mai întâi pachetul, iar când se termină revii la limita zilnică. Pachetul nu expiră și nu se reînnoiește automat.';
+
+  @override
+  String get buyPack => 'Cumpără pachetul';
+
+  @override
+  String get packSignIn =>
+      'Conectează-te la contul Sedno pentru a cumpăra sau restabili pachetul.';
+
+  @override
+  String packBalance(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Utilizări rămase în pachet: $countString';
+  }
+
+  @override
+  String get packCredited => 'Pachetul a fost adăugat în contul tău.';
+
+  @override
+  String get packReserved =>
+      'Utilizările rămase sunt rezervate. Încearcă din nou peste puțin timp.';
+
+  @override
+  String get paidOptionsInAccount =>
+      'Găsești pachetul și abonamentul în Cont. Google Play afișează prețurile.';
 }

@@ -10,6 +10,7 @@ import 'package:sedno_app/features/simplification/domain/simplification_result.d
 class _ServerQuotaRepository
     implements SimplificationRepository, QuotaStateSource {
   final ValueNotifier<QuotaState?> state = ValueNotifier(null);
+  int submissions = 0;
 
   @override
   ValueListenable<QuotaState?> get quotaListenable => state;
@@ -18,15 +19,19 @@ class _ServerQuotaRepository
   Future<QuotaState> current() async => state.value!;
 
   @override
-  Future<SimplificationResponse> simplify(SimplificationRequest request) =>
-      Future.error(StateError('unavailable'));
+  Future<SimplificationResponse> simplify(SimplificationRequest request) async {
+    submissions++;
+    throw StateError('unavailable');
+  }
 }
 
-QuotaState _quota(int used, {int day = 14}) => QuotaState(
+QuotaState _quota(int used, {int day = 14, int pack = 0}) => QuotaState(
   tier: QuotaTier.free,
   limit: 5,
   used: used,
   remaining: 5 - used,
+  packRemaining: pack,
+  packBalance: pack,
   serverTime: DateTime.utc(2026, 10, day, 12),
   resetAt: DateTime.utc(2026, 10, day + 1),
 );
@@ -87,6 +92,16 @@ void main() {
       expect(find.text('Rozumiem, wyślij'), findsNothing);
       await tester.tap(find.text('Zamknij'));
       await tester.pumpAndSettle();
+
+      repository.state.value = _quota(5, pack: 21);
+      await tester.pump();
+      expect(find.text('Użycia pozostałe w pakiecie: 21'), findsOneWidget);
+      await tester.tap(find.text('Uprość'));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('quotaMessage')), findsNothing);
+      await tester.tap(find.text('Rozumiem, wyślij'));
+      await tester.pumpAndSettle();
+      expect(repository.submissions, 1);
 
       repository.state.value = _quota(0, day: 15);
       await tester.pump();

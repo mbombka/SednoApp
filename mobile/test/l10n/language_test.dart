@@ -298,9 +298,17 @@ void main() {
       await tester.pumpWidget(const SizedBox());
     },
   );
-  testWidgets('last language can be selected from the scrolling picker', (
+  testWidgets('last language is fully visible above Android navigation', (
     tester,
   ) async {
+    const screenHeight = 640.0;
+    const navigationHeight = 48.0;
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(320, screenHeight);
+    tester.view.padding = const FakeViewPadding(bottom: navigationHeight);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetPadding);
     final controller = LanguageController(deviceLocales: const [Locale('pl')]);
     addTearDown(controller.dispose);
     await tester.pumpWidget(SednoApp(languageController: controller));
@@ -308,10 +316,17 @@ void main() {
     await tester.tap(find.byTooltip('Menu użytkownika'));
     await tester.pumpAndSettle();
     await tester.ensureVisible(find.text('Język'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Język'));
     await tester.pumpAndSettle();
     final swedish = find.byKey(const ValueKey('language-sv'));
     await tester.scrollUntilVisible(swedish, 250);
+    await tester.drag(find.byType(ListView), const Offset(0, -150));
+    await tester.pumpAndSettle();
+    expect(
+      tester.getRect(swedish).bottom,
+      lessThanOrEqualTo(screenHeight - navigationHeight),
+    );
     await tester.tap(swedish);
     await tester.pumpAndSettle();
     expect(controller.language, AppLanguage.swedish);

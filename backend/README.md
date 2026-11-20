@@ -145,6 +145,24 @@ przerwę; poprawna weryfikacja ją usuwa. Nie odpytujemy nieaktywnych użytkowni
 Usunięcie konta nie anuluje subskrypcji.
 [Aktualna kontrola RTDN i opis zmiany](../docs/subscription-verification-2026-10-21.pl.md).
 
+### Pakiet jednorazowy
+
+Produkt `simplifications_1000` jest obsługiwany na tym samym `sedno-api`
+z tym samym kontem usługi i bazą `(default)`. Używa istniejącej flagi
+`Billing__Enabled`. Google Play potwierdza produkt, płatność i powiązanie
+zakupu z kontem Sedno. `POST /v1/purchases/simplifications` dodaje 1000 użyć
+za każdą opłaconą sztukę w transakcji Firestore, a dopiero potem potwierdza
+realizację zakupu w Google Play przez `consume`. Powtórzenie tokenu umożliwia
+dokończenie realizacji bez ponownego dodawania użyć.
+
+Saldo jest przechowywane na koncie, a skróty tokenów i stan zakupów w
+`play_pack_purchases`. Pakiet obsługuje oba tryby i ma pierwszeństwo przed
+dziennym limitem. Udaną operację rozlicza się z pierwotnie zarezerwowanej puli.
+Porażka i wygaśnięcie rezerwacji zwalniają użycie. Gdy pakiet się skończy,
+obowiązuje limit darmowy, subskrypcyjny lub testerski. Sprawdź
+[schemat API](../contracts/openapi.yaml) i
+[próby pakietu w Google Play](../mobile/docs/google_play_subscription_sandbox.md#pakiet-jednorazowy).
+
 ## Testy i indeksy
 
 ```sh

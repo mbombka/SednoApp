@@ -168,6 +168,7 @@ void main() {
             SimplificationFailure.timeout => strings.requestTimeout,
             SimplificationFailure.unauthorized => strings.sessionExpired,
             SimplificationFailure.rateLimited => strings.quotaExhausted,
+            SimplificationFailure.packReserved => strings.packReserved,
             SimplificationFailure.unavailable => strings.serviceUnavailable,
             SimplificationFailure.rejected =>
               correcting

@@ -44,10 +44,15 @@ Read README, existing code, and current dependencies before making changes.
   purchase testing before public rollout. Use the existing `sedno-api` service,
   its existing service account and `(default)` database for Google Play tests.
   Do not provision a separate billing backend or database.
-- Limits reset at 00:00 UTC according to server time.
+- One-time purchase: Google Play `simplifications_1000`, 1,000 uses, PLN 4.99
+  in Poland. Display the local Play price. The pack belongs to a Sedno account.
+  Reserve purchased uses first in both modes and deduct them only on success.
+  The balance has no expiration or reset. When exhausted, use the account's
+  daily allowance. Verify and fulfill purchases on the existing backend.
+- Daily limits reset at 00:00 UTC according to server time.
 - Free-tier counter: hidden at 2–5 remaining; at 1, show the remaining
   allowance and time until reset; at 0, block submission and show
-  reset information and the subscription offer.
+  reset information and the purchase options.
 - Google/email authentication; billing through Google Play.
 - Account and data deletion; signing out clears local history.
   Account deletion by email is operational, confirmed by the owner on 20.10.2026.

@@ -390,225 +390,228 @@ class _AccountScreenState extends State<AccountScreen>
         _account != null &&
         _account!.provider != IdentityProvider.guest &&
         !pending;
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            context.l10n.account,
-            style: Theme.of(context).textTheme.headlineSmall,
-          ),
-          const SizedBox(height: 16),
-          if (_message case final message?) ...[
-            Semantics(
-              key: _messageKey,
-              liveRegion: true,
-              child: Text(
-                message,
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
-              ),
-            ),
-            if (!pending)
-              TextButton(
-                onPressed: _busy ? null : _load,
-                child: Text(context.l10n.finishDataCleanup),
-              ),
-            const SizedBox(height: 12),
-          ],
-          if (repository == null) Text(context.l10n.accountNotConfigured),
-          if (repository != null && signedIn) ...[
-            Text(_signedInLabel(_account!)),
-            const SizedBox(height: 16),
-            OutlinedButton(
-              onPressed: _busy ? null : _signOut,
-              child: Text(context.l10n.signOut),
-            ),
-            OutlinedButton(
-              onPressed: _busy ? null : _deleteAccount,
-              child: Text(context.l10n.deleteAccount),
-            ),
-          ],
-          if (repository != null && pending) ...[
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
             Text(
-              awaitingSession
-                  ? context.l10n.emailVerified
-                  : context.l10n.checkInbox,
-              style: Theme.of(context).textTheme.titleLarge,
+              context.l10n.account,
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
-            const SizedBox(height: 12),
-            if (_account?.email case final email?)
-              Text(
-                awaitingSession
-                    ? context.l10n.accountEmail(email)
-                    : context.l10n.emailToVerify(email),
-              ),
-            const SizedBox(height: 12),
-            Text(
-              awaitingSession
-                  ? context.l10n.finishAccountLinkNotice
-                  : context.l10n.verifyEmailInstructions,
-            ),
-            const SizedBox(height: 12),
-            Text(context.l10n.guestWhileVerifying),
             const SizedBox(height: 16),
-            FilledButton(
-              onPressed: _busy
-                  ? null
-                  : () => _run(
-                      repository.checkEmailVerification,
-                      checkingVerification: true,
-                    ),
-              child: Text(
-                awaitingSession
-                    ? context.l10n.finishSignIn
-                    : context.l10n.checkVerification,
-              ),
-            ),
-            if (!awaitingSession)
-              OutlinedButton(
-                onPressed: _busy || _resendSeconds > 0
-                    ? null
-                    : _resendVerification,
+            if (_message case final message?) ...[
+              Semantics(
+                key: _messageKey,
+                liveRegion: true,
                 child: Text(
-                  _resendSeconds > 0
-                      ? context.l10n.resendAfter('$_resendSeconds')
-                      : context.l10n.resendEmail,
+                  message,
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ),
               ),
-            TextButton(
-              onPressed: _busy ? null : _signOut,
-              child: Text(context.l10n.signOutUseGuest),
-            ),
-          ],
-          if (repository != null && !signedIn && !pending) ...[
-            Text(switch (_form) {
-              _AccountForm.signIn => context.l10n.signIn,
-              _AccountForm.register => context.l10n.newAccount,
-              _AccountForm.resetPassword => context.l10n.recoverAccess,
-            }, style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: 12),
-            Text(context.l10n.guestSignInNotice),
-            const SizedBox(height: 16),
-            if (_form == _AccountForm.signIn) ...[
+              if (!pending)
+                TextButton(
+                  onPressed: _busy ? null : _load,
+                  child: Text(context.l10n.finishDataCleanup),
+                ),
+              const SizedBox(height: 12),
+            ],
+            if (repository == null) Text(context.l10n.accountNotConfigured),
+            if (repository != null && signedIn) ...[
+              Text(_signedInLabel(_account!)),
+              const SizedBox(height: 16),
+              OutlinedButton(
+                onPressed: _busy ? null : _signOut,
+                child: Text(context.l10n.signOut),
+              ),
+              OutlinedButton(
+                onPressed: _busy ? null : _deleteAccount,
+                child: Text(context.l10n.deleteAccount),
+              ),
+            ],
+            if (repository != null && pending) ...[
+              Text(
+                awaitingSession
+                    ? context.l10n.emailVerified
+                    : context.l10n.checkInbox,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 12),
+              if (_account?.email case final email?)
+                Text(
+                  awaitingSession
+                      ? context.l10n.accountEmail(email)
+                      : context.l10n.emailToVerify(email),
+                ),
+              const SizedBox(height: 12),
+              Text(
+                awaitingSession
+                    ? context.l10n.finishAccountLinkNotice
+                    : context.l10n.verifyEmailInstructions,
+              ),
+              const SizedBox(height: 12),
+              Text(context.l10n.guestWhileVerifying),
+              const SizedBox(height: 16),
               FilledButton(
                 onPressed: _busy
                     ? null
-                    : () => _run(repository.signInWithGoogle),
-                child: Text(context.l10n.signInGoogle),
+                    : () => _run(
+                        repository.checkEmailVerification,
+                        checkingVerification: true,
+                      ),
+                child: Text(
+                  awaitingSession
+                      ? context.l10n.finishSignIn
+                      : context.l10n.checkVerification,
+                ),
               ),
-              const SizedBox(height: 16),
+              if (!awaitingSession)
+                OutlinedButton(
+                  onPressed: _busy || _resendSeconds > 0
+                      ? null
+                      : _resendVerification,
+                  child: Text(
+                    _resendSeconds > 0
+                        ? context.l10n.resendAfter('$_resendSeconds')
+                        : context.l10n.resendEmail,
+                  ),
+                ),
+              TextButton(
+                onPressed: _busy ? null : _signOut,
+                child: Text(context.l10n.signOutUseGuest),
+              ),
             ],
-            Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  TextFormField(
-                    controller: _email,
-                    enabled: !_busy,
-                    keyboardType: TextInputType.emailAddress,
-                    autocorrect: false,
-                    autofillHints: const [AutofillHints.email],
-                    validator: _validateEmail,
-                    decoration: InputDecoration(
-                      labelText: context.l10n.emailAddress,
-                      errorMaxLines: 3,
-                    ),
-                  ),
-                  if (_form != _AccountForm.resetPassword) ...[
-                    const SizedBox(height: 12),
-                    PasswordField(
-                      key: ValueKey('password-$_form'),
-                      controller: _password,
-                      label: context.l10n.password,
+            if (repository != null && !signedIn && !pending) ...[
+              Text(switch (_form) {
+                _AccountForm.signIn => context.l10n.signIn,
+                _AccountForm.register => context.l10n.newAccount,
+                _AccountForm.resetPassword => context.l10n.recoverAccess,
+              }, style: Theme.of(context).textTheme.titleLarge),
+              const SizedBox(height: 12),
+              Text(context.l10n.guestSignInNotice),
+              const SizedBox(height: 16),
+              if (_form == _AccountForm.signIn) ...[
+                FilledButton(
+                  onPressed: _busy
+                      ? null
+                      : () => _run(repository.signInWithGoogle),
+                  child: Text(context.l10n.signInGoogle),
+                ),
+                const SizedBox(height: 16),
+              ],
+              Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    TextFormField(
+                      controller: _email,
                       enabled: !_busy,
-                      newPassword: _form == _AccountForm.register,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return context.l10n.enterPassword;
-                        }
-                        if (_form == _AccountForm.register &&
-                            value.length < 6) {
-                          return context.l10n.passwordMinLength;
-                        }
-                        return null;
-                      },
+                      keyboardType: TextInputType.emailAddress,
+                      autocorrect: false,
+                      autofillHints: const [AutofillHints.email],
+                      validator: _validateEmail,
+                      decoration: InputDecoration(
+                        labelText: context.l10n.emailAddress,
+                        errorMaxLines: 3,
+                      ),
+                    ),
+                    if (_form != _AccountForm.resetPassword) ...[
+                      const SizedBox(height: 12),
+                      PasswordField(
+                        key: ValueKey('password-$_form'),
+                        controller: _password,
+                        label: context.l10n.password,
+                        enabled: !_busy,
+                        newPassword: _form == _AccountForm.register,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return context.l10n.enterPassword;
+                          }
+                          if (_form == _AccountForm.register &&
+                              value.length < 6) {
+                            return context.l10n.passwordMinLength;
+                          }
+                          return null;
+                        },
+                      ),
+                    ],
+                    if (_form == _AccountForm.register) ...[
+                      const SizedBox(height: 12),
+                      PasswordField(
+                        controller: _confirmPassword,
+                        label: context.l10n.repeatPassword,
+                        enabled: !_busy,
+                        newPassword: true,
+                        confirmation: true,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return context.l10n.enterRepeatedPassword;
+                          }
+                          if (value != _password.text) {
+                            return context.l10n.passwordMismatch;
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      Text(context.l10n.verificationEmailNotice),
+                    ],
+                    if (_form == _AccountForm.resetPassword) ...[
+                      const SizedBox(height: 12),
+                      Text(context.l10n.passwordResetInstructions),
+                    ],
+                    const SizedBox(height: 16),
+                    FilledButton(
+                      onPressed: _busy
+                          ? null
+                          : _form == _AccountForm.resetPassword
+                          ? _resetPassword
+                          : _submitEmail,
+                      child: Text(switch (_form) {
+                        _AccountForm.signIn => context.l10n.signInEmail,
+                        _AccountForm.register => context.l10n.createAccount,
+                        _AccountForm.resetPassword =>
+                          context.l10n.sendResetLink,
+                      }),
                     ),
                   ],
-                  if (_form == _AccountForm.register) ...[
-                    const SizedBox(height: 12),
-                    PasswordField(
-                      controller: _confirmPassword,
-                      label: context.l10n.repeatPassword,
-                      enabled: !_busy,
-                      newPassword: true,
-                      confirmation: true,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return context.l10n.enterRepeatedPassword;
-                        }
-                        if (value != _password.text) {
-                          return context.l10n.passwordMismatch;
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 12),
-                    Text(context.l10n.verificationEmailNotice),
-                  ],
-                  if (_form == _AccountForm.resetPassword) ...[
-                    const SizedBox(height: 12),
-                    Text(context.l10n.passwordResetInstructions),
-                  ],
-                  const SizedBox(height: 16),
-                  FilledButton(
-                    onPressed: _busy
-                        ? null
-                        : _form == _AccountForm.resetPassword
-                        ? _resetPassword
-                        : _submitEmail,
-                    child: Text(switch (_form) {
-                      _AccountForm.signIn => context.l10n.signInEmail,
-                      _AccountForm.register => context.l10n.createAccount,
-                      _AccountForm.resetPassword => context.l10n.sendResetLink,
-                    }),
-                  ),
-                ],
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            if (_form == _AccountForm.signIn) ...[
-              TextButton(
-                onPressed: _busy
-                    ? null
-                    : () => _changeForm(_AccountForm.resetPassword),
-                child: Text(context.l10n.forgotPassword),
-              ),
-              TextButton(
-                onPressed: _busy
-                    ? null
-                    : () => _changeForm(_AccountForm.register),
-                child: Text(context.l10n.createAccountLink),
-              ),
-            ] else
-              TextButton(
-                onPressed: _busy
-                    ? null
-                    : () => _changeForm(_AccountForm.signIn),
-                child: Text(context.l10n.backToSignIn),
+              const SizedBox(height: 8),
+              if (_form == _AccountForm.signIn) ...[
+                TextButton(
+                  onPressed: _busy
+                      ? null
+                      : () => _changeForm(_AccountForm.resetPassword),
+                  child: Text(context.l10n.forgotPassword),
+                ),
+                TextButton(
+                  onPressed: _busy
+                      ? null
+                      : () => _changeForm(_AccountForm.register),
+                  child: Text(context.l10n.createAccountLink),
+                ),
+              ] else
+                TextButton(
+                  onPressed: _busy
+                      ? null
+                      : () => _changeForm(_AccountForm.signIn),
+                  child: Text(context.l10n.backToSignIn),
+                ),
+            ],
+            if (_busy) const Center(child: CircularProgressIndicator()),
+            if (signedIn && widget.quota != null)
+              TesterAccessPanel(quota: widget.quota!),
+            if (widget.subscriptionModel case final model?)
+              SubscriptionPanel(
+                model: model,
+                signedIn: signedIn,
+                quota: widget.quota,
               ),
           ],
-          if (_busy) const Center(child: CircularProgressIndicator()),
-          if (signedIn && widget.quota != null)
-            TesterAccessPanel(quota: widget.quota!),
-          if (widget.subscriptionModel case final model?)
-            SubscriptionPanel(
-              model: model,
-              signedIn: signedIn,
-              quota: widget.quota,
-            ),
-        ],
+        ),
       ),
     );
   }

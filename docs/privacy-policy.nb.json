@@ -40,7 +40,8 @@
     {
       "title": "Konto, grenser og betaling",
       "paragraphs": [
-        "Konto er valgfri. Firebase Authentication håndterer Google eller e-post og passord; Sedno lagrer UID, innloggingsmetode og dato, ikke passord. Google kan behandle profil, e-post, IP og forbindelsesdata. Grenser bruker pseudonyme installasjons-, økt- og forespørsels-ID-er, datoer, statuser og HMAC-avtrykk, ikke tekstkopier. De er ikke anonyme; innlogging fornyer ikke gratisgrensen. IP begrenser forespørsler, er ikke et felt i Sedno-databasen, men kan behandles av infrastrukturen. Play Integrity kontrollerer app og enhet uten tekst eller bilder. Google Play håndterer betaling; Sedno får ikke kort- eller bankkonto, lagrer kryptert kjøpstoken, hash, kontotilknytning, status, gyldighet, kontroll og varsel-ID-er mot duplikater."
+        "Konto er valgfri. Firebase Authentication håndterer Google eller e-post og passord; Sedno lagrer UID, innloggingsmetode og dato, ikke passord. Google kan behandle profil, e-post, IP og forbindelsesdata. Grenser bruker pseudonyme installasjons-, økt- og forespørsels-ID-er, datoer, statuser og HMAC-avtrykk, ikke tekstkopier. De er ikke anonyme; innlogging fornyer ikke gratisgrensen. IP begrenser forespørsler, er ikke et felt i Sedno-databasen, men kan behandles av infrastrukturen. Play Integrity kontrollerer app og enhet uten tekst eller bilder. Google Play håndterer betaling; Sedno får ikke kort- eller bankkonto, lagrer kryptert kjøpstoken, hash, kontotilknytning, status, gyldighet, kontroll og varsel-ID-er mot duplikater.",
+        "Når du kjøper en pakke, lagrer Sedno en hash av kjøpstokenet, kjøpsstatusen, tilknytningen til kontoen og antall gjenstående bruk. Når du sletter kontoen, slettes disse dataene og ubrukt saldo. Hasher for refusjoner uten kontotilknytning kan beholdes for å hindre dobbel godskriving."
       ]
     },
     {

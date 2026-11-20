@@ -99,13 +99,19 @@ Próby na urządzeniu: [aparat i OCR](docs/android_camera_ocr_manual_check.md),
 [subskrypcje](docs/google_play_subscription_sandbox.md) i
 [dostępność](../docs/model-acceptance.pl.md#dostępność).
 
-## Konfiguracja subskrypcji
+## Zakupy w Google Play
 
 Produkt Google Play: `subscription_full`, plan bazowy: `monthly`, miesiąc,
 9,99 PLN w Polsce i 400 uproszczeń dziennie łącznie. Identyfikatory są domyślnie
 zapisane w [PlaySubscriptionConfiguration](lib/features/subscription/domain/play_subscription_configuration.dart).
 Cena w interfejsie pochodzi z Google Play. Aplikacja wybiera zwykły miesięczny
 plan z automatycznym odnawianiem, bez promocji.
+
+`simplifications_1000` to jednorazowy pakiet 1000 użyć (4,99 PLN w Polsce).
+W innych krajach aplikacja pokazuje cenę i walutę przekazane przez Google Play.
+Zakup wymaga konta Sedno. Saldo w Start i Konto obejmuje oba tryby i jest
+zużywane przed limitem dziennym. Po wykorzystaniu pakiet można kupić ponownie.
+Do testu pakietu potrzebna jest wersja aplikacji i serwera zawierająca tę funkcję.
 
 Panel zakupów jest domyślnie wyłączony (`PLAY_BILLING_ENABLED=false`). Do prób
 na istniejącym `https://sednoapp-79241-api.web.app` dodaj

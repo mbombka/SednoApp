@@ -34,22 +34,71 @@ class GooglePlayStore implements SubscriptionStore {
   @override
   Stream<List<StorePurchase>> get purchases => _billing.purchaseStream.map(
     (items) => items
-        .where((item) => item.productID == productId)
-        .map(
-          (item) => StorePurchase(
-            item.productID,
-            item.verificationData.serverVerificationData,
-            switch (item.status) {
-              PurchaseStatus.pending => StorePurchaseState.pending,
-              PurchaseStatus.purchased => StorePurchaseState.purchased,
-              PurchaseStatus.restored => StorePurchaseState.restored,
-              PurchaseStatus.canceled => StorePurchaseState.canceled,
-              PurchaseStatus.error => StorePurchaseState.error,
-            },
-          ),
+        .where(
+          (item) =>
+              item.productID == productId || item.productID == packProductId,
         )
+        .map(_purchase)
         .toList(),
   );
+
+  StorePurchase _purchase(PurchaseDetails item) => StorePurchase(
+    item.productID,
+    item.verificationData.serverVerificationData,
+    switch (item.status) {
+      PurchaseStatus.pending => StorePurchaseState.pending,
+      PurchaseStatus.purchased => StorePurchaseState.purchased,
+      PurchaseStatus.restored => StorePurchaseState.restored,
+      PurchaseStatus.canceled => StorePurchaseState.canceled,
+      PurchaseStatus.error => StorePurchaseState.error,
+    },
+  );
+
+  @override
+  Future<List<StorePurchase>> pendingPacks() async {
+    final response = await _billing
+        .getPlatformAddition<InAppPurchaseAndroidPlatformAddition>()
+        .queryPastPurchases();
+    return response.pastPurchases
+        .where((item) => item.productID == packProductId)
+        .map(_purchase)
+        .toList();
+  }
+
+  @override
+  Future<SubscriptionOffer> packOffer() async =>
+      SubscriptionOffer((await _loadPack()).price);
+
+  Future<GooglePlayProductDetails> _loadPack() async {
+    if (!await _billing.isAvailable()) {
+      throw StateError('Sklep jest niedostępny.');
+    }
+    final response = await _billing.queryProductDetails({packProductId});
+    if (response.error != null) {
+      throw StateError('Brak oferty pakietu.');
+    }
+    return response.productDetails
+        .whereType<GooglePlayProductDetails>()
+        .singleWhere(
+          (product) =>
+              product.id == packProductId &&
+              product.productDetails.productType == ProductType.inapp,
+        );
+  }
+
+  @override
+  Future<void> buyPack(String accountBinding) async {
+    final product = await _loadPack();
+    if (!await _billing.buyConsumable(
+      purchaseParam: GooglePlayPurchaseParam(
+        productDetails: product,
+        applicationUserName: accountBinding,
+      ),
+      autoConsume: false,
+    )) {
+      throw StateError('Nie udało się rozpocząć zakupu.');
+    }
+  }
 
   @override
   Future<SubscriptionOffer> offer() async {

@@ -216,7 +216,6 @@
   "simplificationFailed": "Não foi possível simplificar o texto. Tenta novamente.",
   "checkConnection": "Verifica a ligação",
   "quotaCheckFailed": "Não é possível verificar o limite. Verifica a ligação.",
-  "subscriptionInAccount": "A subscrição e o preço estão em Conta.",
   "beforeCorrection": "Antes de corrigir o texto",
   "beforeSimplification": "Antes de simplificar o texto",
   "acceptAndSend": "Compreendi, enviar",
@@ -412,5 +411,21 @@
     }
   },
   "speechModelDownloading": "O modelo de voz está a ser transferido. Tenta mais tarde.",
-  "speechLanguageUnsupported": "O motor de voz deste telemóvel não oferece ditado local neste idioma. Podes escrever ou usar a câmara."
+  "speechLanguageUnsupported": "O motor de voz deste telemóvel não oferece ditado local neste idioma. Podes escrever ou usar a câmara.",
+  "packTitle": "Pacote de 1000 utilizações",
+  "packDescription": "Compra única de 1000 utilizações para Simplificar e Corrigir. Usas primeiro o pacote e, quando se esgotar, voltas ao teu limite diário. O pacote não expira nem se renova automaticamente.",
+  "buyPack": "Comprar pacote",
+  "packSignIn": "Inicia sessão na tua conta Sedno para comprar ou restaurar o pacote.",
+  "packBalance": "Utilizações restantes no pacote: {count}",
+  "packCredited": "O pacote foi adicionado à tua conta.",
+  "packReserved": "As utilizações restantes estão reservadas. Tenta novamente dentro de instantes.",
+  "paidOptionsInAccount": "Encontras o pacote e a subscrição em Conta. O Google Play mostra os preços.",
+  "@packBalance": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

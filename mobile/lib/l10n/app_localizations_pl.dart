@@ -744,10 +744,6 @@ class AppLocalizationsPl extends AppLocalizations {
       'Nie można sprawdzić limitu. Sprawdź połączenie.';
 
   @override
-  String get subscriptionInAccount =>
-      'Subskrypcję i jej cenę znajdziesz w menu Konto.';
-
-  @override
   String get beforeCorrection => 'Zanim poprawisz tekst';
 
   @override
@@ -981,4 +977,38 @@ class AppLocalizationsPl extends AppLocalizations {
   @override
   String get speechLanguageUnsupported =>
       'Silnik mowy w tym telefonie nie obsługuje lokalnego dyktowania w tym języku. Możesz wpisać tekst lub użyć aparatu.';
+
+  @override
+  String get packTitle => 'Pakiet 1000 użyć';
+
+  @override
+  String get packDescription =>
+      'Jednorazowy zakup 1000 użyć w trybach Uprość i Popraw. Najpierw korzystasz z pakietu, a po jego wyczerpaniu wracasz do limitu dziennego. Pakiet nie wygasa ani nie odnawia się automatycznie.';
+
+  @override
+  String get buyPack => 'Kup pakiet';
+
+  @override
+  String get packSignIn =>
+      'Zaloguj się na konto Sedno, aby kupić lub przywrócić pakiet.';
+
+  @override
+  String packBalance(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Użycia pozostałe w pakiecie: $countString';
+  }
+
+  @override
+  String get packCredited => 'Pakiet został dodany do Twojego konta.';
+
+  @override
+  String get packReserved =>
+      'Pozostałe użycia z pakietu są już zarezerwowane. Spróbuj za chwilę.';
+
+  @override
+  String get paidOptionsInAccount =>
+      'Pakiet i subskrypcję znajdziesz w menu Konto. Ceny pokazuje Google Play.';
 }

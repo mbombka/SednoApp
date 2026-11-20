@@ -740,10 +740,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Cannot check your allowance. Check your connection.';
 
   @override
-  String get subscriptionInAccount =>
-      'You can find the subscription and its price in Account.';
-
-  @override
   String get beforeCorrection => 'Before you correct text';
 
   @override
@@ -977,6 +973,40 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get speechLanguageUnsupported =>
       'The speech engine on this phone does not support on-device dictation in this language. You can type or use the camera.';
+
+  @override
+  String get packTitle => '1,000-use pack';
+
+  @override
+  String get packDescription =>
+      'A one-off purchase of 1,000 uses for Simplify and Correct. You use the pack first, then return to your daily allowance when it runs out. The pack does not expire or renew automatically.';
+
+  @override
+  String get buyPack => 'Buy pack';
+
+  @override
+  String get packSignIn =>
+      'Sign in to your Sedno account to buy or restore the pack.';
+
+  @override
+  String packBalance(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Uses left in the pack: $countString';
+  }
+
+  @override
+  String get packCredited => 'The pack has been added to your account.';
+
+  @override
+  String get packReserved =>
+      'The remaining uses are reserved. Try again shortly.';
+
+  @override
+  String get paidOptionsInAccount =>
+      'Find the pack and subscription under Account. Google Play shows the prices.';
 }
 
 /// The translations for English, as used in the United States (`en_US`).
@@ -1714,10 +1744,6 @@ class AppLocalizationsEnUs extends AppLocalizationsEn {
       'Cannot check your allowance. Check your connection.';
 
   @override
-  String get subscriptionInAccount =>
-      'You can find the subscription and its price in Account.';
-
-  @override
   String get beforeCorrection => 'Before you correct text';
 
   @override
@@ -1951,4 +1977,38 @@ class AppLocalizationsEnUs extends AppLocalizationsEn {
   @override
   String get speechLanguageUnsupported =>
       'The speech engine on this phone does not support on-device dictation in this language. You can type or use the camera.';
+
+  @override
+  String get packTitle => '1,000-use pack';
+
+  @override
+  String get packDescription =>
+      'A one-time purchase of 1,000 uses for Simplify and Correct. You use the pack first, then return to your daily allowance when it runs out. The pack does not expire or renew automatically.';
+
+  @override
+  String get buyPack => 'Buy pack';
+
+  @override
+  String get packSignIn =>
+      'Sign in to your Sedno account to buy or restore the pack.';
+
+  @override
+  String packBalance(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Uses left in the pack: $countString';
+  }
+
+  @override
+  String get packCredited => 'The pack has been added to your account.';
+
+  @override
+  String get packReserved =>
+      'The remaining uses are reserved. Try again shortly.';
+
+  @override
+  String get paidOptionsInAccount =>
+      'Find the pack and subscription under Account. Google Play shows the prices.';
 }

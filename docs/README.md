@@ -18,7 +18,7 @@ Na początek przeczytaj [opis projektu](../README.md) i [listę prac przed publi
 | Sprawdzenie jakości AI | [Odbiór uproszczeń](model-acceptance.pl.md) |
 | Pomiar czasu i kosztów AI | [Narzędzie pomiarowe](../backend/tools/Sedno.ModelBenchmark/README.md) |
 | Aparat i odczyt tekstu ze zdjęcia | [Test na telefonie](../mobile/docs/android_camera_ocr_manual_check.md) |
-| Zakupy testowe | [Testy subskrypcji](../mobile/docs/google_play_subscription_sandbox.md) |
+| Zakupy testowe | [Testy subskrypcji i pakietu jednorazowego](../mobile/docs/google_play_subscription_sandbox.md) |
 | Wdrożone płatności i ustawienia Play Console | [Płatności na istniejącym API](billing-deployment-2026-10-20.pl.md) |
 | Zamknięte stare adresy API i sesje | [Kontrola dostępu backendu](backend-access-2026-10-20.pl.md) |
 | Lokalny limiter, proxy Hosting i RTDN | [Limity ruchu API](traffic-limiting-2026-10-21.pl.md) |

@@ -45,12 +45,12 @@ wymagają odbioru przez osoby znające dany język i potrzeby odbiorców.
 
 ## Adresy
 
-Polski pozostaje domyślny pod `/`. Dostępny jest również przez `/pl/`.
+Polski pozostaje domyślny pod `/`. Adres `/pl/` przekierowuje na `/`.
 Pozostałe wersje mają katalogi: `/en/` (UK), `/en-us/`, `/fr/`, `/de/`, `/it/`,
 `/es/`, `/pt/` (Portugalia), `/sk/`, `/cs/`, `/ro/`, `/nb/` (Bokmål), `/sv/`.
 Mapowanie na tagi językowe znajduje się w `locales.json`; nie jest mapowaniem kodów API.
 
-Każdy katalog zawiera:
+Poniżej podano układ plików wersji językowych.
 
 ```text
 index.html                 — strona główna z lokalnymi instrukcjami
@@ -60,14 +60,17 @@ account/index.html         — obrazkowa instrukcja zakładania konta
 ```
 
 Przełącznik języka używa `details` i zwykłych linków. Działa bez JavaScriptu,
-z klawiaturą i po otwarciu lokalnych plików. Zachowuje rodzaj strony: polityka
+z klawiaturą w podglądzie HTTP i na hostingu. Zachowuje rodzaj strony: polityka
 prowadzi do polityki, a usuwanie konta do usuwania konta. Instrukcja konta zachowuje ten sam poradnik po zmianie języka. Strona nie wymusza
 przekierowania na podstawie języka przeglądarki. Nie używa ciasteczek ani pamięci
 lokalnej. Nazwy języków są podane w ich własnym języku.
 
-Stare adresy `/prywatnosc/`, `/usun-konto/` i kotwice strony głównej pozostają
-aktywne. Polskie aliasy i `/pl/` mają adresy kanoniczne, a wszystkie wersje mają
-odnośniki `hreflang`. `sitemap.xml` zawiera kanoniczne adresy 13 wersji i dokumentów.
+Adresy `/pl/`, `/pl/account/`, `/prywatnosc/` i `/usun-konto/` mają stałe
+przekierowania 301. Polskie strony kanoniczne to `/`, `/konto/`,
+`/pl/privacy/` i `/pl/delete-account/`. Adresy z `index.html`, HTTP i `www`
+również przekierowują do formy kanonicznej w HTTPS. Linki na stronie i odnośniki
+`hreflang` używają adresów kanonicznych, które są w `sitemap.xml`.
+`robots.txt` wskazuje mapę witryny.
 
 Pełne polityki pochodzą z tych samych JSON-ów co treść aplikacji. Wariant USA
 korzysta z istniejącego angielskiego dokumentu, tak jak aplikacja. Wzmianki
@@ -78,16 +81,14 @@ Dokumenty backendu mają prostszy układ HTML, lecz wspólne źródło treści.
 
 ## Podgląd
 
-Otwórz `public/index.html` lub np. `public/de/index.html` w przeglądarce.
-Linki i zasoby są względne, więc działają też bez serwera.
-Opcjonalnie:
+Lokalny serwer obsługuje linki prowadzące do katalogów.
 
 ```sh
 python3 -m http.server 8000 --directory website/SednoWebsite/public
 ```
 
-Otwórz `http://localhost:8000/`. Sprawdź przełącznik języka, linki do dokumentów,
-układ na telefonie, fokus klawiatury i powiększenie tekstu.
+Otwórz `http://localhost:8000/` lub np. `http://localhost:8000/de/`.
+Serwer Pythona obsługuje podgląd stron. Reguły z `.htaccess` wykonuje Apache.
 
 ## Publikacja na OVH przez SFTP
 
@@ -97,14 +98,23 @@ kolejnego poziomu na hostingu. Nie przesyłaj szablonów, tłumaczeń źródłow
 README, narzędzi ani `.git`. Nie jest potrzebne budowanie strony na hostingu.
 Nie przygotowujemy dodatkowych paczek.
 
-Przed zastąpieniem plików zachowaj kopię dotychczasowej strony. Sprawdź HTTPS,
-przekierowanie z HTTP, plik startowy i przykładowe adresy:
+Przed zastąpieniem plików zachowaj kopię dotychczasowej strony. Uwzględnij ukryty
+plik `public/.htaccess` oraz `public/robots.txt`. Jeśli na OVH istnieje już
+`.htaccess`, dołącz reguły Sedno do istniejących ustawień i umieść je przed
+ogólnymi przekierowaniami. Po przesłaniu sprawdź kody odpowiedzi dla poniższych adresów.
 
 - `https://sedno.xyz/`
 - `https://sedno.xyz/en/` oraz `https://sedno.xyz/en-us/`
 - `https://sedno.xyz/de/privacy/`
 - `https://sedno.xyz/fr/delete-account/`
-- stare adresy `https://sedno.xyz/prywatnosc/` i `https://sedno.xyz/usun-konto/`.
+- HTTP, `www`, `/pl/`, `/pl/account/`, `/prywatnosc/`, `/usun-konto/` i adresy
+  z `index.html` powinny zwrócić 301 do odpowiedniego adresu kanonicznego.
+- `https://sedno.xyz/robots.txt` i `https://sedno.xyz/sitemap.xml` powinny zwrócić 200.
+
+Po weryfikacji adresów prześlij `sitemap.xml` w Search Console. W Inspekcji URL
+sprawdź adres kanoniczny na pozycjach oznaczonych „Duplicate, Google chose different
+canonical than user”. Raport może pokazywać stan sprzed publikacji, dopóki Google
+ponownie nie odwiedzi strony.
 
 Link do usunięcia konta otwiera program pocztowy z adresem `contact@sedno.xyz`
 i przetłumaczonym tematem. Samo kliknięcie nie wysyła wiadomości ani nie usuwa konta.

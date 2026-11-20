@@ -7,7 +7,7 @@ Sedno to aplikacja na Androida, która upraszcza i poprawia teksty w obsługiwan
 tekst, wkleić go, odczytać ze zdjęcia lub podyktować (Android 13+ z lokalnym
 modelem wybranego języka). Zdjęcia i dźwięk pozostają na telefonie.
 Wynik przygotowuje AI, dlatego trzeba go sprawdzić. Przełącznik nad przyciskiem
-wybiera „Uprość” lub „Popraw”. Oba tryby korzystają ze wspólnego limitu dziennego.
+wybiera „Uprość” lub „Popraw”. Oba tryby korzystają ze wspólnej puli użyć.
 Wynik zastępuje tekst w edytorze; jego nagłówek i systemowy Wstecz przywracają
 oryginał. Gumka, zmiana trybu i rozpoczęcie nagrywania lub zdjęcia czyszczą pole.
 [Lista zadań i opis nowego trybu](docs/popraw-zadania.md).
@@ -49,6 +49,9 @@ Starą instancję Cloud SQL i wszystkie cztery kopie zapasowe usunięto 19.10.20
 - Przygotowana subskrypcja: 9,99 zł miesięcznie, 400 uproszczeń dziennie łącznie.
   Produkt Google Play `subscription_full`, plan `monthly` są skonfigurowane.
   Serwer jest skonfigurowany; pozostają ustawienia Play Console i testy zakupów.
+- Pakiet: jednorazowy zakup 1000 użyć za 4,99 zł w Polsce. Cenę dla danego rynku
+  pokazuje Google Play. Produkt `simplifications_1000` wymaga konta Sedno.
+  Najpierw zużywa się pakiet, potem obowiązuje limit dzienny danego konta.
 - Historia: szyfrowana, tylko na telefonie, do 7 dni; wylogowanie ją usuwa.
 - Tekst trafia przez serwer do OpenAI. Serwer Sedno nie zapisuje tekstu ani wyniku.
 

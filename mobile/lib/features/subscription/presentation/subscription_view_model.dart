@@ -18,18 +18,17 @@ class SubscriptionViewModel extends ChangeNotifier {
   final SubscriptionRepository repository;
   final String productId;
   StreamSubscription<List<StorePurchase>>? _listener;
-  Future<void> _queue = Future.value();
+  Future<void>? _queue;
   bool _disposed = false;
   bool busy = false;
   SubscriptionOffer? offer;
+  SubscriptionOffer? packOffer;
   SubscriptionStatus? status;
   String? message;
 
   Future<void> start() async {
     _listener ??= store.purchases.listen(
-      (items) {
-        _queue = _queue.then((_) => _purchases(items));
-      },
+      (items) => unawaited(_enqueue(items)),
       onError: (Object _) {
         message = strings.paymentReadFailed;
         _notify();
@@ -50,14 +49,38 @@ class SubscriptionViewModel extends ChangeNotifier {
           offer = null;
         }
       }();
+      final packOfferTask = () async {
+        try {
+          packOffer = await store.packOffer();
+        } catch (_) {
+          packOffer = null;
+        }
+      }();
       try {
         status = await repository.current();
         _notify();
       } finally {
-        await offerTask;
+        await Future.wait([offerTask, packOfferTask]);
       }
     });
+    if (!_disposed && status?.packPurchasesEnabled == true) {
+      try {
+        await _enqueue(await store.pendingPacks());
+      } catch (_) {
+        // Play may be unavailable. The next refresh or RTDN can retry delivery.
+      }
+    }
   }
+
+  Future<void> buyPack() => _run(() async {
+    final current = await repository.current();
+    status = current;
+    if (current.accountBinding.isEmpty) {
+      throw StateError(strings.signInBeforePurchase);
+    }
+    if (!current.packPurchasesEnabled) throw StateError(strings.purchaseFailed);
+    await store.buyPack(current.accountBinding);
+  }, errorMessage: () => strings.purchaseFailed);
 
   Future<void> buy() => _run(() async {
     final current = await repository.current();
@@ -90,8 +113,23 @@ class SubscriptionViewModel extends ChangeNotifier {
     }
   }
 
+  Future<void> _enqueue(List<StorePurchase> items) async {
+    if (_disposed || items.isEmpty) return;
+    final processing = (_queue ?? Future<void>.value()).then(
+      (_) => _purchases(items),
+    );
+    _queue = processing;
+    try {
+      await processing;
+    } finally {
+      if (identical(_queue, processing)) _queue = null;
+    }
+  }
+
   Future<void> _purchases(List<StorePurchase> items) async {
-    for (final item in items.where((item) => item.productId == productId)) {
+    for (final item in items.where(
+      (item) => item.productId == productId || item.productId == packProductId,
+    )) {
       if (_disposed) return;
       switch (item.state) {
         case StorePurchaseState.pending:
@@ -102,18 +140,32 @@ class SubscriptionViewModel extends ChangeNotifier {
           message = strings.purchaseFailed;
         case StorePurchaseState.purchased:
         case StorePurchaseState.restored:
-          await _run(() async {
-            status = await repository.verify(item.token);
-            message = status!.active
-                ? strings.subscriptionActive
-                : strings.subscriptionInactive;
-          });
+          if (item.productId == packProductId) {
+            await _run(() async {
+              final state = await repository.verifyPack(item.token);
+              message = switch (state) {
+                'credited' => strings.packCredited,
+                'pending' => strings.paymentPending,
+                _ => strings.purchaseFailed,
+              };
+            }, errorMessage: () => strings.purchaseFailed);
+          } else {
+            await _run(() async {
+              status = await repository.verify(item.token);
+              message = status!.active
+                  ? strings.subscriptionActive
+                  : strings.subscriptionInactive;
+            });
+          }
       }
       _notify();
     }
   }
 
-  Future<void> _run(Future<void> Function() action) async {
+  Future<void> _run(
+    Future<void> Function() action, {
+    String Function()? errorMessage,
+  }) async {
     if (_disposed) return;
     busy = true;
     message = null;
@@ -121,8 +173,8 @@ class SubscriptionViewModel extends ChangeNotifier {
     try {
       await action();
     } catch (_) {
-      status = null;
-      message = strings.subscriptionVerifyFailed;
+      if (errorMessage == null) status = null;
+      message = errorMessage?.call() ?? strings.subscriptionVerifyFailed;
     } finally {
       busy = false;
       _notify();

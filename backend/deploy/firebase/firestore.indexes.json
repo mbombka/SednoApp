@@ -16,6 +16,8 @@
     {"collectionGroup": "simplification_requests", "fieldPath": "Fingerprint", "indexes": []},
     {"collectionGroup": "play_purchases", "fieldPath": "ProtectedToken", "indexes": []},
     {"collectionGroup": "verified_accounts", "fieldPath": "InstallationHashes", "indexes": []},
+    {"collectionGroup": "verified_accounts", "fieldPath": "PackCredits", "indexes": []},
+    {"collectionGroup": "verified_accounts", "fieldPath": "PackReservations", "indexes": []},
     {"collectionGroup": "verified_accounts", "fieldPath": "FirebaseUid", "indexes": []}
   ]
 }

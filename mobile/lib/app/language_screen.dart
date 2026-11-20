@@ -30,26 +30,30 @@ class _LanguageScreenState extends State<LanguageScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(title: Text(context.l10n.language)),
-    body: ListenableBuilder(
-      listenable: widget.controller,
-      builder: (context, _) => ListView(
-        padding: const EdgeInsets.all(20),
-        children: [
-          Text(context.l10n.languageNotice),
-          const SizedBox(height: 16),
-          for (final choice in <AppLanguage?>[null, ...AppLanguage.values])
-            ListTile(
-              key: ValueKey('language-${choice?.code ?? 'system'}'),
-              minVerticalPadding: 16,
-              title: Text(choice?.nativeName ?? context.l10n.systemLanguage),
-              selected: widget.controller.selected == choice,
-              trailing: widget.controller.selected == choice
-                  ? const Icon(Icons.check)
-                  : null,
-              onTap: _saving ? null : () => _select(choice),
-            ),
-          if (_error != null) Semantics(liveRegion: true, child: Text(_error!)),
-        ],
+    body: SafeArea(
+      top: false,
+      child: ListenableBuilder(
+        listenable: widget.controller,
+        builder: (context, _) => ListView(
+          padding: const EdgeInsets.all(20),
+          children: [
+            Text(context.l10n.languageNotice),
+            const SizedBox(height: 16),
+            for (final choice in <AppLanguage?>[null, ...AppLanguage.values])
+              ListTile(
+                key: ValueKey('language-${choice?.code ?? 'system'}'),
+                minVerticalPadding: 16,
+                title: Text(choice?.nativeName ?? context.l10n.systemLanguage),
+                selected: widget.controller.selected == choice,
+                trailing: widget.controller.selected == choice
+                    ? const Icon(Icons.check)
+                    : null,
+                onTap: _saving ? null : () => _select(choice),
+              ),
+            if (_error != null)
+              Semantics(liveRegion: true, child: Text(_error!)),
+          ],
+        ),
       ),
     ),
   );

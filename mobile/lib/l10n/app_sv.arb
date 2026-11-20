@@ -216,7 +216,6 @@
   "simplificationFailed": "Det gick inte att förenkla texten. Försök igen.",
   "checkConnection": "Kontrollera anslutningen",
   "quotaCheckFailed": "Det går inte att kontrollera gränsen. Kontrollera anslutningen.",
-  "subscriptionInAccount": "Prenumerationen och priset finns under Konto.",
   "beforeCorrection": "Innan du rättar text",
   "beforeSimplification": "Innan du förenklar text",
   "acceptAndSend": "Jag förstår, skicka",
@@ -412,5 +411,21 @@
     }
   },
   "speechModelDownloading": "Talmodellen laddas ned. Försök igen senare.",
-  "speechLanguageUnsupported": "Talmotorn på den här telefonen erbjuder inte lokal diktering på det här språket. Du kan skriva eller använda kameran."
+  "speechLanguageUnsupported": "Talmotorn på den här telefonen erbjuder inte lokal diktering på det här språket. Du kan skriva eller använda kameran.",
+  "packTitle": "Paket med 1 000 användningar",
+  "packDescription": "Ett engångsköp av 1 000 användningar för Förenkla och Rätta. Du använder paketet först och återgår till dagsgränsen när det tar slut. Paketet upphör inte att gälla och förnyas inte automatiskt.",
+  "buyPack": "Köp paket",
+  "packSignIn": "Logga in på ditt Sedno-konto för att köpa eller återställa paketet.",
+  "packBalance": "Återstående användningar i paketet: {count}",
+  "packCredited": "Paketet har lagts till på ditt konto.",
+  "packReserved": "De återstående användningarna är reserverade. Försök igen om en stund.",
+  "paidOptionsInAccount": "Du hittar paketet och abonnemanget under Konto. Google Play visar priserna.",
+  "@packBalance": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

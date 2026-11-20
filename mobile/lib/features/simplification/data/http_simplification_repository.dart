@@ -15,6 +15,7 @@ enum SimplificationFailure {
   timeout,
   unauthorized,
   rateLimited,
+  packReserved,
   unavailable,
   rejected,
 }
@@ -237,6 +238,15 @@ class HttpSimplificationRepository
       );
     }
     if (response.statusCode == 429) {
+      try {
+        if (_object(response.body)['code'] == 'pack_reserved') {
+          return const SimplificationApiException(
+            SimplificationFailure.packReserved,
+          );
+        }
+      } on FormatException {
+        // Proxies may return an unstructured rate-limit response.
+      }
       return const SimplificationApiException(
         SimplificationFailure.rateLimited,
       );

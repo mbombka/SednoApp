@@ -1415,12 +1415,6 @@ abstract class AppLocalizations {
   /// **'Nie można sprawdzić limitu. Sprawdź połączenie.'**
   String get quotaCheckFailed;
 
-  /// No description provided for @subscriptionInAccount.
-  ///
-  /// In pl, this message translates to:
-  /// **'Subskrypcję i jej cenę znajdziesz w menu Konto.'**
-  String get subscriptionInAccount;
-
   /// No description provided for @beforeCorrection.
   ///
   /// In pl, this message translates to:
@@ -1810,6 +1804,54 @@ abstract class AppLocalizations {
   /// In pl, this message translates to:
   /// **'Silnik mowy w tym telefonie nie obsługuje lokalnego dyktowania w tym języku. Możesz wpisać tekst lub użyć aparatu.'**
   String get speechLanguageUnsupported;
+
+  /// No description provided for @packTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Pakiet 1000 użyć'**
+  String get packTitle;
+
+  /// No description provided for @packDescription.
+  ///
+  /// In pl, this message translates to:
+  /// **'Jednorazowy zakup 1000 użyć w trybach Uprość i Popraw. Najpierw korzystasz z pakietu, a po jego wyczerpaniu wracasz do limitu dziennego. Pakiet nie wygasa ani nie odnawia się automatycznie.'**
+  String get packDescription;
+
+  /// No description provided for @buyPack.
+  ///
+  /// In pl, this message translates to:
+  /// **'Kup pakiet'**
+  String get buyPack;
+
+  /// No description provided for @packSignIn.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zaloguj się na konto Sedno, aby kupić lub przywrócić pakiet.'**
+  String get packSignIn;
+
+  /// No description provided for @packBalance.
+  ///
+  /// In pl, this message translates to:
+  /// **'Użycia pozostałe w pakiecie: {count}'**
+  String packBalance(int count);
+
+  /// No description provided for @packCredited.
+  ///
+  /// In pl, this message translates to:
+  /// **'Pakiet został dodany do Twojego konta.'**
+  String get packCredited;
+
+  /// No description provided for @packReserved.
+  ///
+  /// In pl, this message translates to:
+  /// **'Pozostałe użycia z pakietu są już zarezerwowane. Spróbuj za chwilę.'**
+  String get packReserved;
+
+  /// No description provided for @paidOptionsInAccount.
+  ///
+  /// In pl, this message translates to:
+  /// **'Pakiet i subskrypcję znajdziesz w menu Konto. Ceny pokazuje Google Play.'**
+  String get paidOptionsInAccount;
 }
 
 class _AppLocalizationsDelegate

@@ -216,7 +216,6 @@
   "simplificationFailed": "Kunne ikke forenkle teksten. Prøv igjen.",
   "checkConnection": "Sjekk tilkoblingen",
   "quotaCheckFailed": "Kan ikke sjekke grensen. Sjekk tilkoblingen.",
-  "subscriptionInAccount": "Abonnementet og prisen finner du under Konto.",
   "beforeCorrection": "Før du retter tekst",
   "beforeSimplification": "Før du forenkler tekst",
   "acceptAndSend": "Jeg forstår, send",
@@ -412,5 +411,21 @@
     }
   },
   "speechModelDownloading": "Talemodellen lastes ned. Prøv igjen senere.",
-  "speechLanguageUnsupported": "Talemotoren på denne telefonen tilbyr ikke lokal diktering på dette språket. Du kan skrive eller bruke kameraet."
+  "speechLanguageUnsupported": "Talemotoren på denne telefonen tilbyr ikke lokal diktering på dette språket. Du kan skrive eller bruke kameraet.",
+  "packTitle": "Pakke med 1 000 bruk",
+  "packDescription": "Et engangskjøp av 1 000 bruk i Forenkle og Rett. Du bruker pakken først og går tilbake til dagsgrensen når den er brukt opp. Pakken utløper ikke og fornyes ikke automatisk.",
+  "buyPack": "Kjøp pakke",
+  "packSignIn": "Logg inn på Sedno-kontoen din for å kjøpe eller gjenopprette pakken.",
+  "packBalance": "Gjenstående bruk i pakken: {count}",
+  "packCredited": "Pakken er lagt til på kontoen din.",
+  "packReserved": "De gjenstående brukene er reservert. Prøv igjen om litt.",
+  "paidOptionsInAccount": "Du finner pakken og abonnementet under Konto. Google Play viser prisene.",
+  "@packBalance": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

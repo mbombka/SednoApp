@@ -738,9 +738,6 @@ class AppLocalizationsIt extends AppLocalizations {
       'Impossibile verificare il limite. Controlla la connessione.';
 
   @override
-  String get subscriptionInAccount => 'Abbonamento e prezzo sono in Account.';
-
-  @override
   String get beforeCorrection => 'Prima di correggere il testo';
 
   @override
@@ -972,4 +969,38 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get speechLanguageUnsupported =>
       'Il motore vocale di questo telefono non offre la dettatura locale in questa lingua. Puoi scrivere o usare la fotocamera.';
+
+  @override
+  String get packTitle => 'Pacchetto da 1.000 utilizzi';
+
+  @override
+  String get packDescription =>
+      'Acquisto una tantum di 1.000 utilizzi per Semplifica e Correggi. Usi prima il pacchetto e, quando finisce, torni al limite giornaliero. Il pacchetto non scade e non si rinnova automaticamente.';
+
+  @override
+  String get buyPack => 'Acquista il pacchetto';
+
+  @override
+  String get packSignIn =>
+      'Accedi al tuo account Sedno per acquistare o ripristinare il pacchetto.';
+
+  @override
+  String packBalance(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Utilizzi rimasti nel pacchetto: $countString';
+  }
+
+  @override
+  String get packCredited => 'Il pacchetto è stato aggiunto al tuo account.';
+
+  @override
+  String get packReserved =>
+      'Gli utilizzi rimanenti sono riservati. Riprova tra poco.';
+
+  @override
+  String get paidOptionsInAccount =>
+      'Trovi il pacchetto e l’abbonamento in Account. Google Play mostra i prezzi.';
 }

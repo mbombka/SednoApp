@@ -216,7 +216,6 @@
   "simplificationFailed": "No se ha podido simplificar el texto. Inténtalo de nuevo.",
   "checkConnection": "Comprueba la conexión",
   "quotaCheckFailed": "No se puede comprobar el límite. Comprueba la conexión.",
-  "subscriptionInAccount": "La suscripción y su precio están en Cuenta.",
   "beforeCorrection": "Antes de corregir el texto",
   "beforeSimplification": "Antes de simplificar el texto",
   "acceptAndSend": "Entendido, enviar",
@@ -412,5 +411,21 @@
     }
   },
   "speechModelDownloading": "Se está descargando el modelo de voz. Inténtalo más tarde.",
-  "speechLanguageUnsupported": "El motor de voz de este teléfono no ofrece dictado local en este idioma. Puedes escribir o usar la cámara."
+  "speechLanguageUnsupported": "El motor de voz de este teléfono no ofrece dictado local en este idioma. Puedes escribir o usar la cámara.",
+  "packTitle": "Paquete de 1000 usos",
+  "packDescription": "Compra única de 1000 usos para Simplificar y Corregir. Primero usas el paquete y, al agotarlo, vuelves a tu límite diario. El paquete no caduca ni se renueva automáticamente.",
+  "buyPack": "Comprar paquete",
+  "packSignIn": "Inicia sesión en tu cuenta de Sedno para comprar o restaurar el paquete.",
+  "packBalance": "Usos que quedan en el paquete: {count}",
+  "packCredited": "El paquete se ha añadido a tu cuenta.",
+  "packReserved": "Los usos restantes están reservados. Inténtalo de nuevo en un momento.",
+  "paidOptionsInAccount": "Encontrarás el paquete y la suscripción en Cuenta. Google Play muestra los precios.",
+  "@packBalance": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

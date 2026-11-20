@@ -2,7 +2,8 @@ using Sedno.Domain;
 
 namespace Sedno.Application;
 
-public record QuotaDto(string Tier, int Limit, int Used, int Remaining, DateTimeOffset ServerTime, DateTimeOffset ResetAt, DateTimeOffset? TesterAccessExpiresAt = null);
+public record QuotaDto(string Tier, int Limit, int Used, int Remaining, DateTimeOffset ServerTime, DateTimeOffset ResetAt, DateTimeOffset? TesterAccessExpiresAt = null,
+    int PackRemaining = 0, int PackBalance = 0);
 public record GuestSessionDto(string AccessToken, AccountDto Account, QuotaDto Quota);
 public record AccountDto(string Id, string Provider);
 public record AuthenticatedSessionDto(string AccessToken, AccountDto Account, QuotaDto Quota);

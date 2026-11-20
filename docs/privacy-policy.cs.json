@@ -40,7 +40,8 @@
     {
       "title": "Účet, limity a platby",
       "paragraphs": [
-        "Účet je volitelný. Firebase Authentication spravuje Google nebo e-mail a heslo; Sedno eviduje UID, způsob přihlášení a datum, nikoli hesla. Google může zpracovávat profil, e-mail, IP a spojení. Limity chrání pseudonymní ID instalace, relace a požadavku, data, stavy a HMAC otisk, nikoli kopie textu. Nejsou anonymní; přihlášení neobnovuje bezplatný limit. IP omezuje požadavky, není polem databáze Sedno, může ji však zpracovávat infrastruktura. Play Integrity ověřuje aplikaci a zařízení bez textu či fotografie. Google Play spravuje platby; Sedno nedostává kartu ani bankovní účet, eviduje šifrovaný nákupní token, hash, propojení účtu, stav, platnost, ověření a ID oznámení proti duplicitám."
+        "Účet je volitelný. Firebase Authentication spravuje Google nebo e-mail a heslo; Sedno eviduje UID, způsob přihlášení a datum, nikoli hesla. Google může zpracovávat profil, e-mail, IP a spojení. Limity chrání pseudonymní ID instalace, relace a požadavku, data, stavy a HMAC otisk, nikoli kopie textu. Nejsou anonymní; přihlášení neobnovuje bezplatný limit. IP omezuje požadavky, není polem databáze Sedno, může ji však zpracovávat infrastruktura. Play Integrity ověřuje aplikaci a zařízení bez textu či fotografie. Google Play spravuje platby; Sedno nedostává kartu ani bankovní účet, eviduje šifrovaný nákupní token, hash, propojení účtu, stav, platnost, ověření a ID oznámení proti duplicitám.",
+        "Při nákupu balíčku Sedno ukládá otisk nákupního tokenu, jeho stav, vazbu na účet a počet zbývajících použití. Smazáním účtu se odstraní tyto údaje i nevyužitá použití. Otisky vrácených plateb bez vazby na účet mohou zůstat uložené, aby se zabránilo dvojímu připsání."
       ]
     },
     {

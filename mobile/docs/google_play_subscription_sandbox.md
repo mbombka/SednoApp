@@ -1,4 +1,4 @@
-# Testy subskrypcji Google Play
+# Testy zakupów Google Play
 
 Obsługę płatności włączono 20.10.2026 na istniejącym serwerze `sedno-api`
 pod adresem `https://sednoapp-79241-api.web.app`, z dotychczasowym kontem
@@ -82,3 +82,27 @@ Niepotwierdzony zakup wymaga szybkiego ponowienia weryfikacji.
 
 Zapisz wersję aplikacji i serwera, czas UTC, scenariusz oraz wynik, bez tokenów,
 danych logowania, tekstów i zdjęć. Po próbach anuluj odnawianie i usuń dane testowe.
+
+
+## Pakiet jednorazowy
+
+Produkt w Google Play: `simplifications_1000`, 1000 użyć, 4,99 PLN w Polsce.
+Użyj zwykłej opcji kupna oznaczonej jako zgodna wstecznie. To z niej Flutter
+pobiera cenę i uruchamia zakup. Włącz w Play Console RTDN dla zakupów
+jednorazowych na tym samym temacie Pub/Sub. Do prób
+potrzebna jest wersja aplikacji i istniejącego `sedno-api` zawierająca obsługę
+pakietu. Wcześniejsze podpisane pakiety testują dotychczasową subskrypcję.
+
+| Próba | Oczekiwany wynik |
+| --- | --- |
+| Cena w Polsce i na innym rynku | W Konto i oknie zakupu widać tę samą lokalną cenę i walutę |
+| Opłacony zakup | Konto dostaje 1000 użyć, Google Play pozwala kupić kolejny pakiet |
+| Płatność oczekująca lub anulowana | Saldo pozostaje bez zmian |
+| Zerwany internet, ponowienie, RTDN i wznowienie | Każdy zakup zwiększa saldo tylko raz |
+| To samo konto Sedno na drugim telefonie | Wyświetla się wspólne saldo, również po reinstalacji |
+| Uprość i Popraw | Każdy sukces zużywa jedno użycie z pakietu, również po wyczerpaniu darmowego limitu |
+| Błąd, anulowanie lub wygaśnięcie rezerwacji | Zarezerwowane użycie znów jest dostępne |
+| Północ UTC | Resetuje się limit dzienny. Saldo pakietu zachowuje pozostałe użycia |
+| Koniec pakietu | Wraca dzienny limit konta bez zerowania wcześniejszych operacji |
+| Zwrot | Pozostałe użycia z danego zakupu zostają usunięte |
+| Aktywna subskrypcja i pakiet | Najpierw zużywa się pakiet, następnie dostępny limit subskrypcji |

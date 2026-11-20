@@ -216,7 +216,6 @@
   "simplificationFailed": "Text se nepodařilo zjednodušit. Zkuste to znovu.",
   "checkConnection": "Zkontrolujte připojení",
   "quotaCheckFailed": "Limit nelze ověřit. Zkontrolujte připojení.",
-  "subscriptionInAccount": "Předplatné a cenu najdete v části Účet.",
   "beforeCorrection": "Před opravou textu",
   "beforeSimplification": "Před zjednodušením textu",
   "acceptAndSend": "Rozumím, odeslat",
@@ -412,5 +411,21 @@
     }
   },
   "speechModelDownloading": "Model řeči se stahuje. Zkuste to později.",
-  "speechLanguageUnsupported": "Rozpoznávač v tomto telefonu nepodporuje místní diktování v tomto jazyce. Můžete psát nebo použít fotoaparát."
+  "speechLanguageUnsupported": "Rozpoznávač v tomto telefonu nepodporuje místní diktování v tomto jazyce. Můžete psát nebo použít fotoaparát.",
+  "packTitle": "Balíček 1 000 použití",
+  "packDescription": "Jednorázový nákup 1 000 použití pro režimy Zjednodušit a Opravit. Nejprve využiješ balíček a po jeho vyčerpání se vrátíš k dennímu limitu. Balíček nevyprší ani se automaticky neobnovuje.",
+  "buyPack": "Koupit balíček",
+  "packSignIn": "Přihlas se k účtu Sedno a kup nebo obnov balíček.",
+  "packBalance": "Zbývající použití v balíčku: {count}",
+  "packCredited": "Balíček byl přidán na tvůj účet.",
+  "packReserved": "Zbývající použití jsou rezervována. Zkus to za chvíli znovu.",
+  "paidOptionsInAccount": "Balíček a předplatné najdeš v části Účet. Ceny zobrazuje Google Play.",
+  "@packBalance": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

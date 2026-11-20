@@ -753,9 +753,6 @@ class AppLocalizationsPt extends AppLocalizations {
       'Não é possível verificar o limite. Verifica a ligação.';
 
   @override
-  String get subscriptionInAccount => 'A subscrição e o preço estão em Conta.';
-
-  @override
   String get beforeCorrection => 'Antes de corrigir o texto';
 
   @override
@@ -989,4 +986,38 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get speechLanguageUnsupported =>
       'O motor de voz deste telemóvel não oferece ditado local neste idioma. Podes escrever ou usar a câmara.';
+
+  @override
+  String get packTitle => 'Pacote de 1000 utilizações';
+
+  @override
+  String get packDescription =>
+      'Compra única de 1000 utilizações para Simplificar e Corrigir. Usas primeiro o pacote e, quando se esgotar, voltas ao teu limite diário. O pacote não expira nem se renova automaticamente.';
+
+  @override
+  String get buyPack => 'Comprar pacote';
+
+  @override
+  String get packSignIn =>
+      'Inicia sessão na tua conta Sedno para comprar ou restaurar o pacote.';
+
+  @override
+  String packBalance(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Utilizações restantes no pacote: $countString';
+  }
+
+  @override
+  String get packCredited => 'O pacote foi adicionado à tua conta.';
+
+  @override
+  String get packReserved =>
+      'As utilizações restantes estão reservadas. Tenta novamente dentro de instantes.';
+
+  @override
+  String get paidOptionsInAccount =>
+      'Encontras o pacote e a subscrição em Conta. O Google Play mostra os preços.';
 }

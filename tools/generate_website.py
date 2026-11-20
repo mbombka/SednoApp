@@ -50,12 +50,19 @@ def relative(source, target):
     return os.path.relpath(target, start=source.parent).replace(os.sep, '/')
 
 
+def canonical_page_path(locale, kind='home'):
+    if locale['slug'] == 'pl' and kind in ('home', 'account'):
+        return Path('index.html' if kind == 'home' else 'konto/index.html')
+    return page_path(locale, kind)
+
+
+def page_href(source, locale, kind='home'):
+    return relative(source, canonical_page_path(locale, kind).parent) + '/'
+
+
 def public_url(locale, kind='home'):
-    if locale['slug'] == 'pl' and kind == 'account':
-        return 'https://sedno.xyz/konto/'
-    if locale['slug'] == 'pl' and kind == 'home':
-        return 'https://sedno.xyz/'
-    return 'https://sedno.xyz/' + page_path(locale, kind).parent.as_posix() + '/'
+    directory = canonical_page_path(locale, kind).parent
+    return 'https://sedno.xyz/' + (directory.as_posix() + '/' if directory.parts else '')
 
 
 def head_links(locale, kind):
@@ -68,7 +75,7 @@ def head_links(locale, kind):
 
 def language_links(locale, source, kind):
     return '\n'.join(
-        f'<a lang="{item["lang"]}" hreflang="{item["lang"]}" href="{relative(source, page_path(item, kind))}"'
+        f'<a lang="{item["lang"]}" hreflang="{item["lang"]}" href="{page_href(source, item, kind)}"'
         + (' aria-current="page"' if item['slug'] == locale['slug'] else '')
         + f'>{ESC(item["name"])}</a>' for item in LOCALES
     )
@@ -76,12 +83,12 @@ def language_links(locale, source, kind):
 
 def header(locale, source, kind, c, app):
     assets = relative(source, Path('styles.css')).removesuffix('styles.css')
-    home = relative(source, page_path(locale))
+    home = page_href(source, locale)
     how = '#jak-to-dziala' if kind == 'home' else home + '#jak-to-dziala'
-    privacy = '#prywatnosc' if kind == 'home' else relative(source, page_path(locale, 'privacy'))
+    privacy = '#prywatnosc' if kind == 'home' else page_href(source, locale, 'privacy')
     return f'''<header class="header wrap">
       <a class="brand" href="{home}" aria-label="{ESC(c['homeLabel'])}"><img class="brand-mark" src="{assets}favicon.svg?v=3" width="36" height="36" alt="" aria-hidden="true">sedno<span class="brand-dot" aria-hidden="true">.</span></a>
-      <nav class="main-nav" aria-label="{ESC(c['navLabel'])}"><a href="{how}">{ESC(app['howItWorks'])}</a><a href="{privacy}">{ESC(c['privacyLabel'])}</a><a href="{relative(source, page_path(locale, 'account'))}">{ESC(c['accountGuideTitle'])}</a></nav>
+      <nav class="main-nav" aria-label="{ESC(c['navLabel'])}"><a href="{how}">{ESC(app['howItWorks'])}</a><a href="{privacy}">{ESC(c['privacyLabel'])}</a><a href="{page_href(source, locale, 'account')}">{ESC(c['accountGuideTitle'])}</a></nav>
       <details class="language-menu">
         <summary><span>{ESC(app['language'])}</span> <span lang="{locale['lang']}">{ESC(locale['name'])}</span></summary>
         <nav class="language-options" aria-label="{ESC(app['language'])}">{language_links(locale, source, kind)}</nav>
@@ -90,9 +97,9 @@ def header(locale, source, kind, c, app):
 
 
 def footer(locale, source, c, app):
-    home = relative(source, page_path(locale))
-    privacy = relative(source, page_path(locale, 'privacy'))
-    deletion = relative(source, page_path(locale, 'deletion'))
+    home = page_href(source, locale)
+    privacy = page_href(source, locale, 'privacy')
+    deletion = page_href(source, locale, 'deletion')
     return f'''<footer class="footer wrap">
       <a class="brand footer-brand" href="{home}" aria-label="{ESC(c['homeLabel'])}">sedno.</a>
       <nav class="footer-links" aria-label="{ESC(c['documentsLabel'])}"><a href="{privacy}">{ESC(c['privacyLabel'])}</a><a href="{deletion}">{ESC(c['deletionLabel'])}</a></nav>
@@ -177,13 +184,14 @@ def instructions(locale, source, c, app):
 def home_page(locale, source):
     c, app, _ = load(locale)
     values = {k: ESC(v) for k, v in c.items() if isinstance(v, str)}
-    values.update({k: ESC(app[k]) for k in ('originalText', 'simplifiedText', 'localMediaNotice', 'language')})
+    values.update({k: ESC(app[k]) for k in ('originalText', 'simplifiedText', 'localMediaNotice', 'language',
+                                                     'packTitle', 'packDescription', 'paidOptionsInAccount')})
     values.update({
         'lang': locale['lang'], 'assets': relative(source, Path('styles.css')).removesuffix('styles.css'),
         'heroTitle0': ESC(c['heroTitle'][0]), 'heroTitle1': ESC(c['heroTitle'][1]),
         'header': header(locale, source, 'home', c, app), 'footer': footer(locale, source, c, app),
         'head_links': head_links(locale, 'home'), 'language_links': language_links(locale, source, 'home'),
-        'privacy_url': relative(source, page_path(locale, 'privacy')),
+        'privacy_url': page_href(source, locale, 'privacy'),
         'overview_steps': ''.join(f'<li><span class="step-number" aria-hidden="true">0{i+1}</span><h3>{ESC(title)}</h3><p>{ESC(desc)}</p></li>' for i, (title, desc) in enumerate(zip(c['stepTitles'], c['stepDescriptions']))),
         'instructions': instructions(locale, source, c, app),
         'help_items': ''.join(f'<li>{ESC(item)}</li>' for item in (app['restoreInstructions'], c['copyHelp'], c['clearHelp'], c['submissionHelp'])),
@@ -256,7 +264,11 @@ def linked_text(value):
     for match in re.finditer(r'https?://[^\s<>]+|contact@sedno\.xyz', value):
         url = match.group().rstrip('.,;')
         parts.append(ESC(value[start:match.start()]))
-        href = 'mailto:' + url if '@' in url and not url.startswith('http') else url
+        href = 'mailto:' + url if url == 'contact@sedno.xyz' else url
+        href = {
+            'https://sedno.xyz/prywatnosc': public_url(LOCALES[0], 'privacy'),
+            'https://sedno.xyz/usun-konto': public_url(LOCALES[0], 'deletion'),
+        }.get(href.rstrip('/'), href)
         parts.append(f'<a href="{ESC(href)}">{ESC(url)}</a>')
         start = match.start() + len(url)
     parts.append(ESC(value[start:]))

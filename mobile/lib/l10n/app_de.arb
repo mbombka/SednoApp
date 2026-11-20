@@ -216,7 +216,6 @@
   "simplificationFailed": "Textvereinfachung fehlgeschlagen. Versuche es erneut.",
   "checkConnection": "Verbindung prüfen",
   "quotaCheckFailed": "Limit konnte nicht geprüft werden. Prüfe die Verbindung.",
-  "subscriptionInAccount": "Abo und Preis findest du unter Konto.",
   "beforeCorrection": "Bevor du Text korrigierst",
   "beforeSimplification": "Bevor du Text vereinfachst",
   "acceptAndSend": "Verstanden, senden",
@@ -412,5 +411,21 @@
     }
   },
   "speechModelDownloading": "Das Sprachmodell wird heruntergeladen. Versuche es später erneut.",
-  "speechLanguageUnsupported": "Die Sprachsoftware dieses Telefons bietet diese Sprache nicht für lokale Diktate an. Du kannst Text eingeben oder die Kamera nutzen."
+  "speechLanguageUnsupported": "Die Sprachsoftware dieses Telefons bietet diese Sprache nicht für lokale Diktate an. Du kannst Text eingeben oder die Kamera nutzen.",
+  "packTitle": "Paket mit 1.000 Nutzungen",
+  "packDescription": "Einmaliger Kauf von 1.000 Nutzungen für Vereinfachen und Korrigieren. Du nutzt zuerst das Paket und danach wieder dein Tageskontingent. Das Paket läuft nicht ab und verlängert sich nicht automatisch.",
+  "buyPack": "Paket kaufen",
+  "packSignIn": "Melde dich bei Sedno an, um das Paket zu kaufen oder wiederherzustellen.",
+  "packBalance": "Verbleibende Nutzungen im Paket: {count}",
+  "packCredited": "Das Paket wurde deinem Konto hinzugefügt.",
+  "packReserved": "Die verbleibenden Nutzungen sind reserviert. Versuche es gleich noch einmal.",
+  "paidOptionsInAccount": "Paket und Abo findest du unter Konto. Google Play zeigt die Preise an.",
+  "@packBalance": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

@@ -722,10 +722,6 @@ class AppLocalizationsNb extends AppLocalizations {
   String get quotaCheckFailed => 'Kan ikke sjekke grensen. Sjekk tilkoblingen.';
 
   @override
-  String get subscriptionInAccount =>
-      'Abonnementet og prisen finner du under Konto.';
-
-  @override
   String get beforeCorrection => 'Før du retter tekst';
 
   @override
@@ -957,4 +953,38 @@ class AppLocalizationsNb extends AppLocalizations {
   @override
   String get speechLanguageUnsupported =>
       'Talemotoren på denne telefonen tilbyr ikke lokal diktering på dette språket. Du kan skrive eller bruke kameraet.';
+
+  @override
+  String get packTitle => 'Pakke med 1 000 bruk';
+
+  @override
+  String get packDescription =>
+      'Et engangskjøp av 1 000 bruk i Forenkle og Rett. Du bruker pakken først og går tilbake til dagsgrensen når den er brukt opp. Pakken utløper ikke og fornyes ikke automatisk.';
+
+  @override
+  String get buyPack => 'Kjøp pakke';
+
+  @override
+  String get packSignIn =>
+      'Logg inn på Sedno-kontoen din for å kjøpe eller gjenopprette pakken.';
+
+  @override
+  String packBalance(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Gjenstående bruk i pakken: $countString';
+  }
+
+  @override
+  String get packCredited => 'Pakken er lagt til på kontoen din.';
+
+  @override
+  String get packReserved =>
+      'De gjenstående brukene er reservert. Prøv igjen om litt.';
+
+  @override
+  String get paidOptionsInAccount =>
+      'Du finner pakken og abonnementet under Konto. Google Play viser prisene.';
 }
