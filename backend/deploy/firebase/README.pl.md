@@ -1,5 +1,11 @@
 # Serwer w Firebase i Google Cloud — Firestore
 
+26.11.2026 wdrożono `sedno-api-tcp-20261126` z domyślnym testem startowym
+TCP portu 8080. Zmiana korzysta z obrazu rewizji `sedno-api-00016-ll9`.
+Po sprawdzeniu gotowości nowej rewizji przełączono na nią cały ruch Cloud Run
+i tag używany przez publiczny Firebase Hosting. Minimum na poziomie usługi
+i rewizji wynosi 0.
+
 23.10.2026: wdrożono **sedno-api-00014-mmh** z 13 wariantami językowymi i przygotowano
 **AAB 0.2.0 (17)**. [Aktualny raport wdrożenia i pakietu](../../../docs/backend-deployment-2026-10-23-multilingual.pl.md).
 
@@ -136,6 +142,14 @@ utraci nowe sesje i wykorzystanie limitów** — zatrzymaj ruch i uzgodnij dane 
 powrotem. Nie ma automatycznego migratora wstecznego.
 
 ## Budowa i wdrożenie
+
+Manifest API korzysta z domyślnego próbnika startowego TCP na porcie 8080.
+Cloud Run może przekazać pierwsze żądanie po otwarciu portu przez serwer.
+Endpoint `/health/live` służy do sprawdzania działającego procesu, a
+`/health/ready` do sprawdzania dostępu do Firestore i stanu migracji podczas
+weryfikacji wdrożenia. Przy zmianie samej konfiguracji startu można ponownie
+użyć obrazu bieżącej rewizji. Przed przełączeniem ruchu sprawdź
+`/health/ready` nowej rewizji i zweryfikuj trasę używaną przez Firebase Hosting.
 
 Z katalogu głównego, po przygotowaniu bazy, IAM i zakończeniu importu:
 

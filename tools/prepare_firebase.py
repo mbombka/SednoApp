@@ -91,8 +91,7 @@ def manifests(project, region, site, image, billing_product, push_email, *, with
                      "containers": [{"image": image, "ports": [{"containerPort": 8080}], "env": env,
                                      "resources": {"limits": {"cpu": "1", "memory": "512Mi"}},
                                      "volumeMounts": mounts,
-                                     "startupProbe": {"httpGet": {"path": "/health/ready", "port": 8080},
-                                                      "periodSeconds": 5, "timeoutSeconds": 2, "failureThreshold": 24},
+                                     # Cloud Run applies its default TCP startup probe to the container port.
                                      "livenessProbe": {"httpGet": {"path": "/health/live", "port": 8080},
                                                        "periodSeconds": 30, "timeoutSeconds": 2}}],
                      "volumes": volumes}}}}

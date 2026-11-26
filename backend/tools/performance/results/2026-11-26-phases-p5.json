@@ -1,0 +1,2129 @@
+{
+  "sedno": {
+    "requested_start_count": 30,
+    "requested_start_client_ms": {
+      "n": 30,
+      "mean": 5555.19,
+      "median": 5522.6,
+      "p95": 5739.88,
+      "max": 6026.43
+    },
+    "verified_cold": 30,
+    "first_client_ms": {
+      "n": 30,
+      "mean": 5555.19,
+      "median": 5522.6,
+      "p95": 5739.88,
+      "max": 6026.43
+    },
+    "first_cloud_request_ms": {
+      "n": 30,
+      "mean": 5322.57,
+      "median": 5318.82,
+      "p95": 5381.56,
+      "max": 5407.99
+    },
+    "start_to_probe_ms": {
+      "n": 30,
+      "mean": 5465.71,
+      "median": 5431.19,
+      "p95": 5658.29,
+      "max": 5662.6
+    },
+    "warm_client_ms": {
+      "n": 30,
+      "mean": 56.07,
+      "median": 36.63,
+      "p95": 234.21,
+      "max": 234.4
+    },
+    "samples": [
+      {
+        "trial": 1,
+        "service": "sedno-perf-phases26-sedno",
+        "revision": "sedno-perf-phases26-sedno-t01",
+        "cold": {
+          "status": 200,
+          "ms": 5692.18,
+          "started_at": "2026-11-26T10:21:13.893111+00:00",
+          "cloud_request_ms": 5330.72
+        },
+        "warm": {
+          "status": 200,
+          "ms": 37.3,
+          "started_at": "2026-11-26T10:21:19.671044+00:00",
+          "cloud_request_ms": 2.44
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 21.35,
+        "requested_start": true,
+        "start_to_probe_ms": 5616.16,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 343.26,
+          "entry_to_http_ms": 1101.19,
+          "http_to_probe_arrival_ms": 4139.86,
+          "probe_arrival_to_confirmation_ms": 31.86,
+          "http_to_probe_confirmed_ms": 4171.72,
+          "launcher_ms": 0.17,
+          "dotnet_to_managed_ms": 382.18,
+          "managed_to_http_ms": 718.84
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 2,
+        "service": "sedno-perf-phases26-sedno",
+        "revision": "sedno-perf-phases26-sedno-t02",
+        "cold": {
+          "status": 200,
+          "ms": 5739.88,
+          "started_at": "2026-11-26T10:21:29.378775+00:00",
+          "cloud_request_ms": 5347.45
+        },
+        "warm": {
+          "status": 200,
+          "ms": 234.21,
+          "started_at": "2026-11-26T10:21:35.215126+00:00",
+          "cloud_request_ms": 2.71
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 23.9,
+        "requested_start": true,
+        "start_to_probe_ms": 5662.6,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 393.99,
+          "entry_to_http_ms": 1212.21,
+          "http_to_probe_arrival_ms": 4026.09,
+          "probe_arrival_to_confirmation_ms": 30.31,
+          "http_to_probe_confirmed_ms": 4056.4,
+          "launcher_ms": 0.83,
+          "dotnet_to_managed_ms": 494.48,
+          "managed_to_http_ms": 716.9
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 3,
+        "service": "sedno-perf-phases26-sedno",
+        "revision": "sedno-perf-phases26-sedno-t03",
+        "cold": {
+          "status": 200,
+          "ms": 5464.53,
+          "started_at": "2026-11-26T10:21:45.144280+00:00",
+          "cloud_request_ms": 5323.49
+        },
+        "warm": {
+          "status": 200,
+          "ms": 38.9,
+          "started_at": "2026-11-26T10:21:50.697123+00:00",
+          "cloud_request_ms": 5.84
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 20.55,
+        "requested_start": true,
+        "start_to_probe_ms": 5390.92,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 132.43,
+          "entry_to_http_ms": 1052.65,
+          "http_to_probe_arrival_ms": 4172.4,
+          "probe_arrival_to_confirmation_ms": 33.44,
+          "http_to_probe_confirmed_ms": 4205.84,
+          "launcher_ms": 0.18,
+          "dotnet_to_managed_ms": 406.87,
+          "managed_to_http_ms": 645.6
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 4,
+        "service": "sedno-perf-phases26-sedno",
+        "revision": "sedno-perf-phases26-sedno-t04",
+        "cold": {
+          "status": 200,
+          "ms": 5524.08,
+          "started_at": "2026-11-26T10:21:59.572033+00:00",
+          "cloud_request_ms": 5361.33
+        },
+        "warm": {
+          "status": 200,
+          "ms": 38.58,
+          "started_at": "2026-11-26T10:22:05.172696+00:00",
+          "cloud_request_ms": 3.42
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 24.33,
+        "requested_start": true,
+        "start_to_probe_ms": 5431.3,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 134.86,
+          "entry_to_http_ms": 1105.53,
+          "http_to_probe_arrival_ms": 4141.32,
+          "probe_arrival_to_confirmation_ms": 49.6,
+          "http_to_probe_confirmed_ms": 4190.92,
+          "launcher_ms": 0.21,
+          "dotnet_to_managed_ms": 420.33,
+          "managed_to_http_ms": 684.99
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 5,
+        "service": "sedno-perf-phases26-sedno",
+        "revision": "sedno-perf-phases26-sedno-t05",
+        "cold": {
+          "status": 200,
+          "ms": 5501.73,
+          "started_at": "2026-11-26T10:22:16.263216+00:00",
+          "cloud_request_ms": 5355.41
+        },
+        "warm": {
+          "status": 200,
+          "ms": 234.4,
+          "started_at": "2026-11-26T10:22:21.846871+00:00",
+          "cloud_request_ms": 3.43
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 20.19,
+        "requested_start": true,
+        "start_to_probe_ms": 5423.88,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 131.54,
+          "entry_to_http_ms": 1088.54,
+          "http_to_probe_arrival_ms": 4155.65,
+          "probe_arrival_to_confirmation_ms": 48.15,
+          "http_to_probe_confirmed_ms": 4203.79,
+          "launcher_ms": 0.15,
+          "dotnet_to_managed_ms": 399.8,
+          "managed_to_http_ms": 688.59
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 6,
+        "service": "sedno-perf-phases26-sedno",
+        "revision": "sedno-perf-phases26-sedno-t06",
+        "cold": {
+          "status": 200,
+          "ms": 5521.12,
+          "started_at": "2026-11-26T10:22:30.931764+00:00",
+          "cloud_request_ms": 5361.78
+        },
+        "warm": {
+          "status": 200,
+          "ms": 35.45,
+          "started_at": "2026-11-26T10:22:36.534071+00:00",
+          "cloud_request_ms": 2.86
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 23.11,
+        "requested_start": true,
+        "start_to_probe_ms": 5439.27,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 136.57,
+          "entry_to_http_ms": 1012.0,
+          "http_to_probe_arrival_ms": 4250.11,
+          "probe_arrival_to_confirmation_ms": 40.59,
+          "http_to_probe_confirmed_ms": 4290.7,
+          "launcher_ms": 0.25,
+          "dotnet_to_managed_ms": 335.79,
+          "managed_to_http_ms": 675.96
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 7,
+        "service": "sedno-perf-phases26-sedno",
+        "revision": "sedno-perf-phases26-sedno-t07",
+        "cold": {
+          "status": 200,
+          "ms": 5525.16,
+          "started_at": "2026-11-26T10:22:45.605033+00:00",
+          "cloud_request_ms": 5381.56
+        },
+        "warm": {
+          "status": 200,
+          "ms": 36.72,
+          "started_at": "2026-11-26T10:22:51.203969+00:00",
+          "cloud_request_ms": 2.72
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 24.97,
+        "requested_start": true,
+        "start_to_probe_ms": 5431.09,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 132.69,
+          "entry_to_http_ms": 1047.19,
+          "http_to_probe_arrival_ms": 4232.44,
+          "probe_arrival_to_confirmation_ms": 18.76,
+          "http_to_probe_confirmed_ms": 4251.2,
+          "launcher_ms": 0.19,
+          "dotnet_to_managed_ms": 380.04,
+          "managed_to_http_ms": 666.95
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 8,
+        "service": "sedno-perf-phases26-sedno",
+        "revision": "sedno-perf-phases26-sedno-t08",
+        "cold": {
+          "status": 200,
+          "ms": 5688.76,
+          "started_at": "2026-11-26T10:23:00.438479+00:00",
+          "cloud_request_ms": 5351.55
+        },
+        "warm": {
+          "status": 200,
+          "ms": 33.86,
+          "started_at": "2026-11-26T10:23:06.205823+00:00",
+          "cloud_request_ms": 2.6
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 22.48,
+        "requested_start": true,
+        "start_to_probe_ms": 5613.05,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 313.58,
+          "entry_to_http_ms": 902.13,
+          "http_to_probe_arrival_ms": 4346.43,
+          "probe_arrival_to_confirmation_ms": 50.9,
+          "http_to_probe_confirmed_ms": 4397.33,
+          "launcher_ms": 0.21,
+          "dotnet_to_managed_ms": 336.49,
+          "managed_to_http_ms": 565.44
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 9,
+        "service": "sedno-perf-phases26-sedno",
+        "revision": "sedno-perf-phases26-sedno-t09",
+        "cold": {
+          "status": 200,
+          "ms": 5449.2,
+          "started_at": "2026-11-26T10:23:15.690526+00:00",
+          "cloud_request_ms": 5304.95
+        },
+        "warm": {
+          "status": 200,
+          "ms": 59.82,
+          "started_at": "2026-11-26T10:23:21.211199+00:00",
+          "cloud_request_ms": 2.72
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 20.48,
+        "requested_start": true,
+        "start_to_probe_ms": 5374.43,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 118.13,
+          "entry_to_http_ms": 973.19,
+          "http_to_probe_arrival_ms": 4268.05,
+          "probe_arrival_to_confirmation_ms": 15.06,
+          "http_to_probe_confirmed_ms": 4283.11,
+          "launcher_ms": 0.23,
+          "dotnet_to_managed_ms": 348.65,
+          "managed_to_http_ms": 624.3
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 10,
+        "service": "sedno-perf-phases26-sedno",
+        "revision": "sedno-perf-phases26-sedno-t10",
+        "cold": {
+          "status": 200,
+          "ms": 6026.43,
+          "started_at": "2026-11-26T10:23:30.357473+00:00",
+          "cloud_request_ms": 5300.49
+        },
+        "warm": {
+          "status": 200,
+          "ms": 42.82,
+          "started_at": "2026-11-26T10:23:36.481477+00:00",
+          "cloud_request_ms": 2.47
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 349.64,
+        "requested_start": true,
+        "start_to_probe_ms": 5622.69,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 374.52,
+          "entry_to_http_ms": 1002.07,
+          "http_to_probe_arrival_ms": 4195.18,
+          "probe_arrival_to_confirmation_ms": 50.92,
+          "http_to_probe_confirmed_ms": 4246.1,
+          "launcher_ms": 0.19,
+          "dotnet_to_managed_ms": 365.2,
+          "managed_to_http_ms": 636.68
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 11,
+        "service": "sedno-perf-phases26-sedno",
+        "revision": "sedno-perf-phases26-sedno-t11",
+        "cold": {
+          "status": 200,
+          "ms": 5483.12,
+          "started_at": "2026-11-26T10:23:45.347484+00:00",
+          "cloud_request_ms": 5314.16
+        },
+        "warm": {
+          "status": 200,
+          "ms": 38.66,
+          "started_at": "2026-11-26T10:23:50.895869+00:00",
+          "cloud_request_ms": 2.84
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 20.19,
+        "requested_start": true,
+        "start_to_probe_ms": 5400.33,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 151.35,
+          "entry_to_http_ms": 1094.97,
+          "http_to_probe_arrival_ms": 4138.19,
+          "probe_arrival_to_confirmation_ms": 15.83,
+          "http_to_probe_confirmed_ms": 4154.02,
+          "launcher_ms": 0.18,
+          "dotnet_to_managed_ms": 393.39,
+          "managed_to_http_ms": 701.39
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 12,
+        "service": "sedno-perf-phases26-sedno",
+        "revision": "sedno-perf-phases26-sedno-t12",
+        "cold": {
+          "status": 200,
+          "ms": 5497.47,
+          "started_at": "2026-11-26T10:23:59.960242+00:00",
+          "cloud_request_ms": 5333.96
+        },
+        "warm": {
+          "status": 200,
+          "ms": 32.23,
+          "started_at": "2026-11-26T10:24:05.532898+00:00",
+          "cloud_request_ms": 4.62
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 24.28,
+        "requested_start": true,
+        "start_to_probe_ms": 5402.22,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 147.31,
+          "entry_to_http_ms": 1122.65,
+          "http_to_probe_arrival_ms": 4119.03,
+          "probe_arrival_to_confirmation_ms": 13.23,
+          "http_to_probe_confirmed_ms": 4132.26,
+          "launcher_ms": 0.2,
+          "dotnet_to_managed_ms": 389.29,
+          "managed_to_http_ms": 733.16
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 13,
+        "service": "sedno-perf-phases26-sedno",
+        "revision": "sedno-perf-phases26-sedno-t13",
+        "cold": {
+          "status": 200,
+          "ms": 5544.88,
+          "started_at": "2026-11-26T10:24:14.040134+00:00",
+          "cloud_request_ms": 5298.31
+        },
+        "warm": {
+          "status": 200,
+          "ms": 30.31,
+          "started_at": "2026-11-26T10:24:19.656751+00:00",
+          "cloud_request_ms": 2.51
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 19.82,
+        "requested_start": true,
+        "start_to_probe_ms": 5468.5,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 219.95,
+          "entry_to_http_ms": 893.55,
+          "http_to_probe_arrival_ms": 4305.36,
+          "probe_arrival_to_confirmation_ms": 49.65,
+          "http_to_probe_confirmed_ms": 4355.0,
+          "launcher_ms": 0.38,
+          "dotnet_to_managed_ms": 312.09,
+          "managed_to_http_ms": 581.07
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 14,
+        "service": "sedno-perf-phases26-sedno",
+        "revision": "sedno-perf-phases26-sedno-t14",
+        "cold": {
+          "status": 200,
+          "ms": 5449.26,
+          "started_at": "2026-11-26T10:24:27.896713+00:00",
+          "cloud_request_ms": 5310.77
+        },
+        "warm": {
+          "status": 200,
+          "ms": 36.05,
+          "started_at": "2026-11-26T10:24:33.426505+00:00",
+          "cloud_request_ms": 4.9
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 23.07,
+        "requested_start": true,
+        "start_to_probe_ms": 5372.62,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 119.97,
+          "entry_to_http_ms": 974.87,
+          "http_to_probe_arrival_ms": 4252.06,
+          "probe_arrival_to_confirmation_ms": 25.73,
+          "http_to_probe_confirmed_ms": 4277.79,
+          "launcher_ms": 0.15,
+          "dotnet_to_managed_ms": 351.15,
+          "managed_to_http_ms": 623.56
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 15,
+        "service": "sedno-perf-phases26-sedno",
+        "revision": "sedno-perf-phases26-sedno-t15",
+        "cold": {
+          "status": 200,
+          "ms": 5531.69,
+          "started_at": "2026-11-26T10:24:42.978863+00:00",
+          "cloud_request_ms": 5314.15
+        },
+        "warm": {
+          "status": 200,
+          "ms": 38.33,
+          "started_at": "2026-11-26T10:24:48.581528+00:00",
+          "cloud_request_ms": 3.17
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 19.61,
+        "requested_start": true,
+        "start_to_probe_ms": 5456.69,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 192.43,
+          "entry_to_http_ms": 854.69,
+          "http_to_probe_arrival_ms": 4375.56,
+          "probe_arrival_to_confirmation_ms": 34.02,
+          "http_to_probe_confirmed_ms": 4409.58,
+          "launcher_ms": 0.19,
+          "dotnet_to_managed_ms": 303.41,
+          "managed_to_http_ms": 551.09
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 16,
+        "service": "sedno-perf-phases26-sedno",
+        "revision": "sedno-perf-phases26-sedno-t16",
+        "cold": {
+          "status": 200,
+          "ms": 5411.64,
+          "started_at": "2026-11-26T10:24:57.255633+00:00",
+          "cloud_request_ms": 5258.87
+        },
+        "warm": {
+          "status": 200,
+          "ms": 30.82,
+          "started_at": "2026-11-26T10:25:02.729976+00:00",
+          "cloud_request_ms": 2.81
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 16.93,
+        "requested_start": true,
+        "start_to_probe_ms": 5336.47,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 120.0,
+          "entry_to_http_ms": 785.62,
+          "http_to_probe_arrival_ms": 4420.64,
+          "probe_arrival_to_confirmation_ms": 10.22,
+          "http_to_probe_confirmed_ms": 4430.86,
+          "launcher_ms": 0.22,
+          "dotnet_to_managed_ms": 263.71,
+          "managed_to_http_ms": 521.7
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 17,
+        "service": "sedno-perf-phases26-sedno",
+        "revision": "sedno-perf-phases26-sedno-t17",
+        "cold": {
+          "status": 200,
+          "ms": 5733.99,
+          "started_at": "2026-11-26T10:25:11.527483+00:00",
+          "cloud_request_ms": 5290.84
+        },
+        "warm": {
+          "status": 200,
+          "ms": 29.15,
+          "started_at": "2026-11-26T10:25:17.362575+00:00",
+          "cloud_request_ms": 2.34
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 19.92,
+        "requested_start": true,
+        "start_to_probe_ms": 5658.29,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 437.83,
+          "entry_to_http_ms": 908.07,
+          "http_to_probe_arrival_ms": 4299.26,
+          "probe_arrival_to_confirmation_ms": 13.13,
+          "http_to_probe_confirmed_ms": 4312.39,
+          "launcher_ms": 0.17,
+          "dotnet_to_managed_ms": 351.41,
+          "managed_to_http_ms": 556.48
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 18,
+        "service": "sedno-perf-phases26-sedno",
+        "revision": "sedno-perf-phases26-sedno-t18",
+        "cold": {
+          "status": 200,
+          "ms": 5444.01,
+          "started_at": "2026-11-26T10:25:25.940181+00:00",
+          "cloud_request_ms": 5289.01
+        },
+        "warm": {
+          "status": 200,
+          "ms": 27.94,
+          "started_at": "2026-11-26T10:25:31.494524+00:00",
+          "cloud_request_ms": 2.53
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 22.97,
+        "requested_start": true,
+        "start_to_probe_ms": 5363.41,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 122.19,
+          "entry_to_http_ms": 856.79,
+          "http_to_probe_arrival_ms": 4373.46,
+          "probe_arrival_to_confirmation_ms": 10.97,
+          "http_to_probe_confirmed_ms": 4384.43,
+          "launcher_ms": 0.19,
+          "dotnet_to_managed_ms": 292.41,
+          "managed_to_http_ms": 564.19
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 19,
+        "service": "sedno-perf-phases26-sedno",
+        "revision": "sedno-perf-phases26-sedno-t19",
+        "cold": {
+          "status": 200,
+          "ms": 5495.91,
+          "started_at": "2026-11-26T10:25:42.956091+00:00",
+          "cloud_request_ms": 5332.23
+        },
+        "warm": {
+          "status": 200,
+          "ms": 34.72,
+          "started_at": "2026-11-26T10:25:48.520972+00:00",
+          "cloud_request_ms": 2.84
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 25.1,
+        "requested_start": true,
+        "start_to_probe_ms": 5414.25,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 136.87,
+          "entry_to_http_ms": 1082.08,
+          "http_to_probe_arrival_ms": 4159.21,
+          "probe_arrival_to_confirmation_ms": 36.09,
+          "http_to_probe_confirmed_ms": 4195.3,
+          "launcher_ms": 0.19,
+          "dotnet_to_managed_ms": 395.81,
+          "managed_to_http_ms": 686.08
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 20,
+        "service": "sedno-perf-phases26-sedno",
+        "revision": "sedno-perf-phases26-sedno-t20",
+        "cold": {
+          "status": 200,
+          "ms": 5465.65,
+          "started_at": "2026-11-26T10:25:58.714189+00:00",
+          "cloud_request_ms": 5302.86
+        },
+        "warm": {
+          "status": 200,
+          "ms": 32.68,
+          "started_at": "2026-11-26T10:26:04.262813+00:00",
+          "cloud_request_ms": 2.54
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 19.75,
+        "requested_start": true,
+        "start_to_probe_ms": 5390.49,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 142.23,
+          "entry_to_http_ms": 983.64,
+          "http_to_probe_arrival_ms": 4232.31,
+          "probe_arrival_to_confirmation_ms": 32.31,
+          "http_to_probe_confirmed_ms": 4264.62,
+          "launcher_ms": 0.14,
+          "dotnet_to_managed_ms": 366.77,
+          "managed_to_http_ms": 616.73
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 21,
+        "service": "sedno-perf-phases26-sedno",
+        "revision": "sedno-perf-phases26-sedno-t21",
+        "cold": {
+          "status": 200,
+          "ms": 5420.83,
+          "started_at": "2026-11-26T10:26:13.425319+00:00",
+          "cloud_request_ms": 5278.41
+        },
+        "warm": {
+          "status": 200,
+          "ms": 40.19,
+          "started_at": "2026-11-26T10:26:18.916528+00:00",
+          "cloud_request_ms": 4.92
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 16.77,
+        "requested_start": true,
+        "start_to_probe_ms": 5345.88,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 134.18,
+          "entry_to_http_ms": 952.04,
+          "http_to_probe_arrival_ms": 4238.41,
+          "probe_arrival_to_confirmation_ms": 21.25,
+          "http_to_probe_confirmed_ms": 4259.66,
+          "launcher_ms": 0.17,
+          "dotnet_to_managed_ms": 340.34,
+          "managed_to_http_ms": 611.53
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 22,
+        "service": "sedno-perf-phases26-sedno",
+        "revision": "sedno-perf-phases26-sedno-t22",
+        "cold": {
+          "status": 200,
+          "ms": 5601.88,
+          "started_at": "2026-11-26T10:26:27.743531+00:00",
+          "cloud_request_ms": 5325.53
+        },
+        "warm": {
+          "status": 200,
+          "ms": 34.59,
+          "started_at": "2026-11-26T10:26:33.423999+00:00",
+          "cloud_request_ms": 2.0
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 19.76,
+        "requested_start": true,
+        "start_to_probe_ms": 5535.82,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 259.3,
+          "entry_to_http_ms": 975.08,
+          "http_to_probe_arrival_ms": 4287.79,
+          "probe_arrival_to_confirmation_ms": 13.66,
+          "http_to_probe_confirmed_ms": 4301.45,
+          "launcher_ms": 0.2,
+          "dotnet_to_managed_ms": 367.9,
+          "managed_to_http_ms": 606.98
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 23,
+        "service": "sedno-perf-phases26-sedno",
+        "revision": "sedno-perf-phases26-sedno-t23",
+        "cold": {
+          "status": 200,
+          "ms": 5552.83,
+          "started_at": "2026-11-26T10:26:42.437490+00:00",
+          "cloud_request_ms": 5365.93
+        },
+        "warm": {
+          "status": 200,
+          "ms": 38.85,
+          "started_at": "2026-11-26T10:26:48.084972+00:00",
+          "cloud_request_ms": 3.74
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 16.08,
+        "requested_start": true,
+        "start_to_probe_ms": 5476.4,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 173.58,
+          "entry_to_http_ms": 1038.0,
+          "http_to_probe_arrival_ms": 4227.72,
+          "probe_arrival_to_confirmation_ms": 37.09,
+          "http_to_probe_confirmed_ms": 4264.81,
+          "launcher_ms": 0.24,
+          "dotnet_to_managed_ms": 337.0,
+          "managed_to_http_ms": 700.76
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 24,
+        "service": "sedno-perf-phases26-sedno",
+        "revision": "sedno-perf-phases26-sedno-t24",
+        "cold": {
+          "status": 200,
+          "ms": 5601.93,
+          "started_at": "2026-11-26T10:26:57.221958+00:00",
+          "cloud_request_ms": 5258.95
+        },
+        "warm": {
+          "status": 200,
+          "ms": 36.65,
+          "started_at": "2026-11-26T10:27:02.888999+00:00",
+          "cloud_request_ms": 3.77
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 12.53,
+        "requested_start": true,
+        "start_to_probe_ms": 5530.79,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 318.59,
+          "entry_to_http_ms": 683.84,
+          "http_to_probe_arrival_ms": 4492.28,
+          "probe_arrival_to_confirmation_ms": 36.08,
+          "http_to_probe_confirmed_ms": 4528.36,
+          "launcher_ms": 0.18,
+          "dotnet_to_managed_ms": 205.15,
+          "managed_to_http_ms": 478.51
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 25,
+        "service": "sedno-perf-phases26-sedno",
+        "revision": "sedno-perf-phases26-sedno-t25",
+        "cold": {
+          "status": 200,
+          "ms": 5636.92,
+          "started_at": "2026-11-26T10:27:10.996122+00:00",
+          "cloud_request_ms": 5354.6
+        },
+        "warm": {
+          "status": 200,
+          "ms": 37.07,
+          "started_at": "2026-11-26T10:27:16.724606+00:00",
+          "cloud_request_ms": 2.5
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 21.62,
+        "requested_start": true,
+        "start_to_probe_ms": 5563.99,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 279.29,
+          "entry_to_http_ms": 1108.98,
+          "http_to_probe_arrival_ms": 4153.55,
+          "probe_arrival_to_confirmation_ms": 22.16,
+          "http_to_probe_confirmed_ms": 4175.71,
+          "launcher_ms": 0.22,
+          "dotnet_to_managed_ms": 458.98,
+          "managed_to_http_ms": 649.78
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 26,
+        "service": "sedno-perf-phases26-sedno",
+        "revision": "sedno-perf-phases26-sedno-t26",
+        "cold": {
+          "status": 200,
+          "ms": 5597.28,
+          "started_at": "2026-11-26T10:27:26.084534+00:00",
+          "cloud_request_ms": 5407.99
+        },
+        "warm": {
+          "status": 200,
+          "ms": 36.61,
+          "started_at": "2026-11-26T10:27:31.753289+00:00",
+          "cloud_request_ms": 3.62
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 23.22,
+        "requested_start": true,
+        "start_to_probe_ms": 5511.82,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 180.09,
+          "entry_to_http_ms": 1347.16,
+          "http_to_probe_arrival_ms": 3948.83,
+          "probe_arrival_to_confirmation_ms": 35.74,
+          "http_to_probe_confirmed_ms": 3984.58,
+          "launcher_ms": 0.33,
+          "dotnet_to_managed_ms": 509.61,
+          "managed_to_http_ms": 837.21
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 27,
+        "service": "sedno-perf-phases26-sedno",
+        "revision": "sedno-perf-phases26-sedno-t27",
+        "cold": {
+          "status": 200,
+          "ms": 5638.0,
+          "started_at": "2026-11-26T10:27:42.336029+00:00",
+          "cloud_request_ms": 5272.46
+        },
+        "warm": {
+          "status": 200,
+          "ms": 36.49,
+          "started_at": "2026-11-26T10:27:48.066521+00:00",
+          "cloud_request_ms": 6.82
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 22.75,
+        "requested_start": true,
+        "start_to_probe_ms": 5556.96,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 348.36,
+          "entry_to_http_ms": 1074.31,
+          "http_to_probe_arrival_ms": 4111.28,
+          "probe_arrival_to_confirmation_ms": 23.0,
+          "http_to_probe_confirmed_ms": 4134.28,
+          "launcher_ms": 0.16,
+          "dotnet_to_managed_ms": 397.2,
+          "managed_to_http_ms": 676.95
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 28,
+        "service": "sedno-perf-phases26-sedno",
+        "revision": "sedno-perf-phases26-sedno-t28",
+        "cold": {
+          "status": 200,
+          "ms": 5503.67,
+          "started_at": "2026-11-26T10:27:56.699492+00:00",
+          "cloud_request_ms": 5344.78
+        },
+        "warm": {
+          "status": 200,
+          "ms": 232.65,
+          "started_at": "2026-11-26T10:28:02.271888+00:00",
+          "cloud_request_ms": 2.88
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 21.49,
+        "requested_start": true,
+        "start_to_probe_ms": 5428.68,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 162.2,
+          "entry_to_http_ms": 1121.33,
+          "http_to_probe_arrival_ms": 4124.61,
+          "probe_arrival_to_confirmation_ms": 20.53,
+          "http_to_probe_confirmed_ms": 4145.15,
+          "launcher_ms": 0.38,
+          "dotnet_to_managed_ms": 399.31,
+          "managed_to_http_ms": 721.64
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 29,
+        "service": "sedno-perf-phases26-sedno",
+        "revision": "sedno-perf-phases26-sedno-t29",
+        "cold": {
+          "status": 200,
+          "ms": 5458.69,
+          "started_at": "2026-11-26T10:28:10.683629+00:00",
+          "cloud_request_ms": 5309.93
+        },
+        "warm": {
+          "status": 200,
+          "ms": 30.47,
+          "started_at": "2026-11-26T10:28:16.211779+00:00",
+          "cloud_request_ms": 2.66
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 22.58,
+        "requested_start": true,
+        "start_to_probe_ms": 5379.36,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 124.37,
+          "entry_to_http_ms": 955.5,
+          "http_to_probe_arrival_ms": 4283.69,
+          "probe_arrival_to_confirmation_ms": 15.8,
+          "http_to_probe_confirmed_ms": 4299.49,
+          "launcher_ms": 0.18,
+          "dotnet_to_managed_ms": 387.1,
+          "managed_to_http_ms": 568.22
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 30,
+        "service": "sedno-perf-phases26-sedno",
+        "revision": "sedno-perf-phases26-sedno-t30",
+        "cold": {
+          "status": 200,
+          "ms": 5453.07,
+          "started_at": "2026-11-26T10:28:24.421466+00:00",
+          "cloud_request_ms": 5294.71
+        },
+        "warm": {
+          "status": 200,
+          "ms": 35.69,
+          "started_at": "2026-11-26T10:28:29.941094+00:00",
+          "cloud_request_ms": 2.7
+        },
+        "warm_same_instance": true,
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 20.82,
+        "requested_start": true,
+        "start_to_probe_ms": 5372.81,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 132.72,
+          "entry_to_http_ms": 873.83,
+          "http_to_probe_arrival_ms": 4354.63,
+          "probe_arrival_to_confirmation_ms": 11.63,
+          "http_to_probe_confirmed_ms": 4366.26,
+          "launcher_ms": 0.12,
+          "dotnet_to_managed_ms": 309.31,
+          "managed_to_http_ms": 564.4
+        }
+      }
+    ],
+    "phases_ms": {
+      "dotnet_to_managed_ms": {
+        "n": 30,
+        "mean": 366.71,
+        "median": 367.33,
+        "p95": 494.48,
+        "max": 509.61
+      },
+      "entry_to_http_ms": {
+        "n": 30,
+        "mean": 1006.12,
+        "median": 1007.04,
+        "p95": 1212.21,
+        "max": 1347.16
+      },
+      "http_to_probe_arrival_ms": {
+        "n": 30,
+        "mean": 4227.51,
+        "median": 4232.38,
+        "p95": 4420.64,
+        "max": 4492.28
+      },
+      "http_to_probe_confirmed_ms": {
+        "n": 30,
+        "mean": 4255.77,
+        "median": 4262.14,
+        "p95": 4430.86,
+        "max": 4528.36
+      },
+      "launcher_ms": {
+        "n": 30,
+        "mean": 0.23,
+        "median": 0.19,
+        "p95": 0.38,
+        "max": 0.83
+      },
+      "managed_to_http_ms": {
+        "n": 30,
+        "mean": 639.19,
+        "median": 641.14,
+        "p95": 733.16,
+        "max": 837.21
+      },
+      "platform_to_entry_ms": {
+        "n": 30,
+        "mean": 203.81,
+        "median": 149.33,
+        "p95": 393.99,
+        "max": 437.83
+      },
+      "probe_arrival_to_confirmation_ms": {
+        "n": 30,
+        "mean": 28.26,
+        "median": 28.02,
+        "p95": 50.9,
+        "max": 50.92
+      }
+    }
+  },
+  "go": {
+    "requested_start_count": 30,
+    "requested_start_client_ms": {
+      "n": 30,
+      "mean": 5229.87,
+      "median": 5199.08,
+      "p95": 5364.82,
+      "max": 5400.61
+    },
+    "verified_cold": 30,
+    "first_client_ms": {
+      "n": 30,
+      "mean": 5229.87,
+      "median": 5199.08,
+      "p95": 5364.82,
+      "max": 5400.61
+    },
+    "first_cloud_request_ms": {
+      "n": 30,
+      "mean": 5026.6,
+      "median": 5029.24,
+      "p95": 5035.53,
+      "max": 5040.34
+    },
+    "start_to_probe_ms": {
+      "n": 30,
+      "mean": 5160.32,
+      "median": 5128.84,
+      "p95": 5296.1,
+      "max": 5328.36
+    },
+    "warm_client_ms": {
+      "n": 30,
+      "mean": 35.04,
+      "median": 34.47,
+      "p95": 42.98,
+      "max": 53.83
+    },
+    "samples": [
+      {
+        "trial": 1,
+        "service": "sedno-perf-phases26-go",
+        "revision": "sedno-perf-phases26-go-t01",
+        "cold": {
+          "status": 200,
+          "ms": 5186.48,
+          "started_at": "2026-11-26T10:21:12.351609+00:00",
+          "cloud_request_ms": 5034.83
+        },
+        "warm": {
+          "status": 200,
+          "ms": 39.32,
+          "started_at": "2026-11-26T10:21:17.691024+00:00",
+          "cloud_request_ms": 1.47
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 24.5,
+        "requested_start": true,
+        "start_to_probe_ms": 5113.3,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 138.69,
+          "entry_to_http_ms": 3.27,
+          "http_to_probe_arrival_ms": 4971.71,
+          "probe_arrival_to_confirmation_ms": -0.36,
+          "http_to_probe_confirmed_ms": 4971.34
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 2,
+        "service": "sedno-perf-phases26-go",
+        "revision": "sedno-perf-phases26-go-t02",
+        "cold": {
+          "status": 200,
+          "ms": 5186.59,
+          "started_at": "2026-11-26T10:21:29.383358+00:00",
+          "cloud_request_ms": 5030.22
+        },
+        "warm": {
+          "status": 200,
+          "ms": 35.18,
+          "started_at": "2026-11-26T10:21:34.648972+00:00",
+          "cloud_request_ms": 1.37
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 25.0,
+        "requested_start": true,
+        "start_to_probe_ms": 5116.49,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 134.52,
+          "entry_to_http_ms": 3.11,
+          "http_to_probe_arrival_ms": 4978.66,
+          "probe_arrival_to_confirmation_ms": 0.2,
+          "http_to_probe_confirmed_ms": 4978.86
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 3,
+        "service": "sedno-perf-phases26-go",
+        "revision": "sedno-perf-phases26-go-t03",
+        "cold": {
+          "status": 200,
+          "ms": 5287.48,
+          "started_at": "2026-11-26T10:21:45.022373+00:00",
+          "cloud_request_ms": 5029.56
+        },
+        "warm": {
+          "status": 200,
+          "ms": 30.9,
+          "started_at": "2026-11-26T10:21:50.392481+00:00",
+          "cloud_request_ms": 1.36
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 25.95,
+        "requested_start": true,
+        "start_to_probe_ms": 5219.18,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 250.16,
+          "entry_to_http_ms": 3.04,
+          "http_to_probe_arrival_ms": 4966.86,
+          "probe_arrival_to_confirmation_ms": -0.89,
+          "http_to_probe_confirmed_ms": 4965.97
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 4,
+        "service": "sedno-perf-phases26-go",
+        "revision": "sedno-perf-phases26-go-t04",
+        "cold": {
+          "status": 200,
+          "ms": 5160.36,
+          "started_at": "2026-11-26T10:22:00.681208+00:00",
+          "cloud_request_ms": 5021.19
+        },
+        "warm": {
+          "status": 200,
+          "ms": 31.33,
+          "started_at": "2026-11-26T10:22:05.928950+00:00",
+          "cloud_request_ms": 1.45
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 15.2,
+        "requested_start": true,
+        "start_to_probe_ms": 5096.87,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 117.53,
+          "entry_to_http_ms": 3.39,
+          "http_to_probe_arrival_ms": 4975.92,
+          "probe_arrival_to_confirmation_ms": 0.02,
+          "http_to_probe_confirmed_ms": 4975.94
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 5,
+        "service": "sedno-perf-phases26-go",
+        "revision": "sedno-perf-phases26-go-t05",
+        "cold": {
+          "status": 200,
+          "ms": 5150.2,
+          "started_at": "2026-11-26T10:22:16.663523+00:00",
+          "cloud_request_ms": 5013.62
+        },
+        "warm": {
+          "status": 200,
+          "ms": 33.39,
+          "started_at": "2026-11-26T10:22:21.892585+00:00",
+          "cloud_request_ms": 1.8
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 13.82,
+        "requested_start": true,
+        "start_to_probe_ms": 5085.37,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 102.89,
+          "entry_to_http_ms": 2.91,
+          "http_to_probe_arrival_ms": 4979.87,
+          "probe_arrival_to_confirmation_ms": -0.3,
+          "http_to_probe_confirmed_ms": 4979.56
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 6,
+        "service": "sedno-perf-phases26-go",
+        "revision": "sedno-perf-phases26-go-t06",
+        "cold": {
+          "status": 200,
+          "ms": 5154.24,
+          "started_at": "2026-11-26T10:22:30.863036+00:00",
+          "cloud_request_ms": 5014.8
+        },
+        "warm": {
+          "status": 200,
+          "ms": 41.36,
+          "started_at": "2026-11-26T10:22:36.102151+00:00",
+          "cloud_request_ms": 1.67
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 20.03,
+        "requested_start": true,
+        "start_to_probe_ms": 5087.64,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 110.54,
+          "entry_to_http_ms": 2.81,
+          "http_to_probe_arrival_ms": 4974.57,
+          "probe_arrival_to_confirmation_ms": -0.28,
+          "http_to_probe_confirmed_ms": 4974.29
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 7,
+        "service": "sedno-perf-phases26-go",
+        "revision": "sedno-perf-phases26-go-t07",
+        "cold": {
+          "status": 200,
+          "ms": 5333.99,
+          "started_at": "2026-11-26T10:22:45.615682+00:00",
+          "cloud_request_ms": 5029.03
+        },
+        "warm": {
+          "status": 200,
+          "ms": 32.91,
+          "started_at": "2026-11-26T10:22:51.043868+00:00",
+          "cloud_request_ms": 1.15
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 21.64,
+        "requested_start": true,
+        "start_to_probe_ms": 5265.45,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 277.57,
+          "entry_to_http_ms": 2.96,
+          "http_to_probe_arrival_ms": 4984.74,
+          "probe_arrival_to_confirmation_ms": 0.19,
+          "http_to_probe_confirmed_ms": 4984.93
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 8,
+        "service": "sedno-perf-phases26-go",
+        "revision": "sedno-perf-phases26-go-t08",
+        "cold": {
+          "status": 200,
+          "ms": 5192.51,
+          "started_at": "2026-11-26T10:23:00.253156+00:00",
+          "cloud_request_ms": 5035.53
+        },
+        "warm": {
+          "status": 200,
+          "ms": 34.42,
+          "started_at": "2026-11-26T10:23:05.529405+00:00",
+          "cloud_request_ms": 1.71
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 23.57,
+        "requested_start": true,
+        "start_to_probe_ms": 5124.25,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 142.8,
+          "entry_to_http_ms": 3.31,
+          "http_to_probe_arrival_ms": 4978.67,
+          "probe_arrival_to_confirmation_ms": -0.53,
+          "http_to_probe_confirmed_ms": 4978.14
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 9,
+        "service": "sedno-perf-phases26-go",
+        "revision": "sedno-perf-phases26-go-t09",
+        "cold": {
+          "status": 200,
+          "ms": 5307.38,
+          "started_at": "2026-11-26T10:23:16.225814+00:00",
+          "cloud_request_ms": 5027.77
+        },
+        "warm": {
+          "status": 200,
+          "ms": 31.51,
+          "started_at": "2026-11-26T10:23:21.612247+00:00",
+          "cloud_request_ms": 1.16
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 20.94,
+        "requested_start": true,
+        "start_to_probe_ms": 5239.74,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 249.55,
+          "entry_to_http_ms": 2.9,
+          "http_to_probe_arrival_ms": 4987.7,
+          "probe_arrival_to_confirmation_ms": -0.41,
+          "http_to_probe_confirmed_ms": 4987.3
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 10,
+        "service": "sedno-perf-phases26-go",
+        "revision": "sedno-perf-phases26-go-t10",
+        "cold": {
+          "status": 200,
+          "ms": 5298.71,
+          "started_at": "2026-11-26T10:23:30.340942+00:00",
+          "cloud_request_ms": 5016.05
+        },
+        "warm": {
+          "status": 200,
+          "ms": 35.05,
+          "started_at": "2026-11-26T10:23:35.721649+00:00",
+          "cloud_request_ms": 0.96
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 11.26,
+        "requested_start": true,
+        "start_to_probe_ms": 5242.88,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 257.92,
+          "entry_to_http_ms": 2.39,
+          "http_to_probe_arrival_ms": 4983.19,
+          "probe_arrival_to_confirmation_ms": -0.62,
+          "http_to_probe_confirmed_ms": 4982.57
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 11,
+        "service": "sedno-perf-phases26-go",
+        "revision": "sedno-perf-phases26-go-t11",
+        "cold": {
+          "status": 200,
+          "ms": 5272.5,
+          "started_at": "2026-11-26T10:23:45.465228+00:00",
+          "cloud_request_ms": 5032.94
+        },
+        "warm": {
+          "status": 200,
+          "ms": 31.09,
+          "started_at": "2026-11-26T10:23:50.806743+00:00",
+          "cloud_request_ms": 1.46
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 20.16,
+        "requested_start": true,
+        "start_to_probe_ms": 5201.91,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 220.42,
+          "entry_to_http_ms": 3.45,
+          "http_to_probe_arrival_ms": 4978.36,
+          "probe_arrival_to_confirmation_ms": -0.32,
+          "http_to_probe_confirmed_ms": 4978.05
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 12,
+        "service": "sedno-perf-phases26-go",
+        "revision": "sedno-perf-phases26-go-t12",
+        "cold": {
+          "status": 200,
+          "ms": 5345.85,
+          "started_at": "2026-11-26T10:23:59.960924+00:00",
+          "cloud_request_ms": 5023.03
+        },
+        "warm": {
+          "status": 200,
+          "ms": 28.93,
+          "started_at": "2026-11-26T10:24:05.388870+00:00",
+          "cloud_request_ms": 1.65
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 11.98,
+        "requested_start": true,
+        "start_to_probe_ms": 5283.85,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 292.02,
+          "entry_to_http_ms": 2.68,
+          "http_to_probe_arrival_ms": 4989.39,
+          "probe_arrival_to_confirmation_ms": -0.25,
+          "http_to_probe_confirmed_ms": 4989.14
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 13,
+        "service": "sedno-perf-phases26-go",
+        "revision": "sedno-perf-phases26-go-t13",
+        "cold": {
+          "status": 200,
+          "ms": 5252.8,
+          "started_at": "2026-11-26T10:24:14.291269+00:00",
+          "cloud_request_ms": 5040.34
+        },
+        "warm": {
+          "status": 200,
+          "ms": 34.65,
+          "started_at": "2026-11-26T10:24:19.619201+00:00",
+          "cloud_request_ms": 1.24
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 27.21,
+        "requested_start": true,
+        "start_to_probe_ms": 5180.55,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 241.53,
+          "entry_to_http_ms": 3.92,
+          "http_to_probe_arrival_ms": 4935.4,
+          "probe_arrival_to_confirmation_ms": -0.3,
+          "http_to_probe_confirmed_ms": 4935.1
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 14,
+        "service": "sedno-perf-phases26-go",
+        "revision": "sedno-perf-phases26-go-t14",
+        "cold": {
+          "status": 200,
+          "ms": 5199.34,
+          "started_at": "2026-11-26T10:24:27.937286+00:00",
+          "cloud_request_ms": 5034.27
+        },
+        "warm": {
+          "status": 200,
+          "ms": 31.55,
+          "started_at": "2026-11-26T10:24:33.214979+00:00",
+          "cloud_request_ms": 1.7
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 23.03,
+        "requested_start": true,
+        "start_to_probe_ms": 5132.03,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 144.35,
+          "entry_to_http_ms": 3.29,
+          "http_to_probe_arrival_ms": 4985.06,
+          "probe_arrival_to_confirmation_ms": -0.68,
+          "http_to_probe_confirmed_ms": 4984.39
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 15,
+        "service": "sedno-perf-phases26-go",
+        "revision": "sedno-perf-phases26-go-t15",
+        "cold": {
+          "status": 200,
+          "ms": 5170.88,
+          "started_at": "2026-11-26T10:24:42.794215+00:00",
+          "cloud_request_ms": 5022.1
+        },
+        "warm": {
+          "status": 200,
+          "ms": 30.94,
+          "started_at": "2026-11-26T10:24:48.041377+00:00",
+          "cloud_request_ms": 1.49
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 21.14,
+        "requested_start": true,
+        "start_to_probe_ms": 5097.35,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 114.3,
+          "entry_to_http_ms": 2.53,
+          "http_to_probe_arrival_ms": 4980.72,
+          "probe_arrival_to_confirmation_ms": -0.19,
+          "http_to_probe_confirmed_ms": 4980.52
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 16,
+        "service": "sedno-perf-phases26-go",
+        "revision": "sedno-perf-phases26-go-t16",
+        "cold": {
+          "status": 200,
+          "ms": 5400.61,
+          "started_at": "2026-11-26T10:24:57.253651+00:00",
+          "cloud_request_ms": 5032.03
+        },
+        "warm": {
+          "status": 200,
+          "ms": 31.27,
+          "started_at": "2026-11-26T10:25:02.718227+00:00",
+          "cloud_request_ms": 1.68
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 24.2,
+        "requested_start": true,
+        "start_to_probe_ms": 5328.36,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 345.07,
+          "entry_to_http_ms": 3.33,
+          "http_to_probe_arrival_ms": 4980.88,
+          "probe_arrival_to_confirmation_ms": -0.92,
+          "http_to_probe_confirmed_ms": 4979.96
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 17,
+        "service": "sedno-perf-phases26-go",
+        "revision": "sedno-perf-phases26-go-t17",
+        "cold": {
+          "status": 200,
+          "ms": 5183.02,
+          "started_at": "2026-11-26T10:25:11.492813+00:00",
+          "cloud_request_ms": 5021.7
+        },
+        "warm": {
+          "status": 200,
+          "ms": 28.47,
+          "started_at": "2026-11-26T10:25:16.759749+00:00",
+          "cloud_request_ms": 1.88
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 24.85,
+        "requested_start": true,
+        "start_to_probe_ms": 5104.99,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 126.13,
+          "entry_to_http_ms": 2.94,
+          "http_to_probe_arrival_ms": 4975.89,
+          "probe_arrival_to_confirmation_ms": 0.03,
+          "http_to_probe_confirmed_ms": 4975.92
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 18,
+        "service": "sedno-perf-phases26-go",
+        "revision": "sedno-perf-phases26-go-t18",
+        "cold": {
+          "status": 200,
+          "ms": 5168.78,
+          "started_at": "2026-11-26T10:25:27.425572+00:00",
+          "cloud_request_ms": 5015.68
+        },
+        "warm": {
+          "status": 200,
+          "ms": 30.52,
+          "started_at": "2026-11-26T10:25:32.711437+00:00",
+          "cloud_request_ms": 1.78
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 15.18,
+        "requested_start": true,
+        "start_to_probe_ms": 5105.2,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 120.89,
+          "entry_to_http_ms": 2.69,
+          "http_to_probe_arrival_ms": 4982.53,
+          "probe_arrival_to_confirmation_ms": -0.9,
+          "http_to_probe_confirmed_ms": 4981.62
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 19,
+        "service": "sedno-perf-phases26-go",
+        "revision": "sedno-perf-phases26-go-t19",
+        "cold": {
+          "status": 200,
+          "ms": 5243.07,
+          "started_at": "2026-11-26T10:25:41.639607+00:00",
+          "cloud_request_ms": 5030.15
+        },
+        "warm": {
+          "status": 200,
+          "ms": 42.98,
+          "started_at": "2026-11-26T10:25:46.963587+00:00",
+          "cloud_request_ms": 1.15
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 22.44,
+        "requested_start": true,
+        "start_to_probe_ms": 5178.58,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 191.26,
+          "entry_to_http_ms": 2.69,
+          "http_to_probe_arrival_ms": 4985.45,
+          "probe_arrival_to_confirmation_ms": -0.82,
+          "http_to_probe_confirmed_ms": 4984.63
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 20,
+        "service": "sedno-perf-phases26-go",
+        "revision": "sedno-perf-phases26-go-t20",
+        "cold": {
+          "status": 200,
+          "ms": 5182.48,
+          "started_at": "2026-11-26T10:25:57.607733+00:00",
+          "cloud_request_ms": 5034.69
+        },
+        "warm": {
+          "status": 200,
+          "ms": 53.83,
+          "started_at": "2026-11-26T10:26:02.867438+00:00",
+          "cloud_request_ms": 1.27
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 18.57,
+        "requested_start": true,
+        "start_to_probe_ms": 5116.56,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 165.56,
+          "entry_to_http_ms": 2.75,
+          "http_to_probe_arrival_ms": 4948.35,
+          "probe_arrival_to_confirmation_ms": -0.1,
+          "http_to_probe_confirmed_ms": 4948.25
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 21,
+        "service": "sedno-perf-phases26-go",
+        "revision": "sedno-perf-phases26-go-t21",
+        "cold": {
+          "status": 200,
+          "ms": 5185.35,
+          "started_at": "2026-11-26T10:26:13.378772+00:00",
+          "cloud_request_ms": 5022.95
+        },
+        "warm": {
+          "status": 200,
+          "ms": 40.31,
+          "started_at": "2026-11-26T10:26:18.634523+00:00",
+          "cloud_request_ms": 1.62
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 21.15,
+        "requested_start": true,
+        "start_to_probe_ms": 5119.61,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 142.42,
+          "entry_to_http_ms": 3.61,
+          "http_to_probe_arrival_ms": 4974.22,
+          "probe_arrival_to_confirmation_ms": -0.64,
+          "http_to_probe_confirmed_ms": 4973.58
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 22,
+        "service": "sedno-perf-phases26-go",
+        "revision": "sedno-perf-phases26-go-t22",
+        "cold": {
+          "status": 200,
+          "ms": 5172.62,
+          "started_at": "2026-11-26T10:26:27.747675+00:00",
+          "cloud_request_ms": 5023.13
+        },
+        "warm": {
+          "status": 200,
+          "ms": 36.24,
+          "started_at": "2026-11-26T10:26:32.990917+00:00",
+          "cloud_request_ms": 2.41
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 13.41,
+        "requested_start": true,
+        "start_to_probe_ms": 5104.83,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 117.88,
+          "entry_to_http_ms": 3.12,
+          "http_to_probe_arrival_ms": 4983.91,
+          "probe_arrival_to_confirmation_ms": -0.08,
+          "http_to_probe_confirmed_ms": 4983.83
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 23,
+        "service": "sedno-perf-phases26-go",
+        "revision": "sedno-perf-phases26-go-t23",
+        "cold": {
+          "status": 200,
+          "ms": 5194.62,
+          "started_at": "2026-11-26T10:26:42.804846+00:00",
+          "cloud_request_ms": 5029.81
+        },
+        "warm": {
+          "status": 200,
+          "ms": 35.58,
+          "started_at": "2026-11-26T10:26:48.088538+00:00",
+          "cloud_request_ms": 1.48
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 26.3,
+        "requested_start": true,
+        "start_to_probe_ms": 5115.32,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 135.06,
+          "entry_to_http_ms": 4.92,
+          "http_to_probe_arrival_ms": 4976.34,
+          "probe_arrival_to_confirmation_ms": -1.0,
+          "http_to_probe_confirmed_ms": 4975.34
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 24,
+        "service": "sedno-perf-phases26-go",
+        "revision": "sedno-perf-phases26-go-t24",
+        "cold": {
+          "status": 200,
+          "ms": 5217.16,
+          "started_at": "2026-11-26T10:26:57.058292+00:00",
+          "cloud_request_ms": 5033.97
+        },
+        "warm": {
+          "status": 200,
+          "ms": 36.66,
+          "started_at": "2026-11-26T10:27:02.343010+00:00",
+          "cloud_request_ms": 1.88
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 27.72,
+        "requested_start": true,
+        "start_to_probe_ms": 5139.38,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 160.61,
+          "entry_to_http_ms": 3.47,
+          "http_to_probe_arrival_ms": 4975.6,
+          "probe_arrival_to_confirmation_ms": -0.3,
+          "http_to_probe_confirmed_ms": 4975.3
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 25,
+        "service": "sedno-perf-phases26-go",
+        "revision": "sedno-perf-phases26-go-t25",
+        "cold": {
+          "status": 200,
+          "ms": 5198.82,
+          "started_at": "2026-11-26T10:27:11.345855+00:00",
+          "cloud_request_ms": 5025.08
+        },
+        "warm": {
+          "status": 200,
+          "ms": 36.1,
+          "started_at": "2026-11-26T10:27:16.648485+00:00",
+          "cloud_request_ms": 2.18
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 20.71,
+        "requested_start": true,
+        "start_to_probe_ms": 5127.59,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 142.49,
+          "entry_to_http_ms": 2.95,
+          "http_to_probe_arrival_ms": 4981.9,
+          "probe_arrival_to_confirmation_ms": 0.25,
+          "http_to_probe_confirmed_ms": 4982.15
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 26,
+        "service": "sedno-perf-phases26-go",
+        "revision": "sedno-perf-phases26-go-t26",
+        "cold": {
+          "status": 200,
+          "ms": 5208.77,
+          "started_at": "2026-11-26T10:27:27.250022+00:00",
+          "cloud_request_ms": 5031.87
+        },
+        "warm": {
+          "status": 200,
+          "ms": 34.52,
+          "started_at": "2026-11-26T10:27:32.525018+00:00",
+          "cloud_request_ms": 1.68
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 24.82,
+        "requested_start": true,
+        "start_to_probe_ms": 5130.08,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 149.34,
+          "entry_to_http_ms": 3.49,
+          "http_to_probe_arrival_ms": 4977.45,
+          "probe_arrival_to_confirmation_ms": -0.21,
+          "http_to_probe_confirmed_ms": 4977.24
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 27,
+        "service": "sedno-perf-phases26-go",
+        "revision": "sedno-perf-phases26-go-t27",
+        "cold": {
+          "status": 200,
+          "ms": 5291.33,
+          "started_at": "2026-11-26T10:27:42.438515+00:00",
+          "cloud_request_ms": 5029.45
+        },
+        "warm": {
+          "status": 200,
+          "ms": 38.46,
+          "started_at": "2026-11-26T10:27:47.821037+00:00",
+          "cloud_request_ms": 0.98
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 24.98,
+        "requested_start": true,
+        "start_to_probe_ms": 5220.06,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 228.68,
+          "entry_to_http_ms": 2.39,
+          "http_to_probe_arrival_ms": 4989.12,
+          "probe_arrival_to_confirmation_ms": -0.13,
+          "http_to_probe_confirmed_ms": 4988.99
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 28,
+        "service": "sedno-perf-phases26-go",
+        "revision": "sedno-perf-phases26-go-t28",
+        "cold": {
+          "status": 200,
+          "ms": 5364.82,
+          "started_at": "2026-11-26T10:27:56.584163+00:00",
+          "cloud_request_ms": 5009.04
+        },
+        "warm": {
+          "status": 200,
+          "ms": 31.18,
+          "started_at": "2026-11-26T10:28:02.015394+00:00",
+          "cloud_request_ms": 1.33
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 17.11,
+        "requested_start": true,
+        "start_to_probe_ms": 5296.1,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 310.94,
+          "entry_to_http_ms": 2.63,
+          "http_to_probe_arrival_ms": 4982.74,
+          "probe_arrival_to_confirmation_ms": -0.2,
+          "http_to_probe_confirmed_ms": 4982.54
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 29,
+        "service": "sedno-perf-phases26-go",
+        "revision": "sedno-perf-phases26-go-t29",
+        "cold": {
+          "status": 200,
+          "ms": 5212.24,
+          "started_at": "2026-11-26T10:28:10.758975+00:00",
+          "cloud_request_ms": 5031.25
+        },
+        "warm": {
+          "status": 200,
+          "ms": 38.36,
+          "started_at": "2026-11-26T10:28:16.042069+00:00",
+          "cloud_request_ms": 1.58
+        },
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 24.69,
+        "requested_start": true,
+        "start_to_probe_ms": 5137.18,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 156.78,
+          "entry_to_http_ms": 2.7,
+          "http_to_probe_arrival_ms": 4978.37,
+          "probe_arrival_to_confirmation_ms": -0.67,
+          "http_to_probe_confirmed_ms": 4977.7
+        },
+        "warm_same_instance": true
+      },
+      {
+        "trial": 30,
+        "service": "sedno-perf-phases26-go",
+        "revision": "sedno-perf-phases26-go-t30",
+        "cold": {
+          "status": 200,
+          "ms": 5173.19,
+          "started_at": "2026-11-26T10:28:24.414126+00:00",
+          "cloud_request_ms": 5021.78
+        },
+        "warm": {
+          "status": 200,
+          "ms": 34.09,
+          "started_at": "2026-11-26T10:28:29.656901+00:00",
+          "cloud_request_ms": 1.84
+        },
+        "warm_same_instance": true,
+        "start_reason": "AUTOSCALING",
+        "verified_cold": true,
+        "instance_start_minus_request_ms": 21.6,
+        "requested_start": true,
+        "start_to_probe_ms": 5099.01,
+        "probe_attempts": 2,
+        "phases_ms": {
+          "platform_to_entry_ms": 130.8,
+          "entry_to_http_ms": 2.87,
+          "http_to_probe_arrival_ms": 4965.55,
+          "probe_arrival_to_confirmation_ms": -0.21,
+          "http_to_probe_confirmed_ms": 4965.34
+        }
+      }
+    ],
+    "phases_ms": {
+      "entry_to_http_ms": {
+        "n": 30,
+        "mean": 3.08,
+        "median": 2.96,
+        "p95": 3.92,
+        "max": 4.92
+      },
+      "http_to_probe_arrival_ms": {
+        "n": 30,
+        "mean": 4976.97,
+        "median": 4978.66,
+        "p95": 4989.12,
+        "max": 4989.39
+      },
+      "http_to_probe_confirmed_ms": {
+        "n": 30,
+        "mean": 4976.62,
+        "median": 4978.5,
+        "p95": 4988.99,
+        "max": 4989.14
+      },
+      "platform_to_entry_ms": {
+        "n": 30,
+        "mean": 180.62,
+        "median": 146.84,
+        "p95": 310.94,
+        "max": 345.07
+      },
+      "probe_arrival_to_confirmation_ms": {
+        "n": 30,
+        "mean": -0.35,
+        "median": -0.3,
+        "p95": 0.2,
+        "max": 0.25
+      }
+    }
+  }
+}

@@ -1,0 +1,487 @@
+{
+  "http5": {
+    "successful": 30,
+    "samples": [
+      {
+        "status": "200",
+        "gate_ms": 5749.6,
+        "request_ms": 626.63,
+        "total_ms": 6377.41,
+        "probe_attempts": 2
+      },
+      {
+        "status": "200",
+        "gate_ms": 5774.42,
+        "request_ms": 452.8,
+        "total_ms": 6228.04,
+        "probe_attempts": 2
+      },
+      {
+        "status": "200",
+        "gate_ms": 5937.15,
+        "request_ms": 517.74,
+        "total_ms": 6456.03,
+        "probe_attempts": 2
+      },
+      {
+        "status": "200",
+        "gate_ms": 5795.04,
+        "request_ms": 625.73,
+        "total_ms": 6421.61,
+        "probe_attempts": 2
+      },
+      {
+        "status": "200",
+        "gate_ms": 5833.37,
+        "request_ms": 679.91,
+        "total_ms": 6514.11,
+        "probe_attempts": 2
+      },
+      {
+        "status": "200",
+        "gate_ms": 5719.85,
+        "request_ms": 367.55,
+        "total_ms": 6088.39,
+        "probe_attempts": 2
+      },
+      {
+        "status": "200",
+        "gate_ms": 5863.86,
+        "request_ms": 455.35,
+        "total_ms": 6320.31,
+        "probe_attempts": 2
+      },
+      {
+        "status": "200",
+        "gate_ms": 5818.26,
+        "request_ms": 578.3,
+        "total_ms": 6397.46,
+        "probe_attempts": 2
+      },
+      {
+        "status": "200",
+        "gate_ms": 5737.69,
+        "request_ms": 562.08,
+        "total_ms": 6300.67,
+        "probe_attempts": 2
+      },
+      {
+        "status": "200",
+        "gate_ms": 5788.53,
+        "request_ms": 485.84,
+        "total_ms": 6276.85,
+        "probe_attempts": 2
+      },
+      {
+        "status": "200",
+        "gate_ms": 5847.77,
+        "request_ms": 444.98,
+        "total_ms": 6293.62,
+        "probe_attempts": 2
+      },
+      {
+        "status": "200",
+        "gate_ms": 5812.2,
+        "request_ms": 490.29,
+        "total_ms": 6303.47,
+        "probe_attempts": 2
+      },
+      {
+        "status": "200",
+        "gate_ms": 5871.33,
+        "request_ms": 571.65,
+        "total_ms": 6444.05,
+        "probe_attempts": 2
+      },
+      {
+        "status": "200",
+        "gate_ms": 5709.3,
+        "request_ms": 445.24,
+        "total_ms": 6155.36,
+        "probe_attempts": 2
+      },
+      {
+        "status": "200",
+        "gate_ms": 5788.22,
+        "request_ms": 388.62,
+        "total_ms": 6178.03,
+        "probe_attempts": 2
+      },
+      {
+        "status": "200",
+        "gate_ms": 5799.79,
+        "request_ms": 421.39,
+        "total_ms": 6222.01,
+        "probe_attempts": 2
+      },
+      {
+        "status": "200",
+        "gate_ms": 5804.01,
+        "request_ms": 385.41,
+        "total_ms": 6190.49,
+        "probe_attempts": 2
+      },
+      {
+        "status": "200",
+        "gate_ms": 5706.78,
+        "request_ms": 465.17,
+        "total_ms": 6172.78,
+        "probe_attempts": 2
+      },
+      {
+        "status": "200",
+        "gate_ms": 5774.8,
+        "request_ms": 426.47,
+        "total_ms": 6202.1,
+        "probe_attempts": 2
+      },
+      {
+        "status": "200",
+        "gate_ms": 5594.73,
+        "request_ms": 325.39,
+        "total_ms": 5920.81,
+        "probe_attempts": 2
+      },
+      {
+        "status": "200",
+        "gate_ms": 5685.92,
+        "request_ms": 332.17,
+        "total_ms": 6018.79,
+        "probe_attempts": 2
+      },
+      {
+        "status": "200",
+        "gate_ms": 5708.33,
+        "request_ms": 374.37,
+        "total_ms": 6083.55,
+        "probe_attempts": 2
+      },
+      {
+        "status": "200",
+        "gate_ms": 5728.3,
+        "request_ms": 375.79,
+        "total_ms": 6104.88,
+        "probe_attempts": 2
+      },
+      {
+        "status": "200",
+        "gate_ms": 5759.66,
+        "request_ms": 430.37,
+        "total_ms": 6190.92,
+        "probe_attempts": 2
+      },
+      {
+        "status": "200",
+        "gate_ms": 5766.96,
+        "request_ms": 372.88,
+        "total_ms": 6140.61,
+        "probe_attempts": 2
+      },
+      {
+        "status": "200",
+        "gate_ms": 6033.47,
+        "request_ms": 500.83,
+        "total_ms": 6535.23,
+        "probe_attempts": 2
+      },
+      {
+        "status": "200",
+        "gate_ms": 5814.63,
+        "request_ms": 371.65,
+        "total_ms": 6187.31,
+        "probe_attempts": 2
+      },
+      {
+        "status": "200",
+        "gate_ms": 5795.79,
+        "request_ms": 428.71,
+        "total_ms": 6225.31,
+        "probe_attempts": 2
+      },
+      {
+        "status": "200",
+        "gate_ms": 5704.55,
+        "request_ms": 431.95,
+        "total_ms": 6137.36,
+        "probe_attempts": 2
+      },
+      {
+        "status": "200",
+        "gate_ms": 5825.9,
+        "request_ms": 442.29,
+        "total_ms": 6269.14,
+        "probe_attempts": 2
+      }
+    ],
+    "gate_ms": {
+      "n": 30,
+      "mean": 5785.01,
+      "median": 5788.38,
+      "p95": 5937.15,
+      "max": 6033.47
+    },
+    "request_ms": {
+      "n": 30,
+      "mean": 459.25,
+      "median": 443.63,
+      "p95": 626.63,
+      "max": 679.91
+    },
+    "total_ms": {
+      "n": 30,
+      "mean": 6245.22,
+      "median": 6223.66,
+      "p95": 6514.11,
+      "max": 6535.23
+    }
+  },
+  "tcp": {
+    "successful": 30,
+    "samples": [
+      {
+        "status": "200",
+        "gate_ms": 806.37,
+        "request_ms": 1287.87,
+        "total_ms": 2096.6,
+        "probe_attempts": 71
+      },
+      {
+        "status": "200",
+        "gate_ms": 729.76,
+        "request_ms": 1328.07,
+        "total_ms": 2058.35,
+        "probe_attempts": 65
+      },
+      {
+        "status": "200",
+        "gate_ms": 733.33,
+        "request_ms": 1396.63,
+        "total_ms": 2130.59,
+        "probe_attempts": 65
+      },
+      {
+        "status": "200",
+        "gate_ms": 690.92,
+        "request_ms": 1655.9,
+        "total_ms": 2347.78,
+        "probe_attempts": 62
+      },
+      {
+        "status": "200",
+        "gate_ms": 963.64,
+        "request_ms": 1271.5,
+        "total_ms": 2235.75,
+        "probe_attempts": 85
+      },
+      {
+        "status": "200",
+        "gate_ms": 685.75,
+        "request_ms": 1460.29,
+        "total_ms": 2147.03,
+        "probe_attempts": 61
+      },
+      {
+        "status": "200",
+        "gate_ms": 617.75,
+        "request_ms": 1237.66,
+        "total_ms": 1856.06,
+        "probe_attempts": 56
+      },
+      {
+        "status": "200",
+        "gate_ms": 666.09,
+        "request_ms": 1359.95,
+        "total_ms": 2026.74,
+        "probe_attempts": 60
+      },
+      {
+        "status": "200",
+        "gate_ms": 606.01,
+        "request_ms": 1149.6,
+        "total_ms": 1756.22,
+        "probe_attempts": 54
+      },
+      {
+        "status": "200",
+        "gate_ms": 907.17,
+        "request_ms": 1322.67,
+        "total_ms": 2230.89,
+        "probe_attempts": 77
+      },
+      {
+        "status": "200",
+        "gate_ms": 734.33,
+        "request_ms": 1379.91,
+        "total_ms": 2115.0,
+        "probe_attempts": 64
+      },
+      {
+        "status": "200",
+        "gate_ms": 722.88,
+        "request_ms": 1483.33,
+        "total_ms": 2206.82,
+        "probe_attempts": 65
+      },
+      {
+        "status": "200",
+        "gate_ms": 755.23,
+        "request_ms": 1466.78,
+        "total_ms": 2223.39,
+        "probe_attempts": 66
+      },
+      {
+        "status": "200",
+        "gate_ms": 663.13,
+        "request_ms": 1284.76,
+        "total_ms": 1948.65,
+        "probe_attempts": 60
+      },
+      {
+        "status": "200",
+        "gate_ms": 656.85,
+        "request_ms": 1226.08,
+        "total_ms": 1883.53,
+        "probe_attempts": 59
+      },
+      {
+        "status": "200",
+        "gate_ms": 626.12,
+        "request_ms": 1112.14,
+        "total_ms": 1738.98,
+        "probe_attempts": 56
+      },
+      {
+        "status": "200",
+        "gate_ms": 640.82,
+        "request_ms": 1100.01,
+        "total_ms": 1741.44,
+        "probe_attempts": 58
+      },
+      {
+        "status": "200",
+        "gate_ms": 627.17,
+        "request_ms": 1207.69,
+        "total_ms": 1835.63,
+        "probe_attempts": 55
+      },
+      {
+        "status": "200",
+        "gate_ms": 587.24,
+        "request_ms": 1257.27,
+        "total_ms": 1845.45,
+        "probe_attempts": 53
+      },
+      {
+        "status": "200",
+        "gate_ms": 667.58,
+        "request_ms": 1299.04,
+        "total_ms": 1967.27,
+        "probe_attempts": 60
+      },
+      {
+        "status": "200",
+        "gate_ms": 489.73,
+        "request_ms": 1134.31,
+        "total_ms": 1624.66,
+        "probe_attempts": 46
+      },
+      {
+        "status": "200",
+        "gate_ms": 606.69,
+        "request_ms": 1260.63,
+        "total_ms": 1867.92,
+        "probe_attempts": 55
+      },
+      {
+        "status": "200",
+        "gate_ms": 544.02,
+        "request_ms": 947.92,
+        "total_ms": 1492.55,
+        "probe_attempts": 50
+      },
+      {
+        "status": "200",
+        "gate_ms": 497.57,
+        "request_ms": 1170.91,
+        "total_ms": 1669.02,
+        "probe_attempts": 46
+      },
+      {
+        "status": "200",
+        "gate_ms": 653.79,
+        "request_ms": 1102.04,
+        "total_ms": 1756.41,
+        "probe_attempts": 58
+      },
+      {
+        "status": "200",
+        "gate_ms": 670.64,
+        "request_ms": 1181.74,
+        "total_ms": 1852.97,
+        "probe_attempts": 60
+      },
+      {
+        "status": "200",
+        "gate_ms": 666.88,
+        "request_ms": 1138.64,
+        "total_ms": 1806.34,
+        "probe_attempts": 59
+      },
+      {
+        "status": "200",
+        "gate_ms": 638.83,
+        "request_ms": 1396.4,
+        "total_ms": 2036.34,
+        "probe_attempts": 57
+      },
+      {
+        "status": "200",
+        "gate_ms": 702.29,
+        "request_ms": 1169.5,
+        "total_ms": 1872.32,
+        "probe_attempts": 62
+      },
+      {
+        "status": "200",
+        "gate_ms": 564.3,
+        "request_ms": 1139.16,
+        "total_ms": 1705.17,
+        "probe_attempts": 52
+      }
+    ],
+    "gate_ms": {
+      "n": 30,
+      "mean": 670.76,
+      "median": 664.61,
+      "p95": 907.17,
+      "max": 963.64
+    },
+    "request_ms": {
+      "n": 30,
+      "mean": 1264.28,
+      "median": 1258.95,
+      "p95": 1483.33,
+      "max": 1655.9
+    },
+    "total_ms": {
+      "n": 30,
+      "mean": 1935.86,
+      "median": 1877.92,
+      "p95": 2235.75,
+      "max": 2347.78
+    }
+  },
+  "firestore_unavailable": {
+    "tcp": {
+      "status": "500",
+      "gate_ms": 601.95,
+      "request_ms": 1045.27,
+      "total_ms": 1647.78,
+      "probe_attempts": 54
+    },
+    "http5": {
+      "status": "startup_gate_timeout",
+      "total_ms": 25005.91
+    }
+  }
+}

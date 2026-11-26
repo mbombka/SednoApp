@@ -38,7 +38,9 @@ class FirebaseDeploymentTests(unittest.TestCase):
         for key in ("OpenAI__ApiKey", "Security__CredentialKey", "Security__FingerprintKey"):
             self.assertNotIn("value", env[key])
             self.assertEqual("1", env[key]["valueFrom"]["secretKeyRef"]["key"])
-        self.assertEqual("/health/ready", container["startupProbe"]["httpGet"]["path"])
+        self.assertNotIn("startupProbe", container)
+        self.assertEqual([{"containerPort": 8080}], container["ports"])
+        self.assertEqual("/health/live", container["livenessProbe"]["httpGet"]["path"])
 
     def test_explicit_first_stage_without_play_product_has_no_purchase_secrets(self):
         config = self.config(billing_product="", push_email="", without_billing=True)

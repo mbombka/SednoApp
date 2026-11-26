@@ -1,0 +1,5384 @@
+{
+  "api_logical_cpus": 1,
+  "rounds_per_level": 10,
+  "levels": {
+    "1": {
+      "rounds": [
+        {
+          "round": 1,
+          "outcomes": {
+            "200": 1
+          },
+          "backend_statuses": {
+            "200": 1
+          },
+          "backend_matches": 1,
+          "batch_ms": 66.35,
+          "dispatch_ms": {
+            "n": 1,
+            "mean": 0.03,
+            "median": 0.03,
+            "p95": 0.03,
+            "max": 0.03
+          },
+          "success": {
+            "client_ms": {
+              "n": 1,
+              "mean": 65.91,
+              "median": 65.91,
+              "p95": 65.91,
+              "max": 65.91
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 1,
+                "mean": 64.8,
+                "median": 64.8,
+                "p95": 64.8,
+                "max": 64.8
+              },
+              "AuthMs": {
+                "n": 1,
+                "mean": 6.2,
+                "median": 6.2,
+                "p95": 6.2,
+                "max": 6.2
+              },
+              "ReserveMs": {
+                "n": 1,
+                "mean": 23.6,
+                "median": 23.6,
+                "p95": 23.6,
+                "max": 23.6
+              },
+              "ModelMs": {
+                "n": 1,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 1,
+                "mean": 27.1,
+                "median": 27.1,
+                "p95": 27.1,
+                "max": 27.1
+              },
+              "QuotaMs": {
+                "n": 1,
+                "mean": 6.3,
+                "median": 6.3,
+                "p95": 6.3,
+                "max": 6.3
+              },
+              "QuotaLockMs": {
+                "n": 1,
+                "mean": 6.5,
+                "median": 6.5,
+                "p95": 6.5,
+                "max": 6.5
+              }
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 1,
+              "mean": 65.91,
+              "median": 65.91,
+              "p95": 65.91,
+              "max": 65.91
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 1,
+                "mean": 64.8,
+                "median": 64.8,
+                "p95": 64.8,
+                "max": 64.8
+              },
+              "AuthMs": {
+                "n": 1,
+                "mean": 6.2,
+                "median": 6.2,
+                "p95": 6.2,
+                "max": 6.2
+              },
+              "ReserveMs": {
+                "n": 1,
+                "mean": 23.6,
+                "median": 23.6,
+                "p95": 23.6,
+                "max": 23.6
+              },
+              "ModelMs": {
+                "n": 1,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 1,
+                "mean": 27.1,
+                "median": 27.1,
+                "p95": 27.1,
+                "max": 27.1
+              },
+              "QuotaMs": {
+                "n": 1,
+                "mean": 6.3,
+                "median": 6.3,
+                "p95": 6.3,
+                "max": 6.3
+              },
+              "QuotaLockMs": {
+                "n": 1,
+                "mean": 6.5,
+                "median": 6.5,
+                "p95": 6.5,
+                "max": 6.5
+              }
+            }
+          }
+        },
+        {
+          "round": 2,
+          "outcomes": {
+            "200": 1
+          },
+          "backend_statuses": {
+            "200": 1
+          },
+          "backend_matches": 1,
+          "batch_ms": 86.54,
+          "dispatch_ms": {
+            "n": 1,
+            "mean": 0.03,
+            "median": 0.03,
+            "p95": 0.03,
+            "max": 0.03
+          },
+          "success": {
+            "client_ms": {
+              "n": 1,
+              "mean": 85.64,
+              "median": 85.64,
+              "p95": 85.64,
+              "max": 85.64
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 1,
+                "mean": 82.5,
+                "median": 82.5,
+                "p95": 82.5,
+                "max": 82.5
+              },
+              "AuthMs": {
+                "n": 1,
+                "mean": 12.8,
+                "median": 12.8,
+                "p95": 12.8,
+                "max": 12.8
+              },
+              "ReserveMs": {
+                "n": 1,
+                "mean": 33.8,
+                "median": 33.8,
+                "p95": 33.8,
+                "max": 33.8
+              },
+              "ModelMs": {
+                "n": 1,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 1,
+                "mean": 23.3,
+                "median": 23.3,
+                "p95": 23.3,
+                "max": 23.3
+              },
+              "QuotaMs": {
+                "n": 1,
+                "mean": 5.8,
+                "median": 5.8,
+                "p95": 5.8,
+                "max": 5.8
+              },
+              "QuotaLockMs": {
+                "n": 1,
+                "mean": 10.4,
+                "median": 10.4,
+                "p95": 10.4,
+                "max": 10.4
+              }
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 1,
+              "mean": 85.64,
+              "median": 85.64,
+              "p95": 85.64,
+              "max": 85.64
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 1,
+                "mean": 82.5,
+                "median": 82.5,
+                "p95": 82.5,
+                "max": 82.5
+              },
+              "AuthMs": {
+                "n": 1,
+                "mean": 12.8,
+                "median": 12.8,
+                "p95": 12.8,
+                "max": 12.8
+              },
+              "ReserveMs": {
+                "n": 1,
+                "mean": 33.8,
+                "median": 33.8,
+                "p95": 33.8,
+                "max": 33.8
+              },
+              "ModelMs": {
+                "n": 1,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 1,
+                "mean": 23.3,
+                "median": 23.3,
+                "p95": 23.3,
+                "max": 23.3
+              },
+              "QuotaMs": {
+                "n": 1,
+                "mean": 5.8,
+                "median": 5.8,
+                "p95": 5.8,
+                "max": 5.8
+              },
+              "QuotaLockMs": {
+                "n": 1,
+                "mean": 10.4,
+                "median": 10.4,
+                "p95": 10.4,
+                "max": 10.4
+              }
+            }
+          }
+        },
+        {
+          "round": 3,
+          "outcomes": {
+            "200": 1
+          },
+          "backend_statuses": {
+            "200": 1
+          },
+          "backend_matches": 1,
+          "batch_ms": 61.83,
+          "dispatch_ms": {
+            "n": 1,
+            "mean": 0.04,
+            "median": 0.04,
+            "p95": 0.04,
+            "max": 0.04
+          },
+          "success": {
+            "client_ms": {
+              "n": 1,
+              "mean": 61.17,
+              "median": 61.17,
+              "p95": 61.17,
+              "max": 61.17
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 1,
+                "mean": 59.8,
+                "median": 59.8,
+                "p95": 59.8,
+                "max": 59.8
+              },
+              "AuthMs": {
+                "n": 1,
+                "mean": 4.6,
+                "median": 4.6,
+                "p95": 4.6,
+                "max": 4.6
+              },
+              "ReserveMs": {
+                "n": 1,
+                "mean": 21.6,
+                "median": 21.6,
+                "p95": 21.6,
+                "max": 21.6
+              },
+              "ModelMs": {
+                "n": 1,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 1,
+                "mean": 26.6,
+                "median": 26.6,
+                "p95": 26.6,
+                "max": 26.6
+              },
+              "QuotaMs": {
+                "n": 1,
+                "mean": 6.2,
+                "median": 6.2,
+                "p95": 6.2,
+                "max": 6.2
+              },
+              "QuotaLockMs": {
+                "n": 1,
+                "mean": 7.5,
+                "median": 7.5,
+                "p95": 7.5,
+                "max": 7.5
+              }
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 1,
+              "mean": 61.17,
+              "median": 61.17,
+              "p95": 61.17,
+              "max": 61.17
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 1,
+                "mean": 59.8,
+                "median": 59.8,
+                "p95": 59.8,
+                "max": 59.8
+              },
+              "AuthMs": {
+                "n": 1,
+                "mean": 4.6,
+                "median": 4.6,
+                "p95": 4.6,
+                "max": 4.6
+              },
+              "ReserveMs": {
+                "n": 1,
+                "mean": 21.6,
+                "median": 21.6,
+                "p95": 21.6,
+                "max": 21.6
+              },
+              "ModelMs": {
+                "n": 1,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 1,
+                "mean": 26.6,
+                "median": 26.6,
+                "p95": 26.6,
+                "max": 26.6
+              },
+              "QuotaMs": {
+                "n": 1,
+                "mean": 6.2,
+                "median": 6.2,
+                "p95": 6.2,
+                "max": 6.2
+              },
+              "QuotaLockMs": {
+                "n": 1,
+                "mean": 7.5,
+                "median": 7.5,
+                "p95": 7.5,
+                "max": 7.5
+              }
+            }
+          }
+        },
+        {
+          "round": 4,
+          "outcomes": {
+            "200": 1
+          },
+          "backend_statuses": {
+            "200": 1
+          },
+          "backend_matches": 1,
+          "batch_ms": 119.91,
+          "dispatch_ms": {
+            "n": 1,
+            "mean": 0.04,
+            "median": 0.04,
+            "p95": 0.04,
+            "max": 0.04
+          },
+          "success": {
+            "client_ms": {
+              "n": 1,
+              "mean": 119.41,
+              "median": 119.41,
+              "p95": 119.41,
+              "max": 119.41
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 1,
+                "mean": 116.5,
+                "median": 116.5,
+                "p95": 116.5,
+                "max": 116.5
+              },
+              "AuthMs": {
+                "n": 1,
+                "mean": 6.7,
+                "median": 6.7,
+                "p95": 6.7,
+                "max": 6.7
+              },
+              "ReserveMs": {
+                "n": 1,
+                "mean": 43.6,
+                "median": 43.6,
+                "p95": 43.6,
+                "max": 43.6
+              },
+              "ModelMs": {
+                "n": 1,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 1,
+                "mean": 50.5,
+                "median": 50.5,
+                "p95": 50.5,
+                "max": 50.5
+              },
+              "QuotaMs": {
+                "n": 1,
+                "mean": 15.0,
+                "median": 15.0,
+                "p95": 15.0,
+                "max": 15.0
+              },
+              "QuotaLockMs": {
+                "n": 1,
+                "mean": 13.2,
+                "median": 13.2,
+                "p95": 13.2,
+                "max": 13.2
+              }
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 1,
+              "mean": 119.41,
+              "median": 119.41,
+              "p95": 119.41,
+              "max": 119.41
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 1,
+                "mean": 116.5,
+                "median": 116.5,
+                "p95": 116.5,
+                "max": 116.5
+              },
+              "AuthMs": {
+                "n": 1,
+                "mean": 6.7,
+                "median": 6.7,
+                "p95": 6.7,
+                "max": 6.7
+              },
+              "ReserveMs": {
+                "n": 1,
+                "mean": 43.6,
+                "median": 43.6,
+                "p95": 43.6,
+                "max": 43.6
+              },
+              "ModelMs": {
+                "n": 1,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 1,
+                "mean": 50.5,
+                "median": 50.5,
+                "p95": 50.5,
+                "max": 50.5
+              },
+              "QuotaMs": {
+                "n": 1,
+                "mean": 15.0,
+                "median": 15.0,
+                "p95": 15.0,
+                "max": 15.0
+              },
+              "QuotaLockMs": {
+                "n": 1,
+                "mean": 13.2,
+                "median": 13.2,
+                "p95": 13.2,
+                "max": 13.2
+              }
+            }
+          }
+        },
+        {
+          "round": 5,
+          "outcomes": {
+            "200": 1
+          },
+          "backend_statuses": {
+            "200": 1
+          },
+          "backend_matches": 1,
+          "batch_ms": 90.16,
+          "dispatch_ms": {
+            "n": 1,
+            "mean": 0.03,
+            "median": 0.03,
+            "p95": 0.03,
+            "max": 0.03
+          },
+          "success": {
+            "client_ms": {
+              "n": 1,
+              "mean": 89.55,
+              "median": 89.55,
+              "p95": 89.55,
+              "max": 89.55
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 1,
+                "mean": 85.2,
+                "median": 85.2,
+                "p95": 85.2,
+                "max": 85.2
+              },
+              "AuthMs": {
+                "n": 1,
+                "mean": 10.2,
+                "median": 10.2,
+                "p95": 10.2,
+                "max": 10.2
+              },
+              "ReserveMs": {
+                "n": 1,
+                "mean": 29.2,
+                "median": 29.2,
+                "p95": 29.2,
+                "max": 29.2
+              },
+              "ModelMs": {
+                "n": 1,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 1,
+                "mean": 33.9,
+                "median": 33.9,
+                "p95": 33.9,
+                "max": 33.9
+              },
+              "QuotaMs": {
+                "n": 1,
+                "mean": 10.9,
+                "median": 10.9,
+                "p95": 10.9,
+                "max": 10.9
+              },
+              "QuotaLockMs": {
+                "n": 1,
+                "mean": 8.2,
+                "median": 8.2,
+                "p95": 8.2,
+                "max": 8.2
+              }
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 1,
+              "mean": 89.55,
+              "median": 89.55,
+              "p95": 89.55,
+              "max": 89.55
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 1,
+                "mean": 85.2,
+                "median": 85.2,
+                "p95": 85.2,
+                "max": 85.2
+              },
+              "AuthMs": {
+                "n": 1,
+                "mean": 10.2,
+                "median": 10.2,
+                "p95": 10.2,
+                "max": 10.2
+              },
+              "ReserveMs": {
+                "n": 1,
+                "mean": 29.2,
+                "median": 29.2,
+                "p95": 29.2,
+                "max": 29.2
+              },
+              "ModelMs": {
+                "n": 1,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 1,
+                "mean": 33.9,
+                "median": 33.9,
+                "p95": 33.9,
+                "max": 33.9
+              },
+              "QuotaMs": {
+                "n": 1,
+                "mean": 10.9,
+                "median": 10.9,
+                "p95": 10.9,
+                "max": 10.9
+              },
+              "QuotaLockMs": {
+                "n": 1,
+                "mean": 8.2,
+                "median": 8.2,
+                "p95": 8.2,
+                "max": 8.2
+              }
+            }
+          }
+        },
+        {
+          "round": 6,
+          "outcomes": {
+            "200": 1
+          },
+          "backend_statuses": {
+            "200": 1
+          },
+          "backend_matches": 1,
+          "batch_ms": 59.46,
+          "dispatch_ms": {
+            "n": 1,
+            "mean": 0.03,
+            "median": 0.03,
+            "p95": 0.03,
+            "max": 0.03
+          },
+          "success": {
+            "client_ms": {
+              "n": 1,
+              "mean": 59.05,
+              "median": 59.05,
+              "p95": 59.05,
+              "max": 59.05
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 1,
+                "mean": 58.0,
+                "median": 58.0,
+                "p95": 58.0,
+                "max": 58.0
+              },
+              "AuthMs": {
+                "n": 1,
+                "mean": 4.2,
+                "median": 4.2,
+                "p95": 4.2,
+                "max": 4.2
+              },
+              "ReserveMs": {
+                "n": 1,
+                "mean": 19.8,
+                "median": 19.8,
+                "p95": 19.8,
+                "max": 19.8
+              },
+              "ModelMs": {
+                "n": 1,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 1,
+                "mean": 22.3,
+                "median": 22.3,
+                "p95": 22.3,
+                "max": 22.3
+              },
+              "QuotaMs": {
+                "n": 1,
+                "mean": 11.1,
+                "median": 11.1,
+                "p95": 11.1,
+                "max": 11.1
+              },
+              "QuotaLockMs": {
+                "n": 1,
+                "mean": 4.7,
+                "median": 4.7,
+                "p95": 4.7,
+                "max": 4.7
+              }
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 1,
+              "mean": 59.05,
+              "median": 59.05,
+              "p95": 59.05,
+              "max": 59.05
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 1,
+                "mean": 58.0,
+                "median": 58.0,
+                "p95": 58.0,
+                "max": 58.0
+              },
+              "AuthMs": {
+                "n": 1,
+                "mean": 4.2,
+                "median": 4.2,
+                "p95": 4.2,
+                "max": 4.2
+              },
+              "ReserveMs": {
+                "n": 1,
+                "mean": 19.8,
+                "median": 19.8,
+                "p95": 19.8,
+                "max": 19.8
+              },
+              "ModelMs": {
+                "n": 1,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 1,
+                "mean": 22.3,
+                "median": 22.3,
+                "p95": 22.3,
+                "max": 22.3
+              },
+              "QuotaMs": {
+                "n": 1,
+                "mean": 11.1,
+                "median": 11.1,
+                "p95": 11.1,
+                "max": 11.1
+              },
+              "QuotaLockMs": {
+                "n": 1,
+                "mean": 4.7,
+                "median": 4.7,
+                "p95": 4.7,
+                "max": 4.7
+              }
+            }
+          }
+        },
+        {
+          "round": 7,
+          "outcomes": {
+            "200": 1
+          },
+          "backend_statuses": {
+            "200": 1
+          },
+          "backend_matches": 1,
+          "batch_ms": 65.0,
+          "dispatch_ms": {
+            "n": 1,
+            "mean": 0.03,
+            "median": 0.03,
+            "p95": 0.03,
+            "max": 0.03
+          },
+          "success": {
+            "client_ms": {
+              "n": 1,
+              "mean": 64.58,
+              "median": 64.58,
+              "p95": 64.58,
+              "max": 64.58
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 1,
+                "mean": 63.3,
+                "median": 63.3,
+                "p95": 63.3,
+                "max": 63.3
+              },
+              "AuthMs": {
+                "n": 1,
+                "mean": 6.3,
+                "median": 6.3,
+                "p95": 6.3,
+                "max": 6.3
+              },
+              "ReserveMs": {
+                "n": 1,
+                "mean": 32.9,
+                "median": 32.9,
+                "p95": 32.9,
+                "max": 32.9
+              },
+              "ModelMs": {
+                "n": 1,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 1,
+                "mean": 17.9,
+                "median": 17.9,
+                "p95": 17.9,
+                "max": 17.9
+              },
+              "QuotaMs": {
+                "n": 1,
+                "mean": 5.6,
+                "median": 5.6,
+                "p95": 5.6,
+                "max": 5.6
+              },
+              "QuotaLockMs": {
+                "n": 1,
+                "mean": 9.1,
+                "median": 9.1,
+                "p95": 9.1,
+                "max": 9.1
+              }
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 1,
+              "mean": 64.58,
+              "median": 64.58,
+              "p95": 64.58,
+              "max": 64.58
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 1,
+                "mean": 63.3,
+                "median": 63.3,
+                "p95": 63.3,
+                "max": 63.3
+              },
+              "AuthMs": {
+                "n": 1,
+                "mean": 6.3,
+                "median": 6.3,
+                "p95": 6.3,
+                "max": 6.3
+              },
+              "ReserveMs": {
+                "n": 1,
+                "mean": 32.9,
+                "median": 32.9,
+                "p95": 32.9,
+                "max": 32.9
+              },
+              "ModelMs": {
+                "n": 1,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 1,
+                "mean": 17.9,
+                "median": 17.9,
+                "p95": 17.9,
+                "max": 17.9
+              },
+              "QuotaMs": {
+                "n": 1,
+                "mean": 5.6,
+                "median": 5.6,
+                "p95": 5.6,
+                "max": 5.6
+              },
+              "QuotaLockMs": {
+                "n": 1,
+                "mean": 9.1,
+                "median": 9.1,
+                "p95": 9.1,
+                "max": 9.1
+              }
+            }
+          }
+        },
+        {
+          "round": 8,
+          "outcomes": {
+            "200": 1
+          },
+          "backend_statuses": {
+            "200": 1
+          },
+          "backend_matches": 1,
+          "batch_ms": 63.25,
+          "dispatch_ms": {
+            "n": 1,
+            "mean": 0.02,
+            "median": 0.02,
+            "p95": 0.02,
+            "max": 0.02
+          },
+          "success": {
+            "client_ms": {
+              "n": 1,
+              "mean": 62.85,
+              "median": 62.85,
+              "p95": 62.85,
+              "max": 62.85
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 1,
+                "mean": 61.8,
+                "median": 61.8,
+                "p95": 61.8,
+                "max": 61.8
+              },
+              "AuthMs": {
+                "n": 1,
+                "mean": 6.0,
+                "median": 6.0,
+                "p95": 6.0,
+                "max": 6.0
+              },
+              "ReserveMs": {
+                "n": 1,
+                "mean": 22.4,
+                "median": 22.4,
+                "p95": 22.4,
+                "max": 22.4
+              },
+              "ModelMs": {
+                "n": 1,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 1,
+                "mean": 20.1,
+                "median": 20.1,
+                "p95": 20.1,
+                "max": 20.1
+              },
+              "QuotaMs": {
+                "n": 1,
+                "mean": 8.5,
+                "median": 8.5,
+                "p95": 8.5,
+                "max": 8.5
+              },
+              "QuotaLockMs": {
+                "n": 1,
+                "mean": 6.4,
+                "median": 6.4,
+                "p95": 6.4,
+                "max": 6.4
+              }
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 1,
+              "mean": 62.85,
+              "median": 62.85,
+              "p95": 62.85,
+              "max": 62.85
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 1,
+                "mean": 61.8,
+                "median": 61.8,
+                "p95": 61.8,
+                "max": 61.8
+              },
+              "AuthMs": {
+                "n": 1,
+                "mean": 6.0,
+                "median": 6.0,
+                "p95": 6.0,
+                "max": 6.0
+              },
+              "ReserveMs": {
+                "n": 1,
+                "mean": 22.4,
+                "median": 22.4,
+                "p95": 22.4,
+                "max": 22.4
+              },
+              "ModelMs": {
+                "n": 1,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 1,
+                "mean": 20.1,
+                "median": 20.1,
+                "p95": 20.1,
+                "max": 20.1
+              },
+              "QuotaMs": {
+                "n": 1,
+                "mean": 8.5,
+                "median": 8.5,
+                "p95": 8.5,
+                "max": 8.5
+              },
+              "QuotaLockMs": {
+                "n": 1,
+                "mean": 6.4,
+                "median": 6.4,
+                "p95": 6.4,
+                "max": 6.4
+              }
+            }
+          }
+        },
+        {
+          "round": 9,
+          "outcomes": {
+            "200": 1
+          },
+          "backend_statuses": {
+            "200": 1
+          },
+          "backend_matches": 1,
+          "batch_ms": 105.55,
+          "dispatch_ms": {
+            "n": 1,
+            "mean": 0.03,
+            "median": 0.03,
+            "p95": 0.03,
+            "max": 0.03
+          },
+          "success": {
+            "client_ms": {
+              "n": 1,
+              "mean": 103.9,
+              "median": 103.9,
+              "p95": 103.9,
+              "max": 103.9
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 1,
+                "mean": 102.1,
+                "median": 102.1,
+                "p95": 102.1,
+                "max": 102.1
+              },
+              "AuthMs": {
+                "n": 1,
+                "mean": 6.0,
+                "median": 6.0,
+                "p95": 6.0,
+                "max": 6.0
+              },
+              "ReserveMs": {
+                "n": 1,
+                "mean": 54.4,
+                "median": 54.4,
+                "p95": 54.4,
+                "max": 54.4
+              },
+              "ModelMs": {
+                "n": 1,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 1,
+                "mean": 33.3,
+                "median": 33.3,
+                "p95": 33.3,
+                "max": 33.3
+              },
+              "QuotaMs": {
+                "n": 1,
+                "mean": 7.4,
+                "median": 7.4,
+                "p95": 7.4,
+                "max": 7.4
+              },
+              "QuotaLockMs": {
+                "n": 1,
+                "mean": 21.3,
+                "median": 21.3,
+                "p95": 21.3,
+                "max": 21.3
+              }
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 1,
+              "mean": 103.9,
+              "median": 103.9,
+              "p95": 103.9,
+              "max": 103.9
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 1,
+                "mean": 102.1,
+                "median": 102.1,
+                "p95": 102.1,
+                "max": 102.1
+              },
+              "AuthMs": {
+                "n": 1,
+                "mean": 6.0,
+                "median": 6.0,
+                "p95": 6.0,
+                "max": 6.0
+              },
+              "ReserveMs": {
+                "n": 1,
+                "mean": 54.4,
+                "median": 54.4,
+                "p95": 54.4,
+                "max": 54.4
+              },
+              "ModelMs": {
+                "n": 1,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 1,
+                "mean": 33.3,
+                "median": 33.3,
+                "p95": 33.3,
+                "max": 33.3
+              },
+              "QuotaMs": {
+                "n": 1,
+                "mean": 7.4,
+                "median": 7.4,
+                "p95": 7.4,
+                "max": 7.4
+              },
+              "QuotaLockMs": {
+                "n": 1,
+                "mean": 21.3,
+                "median": 21.3,
+                "p95": 21.3,
+                "max": 21.3
+              }
+            }
+          }
+        },
+        {
+          "round": 10,
+          "outcomes": {
+            "200": 1
+          },
+          "backend_statuses": {
+            "200": 1
+          },
+          "backend_matches": 1,
+          "batch_ms": 59.47,
+          "dispatch_ms": {
+            "n": 1,
+            "mean": 0.03,
+            "median": 0.03,
+            "p95": 0.03,
+            "max": 0.03
+          },
+          "success": {
+            "client_ms": {
+              "n": 1,
+              "mean": 59.04,
+              "median": 59.04,
+              "p95": 59.04,
+              "max": 59.04
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 1,
+                "mean": 57.8,
+                "median": 57.8,
+                "p95": 57.8,
+                "max": 57.8
+              },
+              "AuthMs": {
+                "n": 1,
+                "mean": 5.1,
+                "median": 5.1,
+                "p95": 5.1,
+                "max": 5.1
+              },
+              "ReserveMs": {
+                "n": 1,
+                "mean": 16.0,
+                "median": 16.0,
+                "p95": 16.0,
+                "max": 16.0
+              },
+              "ModelMs": {
+                "n": 1,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 1,
+                "mean": 28.8,
+                "median": 28.8,
+                "p95": 28.8,
+                "max": 28.8
+              },
+              "QuotaMs": {
+                "n": 1,
+                "mean": 7.2,
+                "median": 7.2,
+                "p95": 7.2,
+                "max": 7.2
+              },
+              "QuotaLockMs": {
+                "n": 1,
+                "mean": 4.3,
+                "median": 4.3,
+                "p95": 4.3,
+                "max": 4.3
+              }
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 1,
+              "mean": 59.04,
+              "median": 59.04,
+              "p95": 59.04,
+              "max": 59.04
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 1,
+                "mean": 57.8,
+                "median": 57.8,
+                "p95": 57.8,
+                "max": 57.8
+              },
+              "AuthMs": {
+                "n": 1,
+                "mean": 5.1,
+                "median": 5.1,
+                "p95": 5.1,
+                "max": 5.1
+              },
+              "ReserveMs": {
+                "n": 1,
+                "mean": 16.0,
+                "median": 16.0,
+                "p95": 16.0,
+                "max": 16.0
+              },
+              "ModelMs": {
+                "n": 1,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 1,
+                "mean": 28.8,
+                "median": 28.8,
+                "p95": 28.8,
+                "max": 28.8
+              },
+              "QuotaMs": {
+                "n": 1,
+                "mean": 7.2,
+                "median": 7.2,
+                "p95": 7.2,
+                "max": 7.2
+              },
+              "QuotaLockMs": {
+                "n": 1,
+                "mean": 4.3,
+                "median": 4.3,
+                "p95": 4.3,
+                "max": 4.3
+              }
+            }
+          }
+        }
+      ],
+      "success": {
+        "client_ms": {
+          "n": 10,
+          "mean": 77.11,
+          "median": 65.24,
+          "p95": 119.41,
+          "max": 119.41
+        },
+        "backend_ms": {
+          "TotalMs": {
+            "n": 10,
+            "mean": 75.18,
+            "median": 64.05,
+            "p95": 116.5,
+            "max": 116.5
+          },
+          "AuthMs": {
+            "n": 10,
+            "mean": 6.81,
+            "median": 6.1,
+            "p95": 12.8,
+            "max": 12.8
+          },
+          "ReserveMs": {
+            "n": 10,
+            "mean": 29.73,
+            "median": 26.4,
+            "p95": 54.4,
+            "max": 54.4
+          },
+          "ModelMs": {
+            "n": 10,
+            "mean": 0.0,
+            "median": 0.0,
+            "p95": 0.0,
+            "max": 0.0
+          },
+          "CompleteMs": {
+            "n": 10,
+            "mean": 28.38,
+            "median": 26.85,
+            "p95": 50.5,
+            "max": 50.5
+          },
+          "QuotaMs": {
+            "n": 10,
+            "mean": 8.4,
+            "median": 7.3,
+            "p95": 15.0,
+            "max": 15.0
+          },
+          "QuotaLockMs": {
+            "n": 10,
+            "mean": 9.16,
+            "median": 7.85,
+            "p95": 21.3,
+            "max": 21.3
+          }
+        }
+      },
+      "all_outcomes": {
+        "client_ms": {
+          "n": 10,
+          "mean": 77.11,
+          "median": 65.24,
+          "p95": 119.41,
+          "max": 119.41
+        },
+        "backend_ms": {
+          "TotalMs": {
+            "n": 10,
+            "mean": 75.18,
+            "median": 64.05,
+            "p95": 116.5,
+            "max": 116.5
+          },
+          "AuthMs": {
+            "n": 10,
+            "mean": 6.81,
+            "median": 6.1,
+            "p95": 12.8,
+            "max": 12.8
+          },
+          "ReserveMs": {
+            "n": 10,
+            "mean": 29.73,
+            "median": 26.4,
+            "p95": 54.4,
+            "max": 54.4
+          },
+          "ModelMs": {
+            "n": 10,
+            "mean": 0.0,
+            "median": 0.0,
+            "p95": 0.0,
+            "max": 0.0
+          },
+          "CompleteMs": {
+            "n": 10,
+            "mean": 28.38,
+            "median": 26.85,
+            "p95": 50.5,
+            "max": 50.5
+          },
+          "QuotaMs": {
+            "n": 10,
+            "mean": 8.4,
+            "median": 7.3,
+            "p95": 15.0,
+            "max": 15.0
+          },
+          "QuotaLockMs": {
+            "n": 10,
+            "mean": 9.16,
+            "median": 7.85,
+            "p95": 21.3,
+            "max": 21.3
+          }
+        }
+      }
+    },
+    "10": {
+      "rounds": [
+        {
+          "round": 1,
+          "outcomes": {
+            "200": 10
+          },
+          "backend_statuses": {
+            "200": 10
+          },
+          "backend_matches": 10,
+          "batch_ms": 225.5,
+          "dispatch_ms": {
+            "n": 10,
+            "mean": 3.43,
+            "median": 3.89,
+            "p95": 4.06,
+            "max": 4.06
+          },
+          "success": {
+            "client_ms": {
+              "n": 10,
+              "mean": 214.82,
+              "median": 215.11,
+              "p95": 221.33,
+              "max": 221.33
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 10,
+                "mean": 207.75,
+                "median": 207.4,
+                "p95": 216.9,
+                "max": 216.9
+              },
+              "AuthMs": {
+                "n": 10,
+                "mean": 18.77,
+                "median": 18.6,
+                "p95": 21.5,
+                "max": 21.5
+              },
+              "ReserveMs": {
+                "n": 10,
+                "mean": 78.55,
+                "median": 80.7,
+                "p95": 84.0,
+                "max": 84.0
+              },
+              "ModelMs": {
+                "n": 10,
+                "mean": 0.01,
+                "median": 0.0,
+                "p95": 0.1,
+                "max": 0.1
+              },
+              "CompleteMs": {
+                "n": 10,
+                "mean": 78.86,
+                "median": 80.25,
+                "p95": 88.2,
+                "max": 88.2
+              },
+              "QuotaMs": {
+                "n": 10,
+                "mean": 31.06,
+                "median": 30.65,
+                "p95": 39.0,
+                "max": 39.0
+              },
+              "QuotaLockMs": {
+                "n": 10,
+                "mean": 24.14,
+                "median": 21.4,
+                "p95": 31.9,
+                "max": 31.9
+              }
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 10,
+              "mean": 214.82,
+              "median": 215.11,
+              "p95": 221.33,
+              "max": 221.33
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 10,
+                "mean": 207.75,
+                "median": 207.4,
+                "p95": 216.9,
+                "max": 216.9
+              },
+              "AuthMs": {
+                "n": 10,
+                "mean": 18.77,
+                "median": 18.6,
+                "p95": 21.5,
+                "max": 21.5
+              },
+              "ReserveMs": {
+                "n": 10,
+                "mean": 78.55,
+                "median": 80.7,
+                "p95": 84.0,
+                "max": 84.0
+              },
+              "ModelMs": {
+                "n": 10,
+                "mean": 0.01,
+                "median": 0.0,
+                "p95": 0.1,
+                "max": 0.1
+              },
+              "CompleteMs": {
+                "n": 10,
+                "mean": 78.86,
+                "median": 80.25,
+                "p95": 88.2,
+                "max": 88.2
+              },
+              "QuotaMs": {
+                "n": 10,
+                "mean": 31.06,
+                "median": 30.65,
+                "p95": 39.0,
+                "max": 39.0
+              },
+              "QuotaLockMs": {
+                "n": 10,
+                "mean": 24.14,
+                "median": 21.4,
+                "p95": 31.9,
+                "max": 31.9
+              }
+            }
+          }
+        },
+        {
+          "round": 2,
+          "outcomes": {
+            "200": 10
+          },
+          "backend_statuses": {
+            "200": 10
+          },
+          "backend_matches": 10,
+          "batch_ms": 207.17,
+          "dispatch_ms": {
+            "n": 10,
+            "mean": 0.25,
+            "median": 0.27,
+            "p95": 0.36,
+            "max": 0.36
+          },
+          "success": {
+            "client_ms": {
+              "n": 10,
+              "mean": 194.77,
+              "median": 193.72,
+              "p95": 206.62,
+              "max": 206.62
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 10,
+                "mean": 191.06,
+                "median": 189.8,
+                "p95": 204.6,
+                "max": 204.6
+              },
+              "AuthMs": {
+                "n": 10,
+                "mean": 10.94,
+                "median": 10.85,
+                "p95": 14.7,
+                "max": 14.7
+              },
+              "ReserveMs": {
+                "n": 10,
+                "mean": 71.38,
+                "median": 72.2,
+                "p95": 81.0,
+                "max": 81.0
+              },
+              "ModelMs": {
+                "n": 10,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 10,
+                "mean": 83.7,
+                "median": 84.75,
+                "p95": 100.5,
+                "max": 100.5
+              },
+              "QuotaMs": {
+                "n": 10,
+                "mean": 24.21,
+                "median": 22.25,
+                "p95": 33.6,
+                "max": 33.6
+              },
+              "QuotaLockMs": {
+                "n": 10,
+                "mean": 18.85,
+                "median": 17.9,
+                "p95": 28.0,
+                "max": 28.0
+              }
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 10,
+              "mean": 194.77,
+              "median": 193.72,
+              "p95": 206.62,
+              "max": 206.62
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 10,
+                "mean": 191.06,
+                "median": 189.8,
+                "p95": 204.6,
+                "max": 204.6
+              },
+              "AuthMs": {
+                "n": 10,
+                "mean": 10.94,
+                "median": 10.85,
+                "p95": 14.7,
+                "max": 14.7
+              },
+              "ReserveMs": {
+                "n": 10,
+                "mean": 71.38,
+                "median": 72.2,
+                "p95": 81.0,
+                "max": 81.0
+              },
+              "ModelMs": {
+                "n": 10,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 10,
+                "mean": 83.7,
+                "median": 84.75,
+                "p95": 100.5,
+                "max": 100.5
+              },
+              "QuotaMs": {
+                "n": 10,
+                "mean": 24.21,
+                "median": 22.25,
+                "p95": 33.6,
+                "max": 33.6
+              },
+              "QuotaLockMs": {
+                "n": 10,
+                "mean": 18.85,
+                "median": 17.9,
+                "p95": 28.0,
+                "max": 28.0
+              }
+            }
+          }
+        },
+        {
+          "round": 3,
+          "outcomes": {
+            "200": 10
+          },
+          "backend_statuses": {
+            "200": 10
+          },
+          "backend_matches": 10,
+          "batch_ms": 259.1,
+          "dispatch_ms": {
+            "n": 10,
+            "mean": 0.29,
+            "median": 0.31,
+            "p95": 0.41,
+            "max": 0.41
+          },
+          "success": {
+            "client_ms": {
+              "n": 10,
+              "mean": 251.32,
+              "median": 251.37,
+              "p95": 258.52,
+              "max": 258.52
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 10,
+                "mean": 246.07,
+                "median": 245.5,
+                "p95": 254.6,
+                "max": 254.6
+              },
+              "AuthMs": {
+                "n": 10,
+                "mean": 28.31,
+                "median": 29.75,
+                "p95": 35.0,
+                "max": 35.0
+              },
+              "ReserveMs": {
+                "n": 10,
+                "mean": 82.79,
+                "median": 85.3,
+                "p95": 88.8,
+                "max": 88.8
+              },
+              "ModelMs": {
+                "n": 10,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 10,
+                "mean": 102.08,
+                "median": 101.4,
+                "p95": 107.3,
+                "max": 107.3
+              },
+              "QuotaMs": {
+                "n": 10,
+                "mean": 32.25,
+                "median": 32.25,
+                "p95": 37.5,
+                "max": 37.5
+              },
+              "QuotaLockMs": {
+                "n": 10,
+                "mean": 22.51,
+                "median": 22.15,
+                "p95": 34.7,
+                "max": 34.7
+              }
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 10,
+              "mean": 251.32,
+              "median": 251.37,
+              "p95": 258.52,
+              "max": 258.52
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 10,
+                "mean": 246.07,
+                "median": 245.5,
+                "p95": 254.6,
+                "max": 254.6
+              },
+              "AuthMs": {
+                "n": 10,
+                "mean": 28.31,
+                "median": 29.75,
+                "p95": 35.0,
+                "max": 35.0
+              },
+              "ReserveMs": {
+                "n": 10,
+                "mean": 82.79,
+                "median": 85.3,
+                "p95": 88.8,
+                "max": 88.8
+              },
+              "ModelMs": {
+                "n": 10,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 10,
+                "mean": 102.08,
+                "median": 101.4,
+                "p95": 107.3,
+                "max": 107.3
+              },
+              "QuotaMs": {
+                "n": 10,
+                "mean": 32.25,
+                "median": 32.25,
+                "p95": 37.5,
+                "max": 37.5
+              },
+              "QuotaLockMs": {
+                "n": 10,
+                "mean": 22.51,
+                "median": 22.15,
+                "p95": 34.7,
+                "max": 34.7
+              }
+            }
+          }
+        },
+        {
+          "round": 4,
+          "outcomes": {
+            "200": 10
+          },
+          "backend_statuses": {
+            "200": 10
+          },
+          "backend_matches": 10,
+          "batch_ms": 258.27,
+          "dispatch_ms": {
+            "n": 10,
+            "mean": 0.26,
+            "median": 0.27,
+            "p95": 0.4,
+            "max": 0.4
+          },
+          "success": {
+            "client_ms": {
+              "n": 10,
+              "mean": 246.64,
+              "median": 248.49,
+              "p95": 257.77,
+              "max": 257.77
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 10,
+                "mean": 239.44,
+                "median": 240.6,
+                "p95": 252.7,
+                "max": 252.7
+              },
+              "AuthMs": {
+                "n": 10,
+                "mean": 20.32,
+                "median": 21.15,
+                "p95": 27.2,
+                "max": 27.2
+              },
+              "ReserveMs": {
+                "n": 10,
+                "mean": 74.49,
+                "median": 73.25,
+                "p95": 86.5,
+                "max": 86.5
+              },
+              "ModelMs": {
+                "n": 10,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 10,
+                "mean": 108.55,
+                "median": 111.45,
+                "p95": 117.2,
+                "max": 117.2
+              },
+              "QuotaMs": {
+                "n": 10,
+                "mean": 34.78,
+                "median": 33.2,
+                "p95": 43.9,
+                "max": 43.9
+              },
+              "QuotaLockMs": {
+                "n": 10,
+                "mean": 21.05,
+                "median": 20.7,
+                "p95": 25.5,
+                "max": 25.5
+              }
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 10,
+              "mean": 246.64,
+              "median": 248.49,
+              "p95": 257.77,
+              "max": 257.77
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 10,
+                "mean": 239.44,
+                "median": 240.6,
+                "p95": 252.7,
+                "max": 252.7
+              },
+              "AuthMs": {
+                "n": 10,
+                "mean": 20.32,
+                "median": 21.15,
+                "p95": 27.2,
+                "max": 27.2
+              },
+              "ReserveMs": {
+                "n": 10,
+                "mean": 74.49,
+                "median": 73.25,
+                "p95": 86.5,
+                "max": 86.5
+              },
+              "ModelMs": {
+                "n": 10,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 10,
+                "mean": 108.55,
+                "median": 111.45,
+                "p95": 117.2,
+                "max": 117.2
+              },
+              "QuotaMs": {
+                "n": 10,
+                "mean": 34.78,
+                "median": 33.2,
+                "p95": 43.9,
+                "max": 43.9
+              },
+              "QuotaLockMs": {
+                "n": 10,
+                "mean": 21.05,
+                "median": 20.7,
+                "p95": 25.5,
+                "max": 25.5
+              }
+            }
+          }
+        },
+        {
+          "round": 5,
+          "outcomes": {
+            "200": 10
+          },
+          "backend_statuses": {
+            "200": 10
+          },
+          "backend_matches": 10,
+          "batch_ms": 312.12,
+          "dispatch_ms": {
+            "n": 10,
+            "mean": 0.51,
+            "median": 0.53,
+            "p95": 0.73,
+            "max": 0.73
+          },
+          "success": {
+            "client_ms": {
+              "n": 10,
+              "mean": 298.82,
+              "median": 301.86,
+              "p95": 311.12,
+              "max": 311.12
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 10,
+                "mean": 286.94,
+                "median": 287.85,
+                "p95": 302.4,
+                "max": 302.4
+              },
+              "AuthMs": {
+                "n": 10,
+                "mean": 49.13,
+                "median": 52.7,
+                "p95": 55.5,
+                "max": 55.5
+              },
+              "ReserveMs": {
+                "n": 10,
+                "mean": 104.62,
+                "median": 109.3,
+                "p95": 120.7,
+                "max": 120.7
+              },
+              "ModelMs": {
+                "n": 10,
+                "mean": 0.01,
+                "median": 0.0,
+                "p95": 0.1,
+                "max": 0.1
+              },
+              "CompleteMs": {
+                "n": 10,
+                "mean": 93.59,
+                "median": 92.5,
+                "p95": 106.2,
+                "max": 106.2
+              },
+              "QuotaMs": {
+                "n": 10,
+                "mean": 39.02,
+                "median": 40.15,
+                "p95": 45.8,
+                "max": 45.8
+              },
+              "QuotaLockMs": {
+                "n": 10,
+                "mean": 24.87,
+                "median": 24.4,
+                "p95": 39.6,
+                "max": 39.6
+              }
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 10,
+              "mean": 298.82,
+              "median": 301.86,
+              "p95": 311.12,
+              "max": 311.12
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 10,
+                "mean": 286.94,
+                "median": 287.85,
+                "p95": 302.4,
+                "max": 302.4
+              },
+              "AuthMs": {
+                "n": 10,
+                "mean": 49.13,
+                "median": 52.7,
+                "p95": 55.5,
+                "max": 55.5
+              },
+              "ReserveMs": {
+                "n": 10,
+                "mean": 104.62,
+                "median": 109.3,
+                "p95": 120.7,
+                "max": 120.7
+              },
+              "ModelMs": {
+                "n": 10,
+                "mean": 0.01,
+                "median": 0.0,
+                "p95": 0.1,
+                "max": 0.1
+              },
+              "CompleteMs": {
+                "n": 10,
+                "mean": 93.59,
+                "median": 92.5,
+                "p95": 106.2,
+                "max": 106.2
+              },
+              "QuotaMs": {
+                "n": 10,
+                "mean": 39.02,
+                "median": 40.15,
+                "p95": 45.8,
+                "max": 45.8
+              },
+              "QuotaLockMs": {
+                "n": 10,
+                "mean": 24.87,
+                "median": 24.4,
+                "p95": 39.6,
+                "max": 39.6
+              }
+            }
+          }
+        },
+        {
+          "round": 6,
+          "outcomes": {
+            "200": 10
+          },
+          "backend_statuses": {
+            "200": 10
+          },
+          "backend_matches": 10,
+          "batch_ms": 222.89,
+          "dispatch_ms": {
+            "n": 10,
+            "mean": 0.32,
+            "median": 0.34,
+            "p95": 0.46,
+            "max": 0.46
+          },
+          "success": {
+            "client_ms": {
+              "n": 10,
+              "mean": 211.28,
+              "median": 213.06,
+              "p95": 222.15,
+              "max": 222.15
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 10,
+                "mean": 205.74,
+                "median": 207.75,
+                "p95": 217.1,
+                "max": 217.1
+              },
+              "AuthMs": {
+                "n": 10,
+                "mean": 12.63,
+                "median": 12.7,
+                "p95": 15.9,
+                "max": 15.9
+              },
+              "ReserveMs": {
+                "n": 10,
+                "mean": 83.4,
+                "median": 85.1,
+                "p95": 89.2,
+                "max": 89.2
+              },
+              "ModelMs": {
+                "n": 10,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 10,
+                "mean": 76.79,
+                "median": 75.65,
+                "p95": 86.3,
+                "max": 86.3
+              },
+              "QuotaMs": {
+                "n": 10,
+                "mean": 32.46,
+                "median": 33.0,
+                "p95": 39.7,
+                "max": 39.7
+              },
+              "QuotaLockMs": {
+                "n": 10,
+                "mean": 25.78,
+                "median": 26.1,
+                "p95": 28.7,
+                "max": 28.7
+              }
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 10,
+              "mean": 211.28,
+              "median": 213.06,
+              "p95": 222.15,
+              "max": 222.15
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 10,
+                "mean": 205.74,
+                "median": 207.75,
+                "p95": 217.1,
+                "max": 217.1
+              },
+              "AuthMs": {
+                "n": 10,
+                "mean": 12.63,
+                "median": 12.7,
+                "p95": 15.9,
+                "max": 15.9
+              },
+              "ReserveMs": {
+                "n": 10,
+                "mean": 83.4,
+                "median": 85.1,
+                "p95": 89.2,
+                "max": 89.2
+              },
+              "ModelMs": {
+                "n": 10,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 10,
+                "mean": 76.79,
+                "median": 75.65,
+                "p95": 86.3,
+                "max": 86.3
+              },
+              "QuotaMs": {
+                "n": 10,
+                "mean": 32.46,
+                "median": 33.0,
+                "p95": 39.7,
+                "max": 39.7
+              },
+              "QuotaLockMs": {
+                "n": 10,
+                "mean": 25.78,
+                "median": 26.1,
+                "p95": 28.7,
+                "max": 28.7
+              }
+            }
+          }
+        },
+        {
+          "round": 7,
+          "outcomes": {
+            "200": 10
+          },
+          "backend_statuses": {
+            "200": 10
+          },
+          "backend_matches": 10,
+          "batch_ms": 281.34,
+          "dispatch_ms": {
+            "n": 10,
+            "mean": 0.39,
+            "median": 0.42,
+            "p95": 0.57,
+            "max": 0.57
+          },
+          "success": {
+            "client_ms": {
+              "n": 10,
+              "mean": 275.24,
+              "median": 274.42,
+              "p95": 280.71,
+              "max": 280.71
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 10,
+                "mean": 269.86,
+                "median": 268.7,
+                "p95": 275.9,
+                "max": 275.9
+              },
+              "AuthMs": {
+                "n": 10,
+                "mean": 18.57,
+                "median": 22.05,
+                "p95": 25.9,
+                "max": 25.9
+              },
+              "ReserveMs": {
+                "n": 10,
+                "mean": 107.9,
+                "median": 108.95,
+                "p95": 115.6,
+                "max": 115.6
+              },
+              "ModelMs": {
+                "n": 10,
+                "mean": 0.02,
+                "median": 0.0,
+                "p95": 0.2,
+                "max": 0.2
+              },
+              "CompleteMs": {
+                "n": 10,
+                "mean": 104.2,
+                "median": 102.75,
+                "p95": 109.3,
+                "max": 109.3
+              },
+              "QuotaMs": {
+                "n": 10,
+                "mean": 38.78,
+                "median": 38.2,
+                "p95": 47.6,
+                "max": 47.6
+              },
+              "QuotaLockMs": {
+                "n": 10,
+                "mean": 32.49,
+                "median": 31.8,
+                "p95": 38.6,
+                "max": 38.6
+              }
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 10,
+              "mean": 275.24,
+              "median": 274.42,
+              "p95": 280.71,
+              "max": 280.71
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 10,
+                "mean": 269.86,
+                "median": 268.7,
+                "p95": 275.9,
+                "max": 275.9
+              },
+              "AuthMs": {
+                "n": 10,
+                "mean": 18.57,
+                "median": 22.05,
+                "p95": 25.9,
+                "max": 25.9
+              },
+              "ReserveMs": {
+                "n": 10,
+                "mean": 107.9,
+                "median": 108.95,
+                "p95": 115.6,
+                "max": 115.6
+              },
+              "ModelMs": {
+                "n": 10,
+                "mean": 0.02,
+                "median": 0.0,
+                "p95": 0.2,
+                "max": 0.2
+              },
+              "CompleteMs": {
+                "n": 10,
+                "mean": 104.2,
+                "median": 102.75,
+                "p95": 109.3,
+                "max": 109.3
+              },
+              "QuotaMs": {
+                "n": 10,
+                "mean": 38.78,
+                "median": 38.2,
+                "p95": 47.6,
+                "max": 47.6
+              },
+              "QuotaLockMs": {
+                "n": 10,
+                "mean": 32.49,
+                "median": 31.8,
+                "p95": 38.6,
+                "max": 38.6
+              }
+            }
+          }
+        },
+        {
+          "round": 8,
+          "outcomes": {
+            "200": 10
+          },
+          "backend_statuses": {
+            "200": 10
+          },
+          "backend_matches": 10,
+          "batch_ms": 239.81,
+          "dispatch_ms": {
+            "n": 10,
+            "mean": 0.4,
+            "median": 0.43,
+            "p95": 0.6,
+            "max": 0.6
+          },
+          "success": {
+            "client_ms": {
+              "n": 10,
+              "mean": 227.27,
+              "median": 230.48,
+              "p95": 239.02,
+              "max": 239.02
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 10,
+                "mean": 221.3,
+                "median": 224.9,
+                "p95": 232.2,
+                "max": 232.2
+              },
+              "AuthMs": {
+                "n": 10,
+                "mean": 14.29,
+                "median": 13.55,
+                "p95": 22.7,
+                "max": 22.7
+              },
+              "ReserveMs": {
+                "n": 10,
+                "mean": 72.27,
+                "median": 71.05,
+                "p95": 105.0,
+                "max": 105.0
+              },
+              "ModelMs": {
+                "n": 10,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 10,
+                "mean": 95.35,
+                "median": 93.2,
+                "p95": 106.9,
+                "max": 106.9
+              },
+              "QuotaMs": {
+                "n": 10,
+                "mean": 38.86,
+                "median": 38.6,
+                "p95": 50.1,
+                "max": 50.1
+              },
+              "QuotaLockMs": {
+                "n": 10,
+                "mean": 17.97,
+                "median": 17.9,
+                "p95": 22.5,
+                "max": 22.5
+              }
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 10,
+              "mean": 227.27,
+              "median": 230.48,
+              "p95": 239.02,
+              "max": 239.02
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 10,
+                "mean": 221.3,
+                "median": 224.9,
+                "p95": 232.2,
+                "max": 232.2
+              },
+              "AuthMs": {
+                "n": 10,
+                "mean": 14.29,
+                "median": 13.55,
+                "p95": 22.7,
+                "max": 22.7
+              },
+              "ReserveMs": {
+                "n": 10,
+                "mean": 72.27,
+                "median": 71.05,
+                "p95": 105.0,
+                "max": 105.0
+              },
+              "ModelMs": {
+                "n": 10,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 10,
+                "mean": 95.35,
+                "median": 93.2,
+                "p95": 106.9,
+                "max": 106.9
+              },
+              "QuotaMs": {
+                "n": 10,
+                "mean": 38.86,
+                "median": 38.6,
+                "p95": 50.1,
+                "max": 50.1
+              },
+              "QuotaLockMs": {
+                "n": 10,
+                "mean": 17.97,
+                "median": 17.9,
+                "p95": 22.5,
+                "max": 22.5
+              }
+            }
+          }
+        },
+        {
+          "round": 9,
+          "outcomes": {
+            "200": 10
+          },
+          "backend_statuses": {
+            "200": 10
+          },
+          "backend_matches": 10,
+          "batch_ms": 216.74,
+          "dispatch_ms": {
+            "n": 10,
+            "mean": 0.31,
+            "median": 0.33,
+            "p95": 0.45,
+            "max": 0.45
+          },
+          "success": {
+            "client_ms": {
+              "n": 10,
+              "mean": 208.17,
+              "median": 211.06,
+              "p95": 216.24,
+              "max": 216.24
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 10,
+                "mean": 202.03,
+                "median": 205.0,
+                "p95": 212.1,
+                "max": 212.1
+              },
+              "AuthMs": {
+                "n": 10,
+                "mean": 19.68,
+                "median": 19.25,
+                "p95": 30.0,
+                "max": 30.0
+              },
+              "ReserveMs": {
+                "n": 10,
+                "mean": 83.08,
+                "median": 83.45,
+                "p95": 94.2,
+                "max": 94.2
+              },
+              "ModelMs": {
+                "n": 10,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 10,
+                "mean": 70.77,
+                "median": 71.45,
+                "p95": 81.4,
+                "max": 81.4
+              },
+              "QuotaMs": {
+                "n": 10,
+                "mean": 28.09,
+                "median": 26.7,
+                "p95": 35.3,
+                "max": 35.3
+              },
+              "QuotaLockMs": {
+                "n": 10,
+                "mean": 22.07,
+                "median": 22.3,
+                "p95": 27.3,
+                "max": 27.3
+              }
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 10,
+              "mean": 208.17,
+              "median": 211.06,
+              "p95": 216.24,
+              "max": 216.24
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 10,
+                "mean": 202.03,
+                "median": 205.0,
+                "p95": 212.1,
+                "max": 212.1
+              },
+              "AuthMs": {
+                "n": 10,
+                "mean": 19.68,
+                "median": 19.25,
+                "p95": 30.0,
+                "max": 30.0
+              },
+              "ReserveMs": {
+                "n": 10,
+                "mean": 83.08,
+                "median": 83.45,
+                "p95": 94.2,
+                "max": 94.2
+              },
+              "ModelMs": {
+                "n": 10,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 10,
+                "mean": 70.77,
+                "median": 71.45,
+                "p95": 81.4,
+                "max": 81.4
+              },
+              "QuotaMs": {
+                "n": 10,
+                "mean": 28.09,
+                "median": 26.7,
+                "p95": 35.3,
+                "max": 35.3
+              },
+              "QuotaLockMs": {
+                "n": 10,
+                "mean": 22.07,
+                "median": 22.3,
+                "p95": 27.3,
+                "max": 27.3
+              }
+            }
+          }
+        },
+        {
+          "round": 10,
+          "outcomes": {
+            "200": 10
+          },
+          "backend_statuses": {
+            "200": 10
+          },
+          "backend_matches": 10,
+          "batch_ms": 221.38,
+          "dispatch_ms": {
+            "n": 10,
+            "mean": 0.27,
+            "median": 0.29,
+            "p95": 0.39,
+            "max": 0.39
+          },
+          "success": {
+            "client_ms": {
+              "n": 10,
+              "mean": 211.42,
+              "median": 214.65,
+              "p95": 220.74,
+              "max": 220.74
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 10,
+                "mean": 204.12,
+                "median": 206.35,
+                "p95": 216.4,
+                "max": 216.4
+              },
+              "AuthMs": {
+                "n": 10,
+                "mean": 20.99,
+                "median": 20.4,
+                "p95": 27.0,
+                "max": 27.0
+              },
+              "ReserveMs": {
+                "n": 10,
+                "mean": 79.35,
+                "median": 81.3,
+                "p95": 89.2,
+                "max": 89.2
+              },
+              "ModelMs": {
+                "n": 10,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 10,
+                "mean": 75.97,
+                "median": 77.85,
+                "p95": 88.3,
+                "max": 88.3
+              },
+              "QuotaMs": {
+                "n": 10,
+                "mean": 27.46,
+                "median": 26.15,
+                "p95": 36.9,
+                "max": 36.9
+              },
+              "QuotaLockMs": {
+                "n": 10,
+                "mean": 22.59,
+                "median": 22.45,
+                "p95": 24.8,
+                "max": 24.8
+              }
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 10,
+              "mean": 211.42,
+              "median": 214.65,
+              "p95": 220.74,
+              "max": 220.74
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 10,
+                "mean": 204.12,
+                "median": 206.35,
+                "p95": 216.4,
+                "max": 216.4
+              },
+              "AuthMs": {
+                "n": 10,
+                "mean": 20.99,
+                "median": 20.4,
+                "p95": 27.0,
+                "max": 27.0
+              },
+              "ReserveMs": {
+                "n": 10,
+                "mean": 79.35,
+                "median": 81.3,
+                "p95": 89.2,
+                "max": 89.2
+              },
+              "ModelMs": {
+                "n": 10,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 10,
+                "mean": 75.97,
+                "median": 77.85,
+                "p95": 88.3,
+                "max": 88.3
+              },
+              "QuotaMs": {
+                "n": 10,
+                "mean": 27.46,
+                "median": 26.15,
+                "p95": 36.9,
+                "max": 36.9
+              },
+              "QuotaLockMs": {
+                "n": 10,
+                "mean": 22.59,
+                "median": 22.45,
+                "p95": 24.8,
+                "max": 24.8
+              }
+            }
+          }
+        }
+      ],
+      "success": {
+        "client_ms": {
+          "n": 100,
+          "mean": 233.97,
+          "median": 220.46,
+          "p95": 301.78,
+          "max": 311.12
+        },
+        "backend_ms": {
+          "TotalMs": {
+            "n": 100,
+            "mean": 227.43,
+            "median": 216.15,
+            "p95": 287.6,
+            "max": 302.4
+          },
+          "AuthMs": {
+            "n": 100,
+            "mean": 21.36,
+            "median": 19.3,
+            "p95": 52.5,
+            "max": 55.5
+          },
+          "ReserveMs": {
+            "n": 100,
+            "mean": 83.78,
+            "median": 81.85,
+            "p95": 113.3,
+            "max": 120.7
+          },
+          "ModelMs": {
+            "n": 100,
+            "mean": 0.0,
+            "median": 0.0,
+            "p95": 0.0,
+            "max": 0.2
+          },
+          "CompleteMs": {
+            "n": 100,
+            "mean": 88.99,
+            "median": 88.8,
+            "p95": 109.9,
+            "max": 117.2
+          },
+          "QuotaMs": {
+            "n": 100,
+            "mean": 32.7,
+            "median": 33.25,
+            "p95": 44.4,
+            "max": 50.1
+          },
+          "QuotaLockMs": {
+            "n": 100,
+            "mean": 23.23,
+            "median": 22.45,
+            "p95": 34.4,
+            "max": 39.6
+          }
+        }
+      },
+      "all_outcomes": {
+        "client_ms": {
+          "n": 100,
+          "mean": 233.97,
+          "median": 220.46,
+          "p95": 301.78,
+          "max": 311.12
+        },
+        "backend_ms": {
+          "TotalMs": {
+            "n": 100,
+            "mean": 227.43,
+            "median": 216.15,
+            "p95": 287.6,
+            "max": 302.4
+          },
+          "AuthMs": {
+            "n": 100,
+            "mean": 21.36,
+            "median": 19.3,
+            "p95": 52.5,
+            "max": 55.5
+          },
+          "ReserveMs": {
+            "n": 100,
+            "mean": 83.78,
+            "median": 81.85,
+            "p95": 113.3,
+            "max": 120.7
+          },
+          "ModelMs": {
+            "n": 100,
+            "mean": 0.0,
+            "median": 0.0,
+            "p95": 0.0,
+            "max": 0.2
+          },
+          "CompleteMs": {
+            "n": 100,
+            "mean": 88.99,
+            "median": 88.8,
+            "p95": 109.9,
+            "max": 117.2
+          },
+          "QuotaMs": {
+            "n": 100,
+            "mean": 32.7,
+            "median": 33.25,
+            "p95": 44.4,
+            "max": 50.1
+          },
+          "QuotaLockMs": {
+            "n": 100,
+            "mean": 23.23,
+            "median": 22.45,
+            "p95": 34.4,
+            "max": 39.6
+          }
+        }
+      }
+    },
+    "100": {
+      "rounds": [
+        {
+          "round": 1,
+          "outcomes": {
+            "200": 100
+          },
+          "backend_statuses": {
+            "200": 100
+          },
+          "backend_matches": 100,
+          "batch_ms": 1305.62,
+          "dispatch_ms": {
+            "n": 100,
+            "mean": 2.51,
+            "median": 1.88,
+            "p95": 6.06,
+            "max": 6.29
+          },
+          "success": {
+            "client_ms": {
+              "n": 100,
+              "mean": 1255.69,
+              "median": 1280.71,
+              "p95": 1298.8,
+              "max": 1301.9
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 100,
+                "mean": 1225.16,
+                "median": 1243.55,
+                "p95": 1283.5,
+                "max": 1293.0
+              },
+              "AuthMs": {
+                "n": 100,
+                "mean": 89.33,
+                "median": 99.45,
+                "p95": 113.6,
+                "max": 126.3
+              },
+              "ReserveMs": {
+                "n": 100,
+                "mean": 525.19,
+                "median": 512.95,
+                "p95": 626.9,
+                "max": 681.0
+              },
+              "ModelMs": {
+                "n": 100,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 100,
+                "mean": 442.48,
+                "median": 446.3,
+                "p95": 484.6,
+                "max": 523.9
+              },
+              "QuotaMs": {
+                "n": 100,
+                "mean": 167.86,
+                "median": 176.1,
+                "p95": 201.7,
+                "max": 204.3
+              },
+              "QuotaLockMs": {
+                "n": 100,
+                "mean": 139.97,
+                "median": 142.35,
+                "p95": 196.7,
+                "max": 205.0
+              }
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 100,
+              "mean": 1255.69,
+              "median": 1280.71,
+              "p95": 1298.8,
+              "max": 1301.9
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 100,
+                "mean": 1225.16,
+                "median": 1243.55,
+                "p95": 1283.5,
+                "max": 1293.0
+              },
+              "AuthMs": {
+                "n": 100,
+                "mean": 89.33,
+                "median": 99.45,
+                "p95": 113.6,
+                "max": 126.3
+              },
+              "ReserveMs": {
+                "n": 100,
+                "mean": 525.19,
+                "median": 512.95,
+                "p95": 626.9,
+                "max": 681.0
+              },
+              "ModelMs": {
+                "n": 100,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 100,
+                "mean": 442.48,
+                "median": 446.3,
+                "p95": 484.6,
+                "max": 523.9
+              },
+              "QuotaMs": {
+                "n": 100,
+                "mean": 167.86,
+                "median": 176.1,
+                "p95": 201.7,
+                "max": 204.3
+              },
+              "QuotaLockMs": {
+                "n": 100,
+                "mean": 139.97,
+                "median": 142.35,
+                "p95": 196.7,
+                "max": 205.0
+              }
+            }
+          }
+        },
+        {
+          "round": 2,
+          "outcomes": {
+            "200": 100
+          },
+          "backend_statuses": {
+            "200": 100
+          },
+          "backend_matches": 100,
+          "batch_ms": 1649.83,
+          "dispatch_ms": {
+            "n": 100,
+            "mean": 1.66,
+            "median": 1.69,
+            "p95": 2.9,
+            "max": 3.02
+          },
+          "success": {
+            "client_ms": {
+              "n": 100,
+              "mean": 1555.61,
+              "median": 1560.14,
+              "p95": 1644.3,
+              "max": 1648.36
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 100,
+                "mean": 1519.35,
+                "median": 1527.75,
+                "p95": 1623.0,
+                "max": 1636.6
+              },
+              "AuthMs": {
+                "n": 100,
+                "mean": 127.42,
+                "median": 133.6,
+                "p95": 154.2,
+                "max": 155.9
+              },
+              "ReserveMs": {
+                "n": 100,
+                "mean": 461.74,
+                "median": 460.75,
+                "p95": 554.6,
+                "max": 700.4
+              },
+              "ModelMs": {
+                "n": 100,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 100,
+                "mean": 687.54,
+                "median": 694.25,
+                "p95": 750.9,
+                "max": 765.8
+              },
+              "QuotaMs": {
+                "n": 100,
+                "mean": 242.22,
+                "median": 243.85,
+                "p95": 312.3,
+                "max": 321.8
+              },
+              "QuotaLockMs": {
+                "n": 100,
+                "mean": 136.55,
+                "median": 130.9,
+                "p95": 198.6,
+                "max": 240.9
+              }
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 100,
+              "mean": 1555.61,
+              "median": 1560.14,
+              "p95": 1644.3,
+              "max": 1648.36
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 100,
+                "mean": 1519.35,
+                "median": 1527.75,
+                "p95": 1623.0,
+                "max": 1636.6
+              },
+              "AuthMs": {
+                "n": 100,
+                "mean": 127.42,
+                "median": 133.6,
+                "p95": 154.2,
+                "max": 155.9
+              },
+              "ReserveMs": {
+                "n": 100,
+                "mean": 461.74,
+                "median": 460.75,
+                "p95": 554.6,
+                "max": 700.4
+              },
+              "ModelMs": {
+                "n": 100,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 100,
+                "mean": 687.54,
+                "median": 694.25,
+                "p95": 750.9,
+                "max": 765.8
+              },
+              "QuotaMs": {
+                "n": 100,
+                "mean": 242.22,
+                "median": 243.85,
+                "p95": 312.3,
+                "max": 321.8
+              },
+              "QuotaLockMs": {
+                "n": 100,
+                "mean": 136.55,
+                "median": 130.9,
+                "p95": 198.6,
+                "max": 240.9
+              }
+            }
+          }
+        },
+        {
+          "round": 3,
+          "outcomes": {
+            "200": 100
+          },
+          "backend_statuses": {
+            "200": 100
+          },
+          "backend_matches": 100,
+          "batch_ms": 2033.58,
+          "dispatch_ms": {
+            "n": 100,
+            "mean": 3.33,
+            "median": 3.43,
+            "p95": 4.95,
+            "max": 5.07
+          },
+          "success": {
+            "client_ms": {
+              "n": 100,
+              "mean": 1944.08,
+              "median": 1950.62,
+              "p95": 2028.68,
+              "max": 2030.06
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 100,
+                "mean": 1912.2,
+                "median": 1922.1,
+                "p95": 2016.8,
+                "max": 2021.2
+              },
+              "AuthMs": {
+                "n": 100,
+                "mean": 147.47,
+                "median": 131.15,
+                "p95": 240.6,
+                "max": 247.2
+              },
+              "ReserveMs": {
+                "n": 100,
+                "mean": 657.53,
+                "median": 659.9,
+                "p95": 778.0,
+                "max": 868.2
+              },
+              "ModelMs": {
+                "n": 100,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 100,
+                "mean": 895.19,
+                "median": 895.85,
+                "p95": 966.8,
+                "max": 1022.1
+              },
+              "QuotaMs": {
+                "n": 100,
+                "mean": 211.16,
+                "median": 213.55,
+                "p95": 264.1,
+                "max": 292.1
+              },
+              "QuotaLockMs": {
+                "n": 100,
+                "mean": 181.73,
+                "median": 175.4,
+                "p95": 234.4,
+                "max": 340.7
+              }
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 100,
+              "mean": 1944.08,
+              "median": 1950.62,
+              "p95": 2028.68,
+              "max": 2030.06
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 100,
+                "mean": 1912.2,
+                "median": 1922.1,
+                "p95": 2016.8,
+                "max": 2021.2
+              },
+              "AuthMs": {
+                "n": 100,
+                "mean": 147.47,
+                "median": 131.15,
+                "p95": 240.6,
+                "max": 247.2
+              },
+              "ReserveMs": {
+                "n": 100,
+                "mean": 657.53,
+                "median": 659.9,
+                "p95": 778.0,
+                "max": 868.2
+              },
+              "ModelMs": {
+                "n": 100,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 100,
+                "mean": 895.19,
+                "median": 895.85,
+                "p95": 966.8,
+                "max": 1022.1
+              },
+              "QuotaMs": {
+                "n": 100,
+                "mean": 211.16,
+                "median": 213.55,
+                "p95": 264.1,
+                "max": 292.1
+              },
+              "QuotaLockMs": {
+                "n": 100,
+                "mean": 181.73,
+                "median": 175.4,
+                "p95": 234.4,
+                "max": 340.7
+              }
+            }
+          }
+        },
+        {
+          "round": 4,
+          "outcomes": {
+            "200": 100
+          },
+          "backend_statuses": {
+            "200": 100
+          },
+          "backend_matches": 100,
+          "batch_ms": 1269.27,
+          "dispatch_ms": {
+            "n": 100,
+            "mean": 2.76,
+            "median": 2.74,
+            "p95": 4.39,
+            "max": 4.5
+          },
+          "success": {
+            "client_ms": {
+              "n": 100,
+              "mean": 1186.52,
+              "median": 1199.6,
+              "p95": 1263.2,
+              "max": 1265.08
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 100,
+                "mean": 1156.9,
+                "median": 1163.45,
+                "p95": 1240.1,
+                "max": 1243.9
+              },
+              "AuthMs": {
+                "n": 100,
+                "mean": 83.96,
+                "median": 83.9,
+                "p95": 116.6,
+                "max": 138.9
+              },
+              "ReserveMs": {
+                "n": 100,
+                "mean": 439.38,
+                "median": 434.85,
+                "p95": 530.4,
+                "max": 587.8
+              },
+              "ModelMs": {
+                "n": 100,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 100,
+                "mean": 471.25,
+                "median": 477.45,
+                "p95": 522.5,
+                "max": 583.7
+              },
+              "QuotaMs": {
+                "n": 100,
+                "mean": 161.7,
+                "median": 160.5,
+                "p95": 203.0,
+                "max": 216.5
+              },
+              "QuotaLockMs": {
+                "n": 100,
+                "mean": 130.61,
+                "median": 130.55,
+                "p95": 169.5,
+                "max": 213.4
+              }
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 100,
+              "mean": 1186.52,
+              "median": 1199.6,
+              "p95": 1263.2,
+              "max": 1265.08
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 100,
+                "mean": 1156.9,
+                "median": 1163.45,
+                "p95": 1240.1,
+                "max": 1243.9
+              },
+              "AuthMs": {
+                "n": 100,
+                "mean": 83.96,
+                "median": 83.9,
+                "p95": 116.6,
+                "max": 138.9
+              },
+              "ReserveMs": {
+                "n": 100,
+                "mean": 439.38,
+                "median": 434.85,
+                "p95": 530.4,
+                "max": 587.8
+              },
+              "ModelMs": {
+                "n": 100,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 100,
+                "mean": 471.25,
+                "median": 477.45,
+                "p95": 522.5,
+                "max": 583.7
+              },
+              "QuotaMs": {
+                "n": 100,
+                "mean": 161.7,
+                "median": 160.5,
+                "p95": 203.0,
+                "max": 216.5
+              },
+              "QuotaLockMs": {
+                "n": 100,
+                "mean": 130.61,
+                "median": 130.55,
+                "p95": 169.5,
+                "max": 213.4
+              }
+            }
+          }
+        },
+        {
+          "round": 5,
+          "outcomes": {
+            "200": 100
+          },
+          "backend_statuses": {
+            "200": 100
+          },
+          "backend_matches": 100,
+          "batch_ms": 1367.48,
+          "dispatch_ms": {
+            "n": 100,
+            "mean": 1.86,
+            "median": 1.46,
+            "p95": 3.82,
+            "max": 4.07
+          },
+          "success": {
+            "client_ms": {
+              "n": 100,
+              "mean": 1275.37,
+              "median": 1296.33,
+              "p95": 1356.11,
+              "max": 1365.69
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 100,
+                "mean": 1250.04,
+                "median": 1267.25,
+                "p95": 1340.0,
+                "max": 1353.0
+              },
+              "AuthMs": {
+                "n": 100,
+                "mean": 111.38,
+                "median": 103.95,
+                "p95": 159.6,
+                "max": 170.9
+              },
+              "ReserveMs": {
+                "n": 100,
+                "mean": 469.28,
+                "median": 461.75,
+                "p95": 574.0,
+                "max": 650.7
+              },
+              "ModelMs": {
+                "n": 100,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 100,
+                "mean": 498.21,
+                "median": 508.1,
+                "p95": 561.4,
+                "max": 579.6
+              },
+              "QuotaMs": {
+                "n": 100,
+                "mean": 170.6,
+                "median": 172.15,
+                "p95": 201.4,
+                "max": 226.3
+              },
+              "QuotaLockMs": {
+                "n": 100,
+                "mean": 141.47,
+                "median": 139.0,
+                "p95": 173.8,
+                "max": 199.0
+              }
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 100,
+              "mean": 1275.37,
+              "median": 1296.33,
+              "p95": 1356.11,
+              "max": 1365.69
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 100,
+                "mean": 1250.04,
+                "median": 1267.25,
+                "p95": 1340.0,
+                "max": 1353.0
+              },
+              "AuthMs": {
+                "n": 100,
+                "mean": 111.38,
+                "median": 103.95,
+                "p95": 159.6,
+                "max": 170.9
+              },
+              "ReserveMs": {
+                "n": 100,
+                "mean": 469.28,
+                "median": 461.75,
+                "p95": 574.0,
+                "max": 650.7
+              },
+              "ModelMs": {
+                "n": 100,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 100,
+                "mean": 498.21,
+                "median": 508.1,
+                "p95": 561.4,
+                "max": 579.6
+              },
+              "QuotaMs": {
+                "n": 100,
+                "mean": 170.6,
+                "median": 172.15,
+                "p95": 201.4,
+                "max": 226.3
+              },
+              "QuotaLockMs": {
+                "n": 100,
+                "mean": 141.47,
+                "median": 139.0,
+                "p95": 173.8,
+                "max": 199.0
+              }
+            }
+          }
+        },
+        {
+          "round": 6,
+          "outcomes": {
+            "200": 100
+          },
+          "backend_statuses": {
+            "200": 100
+          },
+          "backend_matches": 100,
+          "batch_ms": 1673.32,
+          "dispatch_ms": {
+            "n": 100,
+            "mean": 3.34,
+            "median": 3.17,
+            "p95": 6.56,
+            "max": 6.92
+          },
+          "success": {
+            "client_ms": {
+              "n": 100,
+              "mean": 1580.32,
+              "median": 1595.16,
+              "p95": 1665.37,
+              "max": 1669.34
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 100,
+                "mean": 1541.81,
+                "median": 1565.8,
+                "p95": 1642.1,
+                "max": 1651.3
+              },
+              "AuthMs": {
+                "n": 100,
+                "mean": 145.01,
+                "median": 141.55,
+                "p95": 201.0,
+                "max": 206.2
+              },
+              "ReserveMs": {
+                "n": 100,
+                "mean": 604.96,
+                "median": 603.0,
+                "p95": 725.3,
+                "max": 779.8
+              },
+              "ModelMs": {
+                "n": 100,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 100,
+                "mean": 523.55,
+                "median": 520.65,
+                "p95": 599.4,
+                "max": 651.0
+              },
+              "QuotaMs": {
+                "n": 100,
+                "mean": 267.87,
+                "median": 281.6,
+                "p95": 313.2,
+                "max": 318.0
+              },
+              "QuotaLockMs": {
+                "n": 100,
+                "mean": 166.13,
+                "median": 169.75,
+                "p95": 226.3,
+                "max": 288.4
+              }
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 100,
+              "mean": 1580.32,
+              "median": 1595.16,
+              "p95": 1665.37,
+              "max": 1669.34
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 100,
+                "mean": 1541.81,
+                "median": 1565.8,
+                "p95": 1642.1,
+                "max": 1651.3
+              },
+              "AuthMs": {
+                "n": 100,
+                "mean": 145.01,
+                "median": 141.55,
+                "p95": 201.0,
+                "max": 206.2
+              },
+              "ReserveMs": {
+                "n": 100,
+                "mean": 604.96,
+                "median": 603.0,
+                "p95": 725.3,
+                "max": 779.8
+              },
+              "ModelMs": {
+                "n": 100,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 100,
+                "mean": 523.55,
+                "median": 520.65,
+                "p95": 599.4,
+                "max": 651.0
+              },
+              "QuotaMs": {
+                "n": 100,
+                "mean": 267.87,
+                "median": 281.6,
+                "p95": 313.2,
+                "max": 318.0
+              },
+              "QuotaLockMs": {
+                "n": 100,
+                "mean": 166.13,
+                "median": 169.75,
+                "p95": 226.3,
+                "max": 288.4
+              }
+            }
+          }
+        },
+        {
+          "round": 7,
+          "outcomes": {
+            "200": 100
+          },
+          "backend_statuses": {
+            "200": 100
+          },
+          "backend_matches": 100,
+          "batch_ms": 993.85,
+          "dispatch_ms": {
+            "n": 100,
+            "mean": 9.14,
+            "median": 9.51,
+            "p95": 12.69,
+            "max": 13.02
+          },
+          "success": {
+            "client_ms": {
+              "n": 100,
+              "mean": 939.43,
+              "median": 956.27,
+              "p95": 978.72,
+              "max": 981.75
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 100,
+                "mean": 921.31,
+                "median": 933.85,
+                "p95": 961.9,
+                "max": 966.8
+              },
+              "AuthMs": {
+                "n": 100,
+                "mean": 98.51,
+                "median": 99.95,
+                "p95": 146.3,
+                "max": 149.4
+              },
+              "ReserveMs": {
+                "n": 100,
+                "mean": 379.1,
+                "median": 375.65,
+                "p95": 444.3,
+                "max": 488.3
+              },
+              "ModelMs": {
+                "n": 100,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 100,
+                "mean": 341.78,
+                "median": 339.7,
+                "p95": 388.1,
+                "max": 407.9
+              },
+              "QuotaMs": {
+                "n": 100,
+                "mean": 101.42,
+                "median": 100.85,
+                "p95": 131.6,
+                "max": 147.1
+              },
+              "QuotaLockMs": {
+                "n": 100,
+                "mean": 114.43,
+                "median": 119.15,
+                "p95": 160.8,
+                "max": 178.7
+              }
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 100,
+              "mean": 939.43,
+              "median": 956.27,
+              "p95": 978.72,
+              "max": 981.75
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 100,
+                "mean": 921.31,
+                "median": 933.85,
+                "p95": 961.9,
+                "max": 966.8
+              },
+              "AuthMs": {
+                "n": 100,
+                "mean": 98.51,
+                "median": 99.95,
+                "p95": 146.3,
+                "max": 149.4
+              },
+              "ReserveMs": {
+                "n": 100,
+                "mean": 379.1,
+                "median": 375.65,
+                "p95": 444.3,
+                "max": 488.3
+              },
+              "ModelMs": {
+                "n": 100,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 100,
+                "mean": 341.78,
+                "median": 339.7,
+                "p95": 388.1,
+                "max": 407.9
+              },
+              "QuotaMs": {
+                "n": 100,
+                "mean": 101.42,
+                "median": 100.85,
+                "p95": 131.6,
+                "max": 147.1
+              },
+              "QuotaLockMs": {
+                "n": 100,
+                "mean": 114.43,
+                "median": 119.15,
+                "p95": 160.8,
+                "max": 178.7
+              }
+            }
+          }
+        },
+        {
+          "round": 8,
+          "outcomes": {
+            "200": 100
+          },
+          "backend_statuses": {
+            "200": 100
+          },
+          "backend_matches": 100,
+          "batch_ms": 1093.81,
+          "dispatch_ms": {
+            "n": 100,
+            "mean": 4.29,
+            "median": 3.09,
+            "p95": 9.85,
+            "max": 10.13
+          },
+          "success": {
+            "client_ms": {
+              "n": 100,
+              "mean": 1029.22,
+              "median": 1026.64,
+              "p95": 1080.53,
+              "max": 1090.37
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 100,
+                "mean": 1019.15,
+                "median": 1014.75,
+                "p95": 1073.3,
+                "max": 1081.5
+              },
+              "AuthMs": {
+                "n": 100,
+                "mean": 61.06,
+                "median": 62.75,
+                "p95": 72.2,
+                "max": 86.3
+              },
+              "ReserveMs": {
+                "n": 100,
+                "mean": 508.88,
+                "median": 539.15,
+                "p95": 650.2,
+                "max": 690.1
+              },
+              "ModelMs": {
+                "n": 100,
+                "mean": 0.06,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 6.2
+              },
+              "CompleteMs": {
+                "n": 100,
+                "mean": 365.65,
+                "median": 354.85,
+                "p95": 508.1,
+                "max": 556.0
+              },
+              "QuotaMs": {
+                "n": 100,
+                "mean": 83.24,
+                "median": 80.05,
+                "p95": 132.5,
+                "max": 151.4
+              },
+              "QuotaLockMs": {
+                "n": 100,
+                "mean": 114.33,
+                "median": 113.2,
+                "p95": 181.0,
+                "max": 210.6
+              }
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 100,
+              "mean": 1029.22,
+              "median": 1026.64,
+              "p95": 1080.53,
+              "max": 1090.37
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 100,
+                "mean": 1019.15,
+                "median": 1014.75,
+                "p95": 1073.3,
+                "max": 1081.5
+              },
+              "AuthMs": {
+                "n": 100,
+                "mean": 61.06,
+                "median": 62.75,
+                "p95": 72.2,
+                "max": 86.3
+              },
+              "ReserveMs": {
+                "n": 100,
+                "mean": 508.88,
+                "median": 539.15,
+                "p95": 650.2,
+                "max": 690.1
+              },
+              "ModelMs": {
+                "n": 100,
+                "mean": 0.06,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 6.2
+              },
+              "CompleteMs": {
+                "n": 100,
+                "mean": 365.65,
+                "median": 354.85,
+                "p95": 508.1,
+                "max": 556.0
+              },
+              "QuotaMs": {
+                "n": 100,
+                "mean": 83.24,
+                "median": 80.05,
+                "p95": 132.5,
+                "max": 151.4
+              },
+              "QuotaLockMs": {
+                "n": 100,
+                "mean": 114.33,
+                "median": 113.2,
+                "p95": 181.0,
+                "max": 210.6
+              }
+            }
+          }
+        },
+        {
+          "round": 9,
+          "outcomes": {
+            "200": 100
+          },
+          "backend_statuses": {
+            "200": 100
+          },
+          "backend_matches": 100,
+          "batch_ms": 899.61,
+          "dispatch_ms": {
+            "n": 100,
+            "mean": 2.32,
+            "median": 2.08,
+            "p95": 4.71,
+            "max": 5.0
+          },
+          "success": {
+            "client_ms": {
+              "n": 100,
+              "mean": 837.08,
+              "median": 850.37,
+              "p95": 891.57,
+              "max": 898.75
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 100,
+                "mean": 827.68,
+                "median": 841.75,
+                "p95": 883.9,
+                "max": 894.1
+              },
+              "AuthMs": {
+                "n": 100,
+                "mean": 60.01,
+                "median": 52.7,
+                "p95": 114.5,
+                "max": 128.6
+              },
+              "ReserveMs": {
+                "n": 100,
+                "mean": 391.03,
+                "median": 387.45,
+                "p95": 479.7,
+                "max": 513.8
+              },
+              "ModelMs": {
+                "n": 100,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 100,
+                "mean": 297.68,
+                "median": 301.2,
+                "p95": 356.1,
+                "max": 401.1
+              },
+              "QuotaMs": {
+                "n": 100,
+                "mean": 78.53,
+                "median": 78.8,
+                "p95": 120.6,
+                "max": 148.1
+              },
+              "QuotaLockMs": {
+                "n": 100,
+                "mean": 132.08,
+                "median": 134.85,
+                "p95": 164.3,
+                "max": 184.4
+              }
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 100,
+              "mean": 837.08,
+              "median": 850.37,
+              "p95": 891.57,
+              "max": 898.75
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 100,
+                "mean": 827.68,
+                "median": 841.75,
+                "p95": 883.9,
+                "max": 894.1
+              },
+              "AuthMs": {
+                "n": 100,
+                "mean": 60.01,
+                "median": 52.7,
+                "p95": 114.5,
+                "max": 128.6
+              },
+              "ReserveMs": {
+                "n": 100,
+                "mean": 391.03,
+                "median": 387.45,
+                "p95": 479.7,
+                "max": 513.8
+              },
+              "ModelMs": {
+                "n": 100,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 100,
+                "mean": 297.68,
+                "median": 301.2,
+                "p95": 356.1,
+                "max": 401.1
+              },
+              "QuotaMs": {
+                "n": 100,
+                "mean": 78.53,
+                "median": 78.8,
+                "p95": 120.6,
+                "max": 148.1
+              },
+              "QuotaLockMs": {
+                "n": 100,
+                "mean": 132.08,
+                "median": 134.85,
+                "p95": 164.3,
+                "max": 184.4
+              }
+            }
+          }
+        },
+        {
+          "round": 10,
+          "outcomes": {
+            "200": 100
+          },
+          "backend_statuses": {
+            "200": 100
+          },
+          "backend_matches": 100,
+          "batch_ms": 1113.11,
+          "dispatch_ms": {
+            "n": 100,
+            "mean": 4.03,
+            "median": 3.21,
+            "p95": 7.97,
+            "max": 8.08
+          },
+          "success": {
+            "client_ms": {
+              "n": 100,
+              "mean": 1048.62,
+              "median": 1066.28,
+              "p95": 1100.17,
+              "max": 1109.46
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 100,
+                "mean": 1033.09,
+                "median": 1046.3,
+                "p95": 1089.1,
+                "max": 1101.3
+              },
+              "AuthMs": {
+                "n": 100,
+                "mean": 73.63,
+                "median": 75.25,
+                "p95": 104.4,
+                "max": 111.6
+              },
+              "ReserveMs": {
+                "n": 100,
+                "mean": 443.37,
+                "median": 447.75,
+                "p95": 512.5,
+                "max": 528.8
+              },
+              "ModelMs": {
+                "n": 100,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.1
+              },
+              "CompleteMs": {
+                "n": 100,
+                "mean": 401.13,
+                "median": 398.9,
+                "p95": 470.0,
+                "max": 497.2
+              },
+              "QuotaMs": {
+                "n": 100,
+                "mean": 114.6,
+                "median": 119.9,
+                "p95": 174.1,
+                "max": 207.1
+              },
+              "QuotaLockMs": {
+                "n": 100,
+                "mean": 131.21,
+                "median": 135.45,
+                "p95": 171.1,
+                "max": 220.8
+              }
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 100,
+              "mean": 1048.62,
+              "median": 1066.28,
+              "p95": 1100.17,
+              "max": 1109.46
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 100,
+                "mean": 1033.09,
+                "median": 1046.3,
+                "p95": 1089.1,
+                "max": 1101.3
+              },
+              "AuthMs": {
+                "n": 100,
+                "mean": 73.63,
+                "median": 75.25,
+                "p95": 104.4,
+                "max": 111.6
+              },
+              "ReserveMs": {
+                "n": 100,
+                "mean": 443.37,
+                "median": 447.75,
+                "p95": 512.5,
+                "max": 528.8
+              },
+              "ModelMs": {
+                "n": 100,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.1
+              },
+              "CompleteMs": {
+                "n": 100,
+                "mean": 401.13,
+                "median": 398.9,
+                "p95": 470.0,
+                "max": 497.2
+              },
+              "QuotaMs": {
+                "n": 100,
+                "mean": 114.6,
+                "median": 119.9,
+                "p95": 174.1,
+                "max": 207.1
+              },
+              "QuotaLockMs": {
+                "n": 100,
+                "mean": 131.21,
+                "median": 135.45,
+                "p95": 171.1,
+                "max": 220.8
+              }
+            }
+          }
+        }
+      ],
+      "success": {
+        "client_ms": {
+          "n": 1000,
+          "mean": 1265.19,
+          "median": 1205.66,
+          "p95": 1949.36,
+          "max": 2030.06
+        },
+        "backend_ms": {
+          "TotalMs": {
+            "n": 1000,
+            "mean": 1240.67,
+            "median": 1179.0,
+            "p95": 1921.3,
+            "max": 2021.2
+          },
+          "AuthMs": {
+            "n": 1000,
+            "mean": 99.78,
+            "median": 96.8,
+            "p95": 177.5,
+            "max": 247.2
+          },
+          "ReserveMs": {
+            "n": 1000,
+            "mean": 488.05,
+            "median": 470.65,
+            "p95": 689.2,
+            "max": 868.2
+          },
+          "ModelMs": {
+            "n": 1000,
+            "mean": 0.01,
+            "median": 0.0,
+            "p95": 0.0,
+            "max": 6.2
+          },
+          "CompleteMs": {
+            "n": 1000,
+            "mean": 492.44,
+            "median": 455.8,
+            "p95": 894.5,
+            "max": 1022.1
+          },
+          "QuotaMs": {
+            "n": 1000,
+            "mean": 159.92,
+            "median": 160.25,
+            "p95": 289.1,
+            "max": 321.8
+          },
+          "QuotaLockMs": {
+            "n": 1000,
+            "mean": 138.85,
+            "median": 139.0,
+            "p95": 199.2,
+            "max": 340.7
+          }
+        }
+      },
+      "all_outcomes": {
+        "client_ms": {
+          "n": 1000,
+          "mean": 1265.19,
+          "median": 1205.66,
+          "p95": 1949.36,
+          "max": 2030.06
+        },
+        "backend_ms": {
+          "TotalMs": {
+            "n": 1000,
+            "mean": 1240.67,
+            "median": 1179.0,
+            "p95": 1921.3,
+            "max": 2021.2
+          },
+          "AuthMs": {
+            "n": 1000,
+            "mean": 99.78,
+            "median": 96.8,
+            "p95": 177.5,
+            "max": 247.2
+          },
+          "ReserveMs": {
+            "n": 1000,
+            "mean": 488.05,
+            "median": 470.65,
+            "p95": 689.2,
+            "max": 868.2
+          },
+          "ModelMs": {
+            "n": 1000,
+            "mean": 0.01,
+            "median": 0.0,
+            "p95": 0.0,
+            "max": 6.2
+          },
+          "CompleteMs": {
+            "n": 1000,
+            "mean": 492.44,
+            "median": 455.8,
+            "p95": 894.5,
+            "max": 1022.1
+          },
+          "QuotaMs": {
+            "n": 1000,
+            "mean": 159.92,
+            "median": 160.25,
+            "p95": 289.1,
+            "max": 321.8
+          },
+          "QuotaLockMs": {
+            "n": 1000,
+            "mean": 138.85,
+            "median": 139.0,
+            "p95": 199.2,
+            "max": 340.7
+          }
+        }
+      }
+    },
+    "1000": {
+      "rounds": [
+        {
+          "round": 1,
+          "outcomes": {
+            "504": 1000
+          },
+          "backend_statuses": {
+            "504": 1000
+          },
+          "backend_matches": 1000,
+          "batch_ms": 16700.81,
+          "dispatch_ms": {
+            "n": 1000,
+            "mean": 33.39,
+            "median": 34.22,
+            "p95": 65.85,
+            "max": 68.39
+          },
+          "success": {
+            "client_ms": null,
+            "backend_ms": {
+              "TotalMs": null,
+              "AuthMs": null,
+              "ReserveMs": null,
+              "ModelMs": null,
+              "CompleteMs": null,
+              "QuotaMs": null,
+              "QuotaLockMs": null
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 1000,
+              "mean": 13707.71,
+              "median": 13524.17,
+              "p95": 16313.17,
+              "max": 16633.96
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 1000,
+                "mean": 13375.13,
+                "median": 13353.45,
+                "p95": 16063.3,
+                "max": 16351.6
+              },
+              "AuthMs": {
+                "n": 1000,
+                "mean": 803.34,
+                "median": 802.9,
+                "p95": 1188.1,
+                "max": 1347.0
+              },
+              "ReserveMs": {
+                "n": 1000,
+                "mean": 5949.44,
+                "median": 5993.25,
+                "p95": 7230.5,
+                "max": 8533.3
+              },
+              "ModelMs": {
+                "n": 1000,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.3
+              },
+              "CompleteMs": {
+                "n": 1000,
+                "mean": 6568.7,
+                "median": 6511.25,
+                "p95": 9604.6,
+                "max": 10651.9
+              },
+              "QuotaMs": {
+                "n": 243,
+                "mean": 216.73,
+                "median": 6.2,
+                "p95": 1849.5,
+                "max": 3356.0
+              },
+              "QuotaLockMs": {
+                "n": 1000,
+                "mean": 1759.48,
+                "median": 1820.45,
+                "p95": 2687.5,
+                "max": 3475.6
+              }
+            }
+          }
+        },
+        {
+          "round": 2,
+          "outcomes": {
+            "504": 1000
+          },
+          "backend_statuses": {
+            "504": 1000
+          },
+          "backend_matches": 1000,
+          "batch_ms": 16967.45,
+          "dispatch_ms": {
+            "n": 1000,
+            "mean": 56.13,
+            "median": 55.55,
+            "p95": 113.49,
+            "max": 119.56
+          },
+          "success": {
+            "client_ms": null,
+            "backend_ms": {
+              "TotalMs": null,
+              "AuthMs": null,
+              "ReserveMs": null,
+              "ModelMs": null,
+              "CompleteMs": null,
+              "QuotaMs": null,
+              "QuotaLockMs": null
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 1000,
+              "mean": 15820.21,
+              "median": 16001.11,
+              "p95": 16842.53,
+              "max": 16847.65
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 1000,
+                "mean": 15553.32,
+                "median": 15743.6,
+                "p95": 16528.9,
+                "max": 16569.9
+              },
+              "AuthMs": {
+                "n": 1000,
+                "mean": 815.52,
+                "median": 914.7,
+                "p95": 982.3,
+                "max": 1095.8
+              },
+              "ReserveMs": {
+                "n": 1000,
+                "mean": 14737.49,
+                "median": 14834.75,
+                "p95": 15581.2,
+                "max": 16275.6
+              },
+              "ModelMs": {
+                "n": 3,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 3,
+                "mean": 1.6,
+                "median": 1.8,
+                "p95": 2.0,
+                "max": 2.0
+              },
+              "QuotaMs": null,
+              "QuotaLockMs": {
+                "n": 905,
+                "mean": 4142.71,
+                "median": 4295.4,
+                "p95": 6908.6,
+                "max": 8534.5
+              }
+            }
+          }
+        },
+        {
+          "round": 3,
+          "outcomes": {
+            "504": 974,
+            "500": 26
+          },
+          "backend_statuses": {
+            "504": 974,
+            "500": 26
+          },
+          "backend_matches": 1000,
+          "batch_ms": 15967.92,
+          "dispatch_ms": {
+            "n": 1000,
+            "mean": 48.11,
+            "median": 43.04,
+            "p95": 104.01,
+            "max": 106.81
+          },
+          "success": {
+            "client_ms": null,
+            "backend_ms": {
+              "TotalMs": null,
+              "AuthMs": null,
+              "ReserveMs": null,
+              "ModelMs": null,
+              "CompleteMs": null,
+              "QuotaMs": null,
+              "QuotaLockMs": null
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 1000,
+              "mean": 12005.46,
+              "median": 10550.42,
+              "p95": 15593.33,
+              "max": 15859.85
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 1000,
+                "mean": 11542.1,
+                "median": 10119.75,
+                "p95": 15324.9,
+                "max": 15616.5
+              },
+              "AuthMs": {
+                "n": 1000,
+                "mean": 786.78,
+                "median": 897.6,
+                "p95": 947.4,
+                "max": 997.5
+              },
+              "ReserveMs": {
+                "n": 1000,
+                "mean": 10755.0,
+                "median": 9217.85,
+                "p95": 14695.3,
+                "max": 15028.2
+              },
+              "ModelMs": null,
+              "CompleteMs": null,
+              "QuotaMs": null,
+              "QuotaLockMs": {
+                "n": 136,
+                "mean": 1810.27,
+                "median": 1384.1,
+                "p95": 5469.6,
+                "max": 7634.8
+              }
+            }
+          }
+        },
+        {
+          "round": 4,
+          "outcomes": {
+            "504": 694,
+            "500": 306
+          },
+          "backend_statuses": {
+            "504": 694,
+            "500": 306
+          },
+          "backend_matches": 1000,
+          "batch_ms": 15385.31,
+          "dispatch_ms": {
+            "n": 1000,
+            "mean": 62.62,
+            "median": 70.92,
+            "p95": 88.58,
+            "max": 90.17
+          },
+          "success": {
+            "client_ms": null,
+            "backend_ms": {
+              "TotalMs": null,
+              "AuthMs": null,
+              "ReserveMs": null,
+              "ModelMs": null,
+              "CompleteMs": null,
+              "QuotaMs": null,
+              "QuotaLockMs": null
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 1000,
+              "mean": 10286.75,
+              "median": 10362.22,
+              "p95": 14412.2,
+              "max": 15341.87
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 1000,
+                "mean": 9910.42,
+                "median": 9678.65,
+                "p95": 14378.8,
+                "max": 15309.9
+              },
+              "AuthMs": {
+                "n": 1000,
+                "mean": 618.51,
+                "median": 621.5,
+                "p95": 922.0,
+                "max": 939.5
+              },
+              "ReserveMs": {
+                "n": 1000,
+                "mean": 9291.63,
+                "median": 9091.35,
+                "p95": 13914.2,
+                "max": 14622.4
+              },
+              "ModelMs": null,
+              "CompleteMs": null,
+              "QuotaMs": null,
+              "QuotaLockMs": {
+                "n": 70,
+                "mean": 2843.25,
+                "median": 2408.25,
+                "p95": 5712.1,
+                "max": 6771.8
+              }
+            }
+          }
+        },
+        {
+          "round": 5,
+          "outcomes": {
+            "500": 191,
+            "504": 809
+          },
+          "backend_statuses": {
+            "500": 191,
+            "504": 809
+          },
+          "backend_matches": 1000,
+          "batch_ms": 14688.42,
+          "dispatch_ms": {
+            "n": 1000,
+            "mean": 36.65,
+            "median": 37.27,
+            "p95": 60.75,
+            "max": 62.4
+          },
+          "success": {
+            "client_ms": null,
+            "backend_ms": {
+              "TotalMs": null,
+              "AuthMs": null,
+              "ReserveMs": null,
+              "ModelMs": null,
+              "CompleteMs": null,
+              "QuotaMs": null,
+              "QuotaLockMs": null
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 1000,
+              "mean": 9974.6,
+              "median": 10483.67,
+              "p95": 10601.61,
+              "max": 14645.01
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 1000,
+                "mean": 9404.58,
+                "median": 9577.6,
+                "p95": 10063.1,
+                "max": 14504.5
+              },
+              "AuthMs": {
+                "n": 1000,
+                "mean": 759.36,
+                "median": 759.95,
+                "p95": 891.9,
+                "max": 1188.4
+              },
+              "ReserveMs": {
+                "n": 1000,
+                "mean": 8644.89,
+                "median": 8791.5,
+                "p95": 9206.9,
+                "max": 13713.3
+              },
+              "ModelMs": null,
+              "CompleteMs": null,
+              "QuotaMs": null,
+              "QuotaLockMs": {
+                "n": 1,
+                "mean": 1149.3,
+                "median": 1149.3,
+                "p95": 1149.3,
+                "max": 1149.3
+              }
+            }
+          }
+        },
+        {
+          "round": 6,
+          "outcomes": {
+            "504": 898,
+            "500": 102
+          },
+          "backend_statuses": {
+            "504": 898,
+            "500": 102
+          },
+          "backend_matches": 1000,
+          "batch_ms": 14839.69,
+          "dispatch_ms": {
+            "n": 1000,
+            "mean": 17.23,
+            "median": 16.85,
+            "p95": 31.75,
+            "max": 41.79
+          },
+          "success": {
+            "client_ms": null,
+            "backend_ms": {
+              "TotalMs": null,
+              "AuthMs": null,
+              "ReserveMs": null,
+              "ModelMs": null,
+              "CompleteMs": null,
+              "QuotaMs": null,
+              "QuotaLockMs": null
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 1000,
+              "mean": 10410.5,
+              "median": 10682.6,
+              "p95": 11089.47,
+              "max": 14824.51
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 1000,
+                "mean": 9677.1,
+                "median": 9794.65,
+                "p95": 10654.1,
+                "max": 14690.6
+              },
+              "AuthMs": {
+                "n": 1000,
+                "mean": 756.68,
+                "median": 791.8,
+                "p95": 870.7,
+                "max": 886.5
+              },
+              "ReserveMs": {
+                "n": 1000,
+                "mean": 8920.14,
+                "median": 8988.55,
+                "p95": 10166.8,
+                "max": 13900.6
+              },
+              "ModelMs": null,
+              "CompleteMs": null,
+              "QuotaMs": null,
+              "QuotaLockMs": {
+                "n": 1,
+                "mean": 3159.1,
+                "median": 3159.1,
+                "p95": 3159.1,
+                "max": 3159.1
+              }
+            }
+          }
+        },
+        {
+          "round": 7,
+          "outcomes": {
+            "504": 995,
+            "500": 5
+          },
+          "backend_statuses": {
+            "504": 995,
+            "500": 5
+          },
+          "backend_matches": 1000,
+          "batch_ms": 15975.45,
+          "dispatch_ms": {
+            "n": 1000,
+            "mean": 20.17,
+            "median": 20.9,
+            "p95": 33.25,
+            "max": 46.38
+          },
+          "success": {
+            "client_ms": null,
+            "backend_ms": {
+              "TotalMs": null,
+              "AuthMs": null,
+              "ReserveMs": null,
+              "ModelMs": null,
+              "CompleteMs": null,
+              "QuotaMs": null,
+              "QuotaLockMs": null
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 1000,
+              "mean": 11269.18,
+              "median": 11121.3,
+              "p95": 15653.01,
+              "max": 15932.32
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 1000,
+                "mean": 10557.01,
+                "median": 9926.15,
+                "p95": 15529.0,
+                "max": 15762.7
+              },
+              "AuthMs": {
+                "n": 1000,
+                "mean": 694.21,
+                "median": 709.8,
+                "p95": 774.5,
+                "max": 801.1
+              },
+              "ReserveMs": {
+                "n": 1000,
+                "mean": 9861.57,
+                "median": 9204.6,
+                "p95": 14773.0,
+                "max": 14988.8
+              },
+              "ModelMs": {
+                "n": 4,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 4,
+                "mean": 212.73,
+                "median": 1.35,
+                "p95": 847.2,
+                "max": 847.2
+              },
+              "QuotaMs": null,
+              "QuotaLockMs": {
+                "n": 131,
+                "mean": 2710.45,
+                "median": 2818.7,
+                "p95": 4508.5,
+                "max": 5891.9
+              }
+            }
+          }
+        },
+        {
+          "round": 8,
+          "outcomes": {
+            "504": 999,
+            "500": 1
+          },
+          "backend_statuses": {
+            "504": 999,
+            "500": 1
+          },
+          "backend_matches": 1000,
+          "batch_ms": 16829.6,
+          "dispatch_ms": {
+            "n": 1000,
+            "mean": 45.25,
+            "median": 45.26,
+            "p95": 72.9,
+            "max": 75.67
+          },
+          "success": {
+            "client_ms": null,
+            "backend_ms": {
+              "TotalMs": null,
+              "AuthMs": null,
+              "ReserveMs": null,
+              "ModelMs": null,
+              "CompleteMs": null,
+              "QuotaMs": null,
+              "QuotaLockMs": null
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 1000,
+              "mean": 13029.6,
+              "median": 11854.64,
+              "p95": 16617.67,
+              "max": 16753.53
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 1000,
+                "mean": 12021.66,
+                "median": 10556.45,
+                "p95": 16379.2,
+                "max": 16493.4
+              },
+              "AuthMs": {
+                "n": 1000,
+                "mean": 691.35,
+                "median": 712.9,
+                "p95": 758.5,
+                "max": 784.6
+              },
+              "ReserveMs": {
+                "n": 1000,
+                "mean": 11329.74,
+                "median": 9826.75,
+                "p95": 15687.3,
+                "max": 16077.6
+              },
+              "ModelMs": {
+                "n": 3,
+                "mean": 0.0,
+                "median": 0.0,
+                "p95": 0.0,
+                "max": 0.0
+              },
+              "CompleteMs": {
+                "n": 3,
+                "mean": 61.3,
+                "median": 2.5,
+                "p95": 179.2,
+                "max": 179.2
+              },
+              "QuotaMs": null,
+              "QuotaLockMs": {
+                "n": 222,
+                "mean": 2398.83,
+                "median": 2247.55,
+                "p95": 5112.1,
+                "max": 8505.9
+              }
+            }
+          }
+        },
+        {
+          "round": 9,
+          "outcomes": {
+            "504": 954,
+            "500": 46
+          },
+          "backend_statuses": {
+            "504": 954,
+            "500": 46
+          },
+          "backend_matches": 1000,
+          "batch_ms": 16402.35,
+          "dispatch_ms": {
+            "n": 1000,
+            "mean": 28.09,
+            "median": 28.31,
+            "p95": 49.37,
+            "max": 51.83
+          },
+          "success": {
+            "client_ms": null,
+            "backend_ms": {
+              "TotalMs": null,
+              "AuthMs": null,
+              "ReserveMs": null,
+              "ModelMs": null,
+              "CompleteMs": null,
+              "QuotaMs": null,
+              "QuotaLockMs": null
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 1000,
+              "mean": 10978.53,
+              "median": 10647.85,
+              "p95": 13074.51,
+              "max": 16350.44
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 1000,
+                "mean": 10304.38,
+                "median": 10265.05,
+                "p95": 13034.2,
+                "max": 16184.1
+              },
+              "AuthMs": {
+                "n": 1000,
+                "mean": 562.83,
+                "median": 588.05,
+                "p95": 629.3,
+                "max": 802.1
+              },
+              "ReserveMs": {
+                "n": 1000,
+                "mean": 9741.3,
+                "median": 9664.25,
+                "p95": 12483.8,
+                "max": 15560.9
+              },
+              "ModelMs": null,
+              "CompleteMs": null,
+              "QuotaMs": null,
+              "QuotaLockMs": {
+                "n": 5,
+                "mean": 1999.0,
+                "median": 2296.5,
+                "p95": 3875.1,
+                "max": 3875.1
+              }
+            }
+          }
+        },
+        {
+          "round": 10,
+          "outcomes": {
+            "500": 162,
+            "504": 838
+          },
+          "backend_statuses": {
+            "500": 162,
+            "504": 838
+          },
+          "backend_matches": 1000,
+          "batch_ms": 15790.74,
+          "dispatch_ms": {
+            "n": 1000,
+            "mean": 34.12,
+            "median": 38.32,
+            "p95": 55.41,
+            "max": 57.24
+          },
+          "success": {
+            "client_ms": null,
+            "backend_ms": {
+              "TotalMs": null,
+              "AuthMs": null,
+              "ReserveMs": null,
+              "ModelMs": null,
+              "CompleteMs": null,
+              "QuotaMs": null,
+              "QuotaLockMs": null
+            }
+          },
+          "all_outcomes": {
+            "client_ms": {
+              "n": 1000,
+              "mean": 10283.03,
+              "median": 10265.85,
+              "p95": 14595.03,
+              "max": 15733.37
+            },
+            "backend_ms": {
+              "TotalMs": {
+                "n": 1000,
+                "mean": 9825.08,
+                "median": 9737.0,
+                "p95": 14534.8,
+                "max": 15537.3
+              },
+              "AuthMs": {
+                "n": 1000,
+                "mean": 689.77,
+                "median": 651.0,
+                "p95": 1107.8,
+                "max": 1142.5
+              },
+              "ReserveMs": {
+                "n": 1000,
+                "mean": 9134.95,
+                "median": 8872.7,
+                "p95": 13803.3,
+                "max": 15371.4
+              },
+              "ModelMs": null,
+              "CompleteMs": null,
+              "QuotaMs": null,
+              "QuotaLockMs": {
+                "n": 40,
+                "mean": 3428.53,
+                "median": 3452.75,
+                "p95": 7576.1,
+                "max": 9247.1
+              }
+            }
+          }
+        }
+      ],
+      "success": {
+        "client_ms": null,
+        "backend_ms": {
+          "TotalMs": null,
+          "AuthMs": null,
+          "ReserveMs": null,
+          "ModelMs": null,
+          "CompleteMs": null,
+          "QuotaMs": null,
+          "QuotaLockMs": null
+        }
+      },
+      "all_outcomes": {
+        "client_ms": {
+          "n": 10000,
+          "mean": 11776.56,
+          "median": 10781.53,
+          "p95": 16300.59,
+          "max": 16847.65
+        },
+        "backend_ms": {
+          "TotalMs": {
+            "n": 10000,
+            "mean": 11217.08,
+            "median": 10061.6,
+            "p95": 16041.3,
+            "max": 16569.9
+          },
+          "AuthMs": {
+            "n": 10000,
+            "mean": 717.84,
+            "median": 725.2,
+            "p95": 967.8,
+            "max": 1347.0
+          },
+          "ReserveMs": {
+            "n": 10000,
+            "mean": 9836.62,
+            "median": 9150.95,
+            "p95": 15117.4,
+            "max": 16275.6
+          },
+          "ModelMs": {
+            "n": 1010,
+            "mean": 0.0,
+            "median": 0.0,
+            "p95": 0.0,
+            "max": 0.3
+          },
+          "CompleteMs": {
+            "n": 1010,
+            "mean": 6504.69,
+            "median": 6496.25,
+            "p95": 9604.6,
+            "max": 10651.9
+          },
+          "QuotaMs": {
+            "n": 243,
+            "mean": 216.73,
+            "median": 6.2,
+            "p95": 1849.5,
+            "max": 3356.0
+          },
+          "QuotaLockMs": {
+            "n": 2511,
+            "mean": 2784.91,
+            "median": 2151.5,
+            "p95": 5891.9,
+            "max": 9247.1
+          }
+        }
+      }
+    }
+  }
+}

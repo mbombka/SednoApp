@@ -1,7 +1,8 @@
 # Sedno
 
-23.10.2026: wdrożono **sedno-api-00014-mmh** z 13 wariantami językowymi i przygotowano
-**AAB 0.2.0 (17)**. [Aktualny raport wdrożenia i pakietu](docs/backend-deployment-2026-10-23-multilingual.pl.md).
+20.11.2026 wdrożono **sedno-api-00016-ll9** z obsługą pakietu 1000 użyć.
+Podpisany [AAB 1.0.0 (20)](mobile/build/releases/sedno-1.0.0-20.aab)
+korzysta z publicznego adresu API i zawiera obsługę zakupów Google Play.
 
 Sedno to aplikacja na Androida, która upraszcza i poprawia teksty w obsługiwanych językach. Można wpisać
 tekst, wkleić go, odczytać ze zdjęcia lub podyktować (Android 13+ z lokalnym
@@ -19,17 +20,18 @@ w tym portugalskiego z Portugalii i norweskiego Bokmål. Backend z obsługą tyc
 
 Serwer uruchomiono 19.10.2026. Przed udostępnieniem aplikacji pozostają
 [pozostałe kontrole i przygotowanie Google Play](Tasks.md).
-Obsługę płatności włączono na istniejącym serwerze do testów; zakupów nie odebrano
-jeszcze na telefonie. Przygotowano [podpisany AAB 0.2.0 (17)](mobile/docs/google_play_release_17.md)
-z 13 wariantami językowymi, wyborem języka i osobnymi promptami obu trybów.
-Backend z aktualnymi promptami wdrożono 23.10.2026 jako `sedno-api-00014-mmh`,
-ze współbieżnością 80 żądań na instancję.
-[Raport wdrożenia](docs/backend-deployment-2026-10-23.pl.md).
+Backend, Firebase Hosting API i zadanie sprzątania korzystają z wydania z
+20.11.2026. Przed publicznym wydaniem pozostaje zakup testowy przez Google Play
+na telefonie. [Instrukcja prób](mobile/docs/google_play_subscription_sandbox.md).
 Obsługę usuwania konta przez e-mail właściciel potwierdził 20.10.2026.
 
 Backend przełączono na Firestore 19.10.2026. API i godzinowe sprzątanie działają.
 Starą instancję Cloud SQL i wszystkie cztery kopie zapasowe usunięto 19.10.2026.
 [Stan wdrożenia](backend/deploy/firebase/README.pl.md).
+
+26.11.2026 wdrożono domyślny test startowy TCP na porcie 8080 w rewizji
+`sedno-api-tcp-20261126`. `/health/ready` sprawdza Firestore podczas weryfikacji
+wdrożenia. Minimum instancji usługi Cloud Run wynosi 0.
 
 | Informacja | Wartość |
 | --- | --- |

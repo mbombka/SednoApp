@@ -1,5 +1,9 @@
 # Serwer Sedno
 
+Od 26.11.2026 ruch produkcyjny obsługuje `sedno-api-tcp-20261126` z domyślnym
+testem startowym TCP portu 8080. Minimum instancji usługi wynosi 0.
+[Wdrożenie w Cloud Run](deploy/firebase/README.pl.md).
+
 23.10.2026: wdrożono **sedno-api-00014-mmh** z 13 wariantami językowymi i przygotowano
 **AAB 0.2.0 (17)**. [Aktualny raport wdrożenia i pakietu](../docs/backend-deployment-2026-10-23-multilingual.pl.md).
 
@@ -45,6 +49,11 @@ Dane lokalnego kontenera są tymczasowe. Zachowaj klucze bezpieczeństwa przy
 ponownym uruchomieniu API korzystającego z tych samych danych.
 Do trwałego zapisu kluczy użyj .NET user-secrets (`Security:CredentialKey`,
 `Security:FingerprintKey`), nigdy Git.
+
+Przy starcie instancji Cloud Run sprawdza domyślnie port TCP 8080. Pierwsze
+żądanie może trafić do API po otwarciu portu. Wtedy dostęp do Firestore
+sprawdzają operacje wykonywane w ramach żądania. W trakcie wdrożenia
+`/health/ready` nadal pozwala zweryfikować dostęp do bazy i stan migracji.
 
 Produkcja odrzuca emulator, również gdy ustawiono tylko `FIRESTORE_EMULATOR_HOST`.
 Połączenie z prawdziwą bazą wymaga `Firestore__UseEmulator=false`, usunięcia tej
