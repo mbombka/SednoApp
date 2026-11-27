@@ -33,6 +33,8 @@ try:
         'ASPNETCORE_ENVIRONMENT': 'Development', 'ASPNETCORE_HTTP_PORTS': '9090',
         'Firestore__ProjectId': 'demo-synthetic-smoke', 'Firestore__UseEmulator': 'true',
         'FIRESTORE_EMULATOR_HOST': f'{database}:8080',
+        'NO_PROXY': f'127.0.0.1,localhost,{database}',
+        'no_proxy': f'127.0.0.1,localhost,{database}',
         'Model__Provider': 'mock', 'PlayIntegrity__Provider': 'mock',
         'Security__CredentialKey': 'AQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQE=',
         'Security__FingerprintKey': 'AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgI=',
@@ -70,7 +72,7 @@ try:
     with urllib.request.urlopen(request, timeout=10) as response:
         assert json.load(response)['quota']['remaining'] == 4
     cleanup_env = {key: value for key, value in env.items()
-                   if key in ('ASPNETCORE_ENVIRONMENT', 'Firestore__ProjectId', 'Firestore__UseEmulator', 'FIRESTORE_EMULATOR_HOST')}
+                   if key in ('ASPNETCORE_ENVIRONMENT', 'Firestore__ProjectId', 'Firestore__UseEmulator', 'FIRESTORE_EMULATOR_HOST', 'NO_PROXY', 'no_proxy')}
     docker('run', '--rm', '--network', network, *environment(cleanup_env), image, '--cleanup')
     print('Firestore: gotowość, sesja, uproszczenie mock, limit i cleanup bez sekretów: OK.')
     production = dict(cleanup_env, ASPNETCORE_ENVIRONMENT='Production', K_SERVICE='sedno-smoke', PORT='9090')
