@@ -2,7 +2,9 @@ package httpapi
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -18,6 +20,25 @@ import (
 	"github.com/mbombka/SednoApp/backend/internal/simplification"
 	"github.com/mbombka/SednoApp/backend/internal/store"
 )
+
+type testPackClient struct {
+	purchase    store.PlayPack
+	consumed    int
+	failConsume bool
+}
+
+func (p *testPackClient) LookupPack(context.Context, string) (store.PlayPack, error) {
+	return p.purchase, nil
+}
+
+func (p *testPackClient) ConsumePack(context.Context, string) error {
+	if p.failConsume {
+		return errors.New("synthetic Play consumption failure")
+	}
+	p.consumed++
+	p.purchase.Consumed = true
+	return nil
+}
 
 func TestGuestFlowWithEmulator(t *testing.T) {
 	address := os.Getenv("FIRESTORE_EMULATOR_HOST")
@@ -92,6 +113,9 @@ func TestGuestFlowWithEmulator(t *testing.T) {
 	}
 	check(request("GET", "/health/ready", "", ""), 200, `"status":"ready"`)
 	check(request("GET", "/v1/quota", "", ""), 401, "unauthorized")
+	const packPath = "/v1/purchases/simplifications"
+	const packBody = `{"purchaseToken":"synthetic-pack"}`
+	check(request("POST", packPath, packBody, ""), 401, "unauthorized")
 	guest := func() string {
 		w := request("POST", "/v1/guest-sessions", `{"installationId":"shared","integrityToken":"development-ok"}`, "")
 		check(w, 200, `"provider":"guest"`)
@@ -102,6 +126,7 @@ func TestGuestFlowWithEmulator(t *testing.T) {
 		return result.AccessToken
 	}
 	first, second := guest(), guest()
+	check(request("POST", packPath, packBody, first), 403, "account_required")
 	work := `{"requestId":"one","text":"synthetic input","language":"en-US","mode":"correct"}`
 	var both sync.WaitGroup
 	results := make(chan *httptest.ResponseRecorder, 2)
@@ -144,6 +169,7 @@ func TestGuestFlowWithEmulator(t *testing.T) {
 	}
 	check(request("GET", "/v1/quota", "", second), 401, "unauthorized")
 	check(request("GET", "/v1/subscription", "", account.AccessToken), 503, "billing_unavailable")
+	check(request("POST", packPath, packBody, account.AccessToken), 503, "billing_unavailable")
 	check(request("DELETE", "/v1/account", `{"idToken":"other"}`, account.AccessToken), 403, "reauthentication_required")
 	if deleted {
 		t.Fatal("deleted a different account")
@@ -160,9 +186,53 @@ func TestGuestFlowWithEmulator(t *testing.T) {
 			}
 		}
 	}
+
+	app.Billing = &store.Billing{Store: app.Store}
+	app.BillingPackage = "xyz.sedno.app"
+	app.VerifyNotification = func(_ context.Context, token string) bool { return token == "synthetic-push" }
+	client := &testPackClient{}
+	app.Packs = &store.Packs{Store: app.Store, Play: client}
+	subscription := request("GET", "/v1/subscription", "", account.AccessToken)
+	check(subscription, 200, `"packPurchasesEnabled":true`)
+	var status store.Subscription
+	if err := json.Unmarshal(subscription.Body.Bytes(), &status); err != nil || status.AccountBinding == "" {
+		t.Fatal("missing account binding")
+	}
+	client.purchase = store.PlayPack{State: "PENDING", Product: store.PackProductID, Binding: status.AccountBinding}
+	check(request("POST", packPath, `{"purchaseToken":" "}`, account.AccessToken), 400, "invalid_purchase")
+	check(request("POST", packPath, packBody, account.AccessToken), 200, `"state":"pending"`)
+	client.purchase.State, client.purchase.Quantity = "PURCHASED", 2
+	client.failConsume = true
+	check(request("POST", packPath, packBody, account.AccessToken), 503, "billing_unavailable")
+	check(request("GET", "/v1/quota", "", account.AccessToken), 200, `"packRemaining":2000`)
+	client.failConsume = false
+	notify := func(event string) {
+		t.Helper()
+		body := fmt.Sprintf(`{"message":{"messageId":"synthetic-notification","data":%q}}`, base64.StdEncoding.EncodeToString([]byte(event)))
+		check(request("POST", "/notifications/google-play", body, "synthetic-push"), 204, "")
+	}
+	notify(`{"packageName":"xyz.sedno.app","oneTimeProductNotification":{"sku":"simplifications_1000","purchaseToken":"synthetic-pack"}}`)
+	check(request("POST", packPath, packBody, account.AccessToken), 200, `"state":"credited"`)
+	if client.consumed != 1 {
+		t.Fatalf("expected one consumption, got %d", client.consumed)
+	}
+	check(request("GET", "/v1/quota", "", account.AccessToken), 200, `"packRemaining":2000`)
+	check(request("POST", "/v1/simplifications", `{"requestId":"pack-use","text":"synthetic input"}`, account.AccessToken), 200, `"packRemaining":1999`)
+	check(request("GET", "/v1/quota", "", account.AccessToken), 200, `"remaining":4`)
+	client.purchase.Quantity = 1
+	notify(`{"packageName":"xyz.sedno.app","voidedPurchaseNotification":{"productType":2,"refundType":2,"purchaseToken":"synthetic-pack"}}`)
+	check(request("GET", "/v1/quota", "", account.AccessToken), 200, `"packRemaining":999`)
+	notify(`{"packageName":"xyz.sedno.app","voidedPurchaseNotification":{"productType":2,"refundType":1,"purchaseToken":"synthetic-pack"}}`)
+	check(request("POST", packPath, packBody, account.AccessToken), 200, `"state":"invalid"`)
+	check(request("GET", "/v1/quota", "", account.AccessToken), 200, `"packBalance":0`)
+
 	check(request("DELETE", "/v1/account", `{"idToken":"verified"}`, account.AccessToken), 204, "")
 	if !deleted {
 		t.Fatal("Firebase deletion was not called")
+	}
+	receipts, err := db.Collection("play_pack_purchases").Documents(ctx).GetAll()
+	if err != nil || len(receipts) != 0 {
+		t.Fatalf("expected pack receipts to be removed: %v", err)
 	}
 	check(request("GET", "/v1/quota", "", account.AccessToken), 401, "unauthorized")
 }

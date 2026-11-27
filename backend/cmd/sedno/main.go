@@ -207,9 +207,11 @@ func configure(s *store.Store, development, cloudRun, serviceIdentity bool) (*ht
 			return nil, errors.New("Google Play Billing credentials are unavailable")
 		}
 		api.BillingPackage = setting("Billing__PackageName", "xyz.sedno.app")
-		api.Billing = &store.Billing{Store: s, Protection: protection, Play: googleapi.Billing{
+		play := googleapi.Billing{
 			Client: client, Package: api.BillingPackage, Product: setting("Billing__ProductId", "subscription_full"),
-		}}
+		}
+		api.Billing = &store.Billing{Store: s, Protection: protection, Play: play}
+		api.Packs = &store.Packs{Store: s, Play: play}
 		verify := googleapi.PubSubVerifier(audience)
 		api.VerifyNotification = func(ctx context.Context, token string) bool { return verify.PubSub(ctx, token, email) }
 	}

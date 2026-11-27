@@ -21,10 +21,17 @@ type Account struct {
 	TesterAccessExpiresAt *time.Time
 	InstallationHashes    []string
 	Deleting              bool
+	PackCredits           map[string]int             `firestore:"PackCredits,omitempty"`
+	PackReservations      map[string]packReservation `firestore:"PackReservations,omitempty"`
 	FirebaseUid           string
 	Provider              string
 	PrimaryIdentityId     string
 	CreatedAt             time.Time
+}
+
+type packReservation struct {
+	TokenHash string
+	ExpiresAt time.Time
 }
 
 type reservation struct {
@@ -54,6 +61,7 @@ type record struct {
 	Fingerprint          string
 	State                requestState
 	CreatedAt            time.Time
+	PackTokenHash        string `firestore:"PackTokenHash,omitempty"`
 	ReservationDay       string
 	ReservationExpiresAt time.Time
 	FinishedAt           *time.Time
@@ -73,6 +81,8 @@ type Quota struct {
 	Limit                 int        `json:"limit"`
 	Used                  int        `json:"used"`
 	Remaining             int        `json:"remaining"`
+	PackRemaining         int        `json:"packRemaining"`
+	PackBalance           int        `json:"packBalance"`
 	ServerTime            time.Time  `json:"serverTime"`
 	ResetAt               time.Time  `json:"resetAt"`
 	TesterAccessExpiresAt *time.Time `json:"testerAccessExpiresAt"`
@@ -116,8 +126,10 @@ func (s *Store) active(ctx context.Context, tx *firestore.Transaction, id string
 
 type usageSnapshot struct {
 	identity *Identity
+	account  *Account
 	days     map[string]*ledger
 	quota    Quota
+	pack     string
 }
 
 func (s *Store) snapshot(ctx context.Context, tx *firestore.Transaction, id string, paid bool, now time.Time) (usageSnapshot, error) {
@@ -127,6 +139,7 @@ func (s *Store) snapshot(ctx context.Context, tx *firestore.Transaction, id stri
 	}
 	hashes := []string{identity.InstallationHash}
 	quota := Quota{Tier: "free", Limit: 5, ServerTime: now, ResetAt: now.Truncate(24*time.Hour).AddDate(0, 0, 1)}
+	var pack string
 	if account != nil {
 		hashes = append(hashes, account.InstallationHashes...)
 		quota.TesterAccessExpiresAt = account.TesterAccessExpiresAt
@@ -135,6 +148,20 @@ func (s *Store) snapshot(ctx context.Context, tx *firestore.Transaction, id stri
 		}
 		if paid {
 			quota.Tier, quota.Limit = "subscription", 400
+		}
+		held := make(map[string]int)
+		for _, reservation := range account.PackReservations {
+			if reservation.ExpiresAt.After(now) {
+				held[reservation.TokenHash]++
+			}
+		}
+		for token, credits := range account.PackCredits {
+			available := max(0, credits-held[token])
+			quota.PackBalance += credits
+			quota.PackRemaining += available
+			if available > 0 && (pack == "" || token < pack) {
+				pack = token
+			}
 		}
 	}
 	slices.Sort(hashes)
@@ -157,7 +184,7 @@ func (s *Store) snapshot(ctx context.Context, tx *firestore.Transaction, id stri
 		days[hash] = usage
 	}
 	quota.Remaining = max(0, quota.Limit-quota.Used-reserved)
-	return usageSnapshot{identity, days, quota}, nil
+	return usageSnapshot{identity: identity, account: account, days: days, quota: quota, pack: pack}, nil
 }
 
 func (s *Store) Quota(ctx context.Context, id string, paid bool) (Quota, error) {
@@ -224,30 +251,52 @@ func (s *Store) Reserve(ctx context.Context, id, requestID, fingerprint string, 
 			}
 			return nil
 		}
-		if quota.Remaining == 0 {
+		if snapshot.pack == "" && quota.PackBalance > 0 {
+			kind = "pack_reserved"
+			return nil
+		}
+		if snapshot.pack == "" && quota.Remaining == 0 {
 			kind = "quota_exceeded"
 			return nil
 		}
 		day := now.Format(time.DateOnly)
-		hash := snapshot.identity.InstallationHash
-		usage := snapshot.days[hash]
-		if usage.Reservations == nil {
-			usage.Reservations = make(map[string]reservation)
-		}
-		if usage.Used == nil {
-			usage.Used = make(map[string]int)
-		}
 		until := now.Add(5 * time.Minute)
-		usage.Reservations[ref.ID] = reservation{id, until}
 		kind = "reserved"
-		quota.Remaining--
-		if err := tx.Set(s.dayLedger(hash, day), usage); err != nil {
+		if err := s.reserveUse(tx, snapshot, ref.ID, day, now, until, &quota); err != nil {
 			return err
 		}
 		return tx.Create(ref, record{IdentityId: id, RequestId: requestID, Fingerprint: fingerprint, State: processing,
-			CreatedAt: now, ReservationDay: day, ReservationExpiresAt: until})
+			CreatedAt: now, PackTokenHash: snapshot.pack, ReservationDay: day, ReservationExpiresAt: until})
 	})
 	return kind, quota, err
+}
+
+func (s *Store) reserveUse(tx *firestore.Transaction, snapshot usageSnapshot, request, day string, now, until time.Time, quota *Quota) error {
+	if snapshot.pack != "" {
+		account := snapshot.account
+		if account.PackReservations == nil {
+			account.PackReservations = make(map[string]packReservation)
+		}
+		for id, hold := range account.PackReservations {
+			if !hold.ExpiresAt.After(now) {
+				delete(account.PackReservations, id)
+			}
+		}
+		account.PackReservations[request] = packReservation{TokenHash: snapshot.pack, ExpiresAt: until}
+		quota.PackRemaining--
+		return tx.Set(s.doc("verified_accounts", docID(account.Id)), account)
+	}
+	hash := snapshot.identity.InstallationHash
+	usage := snapshot.days[hash]
+	if usage.Reservations == nil {
+		usage.Reservations = make(map[string]reservation)
+	}
+	if usage.Used == nil {
+		usage.Used = make(map[string]int)
+	}
+	usage.Reservations[request] = reservation{snapshot.identity.Id, until}
+	quota.Remaining--
+	return tx.Set(s.dayLedger(hash, day), usage)
 }
 
 func (s *Store) Finish(ctx context.Context, id, requestID string, success bool) (bool, error) {
@@ -260,17 +309,21 @@ func (s *Store) Finish(ctx context.Context, id, requestID string, success bool) 
 	err = s.withUsageLease(ctx, id, func(ctx context.Context, tx *firestore.Transaction) error {
 		completed = false
 		now := s.now()
-		identity, _, err := s.active(ctx, tx, id)
+		identity, account, err := s.active(ctx, tx, id)
 		if err != nil {
-			return err
-		}
-		dayRef := s.dayLedger(identity.InstallationHash, hint.ReservationDay)
-		usage, err := read[ledger](ctx, tx, dayRef)
-		if err != nil || usage == nil {
 			return err
 		}
 		current, err := read[record](ctx, tx, ref)
 		if err != nil || current == nil || current.State != processing || current.ReservationDay != hint.ReservationDay {
+			return err
+		}
+		if current.PackTokenHash != "" {
+			completed, err = s.finishPack(tx, account, ref, current, success, now)
+			return err
+		}
+		dayRef := s.dayLedger(identity.InstallationHash, current.ReservationDay)
+		usage, err := read[ledger](ctx, tx, dayRef)
+		if err != nil || usage == nil {
 			return err
 		}
 		usage.expire(now)
@@ -292,6 +345,34 @@ func (s *Store) Finish(ctx context.Context, id, requestID string, success bool) 
 		return tx.Set(ref, current)
 	})
 	return completed, err
+}
+
+func (s *Store) finishPack(tx *firestore.Transaction, account *Account, ref *firestore.DocumentRef, current *record, success bool, now time.Time) (bool, error) {
+	if account == nil {
+		return false, nil
+	}
+	token := current.PackTokenHash
+	hold := account.PackReservations[ref.ID]
+	delete(account.PackReservations, ref.ID)
+	credits := account.PackCredits[token]
+	completed := success && hold.TokenHash == token && hold.ExpiresAt.After(now) &&
+		current.ReservationExpiresAt.After(now) && credits > 0
+	current.State, current.FinishedAt = failed, &now
+	if success {
+		current.State = expired
+	}
+	if completed {
+		current.State = succeeded
+		if credits == 1 {
+			delete(account.PackCredits, token)
+		} else {
+			account.PackCredits[token]--
+		}
+	}
+	if err := tx.Set(s.doc("verified_accounts", docID(account.Id)), account); err != nil {
+		return false, err
+	}
+	return completed, tx.Set(ref, current)
 }
 
 func (s *Store) Status(ctx context.Context, id, requestID string, paid bool) (*RequestStatus, error) {

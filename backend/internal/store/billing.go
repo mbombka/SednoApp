@@ -51,10 +51,11 @@ type notification struct {
 	ProcessedAt time.Time
 }
 type Subscription struct {
-	State          string     `json:"state"`
-	Active         bool       `json:"active"`
-	ExpiresAt      *time.Time `json:"expiresAt"`
-	AccountBinding string     `json:"accountBinding"`
+	State                string     `json:"state"`
+	Active               bool       `json:"active"`
+	ExpiresAt            *time.Time `json:"expiresAt"`
+	AccountBinding       string     `json:"accountBinding"`
+	PackPurchasesEnabled bool       `json:"packPurchasesEnabled"`
 }
 
 func binding(account string) string { return hash("sedno-account:" + docID(account)) }
@@ -352,7 +353,7 @@ func (b *Billing) update(ctx context.Context, account, token string, lock *lease
 		if row.Revoked {
 			state = "revoked"
 		}
-		result = Subscription{state, !row.Revoked && active, status.ExpiresAt, accountBinding}
+		result = Subscription{State: state, Active: !row.Revoked && active, ExpiresAt: status.ExpiresAt, AccountBinding: accountBinding}
 		return nil
 	})
 	return result, err

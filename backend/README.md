@@ -285,9 +285,16 @@ python3 tools/smoke_firebase_container.py --image sedno-go:test
 ```
 
 Konfiguracje Cloud Build oraz Cloud Run dla API i `--cleanup` korzystają
-z tego obrazu. Skieruj testowe Hosting, RTDN, Firebase Auth i Firestore do
-swojego projektu testowego. Do sprawdzenia zakupów użyj kont testowych
-Google Play. [Instrukcja konfiguracji Cloud Run](deploy/firebase/README.pl.md).
+z tego obrazu. Test lokalny korzysta z emulatora Firestore. Próby zakupów
+Google Play wykonuj kontami testowymi na istniejącej usłudze `sedno-api`
+z jej kontem usługi i bazą `(default)`.
+[Instrukcja konfiguracji Cloud Run](deploy/firebase/README.pl.md).
+
+Po włączeniu `Billing__Enabled` API Go obsługuje również pakiet
+`simplifications_1000`. Zakup weryfikuje `POST /v1/purchases/simplifications`,
+a `GET /v1/quota` zwraca saldo i dostępne użycia. Go współdzieli z .NET
+pola salda i rezerwacji oraz kolekcję `play_pack_purchases` z potwierdzeniami
+zakupów i zwrotów. Saldo pakietu nie resetuje się o północy UTC.
 
 Go czyta oraz zapisuje tokeny zakupów w formacie ASP.NET Core Data Protection
 z `SetApplicationName("Sedno")` i przeznaczeniem `Sedno.PlayPurchase.v1`.

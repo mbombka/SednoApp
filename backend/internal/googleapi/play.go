@@ -115,3 +115,51 @@ func (p Billing) Acknowledge(ctx context.Context, token string) error {
 	}
 	return nil
 }
+
+func (p Billing) LookupPack(ctx context.Context, token string) (store.PlayPack, error) {
+	var result struct {
+		PurchaseStateContext        struct{ PurchaseState string }
+		ObfuscatedExternalAccountID string
+		ProductLineItem             []struct {
+			ProductID           string
+			ProductOfferDetails struct {
+				RefundableQuantity *int
+				ConsumptionState   string
+			}
+		}
+	}
+	code, err := p.Client.call(ctx, http.MethodGet, p.base()+"productsv2/tokens/"+url.PathEscape(token), nil, &result)
+	if code == 404 || code == 410 {
+		return store.PlayPack{State: "UNAVAILABLE"}, nil
+	}
+	state := result.PurchaseStateContext.PurchaseState
+	if err != nil || code/100 != 2 || state == "" || len(result.ProductLineItem) != 1 {
+		return store.PlayPack{}, errUnavailable
+	}
+	item := result.ProductLineItem[0]
+	details := item.ProductOfferDetails
+	quantity := 0
+	if state == "PURCHASED" && item.ProductID == store.PackProductID {
+		if details.RefundableQuantity == nil {
+			return store.PlayPack{}, errUnavailable
+		}
+		quantity = *details.RefundableQuantity
+	}
+	return store.PlayPack{
+		State: state, Product: item.ProductID, Binding: result.ObfuscatedExternalAccountID,
+		Quantity: quantity, Consumed: details.ConsumptionState == "CONSUMPTION_STATE_CONSUMED",
+	}, nil
+}
+
+func (p Billing) ConsumePack(ctx context.Context, token string) error {
+	endpoint := p.base() + "products/" + store.PackProductID + "/tokens/" + url.PathEscape(token) + ":consume"
+	code, err := p.Client.call(ctx, http.MethodPost, endpoint, nil, nil)
+	if err == nil && code/100 == 2 {
+		return nil
+	}
+	status, err := p.LookupPack(ctx, token)
+	if err == nil && status.Product == store.PackProductID && status.Consumed {
+		return nil
+	}
+	return errUnavailable
+}

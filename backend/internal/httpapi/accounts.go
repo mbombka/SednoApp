@@ -107,6 +107,7 @@ func (a *API) currentSubscription(w http.ResponseWriter, r *http.Request, sessio
 	if err != nil {
 		return err
 	}
+	result.PackPurchasesEnabled = a.Packs != nil
 	writeJSON(w, 200, result)
 	return nil
 }
@@ -115,21 +116,49 @@ func (a *API) verifyPurchase(w http.ResponseWriter, r *http.Request, session *st
 	if err := a.billingAccount(session, "kupić subskrypcję"); err != nil {
 		return err
 	}
+	token, err := purchaseToken(w, r)
+	if err != nil {
+		return err
+	}
+	result, err := a.Billing.Verify(r.Context(), *session.AccountID, token)
+	if err != nil {
+		return err
+	}
+	result.PackPurchasesEnabled = a.Packs != nil
+	writeJSON(w, 200, result)
+	return nil
+}
+
+func (a *API) verifyPack(w http.ResponseWriter, r *http.Request, session *store.Session) error {
+	if err := a.billingAccount(session, "kupić pakiet"); err != nil {
+		return err
+	}
+	if a.Packs == nil {
+		return problemError{503, "billing_unavailable", "Płatności są niedostępne."}
+	}
+	token, err := purchaseToken(w, r)
+	if err != nil {
+		return err
+	}
+	state, err := a.Packs.Verify(r.Context(), *session.AccountID, token)
+	if err != nil {
+		return problemError{503, "billing_unavailable", "Płatności są niedostępne."}
+	}
+	writeJSON(w, 200, map[string]string{"state": state})
+	return nil
+}
+
+func purchaseToken(w http.ResponseWriter, r *http.Request) (string, error) {
 	var input *struct {
 		PurchaseToken string `json:"purchaseToken"`
 	}
 	if err := decode(w, r, &input); err != nil {
-		return err
+		return "", err
 	}
 	if input == nil || !validToken(input.PurchaseToken) {
-		return problemError{400, "invalid_purchase", "Nieprawidłowy zakup."}
+		return "", problemError{400, "invalid_purchase", "Nieprawidłowy zakup."}
 	}
-	result, err := a.Billing.Verify(r.Context(), *session.AccountID, input.PurchaseToken)
-	if err != nil {
-		return err
-	}
-	writeJSON(w, 200, result)
-	return nil
+	return input.PurchaseToken, nil
 }
 
 func (a *API) notification(w http.ResponseWriter, r *http.Request) {
@@ -156,8 +185,8 @@ func (a *API) notification(w http.ResponseWriter, r *http.Request) {
 	}
 	data, err := base64.StdEncoding.DecodeString(message.Data)
 	var event struct {
-		PackageName                                                            string
-		TestNotification, VoidedPurchaseNotification, SubscriptionNotification json.RawMessage
+		PackageName                                                                                        string
+		TestNotification, VoidedPurchaseNotification, OneTimeProductNotification, SubscriptionNotification json.RawMessage
 	}
 	if err != nil || json.Unmarshal(data, &event) != nil || event.PackageName != a.BillingPackage {
 		w.WriteHeader(400)
@@ -168,20 +197,42 @@ func (a *API) notification(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	raw := event.VoidedPurchaseNotification
+	voided := raw != nil
+	oneTime := !voided && event.OneTimeProductNotification != nil
 	if raw == nil {
 		raw = event.SubscriptionNotification
+	}
+	if oneTime {
+		raw = event.OneTimeProductNotification
 	}
 	if raw == nil {
 		w.WriteHeader(204)
 		return
 	}
-	var purchase struct{ PurchaseToken string }
+	var purchase struct {
+		PurchaseToken, SKU      string
+		ProductType, RefundType int
+	}
 	if json.Unmarshal(raw, &purchase) != nil || !validToken(purchase.PurchaseToken) {
 		w.WriteHeader(400)
 		return
 	}
-	if err := a.Billing.Notify(r.Context(), message.MessageID, purchase.PurchaseToken); err != nil {
-		handleError(w, r, err)
+	const oneTimeProduct, fullRefund = 2, 1
+	if oneTime && purchase.SKU != store.PackProductID {
+		w.WriteHeader(204)
+		return
+	}
+	if oneTime || voided && purchase.ProductType == oneTimeProduct {
+		if a.Packs == nil {
+			w.WriteHeader(503)
+			return
+		}
+		err = a.Packs.Notify(r.Context(), purchase.PurchaseToken, voided && purchase.RefundType == fullRefund)
+	} else {
+		err = a.Billing.Notify(r.Context(), message.MessageID, purchase.PurchaseToken)
+	}
+	if err != nil {
+		w.WriteHeader(503)
 		return
 	}
 	w.WriteHeader(204)

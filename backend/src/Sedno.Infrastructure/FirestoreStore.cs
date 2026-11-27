@@ -31,6 +31,7 @@ public sealed class FirestoreStore(FirestoreDb database, bool requireMigration =
     public CollectionReference Accounts => Database.Collection("verified_accounts");
     public CollectionReference Requests => Database.Collection("simplification_requests");
     public CollectionReference Purchases => Database.Collection("play_purchases");
+    public CollectionReference PackPurchases => Database.Collection("play_pack_purchases");
     public CollectionReference PlayNotifications => Database.Collection("play_notifications");
     public CollectionReference DailyUsage => Database.Collection("daily_usage");
     public CollectionReference Bindings => Database.Collection("account_bindings");

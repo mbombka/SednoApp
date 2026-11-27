@@ -36,6 +36,9 @@ public sealed class TestModel : IModelProvider
         if (Fail) throw new InvalidOperationException("provider unavailable");
         return "Wersja demonstracyjna: " + text;
     }
+    public Task<string> CorrectAsync(string text, CancellationToken cancellationToken) =>
+        SimplifyAsync(text, cancellationToken);
+
     public void Reset() { Calls = 0; Fail = false; Gate = null; }
 }
 
@@ -134,6 +137,7 @@ public sealed class BackendFixture : IAsyncLifetime
             {
                 services.RemoveAll<TimeProvider>(); services.AddSingleton<TimeProvider>(Clock);
                 services.RemoveAll<IPlayBillingClient>(); services.AddSingleton<IPlayBillingClient>(Billing);
+                services.RemoveAll<IPlayPackClient>(); services.AddSingleton<IPlayPackClient>(Billing);
                 services.RemoveAll<INotificationVerifier>(); services.AddSingleton<INotificationVerifier>(new TestPushVerifier());
                 services.RemoveAll<IModelProvider>(); services.AddSingleton<IModelProvider>(Model);
                 services.RemoveAll<IEntitlementResolver>(); services.AddSingleton<IEntitlementResolver>(Entitlements);
@@ -162,8 +166,20 @@ public sealed class BackendFixture : IAsyncLifetime
     }
 }
 
-public sealed class TestBilling : IPlayBillingClient
+public sealed class TestBilling : IPlayBillingClient, IPlayPackClient
 {
+    public ConcurrentDictionary<string, PlayPack> Packs { get; } = new();
+    public ConcurrentDictionary<string, int> Consumptions { get; } = new();
+    public ConcurrentDictionary<string, bool> FailConsumption { get; } = new();
+    public Task<PlayPack> GetPackAsync(string token, CancellationToken ct) => Task.FromResult(Packs[token]);
+    public Task ConsumePackAsync(string token, CancellationToken ct)
+    {
+        if (FailConsumption.TryRemove(token, out _)) throw new InvalidOperationException("Play unavailable.");
+        Consumptions.AddOrUpdate(token, 1, (_, count) => count + 1);
+        Packs[token] = Packs[token] with { Consumed = true };
+        return Task.CompletedTask;
+    }
+
     public ConcurrentDictionary<string, PlaySubscription> Purchases { get; } = new();
     public ConcurrentDictionary<string, int> Acknowledgements { get; } = new();
     public Task<PlaySubscription> GetAsync(string token, CancellationToken ct) => Task.FromResult(Purchases[token]);

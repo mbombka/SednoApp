@@ -61,18 +61,37 @@ public sealed class UsageStore(FirestoreStore db, IEntitlementResolver entitleme
                 };
                 return new ReservationOutcome(kind, snapshot.Quota);
             }
-            if (snapshot.Quota.Remaining == 0) return new ReservationOutcome("quota_exceeded", snapshot.Quota);
+            var pack = snapshot.Account?.PackCredits.FirstOrDefault(credit =>
+                credit.Value > snapshot.Held.GetValueOrDefault(credit.Key)).Key;
+            if (pack is null && snapshot.Quota.PackBalance > 0)
+                return new ReservationOutcome("pack_reserved", snapshot.Quota);
+            if (pack is null && snapshot.Quota.Remaining == 0)
+                return new ReservationOutcome("quota_exceeded", snapshot.Quota);
             var day = QuotaPolicy.Day(now);
-            var usage = snapshot.Days[snapshot.Identity.InstallationHash];
-            usage.Reservations[reference.Id] = new() { IdentityId = identityId, ExpiresAt = now.Add(ReservationLife) };
-            db.Put(transaction, db.Day(snapshot.Identity.InstallationHash, day), usage);
+            var expiresAt = now.Add(ReservationLife);
+            if (pack is not null)
+            {
+                var account = snapshot.Account!;
+                foreach (var reservation in account.PackReservations.Where(x => x.Value.ExpiresAt <= now).ToArray())
+                    account.PackReservations.Remove(reservation.Key);
+                account.PackReservations[reference.Id] = new() { TokenHash = pack, ExpiresAt = expiresAt };
+                db.Put(transaction, db.Accounts.Document(FirestoreStore.Id(account.Id)), account);
+            }
+            else
+            {
+                var usage = snapshot.Days[snapshot.Identity.InstallationHash];
+                usage.Reservations[reference.Id] = new() { IdentityId = identityId, ExpiresAt = expiresAt };
+                db.Put(transaction, db.Day(snapshot.Identity.InstallationHash, day), usage);
+            }
             db.Put(transaction, reference, new SimplificationRecord
             {
                 IdentityId = identityId, RequestId = requestId, Fingerprint = fingerprint,
                 State = RequestState.Processing, CreatedAt = now, ReservationDay = day,
-                ReservationExpiresAt = now.Add(ReservationLife)
+                PackTokenHash = pack, ReservationExpiresAt = expiresAt
             });
-            return new ReservationOutcome("reserved", snapshot.Quota with { Remaining = snapshot.Quota.Remaining - 1 });
+            return new ReservationOutcome("reserved", pack is null
+                ? snapshot.Quota with { Remaining = snapshot.Quota.Remaining - 1 }
+                : snapshot.Quota with { PackRemaining = snapshot.Quota.PackRemaining - 1 });
         }, QuotaTransactions, ct);
     }
 
@@ -91,7 +110,26 @@ public sealed class UsageStore(FirestoreStore db, IEntitlementResolver entitleme
         {
             await gate.CheckAsync(transaction, ct);
             var now = clock.GetUtcNow();
-            var identity = await ActiveIdentityAsync(transaction, identityId, ct);
+            var (identity, account) = await ActiveIdentityAsync(transaction, identityId, ct);
+            if (hint.PackTokenHash is { } pack)
+            {
+                var packRecord = await db.GetAsync<SimplificationRecord>(transaction, reference, ct);
+                if (account is null || packRecord?.State != RequestState.Processing ||
+                    packRecord.PackTokenHash != pack) return false;
+                var credits = account.PackCredits.GetValueOrDefault(pack);
+                var held = account.PackReservations.Remove(reference.Id);
+                var applied = success && held && credits > 0 && packRecord.ReservationExpiresAt > now;
+                if (applied)
+                {
+                    if (credits == 1) account.PackCredits.Remove(pack);
+                    else account.PackCredits[pack] = credits - 1;
+                }
+                packRecord.State = applied ? RequestState.Succeeded : success ? RequestState.Expired : RequestState.Failed;
+                packRecord.FinishedAt = now;
+                db.Put(transaction, db.Accounts.Document(FirestoreStore.Id(account.Id)), account);
+                db.Put(transaction, reference, packRecord);
+                return applied;
+            }
             var dayReference = db.Day(identity.InstallationHash, hint.ReservationDay);
             var usage = await db.GetAsync<DailyUsage>(transaction, dayReference, ct);
             var record = await db.GetAsync<SimplificationRecord>(transaction, reference, ct);
@@ -134,32 +172,29 @@ public sealed class UsageStore(FirestoreStore db, IEntitlementResolver entitleme
         }, QuotaTransactions, ct);
     }
 
-    private async Task<GuestIdentity> ActiveIdentityAsync(Transaction transaction, Guid id, CancellationToken ct)
+    private async Task<(GuestIdentity Identity, VerifiedAccount? Account)> ActiveIdentityAsync(
+        Transaction transaction, Guid id, CancellationToken ct)
     {
         var identity = await db.GetAsync<GuestIdentity>(transaction, db.Identities.Document(FirestoreStore.Id(id)), ct)
             ?? throw new InvalidOperationException("Identity unavailable.");
-        if (identity.AccountId is Guid accountId)
-        {
-            var account = await db.GetAsync<VerifiedAccount>(transaction, db.Accounts.Document(FirestoreStore.Id(accountId)), ct);
-            if (account is null || account.Deleting) throw new InvalidOperationException("Account unavailable.");
-        }
-        return identity;
+        if (identity.AccountId is not Guid accountId) return (identity, null);
+        var account = await db.GetAsync<VerifiedAccount>(transaction, db.Accounts.Document(FirestoreStore.Id(accountId)), ct);
+        if (account is null || account.Deleting) throw new InvalidOperationException("Account unavailable.");
+        return (identity, account);
     }
 
-    private async Task<(GuestIdentity Identity, Dictionary<string, DailyUsage> Days, QuotaDto Quota)> SnapshotAsync(
+    private async Task<(GuestIdentity Identity, VerifiedAccount? Account, Dictionary<string, DailyUsage> Days,
+        Dictionary<string, int> Held, QuotaDto Quota)> SnapshotAsync(
         Transaction transaction, Guid id, bool paid, DateTimeOffset now, CancellationToken ct)
     {
-        var identity = await db.GetAsync<GuestIdentity>(transaction, db.Identities.Document(FirestoreStore.Id(id)), ct)
-            ?? throw new InvalidOperationException("Identity unavailable.");
-        DateTimeOffset? testerExpiresAt = null;
+        var (identity, account) = await ActiveIdentityAsync(transaction, id, ct);
+        var testerExpiresAt = account?.TesterAccessExpiresAt;
         var hashes = new List<string> { identity.InstallationHash };
-        if (identity.AccountId is Guid accountId)
-        {
-            var account = await db.GetAsync<VerifiedAccount>(transaction, db.Accounts.Document(FirestoreStore.Id(accountId)), ct);
-            if (account is null || account.Deleting) throw new InvalidOperationException("Account unavailable.");
-            hashes.AddRange(account.InstallationHashes);
-            testerExpiresAt = account.TesterAccessExpiresAt;
-        }
+        if (account is not null) hashes.AddRange(account.InstallationHashes);
+        var held = account?.PackReservations.Values.Where(x => x.ExpiresAt > now)
+            .GroupBy(x => x.TokenHash).ToDictionary(x => x.Key, x => x.Count()) ?? [];
+        var packBalance = account?.PackCredits.Values.Sum() ?? 0;
+        var packRemaining = account?.PackCredits.Sum(x => Math.Max(0, x.Value - held.GetValueOrDefault(x.Key))) ?? 0;
         var day = QuotaPolicy.Day(now);
         var days = new Dictionary<string, DailyUsage>();
         foreach (var hash in hashes.Distinct().Order())
@@ -176,7 +211,7 @@ public sealed class UsageStore(FirestoreStore db, IEntitlementResolver entitleme
         var reserved = days.Values.Sum(x => x.Reservations.Count);
         var tester = testerExpiresAt > now;
         var limit = QuotaPolicy.Limit(paid || tester);
-        return (identity, days, new(paid ? "subscription" : tester ? "tester" : "free", limit, used,
-            Math.Max(0, limit - used - reserved), now, QuotaPolicy.ResetAt(now), testerExpiresAt));
+        return (identity, account, days, held, new(paid ? "subscription" : tester ? "tester" : "free", limit, used,
+            Math.Max(0, limit - used - reserved), now, QuotaPolicy.ResetAt(now), testerExpiresAt, packRemaining, packBalance));
     }
 }

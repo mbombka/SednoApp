@@ -50,7 +50,8 @@
       "paragraphs": [
         "Możesz zacząć bez konta. Firebase Authentication obsługuje dobrowolne logowanie Google albo e-mail i hasło. Sedno zapisuje identyfikator UID Firebase, sposób logowania i datę utworzenia konta. Serwer Sedno nie otrzymuje hasła Google ani Firebase. Google może przetwarzać e-mail, dane profilu, adres IP i dane połączenia potrzebne do logowania.",
         "Do ochrony usługi i rozliczania limitów zapisujemy pseudonimowe dane instalacji, sesji i żądań, ich daty, statusy oraz skrót HMAC tekstu. Skrót nie jest kopią tekstu. Identyfikator instalacji jest pseudonimowy, a nie anonimowy. Logowanie nie przyznaje nowego darmowego limitu. Adres IP służy ograniczaniu liczby żądań; nie jest polem bazy Sedno, ale może być przetwarzany przez dostawców infrastruktury. Google Play Integrity sprawdza autentyczność aplikacji i urządzenia, bez otrzymywania tekstu ani zdjęcia.",
-        "Google Play obsługuje płatność i subskrypcję. Sedno nie otrzymuje numeru karty ani danych konta bankowego. Baza Sedno przechowuje szyfrowany token zakupu, jego skrót, powiązanie z kontem, stan i termin uprawnienia oraz dane weryfikacji. Osobne identyfikatory powiadomień zakupowych zapobiegają powtórnej obsłudze zdarzeń."
+        "Google Play obsługuje płatność i subskrypcję. Sedno nie otrzymuje numeru karty ani danych konta bankowego. Baza Sedno przechowuje szyfrowany token zakupu, jego skrót, powiązanie z kontem, stan i termin uprawnienia oraz dane weryfikacji. Osobne identyfikatory powiadomień zakupowych zapobiegają powtórnej obsłudze zdarzeń.",
+        "Przy zakupie pakietu Sedno zapisuje skrót tokenu zakupu, jego stan, powiązanie z kontem i pozostałą liczbę użyć. Usunięcie konta usuwa te dane i niewykorzystane użycia. Skróty zwrotów bez powiązania z kontem mogą pozostać, aby zapobiec ponownemu naliczeniu."
       ]
     },
     {

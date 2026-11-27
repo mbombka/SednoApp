@@ -31,6 +31,7 @@ type API struct {
 	AccountAccess, FreshAccountAccess store.AccountAccess
 	DeleteIdentity                    func(context.Context, string) error
 	Billing                           *store.Billing
+	Packs                             *store.Packs
 	VerifyNotification                func(context.Context, string) bool
 	BillingPackage                    string
 	PrivacyHTML, DeletionEmail        string
@@ -217,6 +218,7 @@ func (a *API) Handler() http.Handler {
 	mux.HandleFunc("DELETE /v1/account", a.protected(a.deleteAccount))
 	mux.HandleFunc("GET /v1/subscription", a.protected(a.currentSubscription))
 	mux.HandleFunc("POST /v1/subscription", a.protected(a.verifyPurchase))
+	mux.HandleFunc("POST /v1/purchases/simplifications", a.protected(a.verifyPack))
 	mux.HandleFunc("GET /v1/quota", a.protected(a.quota))
 	mux.HandleFunc("POST /v1/auth/sign-out", a.protected(a.signOut))
 	mux.HandleFunc("POST /v1/simplifications", a.protected(a.simplify))
@@ -353,6 +355,9 @@ func (a *API) simplify(w http.ResponseWriter, r *http.Request, s *store.Session)
 		return problemError{409, "result_unavailable", "Wynik tego żądania nie jest już dostępny. Użyj nowego identyfikatora."}
 	case "quota_exceeded":
 		problem(w, 429, "quota_exceeded", "Wykorzystano dzienny limit.", &quota)
+		return nil
+	case "pack_reserved":
+		problem(w, 429, "pack_reserved", "Pozostałe użycia z pakietu są zarezerwowane.", &quota)
 		return nil
 	case "expired":
 		return problemError{409, "reservation_expired", "Czas tego żądania minął. Użyj nowego identyfikatora."}

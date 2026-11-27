@@ -172,7 +172,7 @@ func (s *Store) deleteAccount(ctx context.Context, accountID string, deleteIdent
 			}
 		}
 	}
-	for _, collection := range []string{"guest_sessions", "play_purchases"} {
+	for _, collection := range []string{"guest_sessions", "play_purchases", "play_pack_purchases"} {
 		if err := s.deleteQuery(ctx, s.DB.Collection(collection).Where("AccountId", "==", accountID)); err != nil {
 			return err
 		}
