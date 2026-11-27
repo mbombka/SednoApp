@@ -1,11 +1,14 @@
 # Co pozostało przed publikacją
 
-Stan na 20.10.2026: obsługę płatności wdrożono na istniejącym `sedno-api`;
-podpisany AAB 8 z panelem zakupów jest gotowy. Pozostają ustawienia Play Console,
-próby zakupów na telefonie i kontrole przed publikacją.
+Stan na 27.11.2026. Backend Go działa produkcyjnie, a właściciel potwierdził
+upraszczanie na telefonie. Próby zakupów Google Play i kontrole przed publikacją
+są na poniższej liście.
 
 ## Zakończone i zaakceptowane
 
+- [x] Wdrożyć backend Go na istniejącym `sedno-api` i sprawdzić upraszczanie
+  na telefonie. Wdrożenie i potwierdzenie właściciela z 27.11.2026.
+  [Stan produkcji](backend/deploy/firebase/README.pl.md#stan-produkcji).
 - [x] Przełączyć backend PostgreSQL → Firestore. Wdrożono 19.10.2026: 7 dokumentów
   testowych, indeksy READY, publiczne API oraz godzinowe sprzątanie działają.
   [Raport](docs/archiwum/firestore-deployment-2026-10-19.pl.md).
@@ -52,7 +55,7 @@ próby zakupów na telefonie i kontrole przed publikacją.
   Właściciel potwierdził działanie aplikacji i OCR na telefonie 19.10.2026.
   Po zmianie aparatu i kadrowania powtórzyć próby według
   [listy kontroli](mobile/docs/android_camera_ocr_manual_check.md).
-- [x] Dokończyć odbiór na telefonie: historia, wylogowanie,X
+- [x] Dokończyć odbiór na telefonie: historia, wylogowanie,
   limity 5 dziennie i reset według czasu serwera o 00:00 UTC.
 - [x] Sprawdzić jakość rzeczywistych uproszczeń, błędy, brak sieci, timeout
   i zachowanie limitu po nieudanym żądaniu. [Próbki i kryteria](docs/model-acceptance.pl.md).
@@ -75,15 +78,15 @@ próby zakupów na telefonie i kontrole przed publikacją.
   [Raport wdrożenia](docs/billing-deployment-2026-10-20.pl.md).
 - [x] Wskazać konto testera (konto Google właściciela) — właściciel potwierdził, że jest
   już dodane jako konto testowe.
-- [X] Potwierdzić lub uzupełnić w Play Console uprawnienia istniejącego konta
+- [ ] Potwierdzić w Play Console lub podczas zakupu testowego uprawnienia istniejącego konta
   `sedno-api@sednoapp-79241.iam.gserviceaccount.com`: dane finansowe i zarządzanie
   zamówieniami/subskrypcjami. Obecna autoryzacja operatora do Play API zwraca
   `ACCESS_TOKEN_SCOPE_INSUFFICIENT`; nie potwierdzono zmiany tych uprawnień.
 - [x] W Play Console ustawić temat RTDN
   `projects/sednoapp-79241/topics/sedno-billing-rtdn-test` i wysłać test z panelu.
   Test z Play Console 20.10.2026: HTTP 204.
-- [X] Przesłać AAB 8 do kanału wewnętrznego, zainstalować go na koncie testera
-  i wykonać rzeczywiste testy zakupów, przywracania, wygaśnięcia i limitu 400.
+- [ ] Sprawdzić na telefonie zakup i zwrot pakietu 1 000 użyć oraz zakup,
+  przywrócenie i wygaśnięcie subskrypcji z limitem 400.
   [Konfiguracja i lista prób](mobile/docs/google_play_subscription_sandbox.md).
 - [x] Uporządkować nieużywane zasoby odrzuconego osobnego środowiska opisane
   w raporcie wdrożenia. Usunięto je 20.10.2026 razem z sekretami `sedno-postgres*`.

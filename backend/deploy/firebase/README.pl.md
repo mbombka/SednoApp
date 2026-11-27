@@ -1,50 +1,28 @@
-# Serwer w Firebase i Google Cloud — Firestore
+# Wdrożenie backendu Sedno
 
-26.11.2026 wdrożono `sedno-api-tcp-20261126` z domyślnym testem startowym
-TCP portu 8080. Zmiana korzysta z obrazu rewizji `sedno-api-00016-ll9`.
-Po sprawdzeniu gotowości nowej rewizji przełączono na nią cały ruch Cloud Run
-i tag używany przez publiczny Firebase Hosting. Minimum na poziomie usługi
-i rewizji wynosi 0.
+## Stan produkcji
 
-23.10.2026: wdrożono **sedno-api-00014-mmh** z 13 wariantami językowymi i przygotowano
-**AAB 0.2.0 (17)**. [Aktualny raport wdrożenia i pakietu](../../../docs/backend-deployment-2026-10-23-multilingual.pl.md).
+27.11.2026 przełączono cały ruch `sedno-api` i Firebase Hosting na rewizję
+Go `sedno-api-go-20261127-114319`. Backend nadal korzysta z istniejącej bazy
+Firestore `(default)` i konta `sedno-api@sednoapp-79241.iam.gserviceaccount.com`.
+Cloud Run używa sondy startowej TCP na porcie 8080 i skaluje usługę do zera.
 
-API: **https://sednoapp-79241-api.web.app**, projekt `sednoapp-79241`, numer
-`1003558402460`. Obsługę płatności Google Play włączono do testów 20.10.2026
-na istniejącym `sedno-api`; [stan i pozostałe ustawienia](../../../docs/billing-deployment-2026-10-20.pl.md).
-Strona `sedno.xyz` jest oddzielna.
+| Element | Wartość |
+| --- | --- |
+| Publiczne API | [sednoapp-79241-api.web.app](https://sednoapp-79241-api.web.app/health/ready) |
+| Rewizja Cloud Run | `sedno-api-go-20261127-114319` |
+| Wydanie Firebase Hosting | `b41c8bb43aea2a24` |
+| Obraz API i sprzątania | `europe-central2-docker.pkg.dev/sednoapp-79241/backend/api@sha256:d1c3f632716959f9f5fbd3fea62b869b47f197fa254f2ab264f793baa3945552` |
+| Kontrolne wykonanie sprzątania | `sedno-cleanup-pqplk`, zakończone pomyślnie |
+| Ostatnia rewizja .NET | `sedno-api-tcp-20261126` |
 
-23.10.2026 wdrożono **`sedno-api-00013-8x6`** z polskim i angielskim (UK), osobnymi
-promptami i wspólnymi limitami. Hosting i cleanup korzystają z nowego obrazu.
-[Raport wdrożenia](../../../docs/backend-deployment-2026-10-23.pl.md).
+Po przełączeniu sprawdzono publiczną gotowość API, ochronę endpointów przed
+żądaniami bez uwierzytelnienia i zgodność strony prywatności z wersją z repozytorium.
+Adresy tagów poprzednich rewizji zwracają HTTP 404. Właściciel potwierdził
+upraszczanie na telefonie. Zakup pakietu i przywrócenie subskrypcji wymagają
+[prób na telefonie](../../../mobile/docs/google_play_subscription_sandbox.md).
 
-22.10.2026 wdrożono **`sedno-api-00012-9j4`**: aktualne prompty, tryb Popraw
-i czasowy dostęp testerski. Hosting kieruje do nowej rewizji; cleanup działa
-na tym samym obrazie.
-[Raport wdrożenia](../../../docs/backend-deployment-2026-10-22.pl.md).
-
-Poprawkę lokalnego limitera wdrożono 21.10.2026 jako `sedno-api-00011-bfh`.
-Ta sama rewizja zawiera kontrolę odwołania sesji i świeżości subskrypcji.
-Zachowuje obie drogi
-dostępu, rozdziela ważne sesje i RTDN; przed sesją za Hosting pozostaje
-zaakceptowany wspólny limit proxy. Nie dodaje magazynu liczników ani zasobów.
-[Zasady, przybliżenie limitu i kontrola obu adresów](../../../docs/traffic-limiting-2026-10-21.pl.md).
-[Raport wdrożenia i AAB 11](../../../docs/backend-deployment-2026-10-21.pl.md).
-
-20.10.2026 zamknięto stare tagowane adresy i wdrożono kontrolę dawnych sesji
-kont: `sedno-api-00010-wj5`. [Rewizje i wyniki kontroli](../../../docs/backend-access-2026-10-20.pl.md).
-
-**Wdrożono 19.10.2026:** API korzysta z Firestore. Przeniesiono i zweryfikowano
-7 dokumentów testowych; kont i zakupów w źródle było 0. Indeksy są gotowe,
-a godzinowe sprzątanie działa także przez Cloud Scheduler.
-
-Starą instancję `sedno-postgres` i wszystkie 4 stare kopie **trwale usunięto
-19.10.2026**, po jednoznacznej zgodzie właściciela. Przed usunięciem instancji
-potwierdzono pustą listę kopii, a po usunięciu — pustą listę instancji SQL projektu.
-Sekrety SQL `sedno-postgres` i `sedno-postgres-migration` usunięto 20.10.2026.
-Tego samego dnia usunięto konto `sedno-migrate` i jego rolę Cloud SQL Client.
-Nie utworzono nowej ani końcowej kopii.
-[Raport wdrożenia](../../../docs/archiwum/firestore-deployment-2026-10-19.pl.md).
+[Wcześniejsze wdrożenia i pomiary](../../../docs/README.md#wcześniejsze-wdrożenia-i-pomiary).
 
 ## Działające zasoby
 
@@ -68,11 +46,11 @@ Przy 3 instancjach
 daje to nominalnie do 240 równoczesnych żądań całego API. Nie jest to potwierdzona
 testem wydajność uproszczeń. Limity ruchu na minutę pozostają niezależne.
 
-## Przygotowanie projektu
+## Konfiguracja zasobów
 
-1. Utwórz bazę `(default)` w Firestore **Standard / Native mode** w Warszawie.
-   Najpierw sprawdź istniejące bazy i region — nie twórz drugiej bazy zamiast
-   ponownego użycia właściwej. Ta konfiguracja korzysta z jednej bazy.
+1. Dla istniejącego projektu `sednoapp-79241` użyj bazy `(default)` w Firestore
+   Standard (Native mode) w Warszawie. Przy nowej instalacji sprawdź bazę i
+   region przed utworzeniem zasobu.
 2. Włącz Firestore API i Cloud Scheduler API (pozostałe API są opisane w historycznym wdrożeniu).
 3. Nadaj kontu `sedno-api@sednoapp-79241.iam.gserviceaccount.com`
    `roles/datastore.user` z warunkiem
@@ -88,7 +66,11 @@ testem wydajność uproszczeń. Limity ruchu na minutę pozostają niezależne.
    nie dodawaj biblioteki Firestore do Fluttera. Sprawdź, czy wszystkie indeksy
    są `READY` przed wysłaniem ruchu — publikacja konfiguracji nie czeka na ich zbudowanie.
 
-## Migracja działającego PostgreSQL
+## Archiwalna migracja z PostgreSQL
+
+Migrację Sedno zakończono 19.10.2026. Stara baza i kopie zostały wtedy
+usunięte. Poniższa procedura dotyczy importu z dostępnej bazy PostgreSQL.
+[Raport migracji](../../../docs/archiwum/firestore-deployment-2026-10-19.pl.md).
 
 Przygotuj i przećwicz te kroki na odrębnej bazie testowej. Migracja wymaga krótkiej
 przerwy; nie wykonujemy podwójnego zapisu do dwóch baz.
@@ -151,7 +133,8 @@ weryfikacji wdrożenia. Przy zmianie samej konfiguracji startu można ponownie
 użyć obrazu bieżącej rewizji. Przed przełączeniem ruchu sprawdź
 `/health/ready` nowej rewizji i zweryfikuj trasę używaną przez Firebase Hosting.
 
-Z katalogu głównego, po przygotowaniu bazy, IAM i zakończeniu importu:
+Z katalogu głównego zbuduj obraz Go. Cloud Build zapisuje jego digest po
+zakończeniu budowania. Wstaw go do generatora manifestów.
 
 ```sh
 gcloud builds submit --project sednoapp-79241 --billing-project sednoapp-79241 \
@@ -168,8 +151,23 @@ python3 tools/prepare_firebase.py \
 ```
 
 Przejrzyj `service.json`, `cleanup.json`, `firebase.json` oraz reguły i indeksy.
-Pierwsza konfiguracja wymaga utworzenia zadania cleanup i nadania kontu Scheduler
-uprawnienia do jego uruchamiania. Po gotowości indeksów:
+
+Przy zmianie obrazu na istniejącym `sedno-api` zachowaj konfigurację usługi,
+konto, bazę i wersje sekretów. Wdrożenie Go wykonano w następującej kolejności.
+
+1. Utwórz otagowaną rewizję z docelowym digestem bez przydzielania jej ruchu
+   (`gcloud run deploy --no-traffic --tag`). Sprawdź `/health/ready` na adresie
+   tej rewizji oraz odpowiedzi publicznych i chronionych endpointów.
+2. Zaktualizuj obraz istniejącego `sedno-cleanup` i wykonaj zadanie kontrolnie.
+3. Przełącz ruch na sprawdzoną rewizję, opublikuj Firebase Hosting z `pinTag`
+   i potwierdź, że kanał `live` wskazuje nową rewizję oraz zwraca HTTP 200
+   z `/health/ready`.
+4. Uruchom `retire_routes.py` po potwierdzeniu działania publicznego adresu.
+   Przy problemie przed wyłączeniem starych tagów przywróć poprzedni ruch,
+   poprzednie wydanie Hosting i obraz zadania.
+
+Do pierwszej konfiguracji służy skrypt z wygenerowanego katalogu.
+Uruchom go po przygotowaniu IAM oraz potwierdzeniu gotowości indeksów.
 
 ```sh
 cd backend/deploy/generated
@@ -201,8 +199,8 @@ wersje sekretów; zachowaj działające wersje z poprzedniego wdrożenia.
 
 ## Prywatność, kopie i odbiór
 
-Politykę przygotowaną dla Firestore publikuj wraz z migracją; osobna domena
-`sedno.xyz` wymaga [aktualizacji HTML](../../../docs/public/README.pl.md).
+Obraz backendu zawiera plik `docs/public/prywatnosc/index.html`. Osobna domena
+`sedno.xyz` korzysta z [plików do publikacji](../../../docs/public/README.pl.md).
 Godzinowy cleanup usuwa metadane żądań i liczniki po 8 dniach, wygasłe sesje oraz
 niepowiązane tożsamości gości po 90 dniach, gdy nie mają sesji ani żądań.
 Przerwane usuwanie kont jest wznawiane, również po błędzie lub timeoutcie Firebase;

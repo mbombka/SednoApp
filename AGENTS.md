@@ -60,7 +60,8 @@ Read README, existing code, and current dependencies before making changes.
 ## Architecture
 Flutter: feature-first, views → ViewModels → repositories → services.
 Use dependency injection and extend existing architectural choices.
-Backend: C#, ASP.NET Core, a supported .NET LTS release, Cloud Firestore Standard (Native mode).
+Production backend: Go, net/http, Cloud Firestore Standard (Native mode).
+Keep the .NET 10 LTS implementation and tests as a compatibility reference.
 Firestore is accessed only by the backend with IAM; mobile clients have no database access.
 Daily quota reservations and identity linking must remain transactional.
 The emulator is Development-only; metadata cleanup runs as a scheduled job.
@@ -70,10 +71,12 @@ Mocks must be explicit and unavailable in production configurations.
 
 ## Model implementation and benchmarks
 - The shared Git-versioned prompt is `backend/src/Sedno.Infrastructure/Prompts/simplify.pl.txt`.
-  Embed it in the Infrastructure assembly; application and benchmarks use `SimplificationPrompt`.
-  Keep the accepted prompt unchanged during migration; evaluate prompt changes separately.
-- `ResponsesClient` owns HTTP, validation and content-free metrics. Production
-  `OpenAiModelProvider` restricts settings; experimental models belong only in benchmarks.
+  The Go server embeds the versioned prompt files. The .NET reference and
+  benchmarks load the same embedded resources through `SimplificationPrompt`.
+  Evaluate changes to the accepted prompt separately.
+- The Go model client owns HTTP, response validation, content-free metrics,
+  and production model settings. The .NET reference uses `ResponsesClient`
+  and `OpenAiModelProvider`. Experimental models belong in benchmarks.
 - Use `OpenAI:ApiKey` on the server. `OpenAI:AgentId` belongs only to benchmarks.
 - Agent adapters, streaming and session cleanup live in `backend/tools/Sedno.ModelBenchmark/Agents`.
   The application must not reference the benchmark project or register an agent provider.
@@ -104,7 +107,7 @@ Display a warning that AI simplification may contain errors.
 ## Testing and Definition of Done
 Unit tests for logic, widget tests for UI, integration tests for the backend.
 Mock time, network, OCR, the model, authentication, and billing.
-Run dart format, flutter analyze, flutter test, and dotnet test
+Run dart format, flutter analyze, flutter test, go test, go vet, and dotnet test
 for the relevant components.
 Report changed files, test results, and environment limitations.
 Never claim an APK was built unless the build actually ran successfully.

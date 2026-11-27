@@ -1,7 +1,9 @@
 # Aplikacja Android
 
-23.10.2026: wdrożono **sedno-api-00014-mmh** z 13 wariantami językowymi i przygotowano
-**AAB 0.2.0 (17)**. [Aktualny raport wdrożenia i pakietu](../docs/backend-deployment-2026-10-23-multilingual.pl.md).
+Aplikacja 1.0.0 (20) korzysta z publicznego API pod dotychczasowym adresem.
+Po wdrożeniu Go 27.11.2026 właściciel potwierdził upraszczanie na telefonie.
+Zakupy i przywrócenie subskrypcji wymagają prób przez Google Play.
+[Instrukcja prób zakupów](docs/google_play_subscription_sandbox.md).
 
 Potrzebujesz Fluttera z Dartem zgodnym z [pubspec.yaml](pubspec.yaml), Android SDK
 oraz emulatora lub telefonu. Wszystkie polecenia poniżej wykonuj w `mobile/`.
@@ -121,13 +123,14 @@ Identyfikatory można nadpisać przez `PLAY_SUBSCRIPTION_PRODUCT_ID` i
 `PLAY_SUBSCRIPTION_BASE_PLAN_ID` w argumentach budowy. Samo włączenie panelu
 nie uruchamia płatności na serwerze. [Pełne przygotowanie i testy](docs/google_play_subscription_sandbox.md).
 
-Gotowy podpisany pakiet do testów: [wydanie 16](docs/google_play_release_16.md).
+## Aparat i OCR
 
 Aparat działa wewnątrz Sedna: **Zrób zdjęcie → Zaznacz tekst → Uprość**.
 Ramka początkowo obejmuje całe zdjęcie. Można przesunąć jej rogi, aby wybrać
 fragment. Odczytany tekst trafia do pola i od razu do uproszczenia. Po błędzie
-albo przy zbyt długim tekście zostaje w polu do ręcznej poprawy. Zdjęcie pozostaje nieruchome; nie ma dodatkowego zatwierdzania zdjęcia
-ani wyboru proporcji. Zdjęcia i wycinanie fragmentów pozostają na urządzeniu.
+albo przy zbyt długim tekście zostaje w polu do ręcznej poprawy. Podczas
+kadrowania zdjęcie jest nieruchome. Zdjęcia i wycinanie fragmentów
+pozostają na urządzeniu.
 
 Kod jest w `lib/app/` i `lib/features/`; testy mają odpowiadający układ w `test/`.
 Aktualny opis komunikacji z serwerem: [kontrakt API](../contracts/openapi.yaml).

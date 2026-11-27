@@ -1,45 +1,32 @@
 # Serwer Sedno
 
-Od 26.11.2026 ruch produkcyjny obsługuje `sedno-api-tcp-20261126` z domyślnym
-testem startowym TCP portu 8080. Minimum instancji usługi wynosi 0.
-[Wdrożenie w Cloud Run](deploy/firebase/README.pl.md).
+Produkcyjny serwer w Go 1.26 obsługuje upraszczanie, poprawianie, logowanie,
+limity, zakupy i usuwanie konta. Korzysta z bazy `(default)` w Cloud Firestore
+Standard (Native mode). Backend uzyskuje dostęp do bazy przez IAM, a aplikacja
+Flutter korzysta z API. Baza Sedno nie zawiera tekstów, zdjęć ani wyników.
+[Stan produkcji i instrukcja wdrożenia](deploy/firebase/README.pl.md).
 
-23.10.2026: wdrożono **sedno-api-00014-mmh** z 13 wariantami językowymi i przygotowano
-**AAB 0.2.0 (17)**. [Aktualny raport wdrożenia i pakietu](../docs/backend-deployment-2026-10-23-multilingual.pl.md).
-
-Serwer obsługuje uproszczenia AI, logowanie, limity, zakupy i usuwanie konta.
-C# / .NET 10 LTS, Cloud Firestore **Standard, Native mode**, baza `(default)`.
-Dostęp do bazy ma wyłącznie backend przez IAM; aplikacja Flutter korzysta z API.
-Zdjęcia, teksty i wyniki nie są zapisywane w bazie backendu.
-
-Serwer `https://sednoapp-79241-api.web.app` działa z Firestore od 19.10.2026.
-Przeniesiono metadane testowe; starą instancję Cloud SQL i cztery kopie zapasowe
-usunięto 19.10.2026. Obsługę płatności na istniejącym serwerze włączono
-20.10.2026 do testów przez Google Play; odbiór zakupów pozostaje do wykonania.
-[Wdrożenie, migracja i pozostałe porządki](deploy/firebase/README.pl.md).
-
-Aktualizacja 23.10.2026: wdrożono `sedno-api-00013-8x6` z polskimi i angielskimi
-promptami oraz polem `language` w API. Hosting i cleanup używają nowego obrazu.
-[Raport wdrożenia](../docs/backend-deployment-2026-10-23.pl.md).
-
-Aktualizacja 22.10.2026: wdrożono `sedno-api-00012-9j4` z aktualnymi promptami,
-trybem Popraw i czasowym dostępem testerskim.
-[Raport wdrożenia](../docs/backend-deployment-2026-10-22.pl.md).
+`cmd/sedno` to punkt wejścia serwera i zadania `--cleanup`. Projekty .NET 10 LTS
+w `src/` służą do sprawdzania zgodności. Z tych samych plików promptów korzystają
+serwer Go i narzędzie pomiarowe .NET.
 
 ## Uruchomienie lokalne
 
-Potrzebujesz .NET 10 SDK i Dockera z Compose. Polecenia wykonuj w `backend/`.
+Potrzebujesz Go 1.26.11 lub nowszego oraz Dockera z Compose. Polecenia wykonuj w `backend/`.
 Emulator jest odrębnym procesem i nie łączy się z produkcyjną bazą.
 
 ```sh
-docker compose up -d
+docker compose up -d firestore
 export ASPNETCORE_ENVIRONMENT=Development
 export FIRESTORE_EMULATOR_HOST=127.0.0.1:8080
 export Firestore__ProjectId=demo-sedno-local
 export Firestore__UseEmulator=true
 export Security__CredentialKey="$(openssl rand -base64 32)"
 export Security__FingerprintKey="$(openssl rand -base64 32)"
-dotnet run --project src/Sedno.Api --launch-profile DevelopmentMock
+export Model__Provider=mock
+export PlayIntegrity__Provider=mock
+go build -trimpath -o /tmp/sedno ./cmd/sedno
+/tmp/sedno
 ```
 
 Poczekaj na komunikat gotowości emulatora w `docker compose logs firestore`.
@@ -47,8 +34,7 @@ API: `http://127.0.0.1:5000`. `/health/live` sprawdza proces, `/health/ready` �
 odczyt Firestore i brak trwającego importu. Emulator nie wymaga migracji schematu.
 Dane lokalnego kontenera są tymczasowe. Zachowaj klucze bezpieczeństwa przy
 ponownym uruchomieniu API korzystającego z tych samych danych.
-Do trwałego zapisu kluczy użyj .NET user-secrets (`Security:CredentialKey`,
-`Security:FingerprintKey`), nigdy Git.
+Przechowuj klucze poza repozytorium.
 
 Przy starcie instancji Cloud Run sprawdza domyślnie port TCP 8080. Pierwsze
 żądanie może trafić do API po otwarciu portu. Wtedy dostęp do Firestore
@@ -62,10 +48,10 @@ plików kluczy. Nie uruchamiaj testów integracyjnych na produkcyjnym projekcie.
 
 ## Prawdziwe AI
 
-Zapisz `OpenAI:ApiKey` w .NET user-secrets lub ustaw `OpenAI__ApiKey` na serwerze:
+Ustaw `OpenAI__ApiKey` w środowisku serwera.
 
 ```sh
-dotnet run --project src/Sedno.Api --launch-profile Development
+Model__Provider=openai /tmp/sedno
 ```
 
 OpenAI Responses API: `gpt-6-luna`, `reasoning.effort=none`, `service_tier=default`,
@@ -75,7 +61,7 @@ eksperymenty z ustawieniami wykonuj w narzędziu pomiarowym.
 [Prompt](src/Sedno.Infrastructure/Prompts/simplify.pl.txt) i
 [narzędzia pomiarowe](tools/Sedno.ModelBenchmark/README.md) pozostają wspólne.
 
-Do lokalnego logowania z rzeczywistym Firebase ustaw `Firebase__ProjectId=sednoapp-79241`.
+Do lokalnego logowania z rzeczywistym Firebase ustaw `Firebase__ProjectId` na projekt testowy.
 Lokalna weryfikacja istnienia i usuwanie kont wymaga także
 `Firebase__DeletionServiceAccountJsonPath`. To niezależne od połączenia z emulatorem bazy.
 
@@ -91,10 +77,9 @@ Lokalna weryfikacja istnienia i usuwanie kont wymaga także
 - 5 udanych uproszczeń dziennie dla gościa, 400 łącznie dla subskrypcji. Reset o 00:00 UTC.
 - Transakcja rezerwuje miejsce w dziennym dokumencie instalacji. Powiązane konto
   odczytuje dokumenty swoich instalacji; logowanie nie zeruje liczników.
-- Równoczesne żądania oraz zmiany powiązań są kontrolowane transakcjami Firestore.
-  Lokalna kolejka instalacji ogranicza konflikty w obrębie jednej instancji;
-  dzierżawa instalacji kolejkuje zapisy również między instancjami. Transakcje
-  dodatkowo sprawdzają ważność dzierżawy i aktualne powiązania kont.
+- Transakcje Firestore chronią zapisy przy równoczesnych żądaniach i zmianach
+  powiązań. Dzierżawa instalacji koordynuje zapisy między instancjami. Transakcja
+  sprawdza ważność dzierżawy i aktualne powiązania kont.
 - Metadane żądań chronią przed podwójnym wywołaniem AI. Zakończony duplikat zwraca
   `409 result_unavailable`, gdyż wynik nie jest przechowywany na serwerze. Aplikacja
   wysyła wtedy nowe żądanie z nowym identyfikatorem, co zużywa kolejne uproszczenie.
@@ -109,25 +94,25 @@ Lokalna weryfikacja istnienia i usuwanie kont wymaga także
 Sprzątanie lokalne:
 
 ```sh
-dotnet run --project src/Sedno.Api --no-launch-profile -- --cleanup
+/tmp/sedno --cleanup
 ```
 
 W chmurze to godzinowe zadanie `sedno-cleanup`, uruchamiane przez Cloud Scheduler.
 Nie wymaga klucza OpenAI, kluczy sesji ani pierścienia kluczy zakupów.
 API może skalować się do zera; retencja nie zależy od ruchu. Nie używamy Firestore TTL.
 
-## Subskrypcje Google Play
+## Płatności Google Play
 
 Płatności skonfigurowano na istniejącym `sedno-api`, z kontem
 `sedno-api@sednoapp-79241.iam.gserviceaccount.com` i bazą `(default)`.
-[Stan wdrożenia i ustawienia Play Console](../docs/billing-deployment-2026-10-20.pl.md).
-Przed publicznym udostępnieniem wykonaj [testy zakupów](../mobile/docs/google_play_subscription_sandbox.md).
+Przed publicznym udostępnieniem wykonaj [testy zakupów na telefonie](../mobile/docs/google_play_subscription_sandbox.md).
+
+### Subskrypcja
+
 Skonfigurowany produkt to `subscription_full`, plan bazowy `monthly`, cena
-9,99 PLN miesięcznie w Polsce. `Billing:ProductId` ma domyślną wartość
-`subscription_full` w `appsettings.json`; `Billing:Enabled` w pliku pozostaje `false`,
-a jawna konfiguracja wdrożonego serwera ustawia `Billing__Enabled=true`.
-Przy nadpisaniu konfiguracji użyj `Billing__ProductId=subscription_full`.
-Plan `monthly` wybiera aplikacja; nie wpisuj go zamiast identyfikatora produktu.
+9,99 PLN miesięcznie w Polsce. Domyślne wartości w Go to
+`Billing__ProductId=subscription_full` i `Billing__Enabled=false`.
+Produkcja jawnie ustawia `Billing__Enabled=true`. Plan `monthly` wybiera aplikacja.
 Generator manifestów przy włączonych płatnościach wymaga
 `--billing-product subscription_full` oraz konta Pub/Sub w `--push-email`.
 Przy włączeniu wymagane są `Billing__Enabled=true`, `Billing__ProductId`,
@@ -136,9 +121,13 @@ Przy włączeniu wymagane są `Billing__Enabled=true`, `Billing__ProductId`,
 
 `Google__CredentialProvider=cloud-run` korzysta z tożsamości Cloud Run;
 wariant `file` wymaga plików poświadczeń Firebase, Integrity i Billing.
-Pierścień Data Protection jest wspólny, z Secret Manager tylko do odczytu.
-Zachowaj klucze i identyfikatory kont podczas migracji — bez nich nie odczytasz
-istniejących zakupów ani nie zweryfikujesz ich powiązania.
+Go i .NET odczytują i zapisują tokeny subskrypcji w formacie ASP.NET Core Data
+Protection z nazwą aplikacji `Sedno` i przeznaczeniem `Sedno.PlayPurchase.v1`.
+Cloud Run montuje z Secret Manager pierścień XML tylko do odczytu. Musi on
+zawierać aktywny klucz AES-256-CBC z HMAC-SHA256. Jeśli korzystasz z istniejącej
+bazy, zachowaj jej pierścień i oba klucze HMAC sesji i odcisków żądań.
+W trybie Development polecenie `/tmp/sedno --init-billing-keyring ./test-keys`
+tworzy nowy pierścień do lokalnych prób.
 
 RTDN: uwierzytelniony Pub/Sub do `/notifications/google-play`; identyfikator
 wiadomości zapewnia deduplikację. Oczekujący zakup nie daje dostępu. Weryfikacja
@@ -165,35 +154,39 @@ realizację zakupu w Google Play przez `consume`. Powtórzenie tokenu umożliwia
 dokończenie realizacji bez ponownego dodawania użyć.
 
 Saldo jest przechowywane na koncie, a skróty tokenów i stan zakupów w
-`play_pack_purchases`. Pakiet obsługuje oba tryby i ma pierwszeństwo przed
-dziennym limitem. Udaną operację rozlicza się z pierwotnie zarezerwowanej puli.
-Porażka i wygaśnięcie rezerwacji zwalniają użycie. Gdy pakiet się skończy,
-obowiązuje limit darmowy, subskrypcyjny lub testerski. Sprawdź
+`play_pack_purchases`. `GET /v1/quota` zwraca saldo i dostępne użycia. Pakiet
+obsługuje oba tryby, ma pierwszeństwo przed limitem dziennym i nie resetuje się
+o północy UTC. Udaną operację rozlicza się z pierwotnie zarezerwowanej puli.
+Błąd i wygaśnięcie rezerwacji zwalniają użycie. Zwrot odejmuje użycia związane
+z zakupem. Gdy pakiet się skończy, obowiązuje limit darmowy, subskrypcyjny
+lub testerski. Sprawdź
 [schemat API](../contracts/openapi.yaml) i
 [próby pakietu w Google Play](../mobile/docs/google_play_subscription_sandbox.md#pakiet-jednorazowy).
 
 ## Testy i indeksy
 
 ```sh
+FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 go test -count=1 ./...
+go vet ./...
 dotnet test Sedno.Backend.sln
 ```
 
-Testy integracyjne uruchamiają emulator Firestore przez Testcontainers/Docker,
-bez połączenia z Google. Tożsamość, zakupy, AI i czas są kontrolowane w testach.
-Sprawdzają współbieżność, limity, sesje, usuwanie, retencję i import danych.
+Testy integracyjne Go łączą się z lokalnym emulatorem uruchomionym przed
+`go test`. Testy integracyjne .NET uruchamiają własny emulator przez
+Testcontainers. Testy używają syntetycznych danych i zastępują wywołania
+modelu, weryfikację tożsamości i operacje Google Play.
 
-Schemat dokumentów jest w `FirestoreStore`, indeksy i zakaz dostępu klientów w
-[plikach wdrożenia](deploy/firebase). Zmiany schematu dokumentów muszą uwzględniać
-starsze rekordy; brak EF nie usuwa potrzeby planowania migracji danych.
-Historyczne migracje SQL pozostają w Git, wyłączone z kompilacji aplikacji.
-Npgsql występuje wyłącznie w oddzielnym narzędziu jednorazowej migracji.
+Schemat dokumentów Go jest w [internal/store](internal/store). W [plikach
+wdrożenia](deploy/firebase) są indeksy i reguły blokujące dostęp klientów.
+Zmiany schematu muszą uwzględniać starsze rekordy. Historyczne migracje SQL
+są wyłączone z kompilacji aplikacji. Npgsql służy narzędziu do dawnego importu.
 
 ## Diagnostyka odrzucenia Play Integrity
 
 Wdrożona 19.10.2026; poprawka tolerancji zegarów: rewizja `sedno-api-00005-5g5`.
 [Raport wdrożenia i weryfikacji](../docs/archiwum/integrity-diagnostics-deployment-2026-10-19.pl.md).
 
-Backend zapisuje ostrzeżenie `PlayIntegrityRejected` (EventId 4101) z polem
+Backend Go zapisuje ostrzeżenie `Play Integrity rejected` (`EventId=4101`) z polem
 `Reason`. Nie zapisuje tokenów, hashy, identyfikatorów instalacji, pełnych
 odpowiedzi Google ani treści wyjątków. Dopuszcza różnicę zegarów do 5 sekund dla tokenu z przyszłości; maksymalny wiek
 tokenu nadal wynosi 5 minut. Pozostałe kontrole Integrity pozostają bez zmian.
@@ -207,14 +200,14 @@ tokenu nadal wynosi 5 minut. Pozostałe kontrole Integrity pozostają bez zmian.
 | `app_not_recognized` | Brak `PLAY_RECOGNIZED` |
 | `device_not_trusted` | Brak `MEETS_DEVICE_INTEGRITY` w tablicy werdyktów urządzenia |
 | `invalid_response` | Nieprawidłowa struktura, brak wymaganego pola lub nieprawidłowa wartość; nie oznacza automatycznie odrzucenia urządzenia |
-| `transport_error`, `io_error` | Błąd komunikacji lub odczytu danych |
+| `transport_error` | Błąd komunikacji lub odczytu danych |
 
 Po wdrożeniu backendu powtórz logowanie → wylogowanie → logowanie na telefonie.
 Zanotuj czas próby i odczytaj ostrzeżenia:
 
 ```sh
 gcloud logging read \
-  'resource.type="cloud_run_revision" AND resource.labels.service_name="sedno-api" AND (textPayload:"Play Integrity rejected." OR jsonPayload.EventId.Name="PlayIntegrityRejected")' \
+  'resource.type="cloud_run_revision" AND resource.labels.service_name="sedno-api" AND jsonPayload.EventId=4101' \
   --project=sednoapp-79241 --freshness=30m --limit=50
 ```
 
@@ -230,13 +223,13 @@ Wdrożone 19.10.2026, rewizja `sedno-api-00006-j9x`.
 `/v1/auth/sessions` wymaga `email_verified=true` w podpisanym tokenie Firebase
 przy logowaniu przez hasło (`password`). W przeciwnym razie zwraca HTTP 403,
 `email_not_verified`, bez zużycia sesji gościa i bez tworzenia powiązania konta.
-Warunek sprawdza także `GuestStore`. Logowanie Google zachowuje dotychczasowy
+Warunek sprawdza także magazyn sesji Go. Logowanie Google zachowuje dotychczasowy
 przebieg. Po potwierdzeniu adresu aplikacja odświeża token i łączy tę samą sesję
 gościa; limit nie jest zerowany.
 
 Od 20.10.2026 (`sedno-api-00010-wj5`) serwer odrzuca także wcześniej wystawione
-sesje kont bez pola `AccountAccessVerified=true`. Pole zapisuje wyłącznie
-`GuestStore.LinkAsync` po sprawdzeniu tożsamości. Dotyczy to również dawnych
+sesje kont bez pola `AccountAccessVerified=true`. Backend zapisuje to pole
+po sprawdzeniu tożsamości przy łączeniu konta. Dotyczy to również dawnych
 sesji Google: użytkownik musi zalogować się ponownie. Sesje gości, powiązania
 instalacji, limity i zakupy pozostają zachowane. Ponowne logowanie nie przywraca
 ważności starego tokenu. [Raport kontroli](../docs/backend-access-2026-10-20.pl.md).
@@ -290,3 +283,17 @@ dziennie bez zakupu. Datę sprawdza transakcja limitu; użycie nie jest zerowane
 Języki korzystają ze wspólnego limitu i ustawień modelu.
 [Rozszerzenie kodu i kolejność wydania](../docs/multilingual-13-languages.pl.md).
 [Opis zgodności, wdrożenia i rozszerzania](../docs/multilingual-app.pl.md).
+
+
+## Obraz na potrzeby testów
+
+Z katalogu głównego repozytorium zbuduj obraz i uruchom test kontenera.
+
+```sh
+docker build -f backend/Dockerfile -t sedno-go:test .
+python3 tools/smoke_firebase_container.py --image sedno-go:test
+```
+
+Cloud Build korzysta z tego samego Dockerfile dla API i zadania `--cleanup`.
+Lokalny test uruchamia emulator Firestore.
+[Instrukcja konfiguracji Cloud Run](deploy/firebase/README.pl.md).
