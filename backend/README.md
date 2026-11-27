@@ -263,3 +263,52 @@ dziennie bez zakupu. Datę sprawdza transakcja limitu; użycie nie jest zerowane
 Języki korzystają ze wspólnego limitu i ustawień modelu.
 [Rozszerzenie kodu i kolejność wydania](../docs/multilingual-13-languages.pl.md).
 [Opis zgodności, wdrożenia i rozszerzania](../docs/multilingual-app.pl.md).
+
+## Port w Go
+
+Polecenie `sedno-dev` uruchamia lokalny port przepływu gościa na adresie
+`127.0.0.1`. Wymaga Go 1.26, emulatora Firestore na adresie loopback
+i projektu z prefiksem `demo-`. Poniższe polecenia wykonaj w `backend/`.
+
+```sh
+docker compose up -d firestore
+export ASPNETCORE_ENVIRONMENT=Development
+export FIRESTORE_EMULATOR_HOST=127.0.0.1:8080
+export Firestore__ProjectId=demo-sedno-go
+export Firestore__UseEmulator=true
+export PlayIntegrity__Provider=mock
+export Model__Provider=mock
+export Security__CredentialKey="$(openssl rand -base64 32)"
+export Security__FingerprintKey="$(openssl rand -base64 32)"
+CGO_ENABLED=0 go build -trimpath -ldflags='-s -w' -o /tmp/sedno-dev ./cmd/sedno-dev
+/tmp/sedno-dev
+```
+
+Do `POST /v1/guest-sessions` wyślij JSON z `installationId` i testowym
+`integrityToken` o wartości `development-ok`. Tryb `Model__Provider=openai`
+wymaga `OpenAI__ApiKey` i wysyła tekst do OpenAI według ustawień produkcyjnego
+modelu. Testy używają danych syntetycznych.
+
+```sh
+go test -count=1 ./...
+go vet ./...
+```
+
+Testy emulatora obejmują równoległe żądania, wspólny limit instalacji,
+zwalnianie rezerwacji po awarii modelu, transakcyjne łączenie kont
+i wznowienie przerwanego usuwania konta. W lokalnym porównaniu dwa procesy
+korzystające z tego samego emulatora i kluczy obsłużyły wzajemnie swoje
+sesje gości, odczytały wykorzystane limity i rozpoznały ponowienie żądania.
+
+W lokalnym pomiarze wykonano po 15 naprzemiennych startów gotowych binariów
+z włączonymi atrapami modelu i Play Integrity. Od uruchomienia procesu do
+pierwszego HTTP 200 mediana wyniosła 11,1 ms w Go i 463,3 ms w .NET dla
+`/health/live`, a dla `/health/ready` 16,7 ms w Go i 959,1 ms w .NET.
+Emulator Firestore działał przez cały pomiar.
+
+Do kompletnej migracji pozostają produkcyjne integracje Firebase Auth,
+Play Integrity oraz Google Play Billing z RTDN i zgodnością z istniejącym
+pierścieniem kluczy zakupów. Port magazynu danych zawiera operacje powiązania
+i usunięcia konta testowane z zastępczym dostawcą tożsamości. Trasy konta,
+publiczne strony, zadanie Cloud Run i konfiguracja produkcyjna wymagają
+dokończenia. Produkcyjny obraz jest nadal budowany z .NET.
