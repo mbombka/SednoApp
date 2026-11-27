@@ -1,7 +1,16 @@
 **
 !backend/
+!backend/go.mod
+!backend/go.sum
+!backend/cmd/
+!backend/cmd/**
+!backend/internal/
+!backend/internal/**
 !backend/src/
-!backend/src/**
+!backend/src/Sedno.Infrastructure/
+!backend/src/Sedno.Infrastructure/Prompts/
+!backend/src/Sedno.Infrastructure/Prompts/*.go
+!backend/src/Sedno.Infrastructure/Prompts/*.txt
 !docs/
 !docs/public/
 !docs/public/prywatnosc/

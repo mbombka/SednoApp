@@ -37,9 +37,11 @@ func TestGuestFlowWithEmulator(t *testing.T) {
 	defer db.Close()
 	var calls atomic.Int32
 	app := &API{
-		Store:          &store.Store{DB: db, Now: time.Now},
-		CredentialKey:  make([]byte, 32),
-		FingerprintKey: make([]byte, 32),
+		Store:           &store.Store{DB: db, Now: time.Now},
+		Development:     true,
+		VerifyIntegrity: func(_ context.Context, _, token string) bool { return token == "development-ok" },
+		CredentialKey:   make([]byte, 32),
+		FingerprintKey:  make([]byte, 32),
 		RunModel: func(_ context.Context, input simplification.Input) (string, error) {
 			calls.Add(1)
 			if input.RequestID == "fail" {
@@ -47,6 +49,29 @@ func TestGuestFlowWithEmulator(t *testing.T) {
 			}
 			return "synthetic output", nil
 		},
+	}
+	authTime := time.Now().Unix()
+	const uid = "synthetic-firebase-uid"
+	app.VerifyIdentity = func(_ context.Context, token string) *store.VerifiedIdentity {
+		switch token {
+		case "unverified":
+			return &store.VerifiedIdentity{UID: uid, Provider: "email", AuthTime: authTime}
+		case "verified":
+			return &store.VerifiedIdentity{UID: uid, Provider: "email", EmailVerified: true, AuthTime: authTime}
+		case "other":
+			return &store.VerifiedIdentity{UID: "other", Provider: "google", AuthTime: authTime}
+		default:
+			return nil
+		}
+	}
+	app.AccountAccess = func(_ context.Context, user string, issued int64) (bool, error) {
+		return user == uid && issued == authTime, nil
+	}
+	app.FreshAccountAccess = app.AccountAccess
+	deleted := false
+	app.DeleteIdentity = func(_ context.Context, user string) error {
+		deleted = user == uid
+		return nil
 	}
 	handler := app.Handler()
 	request := func(method, path, body, token string) *httptest.ResponseRecorder {
@@ -109,6 +134,21 @@ func TestGuestFlowWithEmulator(t *testing.T) {
 	check(request("GET", "/v1/simplifications/requests/one", "", first), 200, `"status":"succeeded"`)
 	check(request("POST", "/v1/auth/sign-out", "", first), http.StatusNoContent, "")
 	check(request("GET", "/v1/quota", "", first), 401, "unauthorized")
+	check(request("POST", "/v1/auth/sessions", `{"idToken":"unverified"}`, second), 403, "email_not_verified")
+	check(request("GET", "/v1/quota", "", second), 200, `"remaining":4`)
+	linked := request("POST", "/v1/auth/sessions", `{"idToken":"verified"}`, second)
+	check(linked, 200, `"remaining":4`)
+	var account store.SessionResponse
+	if err := json.Unmarshal(linked.Body.Bytes(), &account); err != nil || account.AccessToken == "" {
+		t.Fatal("invalid account session")
+	}
+	check(request("GET", "/v1/quota", "", second), 401, "unauthorized")
+	check(request("GET", "/v1/subscription", "", account.AccessToken), 503, "billing_unavailable")
+	check(request("DELETE", "/v1/account", `{"idToken":"other"}`, account.AccessToken), 403, "reauthentication_required")
+	if deleted {
+		t.Fatal("deleted a different account")
+	}
+
 	docs, err := db.Collection("simplification_requests").Documents(ctx).GetAll()
 	if err != nil || len(docs) != 2 {
 		t.Fatalf("expected two request metadata documents: %v", err)
@@ -118,6 +158,34 @@ func TestGuestFlowWithEmulator(t *testing.T) {
 			if _, ok := doc.Data()[field]; ok {
 				t.Fatalf("request stores %s", field)
 			}
+		}
+	}
+	check(request("DELETE", "/v1/account", `{"idToken":"verified"}`, account.AccessToken), 204, "")
+	if !deleted {
+		t.Fatal("Firebase deletion was not called")
+	}
+	check(request("GET", "/v1/quota", "", account.AccessToken), 401, "unauthorized")
+}
+
+func TestTransportBoundary(t *testing.T) {
+	api := &API{PermitLimit: 1}
+	handler := api.Handler()
+	plain := httptest.NewRequest("GET", "http://example.test/health/live", nil)
+	plain.Header.Set("X-Forwarded-Proto", "https")
+	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, plain)
+	if w.Code != 400 || !strings.Contains(w.Body.String(), "https_required") {
+		t.Fatal("trusted caller's TLS header")
+	}
+
+	cloud := (&API{PermitLimit: 1, CloudRun: true}).Handler()
+	for i, prefix := range []string{"192.0.2.1", "192.0.2.2"} {
+		r := httptest.NewRequest("GET", "http://example.test/health/live", nil)
+		r.Header.Set("X-Forwarded-For", prefix+", 198.51.100.10")
+		w := httptest.NewRecorder()
+		cloud.ServeHTTP(w, r)
+		if want := []int{200, 429}[i]; w.Code != want {
+			t.Fatalf("expected %d, got %d", want, w.Code)
 		}
 	}
 }

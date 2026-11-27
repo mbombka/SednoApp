@@ -11,6 +11,7 @@ import (
 	"time"
 	"unicode"
 
+	"github.com/mbombka/SednoApp/backend/internal/telemetry"
 	"github.com/mbombka/SednoApp/backend/src/Sedno.Infrastructure/Prompts"
 	"github.com/rivo/uniseg"
 )
@@ -95,7 +96,9 @@ func (m *Model) Run(ctx context.Context, input Input) (string, error) {
 }
 
 func (m *Model) send(req *http.Request) (string, error) {
+	started := time.Now()
 	resp, err := m.client.Do(req)
+	telemetry.Record(req.Context(), "responses_headers", started)
 	if err != nil {
 		return "", ErrProvider
 	}
@@ -145,5 +148,6 @@ func (m *Model) send(req *http.Request) (string, error) {
 	if output == "" || uniseg.GraphemeClusterCount(output) > 16000 {
 		return "", ErrProvider
 	}
+	telemetry.Record(req.Context(), "responses_complete", started)
 	return output, nil
 }

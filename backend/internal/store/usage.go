@@ -322,3 +322,14 @@ func (s *Store) Status(ctx context.Context, id, requestID string, paid bool) (*R
 	}, firestore.ReadOnly, firestore.MaxAttempts(10))
 	return result, err
 }
+
+func (s *Store) AccountQuota(ctx context.Context, accountID string) (Quota, error) {
+	account, err := read[Account](ctx, nil, s.doc("verified_accounts", docID(accountID)))
+	if err != nil {
+		return Quota{}, err
+	}
+	if account == nil || account.Deleting {
+		return Quota{}, errors.New("account unavailable")
+	}
+	return s.Quota(ctx, account.PrimaryIdentityId, true)
+}

@@ -4,7 +4,9 @@
 **AAB 0.2.0 (17)**. [Aktualny raport wdrożenia i pakietu](../docs/backend-deployment-2026-10-23-multilingual.pl.md).
 
 Serwer obsługuje uproszczenia AI, logowanie, limity, zakupy i usuwanie konta.
-C# / .NET 10 LTS, Cloud Firestore **Standard, Native mode**, baza `(default)`.
+Gałąź migracyjna buduje serwer w Go 1.26. Wdrożone wcześniej rewizje używają
+.NET 10 LTS. Obie wersje korzystają z Cloud Firestore **Standard, Native mode**,
+baza `(default)`.
 Dostęp do bazy ma wyłącznie backend przez IAM; aplikacja Flutter korzysta z API.
 Zdjęcia, teksty i wyniki nie są zapisywane w bazie backendu.
 
@@ -24,18 +26,21 @@ trybem Popraw i czasowym dostępem testerskim.
 
 ## Uruchomienie lokalne
 
-Potrzebujesz .NET 10 SDK i Dockera z Compose. Polecenia wykonuj w `backend/`.
+Potrzebujesz Go 1.26.11 lub nowszego oraz Dockera z Compose. Polecenia wykonuj w `backend/`.
 Emulator jest odrębnym procesem i nie łączy się z produkcyjną bazą.
 
 ```sh
-docker compose up -d
+docker compose up -d firestore
 export ASPNETCORE_ENVIRONMENT=Development
 export FIRESTORE_EMULATOR_HOST=127.0.0.1:8080
 export Firestore__ProjectId=demo-sedno-local
 export Firestore__UseEmulator=true
 export Security__CredentialKey="$(openssl rand -base64 32)"
 export Security__FingerprintKey="$(openssl rand -base64 32)"
-dotnet run --project src/Sedno.Api --launch-profile DevelopmentMock
+export Model__Provider=mock
+export PlayIntegrity__Provider=mock
+go build -trimpath -o /tmp/sedno ./cmd/sedno
+/tmp/sedno
 ```
 
 Poczekaj na komunikat gotowości emulatora w `docker compose logs firestore`.
@@ -43,8 +48,7 @@ API: `http://127.0.0.1:5000`. `/health/live` sprawdza proces, `/health/ready` �
 odczyt Firestore i brak trwającego importu. Emulator nie wymaga migracji schematu.
 Dane lokalnego kontenera są tymczasowe. Zachowaj klucze bezpieczeństwa przy
 ponownym uruchomieniu API korzystającego z tych samych danych.
-Do trwałego zapisu kluczy użyj .NET user-secrets (`Security:CredentialKey`,
-`Security:FingerprintKey`), nigdy Git.
+Przechowuj klucze poza repozytorium.
 
 Produkcja odrzuca emulator, również gdy ustawiono tylko `FIRESTORE_EMULATOR_HOST`.
 Połączenie z prawdziwą bazą wymaga `Firestore__UseEmulator=false`, usunięcia tej
@@ -53,10 +57,10 @@ plików kluczy. Nie uruchamiaj testów integracyjnych na produkcyjnym projekcie.
 
 ## Prawdziwe AI
 
-Zapisz `OpenAI:ApiKey` w .NET user-secrets lub ustaw `OpenAI__ApiKey` na serwerze:
+Ustaw `OpenAI__ApiKey` w środowisku serwera.
 
 ```sh
-dotnet run --project src/Sedno.Api --launch-profile Development
+Model__Provider=openai /tmp/sedno
 ```
 
 OpenAI Responses API: `gpt-6-luna`, `reasoning.effort=none`, `service_tier=default`,
@@ -66,7 +70,7 @@ eksperymenty z ustawieniami wykonuj w narzędziu pomiarowym.
 [Prompt](src/Sedno.Infrastructure/Prompts/simplify.pl.txt) i
 [narzędzia pomiarowe](tools/Sedno.ModelBenchmark/README.md) pozostają wspólne.
 
-Do lokalnego logowania z rzeczywistym Firebase ustaw `Firebase__ProjectId=sednoapp-79241`.
+Do lokalnego logowania z rzeczywistym Firebase ustaw `Firebase__ProjectId` na projekt testowy.
 Lokalna weryfikacja istnienia i usuwanie kont wymaga także
 `Firebase__DeletionServiceAccountJsonPath`. To niezależne od połączenia z emulatorem bazy.
 
@@ -100,7 +104,7 @@ Lokalna weryfikacja istnienia i usuwanie kont wymaga także
 Sprzątanie lokalne:
 
 ```sh
-dotnet run --project src/Sedno.Api --no-launch-profile -- --cleanup
+/tmp/sedno --cleanup
 ```
 
 W chmurze to godzinowe zadanie `sedno-cleanup`, uruchamiane przez Cloud Scheduler.
@@ -148,8 +152,14 @@ Usunięcie konta nie anuluje subskrypcji.
 ## Testy i indeksy
 
 ```sh
+FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 go test -count=1 ./...
+go vet ./...
 dotnet test Sedno.Backend.sln
 ```
+
+Testy Go uruchamiają scenariusze API i transakcje na działającym emulatorze,
+a testy transportu modelu i podpisów używają danych syntetycznych. Zestaw .NET
+pozostaje dostępny jako punkt odniesienia i obejmuje narzędzia pomiarowe.
 
 Testy integracyjne uruchamiają emulator Firestore przez Testcontainers/Docker,
 bez połączenia z Google. Tożsamość, zakupy, AI i czas są kontrolowane w testach.
@@ -264,51 +274,25 @@ Języki korzystają ze wspólnego limitu i ustawień modelu.
 [Rozszerzenie kodu i kolejność wydania](../docs/multilingual-13-languages.pl.md).
 [Opis zgodności, wdrożenia i rozszerzania](../docs/multilingual-app.pl.md).
 
-## Port w Go
 
-Polecenie `sedno-dev` uruchamia lokalny port przepływu gościa na adresie
-`127.0.0.1`. Wymaga Go 1.26, emulatora Firestore na adresie loopback
-i projektu z prefiksem `demo-`. Poniższe polecenia wykonaj w `backend/`.
+## Obraz na potrzeby testów
 
-```sh
-docker compose up -d firestore
-export ASPNETCORE_ENVIRONMENT=Development
-export FIRESTORE_EMULATOR_HOST=127.0.0.1:8080
-export Firestore__ProjectId=demo-sedno-go
-export Firestore__UseEmulator=true
-export PlayIntegrity__Provider=mock
-export Model__Provider=mock
-export Security__CredentialKey="$(openssl rand -base64 32)"
-export Security__FingerprintKey="$(openssl rand -base64 32)"
-CGO_ENABLED=0 go build -trimpath -ldflags='-s -w' -o /tmp/sedno-dev ./cmd/sedno-dev
-/tmp/sedno-dev
-```
-
-Do `POST /v1/guest-sessions` wyślij JSON z `installationId` i testowym
-`integrityToken` o wartości `development-ok`. Tryb `Model__Provider=openai`
-wymaga `OpenAI__ApiKey` i wysyła tekst do OpenAI według ustawień produkcyjnego
-modelu. Testy używają danych syntetycznych.
+Z katalogu głównego repozytorium zbuduj obraz i uruchom test kontenera.
 
 ```sh
-go test -count=1 ./...
-go vet ./...
+docker build -f backend/Dockerfile -t sedno-go:test .
+python3 tools/smoke_firebase_container.py --image sedno-go:test
 ```
 
-Testy emulatora obejmują równoległe żądania, wspólny limit instalacji,
-zwalnianie rezerwacji po awarii modelu, transakcyjne łączenie kont
-i wznowienie przerwanego usuwania konta. W lokalnym porównaniu dwa procesy
-korzystające z tego samego emulatora i kluczy obsłużyły wzajemnie swoje
-sesje gości, odczytały wykorzystane limity i rozpoznały ponowienie żądania.
+Konfiguracje Cloud Build oraz Cloud Run dla API i `--cleanup` korzystają
+z tego obrazu. Skieruj testowe Hosting, RTDN, Firebase Auth i Firestore do
+swojego projektu testowego. Do sprawdzenia zakupów użyj kont testowych
+Google Play. [Instrukcja konfiguracji Cloud Run](deploy/firebase/README.pl.md).
 
-W lokalnym pomiarze wykonano po 15 naprzemiennych startów gotowych binariów
-z włączonymi atrapami modelu i Play Integrity. Od uruchomienia procesu do
-pierwszego HTTP 200 mediana wyniosła 11,1 ms w Go i 463,3 ms w .NET dla
-`/health/live`, a dla `/health/ready` 16,7 ms w Go i 959,1 ms w .NET.
-Emulator Firestore działał przez cały pomiar.
-
-Do kompletnej migracji pozostają produkcyjne integracje Firebase Auth,
-Play Integrity oraz Google Play Billing z RTDN i zgodnością z istniejącym
-pierścieniem kluczy zakupów. Port magazynu danych zawiera operacje powiązania
-i usunięcia konta testowane z zastępczym dostawcą tożsamości. Trasy konta,
-publiczne strony, zadanie Cloud Run i konfiguracja produkcyjna wymagają
-dokończenia. Produkcyjny obraz jest nadal budowany z .NET.
+Go czyta oraz zapisuje tokeny zakupów w formacie ASP.NET Core Data Protection
+z `SetApplicationName("Sedno")` i przeznaczeniem `Sedno.PlayPurchase.v1`.
+Obsługiwany pierścień to pliki XML używane przez Sedno w Secret Manager,
+z AES-256-CBC i HMAC-SHA256. Pierścień musi zawierać aktywny klucz.
+Do testów lokalnych możesz utworzyć nowy poleceniem `/tmp/sedno --init-billing-keyring ./test-keys`
+w trybie Development. Gdy baza zawiera zakupy, zamontuj pierścień używany
+do ich zapisu. Zachowaj też oba klucze HMAC sesji i odcisków żądań.

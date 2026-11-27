@@ -55,7 +55,8 @@ Read README, existing code, and current dependencies before making changes.
 ## Architecture
 Flutter: feature-first, views → ViewModels → repositories → services.
 Use dependency injection and extend existing architectural choices.
-Backend: C#, ASP.NET Core, a supported .NET LTS release, Cloud Firestore Standard (Native mode).
+Backend: Go, net/http, Cloud Firestore Standard (Native mode). Keep the
+.NET 10 LTS implementation as a compatibility reference for the migration.
 Firestore is accessed only by the backend with IAM; mobile clients have no database access.
 Daily quota reservations and identity linking must remain transactional.
 The emulator is Development-only; metadata cleanup runs as a scheduled job.
@@ -99,7 +100,7 @@ Display a warning that AI simplification may contain errors.
 ## Testing and Definition of Done
 Unit tests for logic, widget tests for UI, integration tests for the backend.
 Mock time, network, OCR, the model, authentication, and billing.
-Run dart format, flutter analyze, flutter test, and dotnet test
+Run dart format, flutter analyze, flutter test, go test, go vet, and dotnet test
 for the relevant components.
 Report changed files, test results, and environment limitations.
 Never claim an APK was built unless the build actually ran successfully.

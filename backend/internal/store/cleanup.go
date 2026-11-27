@@ -97,11 +97,9 @@ func (s *Store) DeleteAccount(ctx context.Context, session *Session, verified Ve
 		*credential.AccountId != account.Id || !credential.AccountAccessVerified || !credential.ExpiresAt.After(s.now()) {
 		return false, err
 	}
-	for _, authTime := range []int64{*credential.FirebaseAuthTime, verified.AuthTime} {
-		allowed, err := fresh(ctx, verified.UID, authTime)
-		if err != nil || !allowed {
-			return false, err
-		}
+	allowed, err := fresh(ctx, verified.UID, min(*credential.FirebaseAuthTime, verified.AuthTime))
+	if err != nil || !allowed {
+		return false, err
 	}
 	err = s.deleteAccount(ctx, account.Id, deleteIdentity)
 	return err == nil, err

@@ -8,6 +8,7 @@ import (
 	"mime"
 	"net"
 	"net/http"
+	"net/netip"
 	"strings"
 	"sync"
 	"time"
@@ -15,15 +16,26 @@ import (
 
 	"github.com/mbombka/SednoApp/backend/internal/simplification"
 	"github.com/mbombka/SednoApp/backend/internal/store"
+	"github.com/mbombka/SednoApp/backend/internal/telemetry"
 )
 
 const bodyLimit = 128 * 1024
 
 type API struct {
-	Store          *store.Store
-	CredentialKey  []byte
-	FingerprintKey []byte
-	RunModel       func(context.Context, simplification.Input) (string, error)
+	Store                             *store.Store
+	CredentialKey                     []byte
+	FingerprintKey                    []byte
+	RunModel                          func(context.Context, simplification.Input) (string, error)
+	VerifyIntegrity                   func(context.Context, string, string) bool
+	VerifyIdentity                    func(context.Context, string) *store.VerifiedIdentity
+	AccountAccess, FreshAccountAccess store.AccountAccess
+	DeleteIdentity                    func(context.Context, string) error
+	Billing                           *store.Billing
+	VerifyNotification                func(context.Context, string) bool
+	BillingPackage                    string
+	PrivacyHTML, DeletionEmail        string
+	Development, CloudRun             bool
+	PermitLimit, NotificationLimit    int
 
 	mu     sync.Mutex
 	window time.Time
@@ -80,14 +92,14 @@ func decode(w http.ResponseWriter, r *http.Request, input any) error {
 	return problemError{400, "invalid_json", "Nieprawidłowe dane."}
 }
 
-func (a *API) limited(key string) bool {
+func (a *API) limited(key string, limit int) bool {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 	now := time.Now()
 	if a.window.IsZero() || now.Sub(a.window) >= time.Minute {
 		a.window, a.counts = now, make(map[string]int)
 	}
-	if a.counts[key] >= 60 {
+	if a.counts[key] >= limit {
 		return true
 	}
 	a.counts[key]++
@@ -98,21 +110,26 @@ type authenticatedHandler func(http.ResponseWriter, *http.Request, *store.Sessio
 
 func (a *API) protected(handler authenticatedHandler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		header := r.Header.Get("Authorization")
+		token := bearer(r)
 		var session *store.Session
-		if len(header) >= 7 && strings.EqualFold(header[:7], "Bearer ") {
+		if token != "" {
 			var err error
-			session, err = a.Store.Authenticate(r.Context(), header[7:], a.CredentialKey, nil)
+			end := telemetry.Measure(r.Context(), "auth")
+			session, err = a.Store.Authenticate(r.Context(), token, a.CredentialKey, a.AccountAccess)
+			end()
 			if err != nil {
 				handleError(w, r, err)
 				return
 			}
 		}
-		key := peerKey(r)
+		key := a.peerKey(r)
 		if session != nil {
 			key = "guest:" + session.IdentityID
+			if session.AccountID != nil {
+				key = "account:" + *session.AccountID
+			}
 		}
-		if a.limited(key) {
+		if a.limited(key, a.PermitLimit) {
 			problem(w, 429, "rate_limited", "Zbyt wiele żądań.", nil)
 			return
 		}
@@ -124,12 +141,32 @@ func (a *API) protected(handler authenticatedHandler) http.HandlerFunc {
 	}
 }
 
-func peerKey(r *http.Request) string {
-	host, _, err := net.SplitHostPort(r.RemoteAddr)
-	if err != nil {
-		host = "unknown"
+func bearer(r *http.Request) string {
+	values := r.Header.Values("Authorization")
+	if len(values) != 1 {
+		return ""
 	}
-	return "network:" + host
+	header := values[0]
+	if len(header) >= 7 && strings.EqualFold(header[:7], "Bearer ") {
+		return header[7:]
+	}
+	return ""
+}
+
+func (a *API) peerKey(r *http.Request) string {
+	host, _, _ := net.SplitHostPort(r.RemoteAddr)
+	if a.CloudRun {
+		values := r.Header.Values("X-Forwarded-For")
+		if len(values) == 0 {
+			return "network:unknown"
+		}
+		last := values[len(values)-1]
+		host = strings.TrimSpace(last[strings.LastIndexByte(last, ',')+1:])
+	}
+	if ip, err := netip.ParseAddr(host); err == nil {
+		return "network:" + ip.Unmap().WithZone("").String()
+	}
+	return "network:unknown"
 }
 
 func handleError(w http.ResponseWriter, r *http.Request, err error) {
@@ -139,20 +176,24 @@ func handleError(w http.ResponseWriter, r *http.Request, err error) {
 	var validation *simplification.ValidationError
 	var detail problemError
 	switch {
+	case r.URL.Path == "/v1/simplifications" && errors.Is(r.Context().Err(), context.DeadlineExceeded):
+		problem(w, 504, "simplification_timeout", "Upraszczanie trwało zbyt długo. Spróbuj ponownie.", nil)
 	case errors.As(err, &detail):
 		problem(w, detail.status, detail.code, detail.title, nil)
 	case errors.As(err, &validation):
 		problem(w, 400, validation.Code, validation.Title, nil)
-	case r.URL.Path == "/v1/simplifications" && errors.Is(r.Context().Err(), context.DeadlineExceeded):
-		problem(w, 504, "simplification_timeout", "Upraszczanie trwało zbyt długo. Spróbuj ponownie.", nil)
 	default:
 		problem(w, 500, "server_error", "Wystąpił błąd serwera.", nil)
 	}
 }
 
-// Handler serves an isolated development API. It is bound to loopback by the
-// development command and uses an explicit mock installation verifier.
 func (a *API) Handler() http.Handler {
+	if a.PermitLimit == 0 {
+		a.PermitLimit = 60
+	}
+	if a.NotificationLimit == 0 {
+		a.NotificationLimit = 600
+	}
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /health/live", func(w http.ResponseWriter, r *http.Request) {
 		_, _ = io.WriteString(w, "Healthy")
@@ -167,12 +208,15 @@ func (a *API) Handler() http.Handler {
 		writeJSON(w, 200, map[string]string{"status": "ready"})
 	})
 	mux.HandleFunc("POST /v1/guest-sessions", func(w http.ResponseWriter, r *http.Request) {
-		if a.limited(peerKey(r)) {
-			problem(w, 429, "rate_limited", "Zbyt wiele żądań.", nil)
-			return
-		}
 		handleError(w, r, a.createGuest(w, r))
 	})
+	mux.HandleFunc("GET /prywatnosc", document(a.PrivacyHTML))
+	mux.HandleFunc("GET /usun-konto", document(deletionPage(a.DeletionEmail)))
+	mux.HandleFunc("POST /notifications/google-play", a.notification)
+	mux.HandleFunc("POST /v1/auth/sessions", a.protected(a.link))
+	mux.HandleFunc("DELETE /v1/account", a.protected(a.deleteAccount))
+	mux.HandleFunc("GET /v1/subscription", a.protected(a.currentSubscription))
+	mux.HandleFunc("POST /v1/subscription", a.protected(a.verifyPurchase))
 	mux.HandleFunc("GET /v1/quota", a.protected(a.quota))
 	mux.HandleFunc("POST /v1/auth/sign-out", a.protected(a.signOut))
 	mux.HandleFunc("POST /v1/simplifications", a.protected(a.simplify))
@@ -183,10 +227,31 @@ func (a *API) Handler() http.Handler {
 			problem(w, 413, "request_too_large", "Żądanie jest zbyt duże.", nil)
 			return
 		}
-		if r.URL.Path == "/v1/simplifications" {
+		if !a.Development && !a.CloudRun && r.TLS == nil {
+			problem(w, 400, "https_required", "Wymagane jest połączenie HTTPS.", nil)
+			return
+		}
+		path := r.URL.Path
+		if !(strings.HasPrefix(path, "/v1/") && path != "/v1/guest-sessions") {
+			key, limit := a.peerKey(r), a.PermitLimit
+			if path == "/notifications/google-play" && r.Method == http.MethodPost {
+				key, limit = "notifications", a.NotificationLimit
+			}
+			if a.limited(key, limit) {
+				problem(w, 429, "rate_limited", "Zbyt wiele żądań.", nil)
+				return
+			}
+		}
+		if path == "/v1/simplifications" {
 			ctx, cancel := context.WithTimeout(r.Context(), 9*time.Second)
 			defer cancel()
-			r = r.WithContext(ctx)
+			deadline, _ := ctx.Deadline()
+			_ = http.NewResponseController(w).SetReadDeadline(deadline)
+			ctx, timing := telemetry.Start(ctx)
+			response := &timedResponse{ResponseWriter: w}
+			defer func() { timing.Log(response.status) }()
+			mux.ServeHTTP(response, r.WithContext(ctx))
+			return
 		}
 		mux.ServeHTTP(w, r)
 	})
@@ -203,7 +268,7 @@ func (a *API) createGuest(w http.ResponseWriter, r *http.Request) error {
 	if input == nil || strings.TrimSpace(input.InstallationID) == "" || len(utf16.Encode([]rune(input.InstallationID))) > 200 {
 		return problemError{400, "invalid_installation_id", "Nieprawidłowy identyfikator instalacji."}
 	}
-	if input.IntegrityToken != "development-ok" {
+	if a.VerifyIntegrity == nil || !a.VerifyIntegrity(r.Context(), input.InstallationID, input.IntegrityToken) {
 		return problemError{403, "integrity_failed", "Nie można potwierdzić instalacji."}
 	}
 	session, err := a.Store.CreateGuest(r.Context(), input.InstallationID, a.CredentialKey)
@@ -215,7 +280,11 @@ func (a *API) createGuest(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (a *API) quota(w http.ResponseWriter, r *http.Request, s *store.Session) error {
-	quota, err := a.Store.Quota(r.Context(), s.IdentityID, false)
+	paid, err := a.paid(r.Context(), s)
+	if err != nil {
+		return err
+	}
+	quota, err := a.Store.Quota(r.Context(), s.IdentityID, paid)
 	if err != nil {
 		return err
 	}
@@ -236,7 +305,11 @@ func (a *API) status(w http.ResponseWriter, r *http.Request, s *store.Session) e
 	if !simplification.ValidRequestID(id) {
 		return problemError{400, "invalid_request_id", "Nieprawidłowy identyfikator żądania."}
 	}
-	result, err := a.Store.Status(r.Context(), s.IdentityID, id, false)
+	paid, err := a.paid(r.Context(), s)
+	if err != nil {
+		return err
+	}
+	result, err := a.Store.Status(r.Context(), s.IdentityID, id, paid)
 	if err != nil {
 		return err
 	}
@@ -259,7 +332,13 @@ func (a *API) simplify(w http.ResponseWriter, r *http.Request, s *store.Session)
 		return err
 	}
 	ctx := r.Context()
-	kind, quota, err := a.Store.Reserve(ctx, s.IdentityID, input.RequestID, input.Fingerprint(a.FingerprintKey), false)
+	paid, err := a.paid(ctx, s)
+	if err != nil {
+		return err
+	}
+	end := telemetry.Measure(ctx, "reserve")
+	kind, quota, err := a.Store.Reserve(ctx, s.IdentityID, input.RequestID, input.Fingerprint(a.FingerprintKey), paid)
+	end()
 	if err != nil {
 		return err
 	}
@@ -283,7 +362,9 @@ func (a *API) simplify(w http.ResponseWriter, r *http.Request, s *store.Session)
 	default:
 		return errors.New("invalid reservation outcome")
 	}
+	end = telemetry.Measure(ctx, "model")
 	output, err := a.RunModel(ctx, *input)
+	end()
 	if ctx.Err() != nil {
 		// An interrupted request cannot tell whether the model processed it.
 		return ctx.Err()
@@ -297,14 +378,18 @@ func (a *API) simplify(w http.ResponseWriter, r *http.Request, s *store.Session)
 		}
 		return problemError{503, "provider_unavailable", "Usługa upraszczania jest chwilowo niedostępna."}
 	}
+	end = telemetry.Measure(ctx, "complete")
 	completed, err := a.Store.Finish(ctx, s.IdentityID, input.RequestID, true)
+	end()
 	if err != nil {
 		return err
 	}
 	if !completed {
 		return problemError{409, "reservation_expired", "Czas tego żądania minął. Użyj nowego identyfikatora."}
 	}
-	quota, err = a.Store.Quota(ctx, s.IdentityID, false)
+	end = telemetry.Measure(ctx, "quota")
+	quota, err = a.Store.Quota(ctx, s.IdentityID, paid)
+	end()
 	if err != nil {
 		return err
 	}
@@ -312,4 +397,32 @@ func (a *API) simplify(w http.ResponseWriter, r *http.Request, s *store.Session)
 		"id": input.RequestID, "text": output, "createdAt": a.Store.Now().UTC(), "mode": input.Mode, "language": input.Language,
 	}})
 	return nil
+}
+
+func (a *API) paid(ctx context.Context, session *store.Session) (bool, error) {
+	if a.Billing == nil {
+		return false, nil
+	}
+	return a.Billing.Paid(ctx, session.AccountID)
+}
+
+type timedResponse struct {
+	http.ResponseWriter
+	status int
+}
+
+func (w *timedResponse) Unwrap() http.ResponseWriter { return w.ResponseWriter }
+
+func (w *timedResponse) WriteHeader(status int) {
+	if w.status == 0 && status >= 200 {
+		w.status = status
+	}
+	w.ResponseWriter.WriteHeader(status)
+}
+
+func (w *timedResponse) Write(data []byte) (int, error) {
+	if w.status == 0 {
+		w.status = http.StatusOK
+	}
+	return w.ResponseWriter.Write(data)
 }
