@@ -50,7 +50,7 @@ func run() error {
 	if (cloudRun || job) && env != "Production" || job && !cleanup {
 		return errors.New("Cloud Run requires Production and jobs require --cleanup")
 	}
-	emulator, err := boolSetting("Firestore__UseEmulator")
+	emulator, err := boolSetting("Firestore__UseEmulator", false)
 	if err != nil {
 		return err
 	}
@@ -65,7 +65,7 @@ func run() error {
 	if strings.TrimSpace(project) == "" {
 		return errors.New("Firestore__ProjectId is required")
 	}
-	requireMigration, err := boolSetting("Firestore__RequireMigration")
+	requireMigration, err := boolSetting("Firestore__RequireMigration", env == "Production")
 	if err != nil {
 		return err
 	}
@@ -180,12 +180,12 @@ func configure(s *store.Store, development, cloudRun, serviceIdentity bool) (*ht
 		return nil, errors.New("invalid PlayIntegrity__Provider")
 	}
 
-	enabled, err := boolSetting("Billing__Enabled")
+	enabled, err := boolSetting("Billing__Enabled", false)
 	if err != nil {
 		return nil, err
 	}
 	if enabled {
-		readOnly, err := boolSetting("Billing__ReadOnlyKeyRing")
+		readOnly, err := boolSetting("Billing__ReadOnlyKeyRing", false)
 		if err != nil {
 			return nil, err
 		}
@@ -213,7 +213,11 @@ func configure(s *store.Store, development, cloudRun, serviceIdentity bool) (*ht
 		verify := googleapi.PubSubVerifier(audience)
 		api.VerifyNotification = func(ctx context.Context, token string) bool { return verify.PubSub(ctx, token, email) }
 	}
-	api.DeletionEmail = os.Getenv("Privacy__DeletionEmail")
+	defaultEmail := "contact@sedno.xyz"
+	if development {
+		defaultEmail = ""
+	}
+	api.DeletionEmail = setting("Privacy__DeletionEmail", defaultEmail)
 	if !development && !validEmail(api.DeletionEmail) {
 		return nil, errors.New("Privacy__DeletionEmail is required")
 	}
@@ -284,8 +288,8 @@ func setting(name, fallback string) string {
 	return fallback
 }
 
-func boolSetting(name string) (bool, error) {
-	switch strings.ToLower(setting(name, "false")) {
+func boolSetting(name string, fallback bool) (bool, error) {
+	switch strings.ToLower(setting(name, strconv.FormatBool(fallback))) {
 	case "true":
 		return true, nil
 	case "false":
