@@ -47,7 +47,7 @@ try:
             with urllib.request.urlopen(base + '/health/ready', timeout=2) as response:
                 assert response.status == 200
                 break
-        except (urllib.error.URLError, ConnectionError):
+        except (urllib.error.URLError, ConnectionError, TimeoutError):
             time.sleep(0.5)
     else:
         raise RuntimeError('Brak gotowości API z lokalnym emulatorem.')
